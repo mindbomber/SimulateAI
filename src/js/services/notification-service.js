@@ -216,6 +216,38 @@ class NotificationService {
 
     const { type = "info", title, message } = notificationData;
 
+    // Prevent duplicate toasts by checking if one was recently shown with same content
+    const toastKey = `${title}-${message}`;
+    const now = Date.now();
+
+    if (this.recentToasts && this.recentToasts.has(toastKey)) {
+      const lastShown = this.recentToasts.get(toastKey);
+      if (now - lastShown < 2000) {
+        // Within 2 seconds
+        console.log(
+          "[NotificationService] Preventing duplicate toast:",
+          toastKey,
+        );
+        return;
+      }
+    }
+
+    // Track this toast to prevent duplicates
+    if (!this.recentToasts) {
+      this.recentToasts = new Map();
+    }
+    this.recentToasts.set(toastKey, now);
+
+    // Clean up old entries periodically
+    if (this.recentToasts.size > 20) {
+      const cutoff = now - 10000; // 10 seconds ago
+      for (const [key, timestamp] of this.recentToasts.entries()) {
+        if (timestamp < cutoff) {
+          this.recentToasts.delete(key);
+        }
+      }
+    }
+
     this.toastService.show({
       type: this.mapNotificationTypeToToast(type),
       title,

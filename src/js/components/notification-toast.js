@@ -35,6 +35,7 @@ class NotificationToast {
     this.container = null;
     this.toasts = new Map();
     this.isPaused = false; // Flag to temporarily suppress notifications
+    this.recentToasts = new Map(); // Track recent toasts to prevent duplicates
     this.init();
   }
 
@@ -76,6 +77,39 @@ class NotificationToast {
       closable = true,
       onClose = null,
     } = options;
+
+    // Prevent duplicate toasts with same content within short timeframe
+    const toastKey = `${title}-${message}`;
+    const now = Date.now();
+
+    if (!this.recentToasts) {
+      this.recentToasts = new Map();
+    }
+
+    if (this.recentToasts.has(toastKey)) {
+      const lastShown = this.recentToasts.get(toastKey);
+      if (now - lastShown < 1500) {
+        // Within 1.5 seconds
+        console.log(
+          "[NotificationToast] Preventing duplicate toast:",
+          toastKey,
+        );
+        return null;
+      }
+    }
+
+    // Track this toast
+    this.recentToasts.set(toastKey, now);
+
+    // Clean up old entries
+    if (this.recentToasts.size > 15) {
+      const cutoff = now - 5000; // 5 seconds ago
+      for (const [key, timestamp] of this.recentToasts.entries()) {
+        if (timestamp < cutoff) {
+          this.recentToasts.delete(key);
+        }
+      }
+    }
 
     const id = this.generateId();
     const toast = this.createToast(id, type, title, message, closable);

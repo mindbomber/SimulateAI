@@ -488,7 +488,7 @@ class CSSLayersMigrationAnalyzer {
 // Initialize analyzer when DOM is ready
 document.addEventListener("DOMContentLoaded", () => {
   // Try to get app instance for DataHandler integration
-  const app = window.app || window.SimulateAI || null;
+  const app = window.simulateAIApp || window.app || window.SimulateAI || null;
   const analyzer = new CSSLayersMigrationAnalyzer(app);
 
   // Store globally for access

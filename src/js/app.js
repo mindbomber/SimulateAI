@@ -6286,14 +6286,24 @@ class SimulateAIApp {
           data: data,
         },
       );
-    } else if (window.NotificationToast) {
-      window.NotificationToast.show({
-        type: "info",
-        message: `${notification.title}: ${notification.body}`,
-        duration: 6000,
-        closable: true,
-        data: data,
-      });
+    } else {
+      // Fallback: use notification service if available, otherwise direct toast
+      if (window.notificationService) {
+        window.notificationService.showToast({
+          type: "info",
+          title: notification.title || "SimulateAI Notification",
+          message: notification.body,
+          data: data,
+        });
+      } else if (window.NotificationToast) {
+        window.NotificationToast.show({
+          type: "info",
+          message: `${notification.title}: ${notification.body}`,
+          duration: 6000,
+          closable: true,
+          data: data,
+        });
+      }
     }
   }
 

@@ -541,7 +541,8 @@ class DonationPreferences {
   // Static method for easy initialization with app reference
   static init(app = null) {
     if (!window.donationPreferences) {
-      const appRef = app || window.simulateAI || window.app || null;
+      const appRef =
+        app || window.simulateAIApp || window.app || window.simulateAI || null;
       window.donationPreferences = new DonationPreferences(appRef);
     }
     return window.donationPreferences;
@@ -552,8 +553,9 @@ class DonationPreferences {
 document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => {
     if (!window.donationPreferences) {
-      // Try to get app reference from SimulateAI or global app
-      const app = window.simulateAI || window.app || null;
+      // Try to get app reference from simulateAIApp, app, or simulateAI
+      const app =
+        window.simulateAIApp || window.app || window.simulateAI || null;
       window.donationPreferences = new DonationPreferences(app);
     }
   }, 100);

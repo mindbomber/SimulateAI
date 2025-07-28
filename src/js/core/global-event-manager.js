@@ -638,8 +638,9 @@ class GlobalEventManager {
     }
 
     // Send to enhanced analytics if available
-    if (window.app?.analyticsManager?.trackEvent) {
-      window.app.analyticsManager.trackEvent(eventName, {
+    const app = window.simulateAIApp || window.app || window.simulateAI || null;
+    if (app?.analyticsManager?.trackEvent) {
+      app.analyticsManager.trackEvent(eventName, {
         ...data,
         timestamp: new Date().toISOString(),
         source: "global_event_manager",

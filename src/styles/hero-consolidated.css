@@ -10,6 +10,58 @@
    HERO BASE STYLES
    ================================ */
 
+/* ================================
+   LOADED STATE ANIMATIONS
+   ================================ */
+
+/* Hero content loaded animations - inherited from state-management-consolidated.css */
+html.loaded .hero .hero-content,
+html.loaded .hero .hero-content h1,
+html.loaded .hero .hero-content p,
+html.loaded .hero .hero-simulation,
+html.loaded .hero-title,
+html.loaded .hero-description,
+html.loaded .hero-actions {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity var(--transition-duration, 0.6s) ease-out,
+    transform var(--transition-duration, 0.6s) ease-out;
+  animation-play-state: running;
+}
+
+/* Hero radar demo loaded animations - inherited from state-management-consolidated.css */
+html.loaded .hero-radar-demo {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity var(--transition-duration, 0.8s) ease-out
+      var(--transition-delay, 0.2s),
+    transform var(--transition-duration, 0.8s) ease-out
+      var(--transition-delay, 0.2s);
+  animation-play-state: running;
+}
+
+html.loaded .hero-radar-demo h3 {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity var(--transition-duration, 0.6s) ease-out
+      var(--transition-delay, 0.4s),
+    transform var(--transition-duration, 0.6s) ease-out
+      var(--transition-delay, 0.4s);
+}
+
+html.loaded .hero-radar-demo p {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity var(--transition-duration, 0.6s) ease-out
+      var(--transition-delay, 0.6s),
+    transform var(--transition-duration, 0.6s) ease-out
+      var(--transition-delay, 0.6s);
+}
+
 @layer components {
   .hero {
     position: relative;
@@ -335,6 +387,155 @@
 .dark-mode .demo-btn {
   border-color: var(--demo-btn-border-dark, rgba(255, 255, 255, 0.2));
   background: var(--demo-btn-background-dark, rgba(255, 255, 255, 0.05));
+}
+
+/* Hero Section Dark Mode - from appearance-settings.css */
+.dark-mode .hero-section {
+  background: var(--theme-bg-primary);
+  color: var(--theme-text-primary);
+}
+
+.dark-mode .hero::before {
+  opacity: 0.1;
+}
+
+.dark-mode .hero-content {
+  color: var(--theme-text-primary);
+}
+
+.dark-mode .hero-section h1,
+.dark-mode .hero-title {
+  color: var(--theme-text-primary);
+}
+
+.dark-mode .hero-section h2 {
+  color: var(--theme-text-primary);
+}
+
+.dark-mode .hero-section p,
+.dark-mode .hero-description {
+  color: var(--theme-text-secondary);
+}
+
+.dark-mode .hero-badge {
+  background: var(--theme-accent);
+  color: var(--theme-text-on-accent);
+}
+
+/* Hero Demo Components Dark Mode - from hero-demo.css */
+.dark-mode .hero-demo-container {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .demo-title {
+  color: #ffffff;
+}
+
+.dark-mode .demo-subtitle {
+  color: #b3b3b3;
+}
+
+.dark-mode .scenario-panel {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.dark-mode .scenario-counter {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark-mode .scenario-question {
+  color: #ffffff;
+}
+
+.dark-mode .choice-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.dark-mode .choice-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.dark-mode .choice-btn:focus {
+  outline: 2px solid #4a9eff;
+  outline-offset: 2px;
+}
+
+.dark-mode .choice-btn.selected {
+  background: rgba(74, 158, 255, 0.3);
+  border-color: #4a9eff;
+}
+
+.dark-mode .choice-text {
+  color: #ffffff;
+}
+
+.dark-mode .choice-arrow {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.dark-mode .scenario-feedback {
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.dark-mode .demo-feedback-popover {
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .demo-feedback-popover .popover-content {
+  color: #ffffff;
+}
+
+.dark-mode .demo-feedback-popover .popover-content h5 {
+  color: #ffffff;
+}
+
+.dark-mode .demo-feedback-popover .popover-content p {
+  color: #cccccc;
+}
+
+.dark-mode .demo-actions .btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.dark-mode .demo-actions .btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.dark-mode .demo-actions .btn-primary {
+  background: #4a9eff;
+  border-color: #4a9eff;
+  color: #ffffff;
+}
+
+.dark-mode .demo-actions .btn-primary:hover {
+  background: #3a8eef;
+  border-color: #3a8eef;
+}
+
+.dark-mode .demo-actions .btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+
+.dark-mode .demo-actions .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 /* ================================

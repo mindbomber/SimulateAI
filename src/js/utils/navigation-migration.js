@@ -228,8 +228,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Set up your app-specific navigation handlers
         
         // Example: Connect to your app instance
-        if (window.app) {
-            window.app.sharedNav = window.sharedNav;
+        const app = window.simulateAIApp || window.app || window.simulateAI || null;
+        if (app) {
+            app.sharedNav = window.sharedNav;
         }
     }
 });

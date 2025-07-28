@@ -2008,36 +2008,23 @@ class SettingsManager {
   }
 }
 
-// Auto-initialize when DOM is ready
-document.addEventListener("DOMContentLoaded", () => {
-  // Wait a bit for shared navigation to inject HTML and app to initialize
-  setTimeout(() => {
-    if (!window.settingsManager) {
-      // Try to get app reference from SimulateAI or global app
-      const app = window.simulateAI || window.app || null;
-      window.settingsManager = new SettingsManager(app);
-    }
-  }, 100);
-});
+// Consolidated initialization - single entry point
+function initializeSettingsManager() {
+  if (!window.settingsManager) {
+    const app = window.simulateAIApp || window.app || window.simulateAI || null;
+    window.settingsManager = new SettingsManager(app);
+  }
+}
 
-// Also try to initialize if DOM is already loaded
+// Auto-initialize when DOM is ready
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", () => {
-    setTimeout(() => {
-      if (!window.settingsManager) {
-        const app = window.simulateAI || window.app || null;
-        window.settingsManager = new SettingsManager(app);
-      }
-    }, 100);
+    // Wait a bit for shared navigation to inject HTML and app to initialize
+    setTimeout(initializeSettingsManager, 100);
   });
 } else {
   // DOM is already loaded - wait for navigation to be injected
-  setTimeout(() => {
-    if (!window.settingsManager) {
-      const app = window.simulateAI || window.app || null;
-      window.settingsManager = new SettingsManager(app);
-    }
-  }, 100);
+  setTimeout(initializeSettingsManager, 100);
 }
 
 // Add required CSS animations

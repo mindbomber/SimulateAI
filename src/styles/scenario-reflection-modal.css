@@ -1854,7 +1854,7 @@
   /* ===== FOOTER - CLEAN NAVIGATION ===== */
   /* Modal footer container - ensure visibility across all viewports */
   .scenario-reflection-modal .modal-footer {
-    display: block !important;
+    display: flex !important;
     position: relative;
     flex-shrink: 0;
     padding: 0;
@@ -1985,7 +1985,7 @@
 
     /* Ensure modal footer is always visible on mobile */
     .scenario-reflection-modal .modal-footer {
-      display: block !important;
+      display: flex !important;
       position: sticky;
       bottom: 0;
       z-index: 10;
@@ -2198,7 +2198,7 @@
 
     /* Ensure footer stays visible on small phones */
     .scenario-reflection-modal .modal-footer {
-      display: block !important;
+      display: flex !important;
       position: sticky;
       bottom: 0;
       z-index: 15;

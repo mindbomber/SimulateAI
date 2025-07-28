@@ -251,8 +251,10 @@ class InfiniteLoopDetector {
   disconnectObservers() {
     try {
       // Disconnect onboarding tour observer
-      if (window.app?.onboardingTour?.contentObserver) {
-        window.app.onboardingTour.contentObserver.disconnect();
+      const app =
+        window.simulateAIApp || window.app || window.simulateAI || null;
+      if (app?.onboardingTour?.contentObserver) {
+        app.onboardingTour.contentObserver.disconnect();
         logger.info(
           "InfiniteLoopDetector",
           "✅ Onboarding content observer disconnected",

@@ -900,6 +900,12 @@ class ScenarioBrowser {
     const scenarioList = document.getElementById("scenarios-list");
     if (!scenarioList) return;
 
+    // Prevent duplicate event listeners
+    if (scenarioList.hasAttribute("data-listeners-bound")) {
+      return;
+    }
+    scenarioList.setAttribute("data-listeners-bound", "true");
+
     scenarioList.addEventListener("click", (event) => {
       const { target } = event;
 

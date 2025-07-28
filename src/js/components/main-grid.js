@@ -2555,8 +2555,10 @@ class MainGrid {
       this.updateProgress(category.id, scenarioId, true, true);
 
       // Reset surprise tab cooldown to allow immediate new surprise
-      if (window.app && window.app.lastSurpriseTime) {
-        window.app.lastSurpriseTime = 0;
+      const app =
+        window.simulateAIApp || window.app || window.simulateAI || null;
+      if (app && app.lastSurpriseTime) {
+        app.lastSurpriseTime = 0;
         logger.debug("Reset surprise tab cooldown after scenario completion");
       }
 
@@ -3066,8 +3068,10 @@ class MainGrid {
         this.deferredBadges.delete(scenarioId);
 
         // Reset surprise tab cooldown to allow immediate new surprise
-        if (window.app && window.app.lastSurpriseTime) {
-          window.app.lastSurpriseTime = 0;
+        const appRef =
+          window.simulateAIApp || window.app || window.simulateAI || null;
+        if (appRef && appRef.lastSurpriseTime) {
+          appRef.lastSurpriseTime = 0;
           logger.debug(
             "Reset surprise tab cooldown after reflection completion",
           );

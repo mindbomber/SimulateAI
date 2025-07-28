@@ -21,7 +21,6 @@
  */
 
 // Import DataHandler for enhanced data management
-import DataHandler from "../core/data-handler.js";
 
 // Constants
 const MOBILE_BREAKPOINT = 768;
@@ -59,11 +58,22 @@ class FloatingActionTab {
    */
   async initializeDataHandler() {
     try {
-      this.dataHandler = new DataHandler();
-      await this.dataHandler.initialize();
-      await this.loadAnalyticsData();
-      await this.loadUserPreferences();
-      console.log("FloatingActionTab: DataHandler initialized successfully");
+      // Get DataHandler from app instance
+      const app =
+        window.simulateAIApp || window.app || window.simulateAI || null;
+      this.dataHandler = app?.dataHandler || null;
+
+      if (this.dataHandler) {
+        await this.loadAnalyticsData();
+        await this.loadUserPreferences();
+        console.log("FloatingActionTab: DataHandler initialized successfully");
+      } else {
+        console.warn(
+          "[FloatingActionTab] DataHandler not available, using fallback mode",
+        );
+        this.loadAnalyticsFromLocalStorage();
+        this.loadPreferencesFromLocalStorage();
+      }
     } catch (error) {
       console.warn(
         "[FloatingActionTab] DataHandler initialization failed, using fallback mode:",
@@ -225,8 +235,9 @@ class FloatingActionTab {
     this.saveAnalyticsData();
 
     // Track with app analytics if available
-    if (window.app?.analyticsManager) {
-      window.app.analyticsManager.trackEvent("floating_action_tab", {
+    const app = window.simulateAIApp || window.app || window.simulateAI || null;
+    if (app?.analyticsManager) {
+      app.analyticsManager.trackEvent("floating_action_tab", {
         action,
         isMobile: this.isMobile,
         sessionDuration: Date.now() - this.interactionMetrics.sessionStart,
@@ -236,23 +247,37 @@ class FloatingActionTab {
   }
 
   init() {
+    console.log(
+      "FloatingActionTab: init() called, isInitialized =",
+      this.isInitialized,
+    );
     if (this.isInitialized) return;
 
     this.createElement();
     this.attachToDOM();
     this.applyInitialSettings();
     this.isInitialized = true;
+    console.log("FloatingActionTab: Initialization complete");
   }
 
   listenToSettings() {
+    console.log("FloatingActionTab: Setting up settings listeners");
     // Listen for settings changes
     window.addEventListener("settingsChanged", (e) => {
+      console.log(
+        "FloatingActionTab: settingsChanged event received",
+        e.detail,
+      );
       const { settings } = e.detail;
       this.updateVisibility(settings.donateTabEnabled);
     });
 
     // Listen for settings manager ready
     window.addEventListener("settingsManagerReady", (e) => {
+      console.log(
+        "FloatingActionTab: settingsManagerReady event received",
+        e.detail,
+      );
       const { settings } = e.detail;
       this.updateVisibility(settings.donateTabEnabled);
     });
@@ -263,7 +288,17 @@ class FloatingActionTab {
     const applySettings = () => {
       if (window.settingsManager) {
         const enabled = window.settingsManager.getSetting("donateTabEnabled");
+        console.log(
+          "FloatingActionTab: Settings found, donateTabEnabled =",
+          enabled,
+        );
         this.updateVisibility(enabled);
+      } else {
+        console.log(
+          "FloatingActionTab: Settings manager not ready, showing tab by default",
+        );
+        // Show by default if settings manager is not ready
+        this.updateVisibility(true);
       }
     };
 
@@ -272,11 +307,24 @@ class FloatingActionTab {
 
     // Also try after a short delay in case settings manager isn't ready
     setTimeout(applySettings, 100);
+
+    // Try one more time after a longer delay
+    setTimeout(applySettings, 500);
   }
 
   updateVisibility(enabled) {
+    console.log(
+      "FloatingActionTab: updateVisibility called with enabled =",
+      enabled,
+      "link exists =",
+      !!this.link,
+    );
     if (this.link) {
-      this.link.style.display = enabled ? "block" : "none";
+      // TEMPORARY DEBUG: Always show for testing
+      this.link.style.display = "block"; // enabled ? "block" : "none";
+      console.log(
+        "FloatingActionTab: Set display to block (FORCED FOR DEBUGGING)",
+      );
     }
   }
 
@@ -322,6 +370,12 @@ class FloatingActionTab {
   attachToDOM() {
     // Add to the end of the body
     document.body.appendChild(this.link);
+    console.log("FloatingActionTab: Attached to DOM, element:", this.link);
+
+    // Force visibility for debugging
+    this.link.style.display = "block";
+    this.link.style.visibility = "visible";
+    console.log("FloatingActionTab: Forced visibility");
   }
 
   bindEvents() {
@@ -696,9 +750,26 @@ class FloatingActionTab {
   }
 }
 
-// Auto-initialize when DOM is ready
-document.addEventListener("DOMContentLoaded", () => {
-  window.floatingActionTab = new FloatingActionTab();
-});
+// Auto-initialize when DOM is ready with timing coordination
+function initializeFloatingActionTab() {
+  console.log("FloatingActionTab: initializeFloatingActionTab called");
+  if (!window.floatingActionTab) {
+    console.log("FloatingActionTab: Creating new instance");
+    window.floatingActionTab = new FloatingActionTab();
+  } else {
+    console.log("FloatingActionTab: Instance already exists");
+  }
+}
+
+// Initialize with proper timing to ensure settings manager is ready
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => {
+    // Small delay to ensure shared navigation and settings manager are ready
+    setTimeout(initializeFloatingActionTab, 150);
+  });
+} else {
+  // DOM is already loaded, wait for other components
+  setTimeout(initializeFloatingActionTab, 150);
+}
 
 export default FloatingActionTab;

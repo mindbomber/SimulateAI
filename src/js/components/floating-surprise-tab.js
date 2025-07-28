@@ -39,6 +39,20 @@ class FloatingSurpriseTab {
     this.collapseTimeout = null;
     this.lastClickTime = 0;
 
+    // Store bound event handlers to properly remove them later
+    this.boundHandlers = {
+      resize: this.handleResize.bind(this),
+      mouseEnter: this.handleMouseEnter.bind(this),
+      mouseLeave: this.handleMouseLeave.bind(this),
+      touchStart: this.handleTouchStart.bind(this),
+      touchEnd: this.handleTouchEnd.bind(this),
+      mobileClick: this.handleMobileClick.bind(this),
+      desktopClick: this.handleDesktopClick.bind(this),
+      keyDown: this.handleKeyDown.bind(this),
+      focus: this.handleFocus.bind(this),
+      blur: this.handleBlur.bind(this),
+    };
+
     // DataHandler integration for enhanced analytics and persistence
     this.dataHandler = null;
     this.initializeDataHandler();
@@ -250,8 +264,9 @@ class FloatingSurpriseTab {
     this.saveSurpriseMetrics();
 
     // Track with app analytics if available
-    if (window.app?.analyticsManager) {
-      window.app.analyticsManager.trackEvent("floating_surprise_tab", {
+    const app = window.simulateAIApp || window.app || window.simulateAI || null;
+    if (app?.analyticsManager) {
+      app.analyticsManager.trackEvent("floating_surprise_tab", {
         action,
         isMobile: this.isMobile,
         sessionDuration: Date.now() - this.surpriseMetrics.sessionStart,
@@ -369,32 +384,23 @@ class FloatingSurpriseTab {
 
   bindEvents() {
     // Handle resize events
-    window.addEventListener("resize", this.handleResize.bind(this));
+    window.addEventListener("resize", this.boundHandlers.resize);
 
     // Handle hover/click events
     if (this.isMobile) {
-      this.link.addEventListener(
-        "touchstart",
-        this.handleTouchStart.bind(this),
-      );
-      this.link.addEventListener("touchend", this.handleTouchEnd.bind(this));
-      this.link.addEventListener("click", this.handleMobileClick.bind(this));
+      this.link.addEventListener("touchstart", this.boundHandlers.touchStart);
+      this.link.addEventListener("touchend", this.boundHandlers.touchEnd);
+      this.link.addEventListener("click", this.boundHandlers.mobileClick);
     } else {
-      this.link.addEventListener(
-        "mouseenter",
-        this.handleMouseEnter.bind(this),
-      );
-      this.link.addEventListener(
-        "mouseleave",
-        this.handleMouseLeave.bind(this),
-      );
-      this.link.addEventListener("click", this.handleDesktopClick.bind(this));
+      this.link.addEventListener("mouseenter", this.boundHandlers.mouseEnter);
+      this.link.addEventListener("mouseleave", this.boundHandlers.mouseLeave);
+      this.link.addEventListener("click", this.boundHandlers.desktopClick);
     }
 
     // Handle keyboard navigation
-    this.link.addEventListener("keydown", this.handleKeyDown.bind(this));
-    this.link.addEventListener("focus", this.handleFocus.bind(this));
-    this.link.addEventListener("blur", this.handleBlur.bind(this));
+    this.link.addEventListener("keydown", this.boundHandlers.keyDown);
+    this.link.addEventListener("focus", this.boundHandlers.focus);
+    this.link.addEventListener("blur", this.boundHandlers.blur);
   }
 
   handleResize() {
@@ -430,14 +436,14 @@ class FloatingSurpriseTab {
     }
   }
 
-  handleTouchStart(e) {
+  handleTouchStart() {
     if (this.isMobile) {
       // Allow default behavior to ensure click events work
-      this.createRipple(e.touches[0]);
+      this.createRipple();
     }
   }
 
-  handleTouchEnd(_e) {
+  handleTouchEnd() {
     if (this.isMobile) {
       // Allow default behavior to ensure click events work
     }
@@ -538,7 +544,7 @@ class FloatingSurpriseTab {
     }
   }
 
-  createRipple(_event) {
+  createRipple() {
     // Reset ripple
     this.container.classList.remove("ripple-active");
 
@@ -562,143 +568,137 @@ class FloatingSurpriseTab {
       source: "floating_tab",
     });
 
-    // Try multiple approaches to trigger surprise me functionality
-    let success = false;
-    let successMethod = null;
+    // Simplified approach: Find and launch a random uncompleted scenario
+    const randomScenario = this.findRandomUncompletedScenario();
 
-    // Approach 1: Use main grid's launch random scenario method
-    if (
-      window.mainGrid &&
-      typeof window.mainGrid.launchRandomScenario === "function"
-    ) {
-      console.log("FloatingSurpriseTab: Using mainGrid.launchRandomScenario");
-      try {
-        window.mainGrid.launchRandomScenario();
-        success = true;
-        successMethod = "mainGrid.launchRandomScenario";
-      } catch (error) {
-        console.error(
-          "FloatingSurpriseTab: Error with mainGrid.launchRandomScenario:",
-          error,
-        );
-        this.trackSurpriseInteraction("surprise_error", {
-          method: "mainGrid.launchRandomScenario",
-          error: error.message,
-        });
-      }
-    }
+    if (randomScenario) {
+      console.log(
+        "FloatingSurpriseTab: Launching random scenario:",
+        randomScenario,
+      );
+      this.launchScenario(randomScenario);
 
-    // Approach 2: Use app's launch random scenario method
-    if (
-      !success &&
-      window.app &&
-      typeof window.app.launchRandomScenario === "function"
-    ) {
-      console.log("FloatingSurpriseTab: Using app.launchRandomScenario");
-      try {
-        window.app.launchRandomScenario();
-        success = true;
-        successMethod = "app.launchRandomScenario";
-      } catch (error) {
-        console.error(
-          "FloatingSurpriseTab: Error with app.launchRandomScenario:",
-          error,
-        );
-        this.trackSurpriseInteraction("surprise_error", {
-          method: "app.launchRandomScenario",
-          error: error.message,
-        });
-      }
-    }
-
-    // Approach 3: Use global triggerSurpriseMe function
-    if (
-      !success &&
-      typeof window.triggerSurpriseMe === "function" &&
-      window.triggerSurpriseMe !== this.triggerSurpriseMe
-    ) {
-      console.log("FloatingSurpriseTab: Using global triggerSurpriseMe");
-      try {
-        window.triggerSurpriseMe();
-        success = true;
-        successMethod = "global.triggerSurpriseMe";
-      } catch (error) {
-        console.error(
-          "FloatingSurpriseTab: Error with global triggerSurpriseMe:",
-          error,
-        );
-        this.trackSurpriseInteraction("surprise_error", {
-          method: "global.triggerSurpriseMe",
-          error: error.message,
-        });
-      }
-    }
-
-    // Approach 4: Fallback to clicking the original surprise me button
-    if (!success) {
-      console.log("FloatingSurpriseTab: Fallback to clicking original button");
-      const originalButton = document.getElementById("surprise-me-nav");
-      if (originalButton) {
-        try {
-          originalButton.click();
-          success = true;
-          successMethod = "button.click";
-        } catch (error) {
-          console.error(
-            "FloatingSurpriseTab: Error clicking original button:",
-            error,
-          );
-          this.trackSurpriseInteraction("surprise_error", {
-            method: "button.click",
-            error: error.message,
-          });
-        }
-      }
-    }
-
-    // Approach 5: Try to trigger via custom event
-    if (!success) {
-      console.log("FloatingSurpriseTab: Dispatching custom event");
-      try {
-        const event = new CustomEvent("surpriseMeRequested", {
-          detail: { source: "floating-tab" },
-        });
-        document.dispatchEvent(event);
-        success = true;
-        successMethod = "custom.event";
-      } catch (error) {
-        console.error(
-          "FloatingSurpriseTab: Error dispatching custom event:",
-          error,
-        );
-        this.trackSurpriseInteraction("surprise_error", {
-          method: "custom.event",
-          error: error.message,
-        });
-      }
-    }
-
-    if (success) {
       // Track successful surprise trigger
       this.trackSurpriseInteraction("surprise_success", {
-        method: successMethod,
+        method: "direct_scenario_launch",
+        scenarioId: randomScenario.id,
         timestamp: Date.now(),
       });
 
       // Add visual feedback
       this.addSuccessFeedback();
     } else {
-      console.warn(
-        "FloatingSurpriseTab: All approaches failed to trigger surprise me",
-      );
+      console.log("FloatingSurpriseTab: No uncompleted scenarios found");
 
-      // Track complete failure
-      this.trackSurpriseInteraction("surprise_complete_failure", {
+      // Track failure
+      this.trackSurpriseInteraction("surprise_no_scenarios", {
         timestamp: Date.now(),
-        attempts: 5,
       });
 
-      this.addErrorFeedback();
+      this.addNoScenariosFeedback();
+    }
+  }
+
+  /**
+   * Find a random uncompleted scenario
+   */
+  findRandomUncompletedScenario() {
+    // Get all scenario cards
+    const scenarioCards = document.querySelectorAll(".scenario-card");
+    const uncompletedScenarios = [];
+
+    scenarioCards.forEach((card) => {
+      // Check if scenario is not completed (no completed class or checkmark)
+      const isCompleted =
+        card.classList.contains("completed") ||
+        card.querySelector(".scenario-completed-icon") ||
+        card.querySelector(".completion-status.completed");
+
+      if (!isCompleted) {
+        const scenarioId = card.dataset.scenarioId || card.id;
+        const title = card
+          .querySelector(".scenario-title")
+          ?.textContent?.trim();
+        const categoryId =
+          card.dataset.categoryId ||
+          card.closest("[data-category-id]")?.dataset.categoryId;
+
+        if (scenarioId && title) {
+          uncompletedScenarios.push({
+            id: scenarioId,
+            title: title,
+            categoryId: categoryId,
+            element: card,
+          });
+        }
+      }
+    });
+
+    // Return random uncompleted scenario
+    if (uncompletedScenarios.length > 0) {
+      const randomIndex = Math.floor(
+        Math.random() * uncompletedScenarios.length,
+      );
+      return uncompletedScenarios[randomIndex];
+    }
+
+    return null;
+  }
+
+  /**
+   * Launch a scenario using the same mechanism as scenario cards
+   */
+  launchScenario(scenario) {
+    try {
+      // Find the quick start button for this scenario
+      const quickStartBtn = scenario.element.querySelector(
+        ".scenario-quick-start-btn",
+      );
+
+      if (quickStartBtn) {
+        // Simulate clicking the quick start button
+        console.log(
+          "FloatingSurpriseTab: Clicking quick start button for:",
+          scenario.title,
+        );
+        quickStartBtn.click();
+        return true;
+      }
+
+      // Fallback: try the regular start button
+      const startBtn = scenario.element.querySelector(".scenario-start-btn");
+      if (startBtn) {
+        console.log(
+          "FloatingSurpriseTab: Clicking start button for:",
+          scenario.title,
+        );
+        startBtn.click();
+        return true;
+      }
+
+      // Final fallback: dispatch a custom event with scenario details
+      const event = new CustomEvent("launchScenario", {
+        detail: {
+          scenarioId: scenario.id,
+          categoryId: scenario.categoryId,
+          source: "surprise_tab",
+        },
+      });
+      document.dispatchEvent(event);
+
+      console.log(
+        "FloatingSurpriseTab: Dispatched launchScenario event for:",
+        scenario.title,
+      );
+      return true;
+    } catch (error) {
+      console.error("FloatingSurpriseTab: Error launching scenario:", error);
+      this.trackSurpriseInteraction("surprise_error", {
+        method: "direct_scenario_launch",
+        scenarioId: scenario.id,
+        error: error.message,
+      });
+      return false;
     }
   }
 
@@ -737,6 +737,25 @@ class FloatingSurpriseTab {
         title.textContent = originalTitle;
         subtitle.textContent = originalSubtitle;
       }, SURPRISE_FEEDBACK_DURATION);
+    }
+  }
+
+  addNoScenariosFeedback() {
+    const title = this.container.querySelector(".surprise-tab-title");
+    const subtitle = this.container.querySelector(".surprise-tab-subtitle");
+
+    if (title && subtitle) {
+      const originalTitle = title.textContent;
+      const originalSubtitle = subtitle.textContent;
+
+      title.textContent = "All Done! 🎉";
+      subtitle.textContent = "You've completed everything!";
+
+      // Reset after a longer delay since this is good news
+      setTimeout(() => {
+        title.textContent = originalTitle;
+        subtitle.textContent = originalSubtitle;
+      }, SURPRISE_FEEDBACK_DURATION * 2);
     }
   }
 
@@ -822,16 +841,30 @@ class FloatingSurpriseTab {
   }
 
   unbindEvents() {
-    // Remove all event listeners
-    this.link.removeEventListener("mouseenter", this.handleMouseEnter);
-    this.link.removeEventListener("mouseleave", this.handleMouseLeave);
-    this.link.removeEventListener("click", this.handleDesktopClick);
-    this.link.removeEventListener("click", this.handleMobileClick);
-    this.link.removeEventListener("touchstart", this.handleTouchStart);
-    this.link.removeEventListener("touchend", this.handleTouchEnd);
-    this.link.removeEventListener("keydown", this.handleKeyDown);
-    this.link.removeEventListener("focus", this.handleFocus);
-    this.link.removeEventListener("blur", this.handleBlur);
+    // Remove window event listeners
+    window.removeEventListener("resize", this.boundHandlers.resize);
+
+    // Remove element event listeners
+    if (this.link) {
+      this.link.removeEventListener(
+        "mouseenter",
+        this.boundHandlers.mouseEnter,
+      );
+      this.link.removeEventListener(
+        "mouseleave",
+        this.boundHandlers.mouseLeave,
+      );
+      this.link.removeEventListener("click", this.boundHandlers.desktopClick);
+      this.link.removeEventListener("click", this.boundHandlers.mobileClick);
+      this.link.removeEventListener(
+        "touchstart",
+        this.boundHandlers.touchStart,
+      );
+      this.link.removeEventListener("touchend", this.boundHandlers.touchEnd);
+      this.link.removeEventListener("keydown", this.boundHandlers.keyDown);
+      this.link.removeEventListener("focus", this.boundHandlers.focus);
+      this.link.removeEventListener("blur", this.boundHandlers.blur);
+    }
   }
 
   destroy() {
@@ -848,14 +881,28 @@ class FloatingSurpriseTab {
 
 // Initialize the floating surprise tab when the DOM is ready
 document.addEventListener("DOMContentLoaded", () => {
+  // Prevent multiple initialization
+  if (window.floatingSurpriseTab) {
+    console.warn("FloatingSurpriseTab: Already initialized, skipping...");
+    return;
+  }
+
   // Initialize the floating surprise tab
   window.floatingSurpriseTab = new FloatingSurpriseTab();
 });
 
 // Export global function for easy access
 window.triggerSurpriseMe = function () {
-  if (typeof window.app !== "undefined" && window.app.launchRandomScenario) {
-    window.app.launchRandomScenario();
+  // Use the floating surprise tab if available
+  if (
+    window.floatingSurpriseTab &&
+    typeof window.floatingSurpriseTab.triggerSurpriseMe === "function"
+  ) {
+    window.floatingSurpriseTab.triggerSurpriseMe();
+  } else {
+    console.warn(
+      "FloatingSurpriseTab not available, cannot trigger surprise me",
+    );
   }
 };
 

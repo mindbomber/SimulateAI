@@ -1488,7 +1488,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (document.querySelector(".donor-appreciation-section")) {
     // Initialize with app instance for DataHandler integration
     // Access global app instance if available
-    const app = window.app || window.simulateAI || null;
+    const app = window.simulateAIApp || window.app || window.simulateAI || null;
     window.professionalDonorWall = new ProfessionalDonorWall(app);
 
     // Clean up on page unload

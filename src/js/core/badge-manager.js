@@ -503,8 +503,9 @@ export class BadgeManager {
 let badgeManager;
 
 // Enhanced initialization for app integration
-if (typeof window !== "undefined" && window.app) {
-  badgeManager = new BadgeManager(window.app);
+if (typeof window !== "undefined") {
+  const app = window.simulateAIApp || window.app || window.simulateAI || null;
+  badgeManager = new BadgeManager(app);
 } else {
   badgeManager = new BadgeManager();
 }
