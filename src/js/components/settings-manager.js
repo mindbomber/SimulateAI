@@ -29,7 +29,7 @@
  * - Reduced DOM Mutations: Batch operations minimize reflow/repaint cycles
  */
 
-import { userEngagementTracker } from "../services/user-engagement-tracker.js";
+import googleAnalytics from "../services/google-analytics.js";
 
 // Constants
 const SETTINGS_STORAGE_KEY = "simulateai_settings";
@@ -796,7 +796,7 @@ class SettingsManager {
         this.settings.surpriseTabEnabled = e.target.checked;
 
         // Track the settings change
-        userEngagementTracker.trackUserEvent("settings_change", {
+        googleAnalytics.trackEvent("settings_change", {
           settingName: "surpriseTabEnabled",
           oldValue,
           newValue: e.target.checked,
@@ -817,7 +817,7 @@ class SettingsManager {
         this.settings.tourTabEnabled = e.target.checked;
 
         // Track the settings change
-        userEngagementTracker.trackUserEvent("settings_change", {
+        googleAnalytics.trackEvent("settings_change", {
           settingName: "tourTabEnabled",
           oldValue,
           newValue: e.target.checked,
@@ -842,7 +842,7 @@ class SettingsManager {
           this.showDonationRequiredMessage();
 
           // Track the restricted action
-          userEngagementTracker.trackUserEvent("settings_restriction", {
+          googleAnalytics.trackEvent("settings_restriction", {
             settingName: "donateTabEnabled",
             attemptedValue: false,
             restrictionReason: "non_donor",
@@ -856,7 +856,7 @@ class SettingsManager {
         this.settings.donateTabEnabled = e.target.checked;
 
         // Track the settings change
-        userEngagementTracker.trackUserEvent("settings_change", {
+        googleAnalytics.trackEvent("settings_change", {
           settingName: "donateTabEnabled",
           oldValue,
           newValue: e.target.checked,
@@ -878,7 +878,7 @@ class SettingsManager {
         this.settings.theme = e.target.value;
 
         // Track the theme change
-        userEngagementTracker.trackUserEvent("settings_change", {
+        googleAnalytics.trackEvent("settings_change", {
           settingName: "theme",
           oldValue,
           newValue: e.target.value,
@@ -899,7 +899,7 @@ class SettingsManager {
         this.settings.fontSize = e.target.value;
 
         // Track the font size change
-        userEngagementTracker.trackUserEvent("settings_change", {
+        googleAnalytics.trackEvent("settings_change", {
           settingName: "fontSize",
           oldValue,
           newValue: e.target.value,
@@ -920,7 +920,7 @@ class SettingsManager {
         this.settings.highContrast = e.target.checked;
 
         // Track the accessibility setting change
-        userEngagementTracker.trackUserEvent("settings_change", {
+        googleAnalytics.trackEvent("settings_change", {
           settingName: "highContrast",
           oldValue,
           newValue: e.target.checked,
@@ -1379,7 +1379,7 @@ class SettingsManager {
       settingsMenu.style.display = newState ? "block" : "none";
 
       // Track settings panel interaction
-      userEngagementTracker.trackUserEvent("settings_panel_interaction", {
+      googleAnalytics.trackEvent("settings_panel_interaction", {
         action: newState ? "open" : "close",
         trigger: "click",
         method: "toggle",
@@ -1401,7 +1401,7 @@ class SettingsManager {
 
       // Track settings panel open (if not already open)
       if (!wasOpen) {
-        userEngagementTracker.trackUserEvent("settings_panel_interaction", {
+        googleAnalytics.trackEvent("settings_panel_interaction", {
           action: "open",
           trigger: "hover",
           method: "direct",
@@ -1424,7 +1424,7 @@ class SettingsManager {
 
       // Track settings panel close (if was open)
       if (wasOpen) {
-        userEngagementTracker.trackUserEvent("settings_panel_interaction", {
+        googleAnalytics.trackEvent("settings_panel_interaction", {
           action: "close",
           trigger: "hover_leave",
           method: "direct",
@@ -1507,7 +1507,7 @@ class SettingsManager {
         const oldValue = this.settings.achievementNotifications;
         this.settings.achievementNotifications = e.target.checked;
 
-        userEngagementTracker.trackUserEvent("settings_change", {
+        googleAnalytics.trackEvent("settings_change", {
           settingName: "achievementNotifications",
           oldValue,
           newValue: e.target.checked,
@@ -1527,7 +1527,7 @@ class SettingsManager {
         const oldValue = this.settings.badgeNotifications;
         this.settings.badgeNotifications = e.target.checked;
 
-        userEngagementTracker.trackUserEvent("settings_change", {
+        googleAnalytics.trackEvent("settings_change", {
           settingName: "badgeNotifications",
           oldValue,
           newValue: e.target.checked,
@@ -1549,7 +1549,7 @@ class SettingsManager {
         const oldValue = this.settings.progressNotifications;
         this.settings.progressNotifications = e.target.checked;
 
-        userEngagementTracker.trackUserEvent("settings_change", {
+        googleAnalytics.trackEvent("settings_change", {
           settingName: "progressNotifications",
           oldValue,
           newValue: e.target.checked,
@@ -1606,7 +1606,7 @@ class SettingsManager {
       this.updateNotificationStatus("disabled");
     }
 
-    userEngagementTracker.trackUserEvent("settings_change", {
+    googleAnalytics.trackEvent("settings_change", {
       settingName: "notificationsEnabled",
       oldValue,
       newValue: this.settings.notificationsEnabled,

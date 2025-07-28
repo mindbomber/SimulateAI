@@ -7,9 +7,7 @@
  */
 
 import { userEngagementTracker } from "./user-engagement-tracker.js";
-import { UserInsightsDashboard } from "../components/user-insights-dashboard.js";
 import regionalAnalytics from "./regional-analytics.js";
-import regionalAnalyticsDashboard from "../components/regional-analytics-dashboard.js";
 import logger from "../utils/logger.js";
 
 /**
@@ -29,9 +27,7 @@ const ANALYSIS_CONSTANTS = {
 class EnhancedUserTracking {
   constructor() {
     this.userEngagementTracker = userEngagementTracker; // Use singleton instance
-    this.userInsightsDashboard = new UserInsightsDashboard();
     this.regionalAnalytics = regionalAnalytics;
-    this.regionalAnalyticsDashboard = regionalAnalyticsDashboard;
 
     this.isInitialized = false;
     this.init();
@@ -81,7 +77,7 @@ class EnhancedUserTracking {
   }
 
   /**
-   * Setup keyboard shortcuts for dashboards
+   * Setup keyboard shortcuts for debugging
    */
   setupKeyboardShortcuts() {
     document.addEventListener("keydown", (event) => {
@@ -93,13 +89,12 @@ class EnhancedUserTracking {
 
       if (event.ctrlKey && event.shiftKey) {
         switch (event.key) {
-          case "I":
+          case "D":
             event.preventDefault();
-            this.toggleUserInsightsDashboard();
-            break;
-          case "R":
-            event.preventDefault();
-            this.toggleRegionalAnalyticsDashboard();
+            console.log(
+              "Enhanced User Tracking Debug:",
+              this.getSystemStatus(),
+            );
             break;
         }
       }
@@ -112,16 +107,6 @@ class EnhancedUserTracking {
   setupGlobalAccess() {
     // Enhanced user tracking interface
     window.userTracking = {
-      // User insights methods
-      showInsights: () => this.userInsightsDashboard.show(),
-      hideInsights: () => this.userInsightsDashboard.hide(),
-      toggleInsights: () => this.userInsightsDashboard.toggle(),
-
-      // Regional analytics methods
-      showRegionalDashboard: () => this.regionalAnalyticsDashboard.show(),
-      hideRegionalDashboard: () => this.regionalAnalyticsDashboard.hide(),
-      toggleRegionalDashboard: () => this.regionalAnalyticsDashboard.toggle(),
-
       // Data access methods
       getProfile: () => this.userEngagementTracker.getUserProfile(),
       getMetrics: () => this.userEngagementTracker.getEngagementMetrics(),
@@ -145,11 +130,8 @@ class EnhancedUserTracking {
         this.regionalAnalytics.trackScenarioDecision(decisionData),
     };
 
-    // Legacy compatibility
+    // Legacy compatibility for regional analytics
     window.regionalAnalytics = {
-      showDashboard: () => this.regionalAnalyticsDashboard.show(),
-      hideDashboard: () => this.regionalAnalyticsDashboard.hide(),
-      toggleDashboard: () => this.regionalAnalyticsDashboard.toggle(),
       getStatus: () => this.regionalAnalytics.getStatus(),
       generateInsights: () => this.regionalAnalytics.generateRegionalInsights(),
       exportData: () => this.regionalAnalytics.exportRegionalData(),

@@ -4297,38 +4297,65 @@ class MainGrid {
     const scenariosContainer = this.scenarioContainer;
     if (!scenariosContainer) return;
 
-    // Clear existing scenario cards (but keep the toolbar)
+    // Clear existing scenario cards (but keep the toolbar) - Use batched removal
     const existingCards = scenariosContainer.querySelectorAll(
       ".scenario-card-wrapper, .scenario-card, .no-scenarios-message, .scenario-count",
     );
-    existingCards.forEach((card) => card.remove());
+
+    // Batch element removal for better performance
+    if (existingCards.length > 0) {
+      this.scheduleDOMUpdate(() => {
+        existingCards.forEach((card) => card.remove());
+      });
+    }
 
     if (this.filteredScenarios.length === 0) {
-      // Show no results message
-      const noResults = document.createElement("div");
-      noResults.className = "no-scenarios-message";
-      noResults.innerHTML = `
-        <div class="no-scenarios-icon">🔍</div>
-        <h3>No scenarios found</h3>
-        <p>Try adjusting your search terms or filters</p>
-      `;
-      scenariosContainer.appendChild(noResults);
+      // Create no results message using batched element creation
+      const noResultsData = [
+        {
+          tagName: "div",
+          className: "no-scenarios-message",
+          innerHTML: `
+          <div class="no-scenarios-icon">🔍</div>
+          <h3>No scenarios found</h3>
+          <p>Try adjusting your search terms or filters</p>
+        `,
+        },
+      ];
+
+      this.batchCreateElements(noResultsData, scenariosContainer);
       return;
     }
 
-    // Add scenario count display
-    const countElement = document.createElement("div");
-    countElement.className = "scenario-count";
-    countElement.innerHTML = `
-      <p class="count-text">Showing <span class="count-number">${this.filteredScenarios.length}</span> of ${this.allScenarios.length} scenarios</p>
-    `;
-    scenariosContainer.appendChild(countElement);
+    // Create scenario count display using batched element creation
+    const countData = [
+      {
+        tagName: "div",
+        className: "scenario-count",
+        innerHTML: `
+        <p class="count-text">Showing <span class="count-number">${this.filteredScenarios.length}</span> of ${this.allScenarios.length} scenarios</p>
+      `,
+      },
+    ];
 
-    // Render scenarios
-    for (const scenario of this.filteredScenarios) {
-      const scenarioElement = await this.createScenarioElement(scenario);
-      scenariosContainer.appendChild(scenarioElement);
-    }
+    // First add the count element
+    this.batchCreateElements(countData, scenariosContainer);
+
+    // Render scenarios using batched creation
+    const scenarioElements = await Promise.all(
+      this.filteredScenarios.map((scenario) =>
+        this.createScenarioElement(scenario),
+      ),
+    );
+
+    // Batch all scenario insertions into a single DOM operation using DocumentFragment
+    this.scheduleDOMUpdate(() => {
+      const fragment = document.createDocumentFragment();
+      scenarioElements.forEach((element) => {
+        fragment.appendChild(element);
+      });
+      scenariosContainer.appendChild(fragment);
+    });
 
     // Update results count
     this.updateResultsCount();

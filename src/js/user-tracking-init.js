@@ -16,24 +16,19 @@
 
 /**
  * User Tracking Initialization
- * Initializes comprehensive user metadata tracking and insights dashboard
- * with enhanced regional analytics capabilities
+ * Initializes Google Analytics for comprehensive user tracking
  */
 
-import enhancedUserTracking from "./services/enhanced-user-tracking.js";
 import googleAnalytics from "./services/google-analytics.js";
 import logger from "./utils/logger.js";
 
-// Initialize enhanced user tracking when DOM is ready
+// Initialize Google Analytics when DOM is ready
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    logger.info("Initializing enhanced user tracking system...");
+    logger.info("Initializing Google Analytics tracking system...");
 
-    // Initialize Google Analytics first
+    // Initialize Google Analytics
     await googleAnalytics.initialize();
-
-    // Initialize the enhanced user tracking system
-    enhancedUserTracking.initialize();
 
     // Track app startup in GA4
     googleAnalytics.trackEvent("app_startup", {
@@ -42,11 +37,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       viewport: `${window.innerWidth}x${window.innerHeight}`,
     });
 
-    logger.info("Enhanced user tracking system initialized successfully");
+    logger.info("Google Analytics tracking system initialized successfully");
   } catch (error) {
-    logger.error("Failed to initialize enhanced user tracking system:", error);
+    logger.error(
+      "Failed to initialize Google Analytics tracking system:",
+      error,
+    );
   }
 });
 
 // Export for use in other modules
-export { enhancedUserTracking, googleAnalytics };
+export { googleAnalytics };
