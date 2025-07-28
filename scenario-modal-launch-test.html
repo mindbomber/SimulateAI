@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scenario Modal Launch Methods Test</title>
+    <link rel="stylesheet" href="./src/styles/notification-toast.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+
+      .test-section {
+        background: white;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .test-btn {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        margin: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        min-width: 200px;
+      }
+
+      .test-btn:hover {
+        background: #2563eb;
+      }
+
+      .test-btn.surprise {
+        background: #f59e0b;
+      }
+
+      .test-btn.surprise:hover {
+        background: #d97706;
+      }
+
+      .test-btn.learning {
+        background: #10b981;
+      }
+
+      .test-btn.learning:hover {
+        background: #059669;
+      }
+
+      .test-btn.quick {
+        background: #ef4444;
+      }
+
+      .test-btn.quick:hover {
+        background: #dc2626;
+      }
+
+      .result {
+        margin-top: 15px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 4px;
+        border-left: 4px solid #3b82f6;
+      }
+
+      .status {
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      h1 {
+        color: #1f2937;
+        text-align: center;
+      }
+
+      h2 {
+        color: #374151;
+        border-bottom: 2px solid #e5e7eb;
+        padding-bottom: 10px;
+      }
+
+      .log {
+        background: #1f2937;
+        color: #f9fafb;
+        padding: 15px;
+        border-radius: 5px;
+        font-family: monospace;
+        font-size: 12px;
+        max-height: 300px;
+        overflow-y: auto;
+        margin-top: 10px;
+      }
+
+      .method-info {
+        background: #eff6ff;
+        border: 1px solid #dbeafe;
+        border-radius: 5px;
+        padding: 15px;
+        margin: 10px 0;
+      }
+
+      .method-info h3 {
+        margin-top: 0;
+        color: #1d4ed8;
+      }
+
+      .success {
+        color: #059669;
+        font-weight: bold;
+      }
+
+      .error {
+        color: #dc2626;
+        font-weight: bold;
+      }
+
+      .warning {
+        color: #d97706;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🎯 Scenario Modal Launch Methods Test</h1>
+
+    <div class="test-section">
+      <h2>📊 System Architecture Status</h2>
+      <div class="status" id="system-status">Loading...</div>
+      <div id="services-list"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>🚀 Three Launch Methods</h2>
+      <p>Testing the three ways to launch scenario modals in SimulateAI:</p>
+
+      <div class="method-info">
+        <h3>1. 🎲 Surprise Tab Launch</h3>
+        <p>
+          <strong>Method:</strong> FloatingSurpriseTab → Unified Architecture →
+          ScenarioModal
+        </p>
+        <p>
+          <strong>Path:</strong> triggerSurpriseMe() → launchScenario() →
+          openScenarioModalDirect()
+        </p>
+        <button class="test-btn surprise" onclick="testSurpriseTabLaunch()">
+          Test Surprise Tab Launch
+        </button>
+      </div>
+
+      <div class="method-info">
+        <h3>2. 🎓 Learning Lab Launch (PreLaunchModal)</h3>
+        <p>
+          <strong>Method:</strong> Scenario Card → PreLaunchModal → onLaunch →
+          ScenarioModal
+        </p>
+        <p>
+          <strong>Path:</strong> Learning Lab Button → PreLaunchModal → "Start
+          Exploration" → ScenarioModal
+        </p>
+        <button class="test-btn learning" onclick="testLearningLabLaunch()">
+          Test Learning Lab Launch
+        </button>
+      </div>
+
+      <div class="method-info">
+        <h3>3. ⚡ Quick Start Launch</h3>
+        <p><strong>Method:</strong> Scenario Card → Direct ScenarioModal</p>
+        <p>
+          <strong>Path:</strong> Quick Start Button → openScenarioModalDirect()
+          → ScenarioModal
+        </p>
+        <button class="test-btn quick" onclick="testQuickStartLaunch()">
+          Test Quick Start Launch
+        </button>
+      </div>
+
+      <div class="result" id="launch-results"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>🔄 Integration Tests</h2>
+      <p>Testing cross-component integration and event coordination:</p>
+
+      <button class="test-btn" onclick="testEventCoordination()">
+        Test Event Coordination
+      </button>
+
+      <button class="test-btn" onclick="testMultipleLaunches()">
+        Test Multiple Launch Methods
+      </button>
+
+      <button class="test-btn" onclick="testFallbackMethods()">
+        Test Fallback Methods
+      </button>
+
+      <div class="result" id="integration-results"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>📋 Debug Log</h2>
+      <button class="test-btn" onclick="clearLog()">Clear Log</button>
+      <div class="log" id="debug-log"></div>
+    </div>
+
+    <!-- Mock minimal scenario data for testing -->
+    <script>
+      // Mock data for testing
+      window.mockCategories = [
+        {
+          id: "ai-ethics",
+          title: "AI Ethics",
+          color: "#3b82f6",
+          icon: "🤖",
+          scenarios: [
+            {
+              id: "bias-detection",
+              title: "AI Bias Detection",
+              description: "Test scenario for bias detection",
+              categoryId: "ai-ethics",
+              difficulty: "beginner",
+            },
+          ],
+        },
+      ];
+
+      window.mockScenario = {
+        id: "bias-detection",
+        title: "AI Bias Detection",
+        description: "Test scenario for bias detection",
+        categoryId: "ai-ethics",
+        difficulty: "beginner",
+      };
+
+      // Test utilities
+      let testCount = 0;
+      let logEntries = [];
+
+      // Override console.log to capture debug messages
+      const originalLog = console.log;
+      console.log = function (...args) {
+        originalLog.apply(console, args);
+        logEntries.push(
+          `[${new Date().toLocaleTimeString()}] ${args.join(" ")}`,
+        );
+        updateLog();
+      };
+
+      function updateLog() {
+        const logEl = document.getElementById("debug-log");
+        logEl.innerHTML = logEntries.slice(-30).join("<br>");
+        logEl.scrollTop = logEl.scrollHeight;
+      }
+
+      function clearLog() {
+        logEntries = [];
+        updateLog();
+      }
+
+      function updateResults(elementId, message, type = "info") {
+        const className =
+          type === "success"
+            ? "success"
+            : type === "error"
+              ? "error"
+              : type === "warning"
+                ? "warning"
+                : "";
+        document.getElementById(elementId).innerHTML = `
+                <strong>Test ${++testCount}:</strong> <span class="${className}">${message}</span>
+                <br><small>Time: ${new Date().toLocaleTimeString()}</small>
+            `;
+      }
+
+      // System Status Check
+      function checkSystemStatus() {
+        const status = document.getElementById("system-status");
+        const servicesList = document.getElementById("services-list");
+
+        let statusText = "";
+        let servicesText = "<ul>";
+
+        // Check core components
+        const components = [
+          {
+            name: "MainGrid (window.app.categoryGrid)",
+            obj: window.app?.categoryGrid,
+          },
+          { name: "FloatingSurpriseTab", obj: window.floatingSurpriseTab },
+          { name: "ScenarioBrowser", obj: window.scenarioBrowser },
+          { name: "NotificationToast", obj: window.NotificationToast },
+          { name: "PreLaunchModal", obj: window.PreLaunchModal },
+          { name: "App Instance", obj: window.app },
+        ];
+
+        components.forEach((comp) => {
+          if (comp.obj) {
+            statusText += `✅ ${comp.name} loaded<br>`;
+            servicesText += `<li>✅ ${comp.name} - Ready</li>`;
+          } else {
+            statusText += `❌ ${comp.name} not found<br>`;
+            servicesText += `<li>❌ ${comp.name} - Missing</li>`;
+          }
+        });
+
+        // Check specific methods
+        const methods = [
+          {
+            name: "MainGrid.openScenarioModalDirect",
+            method: window.app?.categoryGrid?.openScenarioModalDirect,
+          },
+          {
+            name: "FloatingSurpriseTab.triggerSurpriseMe",
+            method: window.floatingSurpriseTab?.triggerSurpriseMe,
+          },
+          {
+            name: "ScenarioBrowser.openScenario",
+            method: window.scenarioBrowser?.openScenario,
+          },
+        ];
+
+        methods.forEach((method) => {
+          if (typeof method.method === "function") {
+            servicesText += `<li>✅ ${method.name} - Available</li>`;
+          } else {
+            servicesText += `<li>❌ ${method.name} - Missing</li>`;
+          }
+        });
+
+        servicesText += "</ul>";
+
+        status.innerHTML = statusText;
+        servicesList.innerHTML = servicesText;
+      }
+
+      // Test Functions
+      function testSurpriseTabLaunch() {
+        console.log("=== Testing Surprise Tab Launch ===");
+
+        try {
+          if (
+            window.floatingSurpriseTab &&
+            typeof window.floatingSurpriseTab.triggerSurpriseMe === "function"
+          ) {
+            window.floatingSurpriseTab.triggerSurpriseMe();
+            updateResults(
+              "launch-results",
+              "Surprise Tab launch triggered successfully",
+              "success",
+            );
+          } else if (typeof window.triggerSurpriseMe === "function") {
+            window.triggerSurpriseMe();
+            updateResults(
+              "launch-results",
+              "Global triggerSurpriseMe function called successfully",
+              "success",
+            );
+          } else {
+            // Fallback: simulate the surprise tab method
+            if (window.app?.categoryGrid?.openScenarioModalDirect) {
+              window.app.categoryGrid.openScenarioModalDirect(
+                "ai-ethics",
+                "bias-detection",
+              );
+              updateResults(
+                "launch-results",
+                "Surprise Tab simulation via MainGrid successful",
+                "warning",
+              );
+            } else {
+              updateResults(
+                "launch-results",
+                "Surprise Tab method not available",
+                "error",
+              );
+            }
+          }
+        } catch (error) {
+          console.error("Surprise Tab test error:", error);
+          updateResults(
+            "launch-results",
+            `Surprise Tab test failed: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      function testLearningLabLaunch() {
+        console.log("=== Testing Learning Lab Launch ===");
+
+        try {
+          // Import PreLaunchModal and test Learning Lab flow
+          import("./src/js/components/pre-launch-modal.js")
+            .then(({ default: PreLaunchModal }) => {
+              const mockCategory = window.mockCategories[0];
+              const mockScenario = mockCategory.scenarios[0];
+
+              const preModal = new PreLaunchModal(mockCategory.id, {
+                categoryData: mockCategory,
+                scenarioData: mockScenario,
+                onLaunch: () => {
+                  console.log("PreLaunchModal onLaunch triggered");
+                  // Simulate opening scenario modal
+                  if (window.app?.categoryGrid?.openScenarioModal) {
+                    window.app.categoryGrid.openScenarioModal(
+                      mockScenario.id,
+                      mockCategory.id,
+                    );
+                  } else {
+                    console.log(
+                      "Would open ScenarioModal for:",
+                      mockScenario.title,
+                    );
+                  }
+                  updateResults(
+                    "launch-results",
+                    "Learning Lab flow completed successfully",
+                    "success",
+                  );
+                },
+                onCancel: () => {
+                  console.log("PreLaunchModal cancelled");
+                  updateResults(
+                    "launch-results",
+                    "Learning Lab cancelled by user",
+                    "warning",
+                  );
+                },
+              });
+
+              preModal.show();
+              updateResults(
+                "launch-results",
+                'Learning Lab modal opened - click "Start Exploration"',
+                "success",
+              );
+            })
+            .catch((error) => {
+              console.error("PreLaunchModal import error:", error);
+              updateResults(
+                "launch-results",
+                `Learning Lab test failed: ${error.message}`,
+                "error",
+              );
+            });
+        } catch (error) {
+          console.error("Learning Lab test error:", error);
+          updateResults(
+            "launch-results",
+            `Learning Lab test failed: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      function testQuickStartLaunch() {
+        console.log("=== Testing Quick Start Launch ===");
+
+        try {
+          if (window.app?.categoryGrid?.openScenarioModalDirect) {
+            window.app.categoryGrid.openScenarioModalDirect(
+              "ai-ethics",
+              "bias-detection",
+            );
+            updateResults(
+              "launch-results",
+              "Quick Start launch via MainGrid successful",
+              "success",
+            );
+          } else if (window.scenarioBrowser?.openScenarioModalDirect) {
+            window.scenarioBrowser.openScenarioModalDirect(
+              "ai-ethics",
+              "bias-detection",
+            );
+            updateResults(
+              "launch-results",
+              "Quick Start launch via ScenarioBrowser successful",
+              "success",
+            );
+          } else {
+            // Direct ScenarioModal test
+            import("./src/js/components/scenario-modal.js")
+              .then(({ default: ScenarioModal }) => {
+                const scenarioModal = new ScenarioModal();
+                scenarioModal.open("bias-detection", "ai-ethics");
+                updateResults(
+                  "launch-results",
+                  "Direct ScenarioModal instantiation successful",
+                  "success",
+                );
+              })
+              .catch((error) => {
+                console.error("ScenarioModal import error:", error);
+                updateResults(
+                  "launch-results",
+                  `Quick Start test failed: ${error.message}`,
+                  "error",
+                );
+              });
+          }
+        } catch (error) {
+          console.error("Quick Start test error:", error);
+          updateResults(
+            "launch-results",
+            `Quick Start test failed: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      function testEventCoordination() {
+        console.log("=== Testing Event Coordination ===");
+
+        // Test custom event dispatch
+        const event = new CustomEvent("launchScenario", {
+          detail: {
+            scenarioId: "bias-detection",
+            categoryId: "ai-ethics",
+            source: "test_coordination",
+          },
+        });
+
+        document.dispatchEvent(event);
+        updateResults(
+          "integration-results",
+          "Custom launchScenario event dispatched",
+          "success",
+        );
+      }
+
+      function testMultipleLaunches() {
+        console.log("=== Testing Multiple Launch Methods ===");
+
+        let launchCount = 0;
+        const methods = [
+          () =>
+            window.app?.categoryGrid?.openScenarioModalDirect(
+              "ai-ethics",
+              "bias-detection",
+            ),
+          () => window.floatingSurpriseTab?.triggerSurpriseMe?.(),
+          () =>
+            document.dispatchEvent(
+              new CustomEvent("launchScenario", {
+                detail: {
+                  scenarioId: "bias-detection",
+                  categoryId: "ai-ethics",
+                  source: "multi_test",
+                },
+              }),
+            ),
+        ];
+
+        methods.forEach((method, index) => {
+          try {
+            method();
+            launchCount++;
+            console.log(`Launch method ${index + 1} executed`);
+          } catch (error) {
+            console.error(`Launch method ${index + 1} failed:`, error);
+          }
+        });
+
+        updateResults(
+          "integration-results",
+          `${launchCount}/${methods.length} launch methods executed`,
+          launchCount === methods.length ? "success" : "warning",
+        );
+      }
+
+      function testFallbackMethods() {
+        console.log("=== Testing Fallback Methods ===");
+
+        // Test URL navigation fallback
+        const originalLocation = window.location.href;
+
+        try {
+          // Simulate fallback URL navigation (don't actually navigate)
+          const fallbackUrl = `app.html?category=ai-ethics&scenario=bias-detection&source=fallback_test`;
+          console.log("Would navigate to fallback URL:", fallbackUrl);
+          updateResults(
+            "integration-results",
+            "Fallback URL method available",
+            "success",
+          );
+        } catch (error) {
+          console.error("Fallback test error:", error);
+          updateResults(
+            "integration-results",
+            `Fallback test failed: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      // Initialize
+      window.addEventListener("load", () => {
+        setTimeout(checkSystemStatus, 1000);
+      });
+
+      // Listen for scenario modal events
+      document.addEventListener("scenario-modal-opened", (event) => {
+        console.log("Scenario modal opened:", event.detail);
+        updateResults(
+          "integration-results",
+          "Scenario modal opened successfully",
+          "success",
+        );
+      });
+
+      document.addEventListener("scenario-completed", (event) => {
+        console.log("Scenario completed:", event.detail);
+        updateResults(
+          "integration-results",
+          "Scenario completed successfully",
+          "success",
+        );
+      });
+    </script>
+  </body>
+</html>

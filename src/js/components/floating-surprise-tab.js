@@ -646,42 +646,77 @@ class FloatingSurpriseTab {
   }
 
   /**
-   * Launch a scenario using the same mechanism as scenario cards
+   * Launch a scenario using the unified architecture
    */
   launchScenario(scenario) {
     try {
-      // Find the quick start button for this scenario
-      const quickStartBtn = scenario.element.querySelector(
-        ".scenario-quick-start-btn",
+      console.log(
+        "FloatingSurpriseTab: Launching scenario via unified architecture:",
+        scenario.title,
       );
 
-      if (quickStartBtn) {
-        // Simulate clicking the quick start button
-        console.log(
-          "FloatingSurpriseTab: Clicking quick start button for:",
-          scenario.title,
+      // Method 1: Try to use the main grid's unified launch system
+      if (
+        window.app &&
+        window.app.categoryGrid &&
+        window.app.categoryGrid.openScenarioModalDirect
+      ) {
+        console.log("FloatingSurpriseTab: Using MainGrid unified launch");
+        window.app.categoryGrid.openScenarioModalDirect(
+          scenario.categoryId,
+          scenario.id,
         );
-        quickStartBtn.click();
         return true;
       }
 
-      // Fallback: try the regular start button
-      const startBtn = scenario.element.querySelector(".scenario-start-btn");
-      if (startBtn) {
+      // Method 2: Try to use the scenario browser's unified launch system
+      if (
+        window.scenarioBrowser &&
+        window.scenarioBrowser.openScenarioModalDirect
+      ) {
         console.log(
-          "FloatingSurpriseTab: Clicking start button for:",
-          scenario.title,
+          "FloatingSurpriseTab: Using ScenarioBrowser unified launch",
         );
-        startBtn.click();
+        window.scenarioBrowser.openScenarioModalDirect(
+          scenario.categoryId,
+          scenario.id,
+        );
         return true;
       }
 
-      // Final fallback: dispatch a custom event with scenario details
+      // Method 3: Try direct ScenarioModal instantiation (same as Quick Start)
+      if (window.ScenarioModal || typeof ScenarioModal !== "undefined") {
+        console.log(
+          "FloatingSurpriseTab: Using direct ScenarioModal instantiation",
+        );
+        import("../components/scenario-modal.js")
+          .then(({ default: ScenarioModal }) => {
+            const scenarioModal = new ScenarioModal();
+            scenarioModal.open(scenario.id, scenario.categoryId);
+          })
+          .catch((error) => {
+            console.error(
+              "FloatingSurpriseTab: Failed to import ScenarioModal:",
+              error,
+            );
+            this.fallbackLaunchMethod(scenario);
+          });
+        return true;
+      }
+
+      // Method 4: Fallback to button simulation (original method)
+      const success = this.tryButtonSimulation(scenario);
+      if (success) {
+        return true;
+      }
+
+      // Method 5: Final fallback - custom event dispatch
       const event = new CustomEvent("launchScenario", {
         detail: {
           scenarioId: scenario.id,
           categoryId: scenario.categoryId,
           source: "surprise_tab",
+          timestamp: Date.now(),
         },
       });
       document.dispatchEvent(event);
@@ -694,12 +729,62 @@ class FloatingSurpriseTab {
     } catch (error) {
       console.error("FloatingSurpriseTab: Error launching scenario:", error);
       this.trackSurpriseInteraction("surprise_error", {
-        method: "direct_scenario_launch",
+        method: "unified_scenario_launch",
         scenarioId: scenario.id,
         error: error.message,
       });
       return false;
     }
+  }
+
+  /**
+   * Try button simulation method (legacy fallback)
+   */
+  tryButtonSimulation(scenario) {
+    try {
+      // Find the quick start button for this scenario
+      const quickStartBtn = scenario.element?.querySelector(
+        ".scenario-quick-start-btn",
+      );
+
+      if (quickStartBtn) {
+        console.log(
+          "FloatingSurpriseTab: Clicking quick start button for:",
+          scenario.title,
+        );
+        quickStartBtn.click();
+        return true;
+      }
+
+      // Fallback: try the regular start button
+      const startBtn = scenario.element?.querySelector(".scenario-start-btn");
+      if (startBtn) {
+        console.log(
+          "FloatingSurpriseTab: Clicking start button for:",
+          scenario.title,
+        );
+        startBtn.click();
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error("FloatingSurpriseTab: Button simulation failed:", error);
+      return false;
+    }
+  }
+
+  /**
+   * Final fallback launch method
+   */
+  fallbackLaunchMethod(scenario) {
+    console.log("FloatingSurpriseTab: Using final fallback method");
+
+    // Try direct URL navigation as absolute last resort
+    const url = `app.html?category=${scenario.categoryId}&scenario=${scenario.id}&source=surprise_tab`;
+
+    // Use window.location for immediate navigation
+    window.location.href = url;
   }
 
   addSuccessFeedback() {

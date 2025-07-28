@@ -2049,6 +2049,15 @@ class MainGrid {
         this.scenarioCompletedHandler,
       );
     }
+
+    // Listen for surprise tab scenario launch requests - only add once
+    if (!this.launchScenarioHandler) {
+      this.launchScenarioHandler = this.handleLaunchScenarioEvent.bind(this);
+      document.addEventListener("launchScenario", this.launchScenarioHandler);
+      logger.info(
+        "🎯 MAIN-GRID: launchScenario event listener attached for surprise tab integration",
+      );
+    }
   }
 
   removeEventListeners() {
@@ -2096,6 +2105,15 @@ class MainGrid {
         this.scenarioCompletedHandler,
       );
       this.scenarioCompletedHandler = null;
+    }
+
+    // Remove launch scenario event listener
+    if (this.launchScenarioHandler) {
+      document.removeEventListener(
+        "launchScenario",
+        this.launchScenarioHandler,
+      );
+      this.launchScenarioHandler = null;
     }
 
     // Clean up scenario modal instance
@@ -2587,6 +2605,34 @@ class MainGrid {
         });
       }
     }
+  }
+
+  /**
+   * Handle scenario launch requests from surprise tab and other components
+   */
+  handleLaunchScenarioEvent(event) {
+    const { scenarioId, categoryId, source } = event.detail;
+
+    logger.info("MainGrid: Handling launchScenario event", {
+      scenarioId,
+      categoryId,
+      source,
+    });
+
+    // Track the launch request
+    this.systemCollector.trackScenarioPerformance({
+      scenarioId,
+      categoryId,
+      action: "view",
+      metadata: {
+        source: source || "unknown",
+        launchMethod: "custom_event",
+        timestamp: new Date().toISOString(),
+      },
+    });
+
+    // Use the unified launch method (direct to scenario modal)
+    this.openScenarioModalDirect(categoryId, scenarioId);
   }
 
   /**
