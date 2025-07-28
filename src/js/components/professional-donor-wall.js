@@ -7,6 +7,7 @@
  * - DOM element caching to reduce querySelector calls
  * - Batched DOM operations and element reuse
  * - Optimized state change detection and updates
+ * - DOM Batching Manager for efficient DOM manipulations
  *
  * DataHandler Integration:
  * - Centralized donor data management and analytics
@@ -15,11 +16,170 @@
  * - Offline interaction queuing and smart caching
  */
 
+/**
+ * DOM Batching Manager for optimized DOM operations
+ */
+class DonorWallBatchManager {
+  constructor() {
+    this.pendingOperations = [];
+    this.animationScheduled = false;
+    this.performanceMetrics = {
+      batchedOperations: 0,
+      layoutRecalculations: 0,
+      domOperationsSaved: 0,
+      renderTime: 0,
+    };
+  }
+
+  /**
+   * Schedule DOM operation for batching
+   */
+  scheduleDOMUpdate(callback) {
+    this.pendingOperations.push(callback);
+
+    if (!this.animationScheduled) {
+      this.animationScheduled = true;
+      requestAnimationFrame(() => {
+        this.executeBatch();
+      });
+    }
+  }
+
+  /**
+   * Execute all pending DOM operations in a batch
+   */
+  executeBatch() {
+    const startTime = performance.now();
+
+    try {
+      this.pendingOperations.forEach((operation) => {
+        try {
+          operation();
+        } catch (error) {
+          console.warn(
+            "[DonorWall] Failed to execute batched operation:",
+            error,
+          );
+        }
+      });
+
+      this.performanceMetrics.batchedOperations++;
+      this.performanceMetrics.domOperationsSaved += Math.max(
+        0,
+        this.pendingOperations.length - 1,
+      );
+    } finally {
+      this.pendingOperations = [];
+      this.animationScheduled = false;
+
+      const endTime = performance.now();
+      this.performanceMetrics.renderTime = endTime - startTime;
+      this.performanceMetrics.layoutRecalculations++;
+    }
+  }
+
+  /**
+   * Batch DOM element creation using DocumentFragment
+   */
+  batchCreateElements(elementsData) {
+    const fragment = document.createDocumentFragment();
+
+    elementsData.forEach(
+      ({ tagName, className, attributes, innerHTML, children }) => {
+        const element = document.createElement(tagName);
+
+        if (className) element.className = className;
+        if (innerHTML) element.innerHTML = innerHTML;
+
+        // Batch set attributes
+        if (attributes) {
+          Object.entries(attributes).forEach(([key, value]) => {
+            element.setAttribute(key, value);
+          });
+        }
+
+        // Append children if provided
+        if (children && children.length > 0) {
+          children.forEach((child) => {
+            if (typeof child === "string") {
+              element.appendChild(document.createTextNode(child));
+            } else {
+              element.appendChild(child);
+            }
+          });
+        }
+
+        fragment.appendChild(element);
+      },
+    );
+
+    return fragment;
+  }
+
+  /**
+   * Batch attribute updates for multiple elements
+   */
+  batchSetAttributes(elements, attributes) {
+    this.scheduleDOMUpdate(() => {
+      elements.forEach((element) => {
+        Object.entries(attributes).forEach(([key, value]) => {
+          element.setAttribute(key, value);
+        });
+      });
+    });
+  }
+
+  /**
+   * Batch class operations for multiple elements
+   */
+  batchClassOperations(operations) {
+    this.scheduleDOMUpdate(() => {
+      operations.forEach(({ elements, action, className }) => {
+        elements.forEach((element) => {
+          switch (action) {
+            case "add":
+              element.classList.add(className);
+              break;
+            case "remove":
+              element.classList.remove(className);
+              break;
+            case "toggle":
+              element.classList.toggle(className);
+              break;
+          }
+        });
+      });
+    });
+  }
+
+  /**
+   * Get performance metrics
+   */
+  getMetrics() {
+    return { ...this.performanceMetrics };
+  }
+
+  /**
+   * Reset performance metrics
+   */
+  resetMetrics() {
+    this.performanceMetrics = {
+      batchedOperations: 0,
+      layoutRecalculations: 0,
+      domOperationsSaved: 0,
+      renderTime: 0,
+    };
+  }
+}
+
 class ProfessionalDonorWall {
   constructor(app = null) {
     // DataHandler integration for centralized data management
     this.app = app;
     this.dataHandler = app?.dataHandler || null;
+
+    // Initialize batching manager for optimized DOM operations
+    this.batchManager = new DonorWallBatchManager();
 
     this.currentSlide = 0;
     this.currentFilter = "recent";
@@ -588,7 +748,7 @@ class ProfessionalDonorWall {
   }
 
   /**
-   * Render donor cards in the carousel with change detection and caching
+   * Render donor cards in the carousel with batched DOM operations
    */
   renderDonorCards() {
     const container = this.getCachedElement("container");
@@ -600,35 +760,86 @@ class ProfessionalDonorWall {
       return; // No changes, skip expensive DOM operations
     }
 
-    container.innerHTML = "";
+    const startTime = performance.now();
 
-    this.filteredDonors.forEach((donor, index) => {
-      const card = this.createDonorCard(donor);
-      container.appendChild(card);
+    // Batch DOM operations for optimal performance
+    this.batchManager.scheduleDOMUpdate(() => {
+      container.innerHTML = "";
 
-      // Add entrance animation
-      setTimeout(() => {
-        card.classList.add("animate-in");
-      }, index * 100);
+      // Create all donor cards using DocumentFragment for batched insertion
+      const cardsData = this.filteredDonors.map((donor, index) => ({
+        element: this.createDonorCard(donor),
+        animationDelay: index * 100,
+      }));
+
+      // Use DocumentFragment for efficient batch insertion
+      const fragment = document.createDocumentFragment();
+      cardsData.forEach(({ element }) => {
+        fragment.appendChild(element);
+      });
+
+      // Single DOM insertion operation
+      container.appendChild(fragment);
+
+      // Batch animation class additions
+      this.batchManager.scheduleDOMUpdate(() => {
+        cardsData.forEach(({ element, animationDelay }) => {
+          setTimeout(() => {
+            element.classList.add("animate-in");
+          }, animationDelay);
+        });
+      });
     });
 
     this.lastRenderedData = currentDataHash; // Mark as rendered
     this.updateCarouselState();
+
+    const endTime = performance.now();
+    console.debug(
+      `[DonorWall] Batched card rendering took ${endTime - startTime}ms`,
+    );
   }
 
   /**
-   * Create individual donor card element with optimized DOM operations
+   * Create individual donor card element with batched DOM operations
    */
   createDonorCard(donor) {
-    const card = document.createElement("div");
-    card.className = "donor-card";
-    card.setAttribute("data-visibility", donor.visibility);
-    card.setAttribute("data-donor-id", donor.id);
+    // Use batched element creation for optimal performance
+    const cardElements = [
+      {
+        tagName: "div",
+        className: "donor-card",
+        attributes: {
+          "data-visibility": donor.visibility,
+          "data-donor-id": donor.id,
+        },
+      },
+    ];
 
-    // Create avatar section
+    const card = this.batchManager.batchCreateElements(cardElements).firstChild;
+
+    // Create avatar and info sections
     const avatar = this.createAvatar(donor);
+    const info = this.createDonorInfo(donor);
 
-    // Create donor info section with batched element creation
+    // Batch append operations
+    this.batchManager.scheduleDOMUpdate(() => {
+      card.appendChild(avatar);
+      card.appendChild(info);
+    });
+
+    // Add hover analytics with batched event listener
+    card.addEventListener("mouseenter", () => {
+      this.trackInteraction("donor_card_hover", { donorId: donor.id });
+    });
+
+    return card;
+  }
+
+  /**
+   * Create donor info section with batched operations
+   */
+  createDonorInfo(donor) {
     const info = document.createElement("div");
     info.className = "donor-info";
 
@@ -641,56 +852,80 @@ class ProfessionalDonorWall {
 
     // Add reflection if available and user has opted in
     if (donor.reflection && donor.visibility !== "anonymous") {
-      const reflection = document.createElement("div");
-      reflection.className = "donor-reflection";
-      reflection.innerHTML = `<p>${donor.reflection}</p>`;
-      info.appendChild(reflection);
+      this.batchManager.scheduleDOMUpdate(() => {
+        const reflection = document.createElement("div");
+        reflection.className = "donor-reflection";
+        reflection.innerHTML = `<p>${donor.reflection}</p>`;
+        info.appendChild(reflection);
+      });
     }
 
-    // Assemble card efficiently
-    card.appendChild(avatar);
-    card.appendChild(info);
-
-    // Add hover analytics
-    card.addEventListener("mouseenter", () => {
-      this.trackInteraction("donor_card_hover", { donorId: donor.id });
-    });
-
-    return card;
+    return info;
   }
 
   /**
-   * Create avatar element for donor
+   * Create avatar element for donor with batched operations
    */
   createAvatar(donor) {
     const avatarContainer = document.createElement("div");
     avatarContainer.className = "donor-avatar";
 
+    // Prepare elements for batched creation
+    const elementsToAppend = [];
+
     if (donor.visibility === "anonymous" || !donor.avatar) {
-      const anonymousAvatar = document.createElement("div");
-      anonymousAvatar.className = "anonymous-avatar";
-      anonymousAvatar.setAttribute("aria-label", "Anonymous contributor");
-      avatarContainer.appendChild(anonymousAvatar);
+      const anonymousAvatarData = {
+        tagName: "div",
+        className: "anonymous-avatar",
+        attributes: {
+          "aria-label": "Anonymous contributor",
+        },
+      };
+      const anonymousAvatar = this.batchManager.batchCreateElements([
+        anonymousAvatarData,
+      ]).firstChild;
+      elementsToAppend.push(anonymousAvatar);
     } else {
       const img = document.createElement("img");
       img.src = donor.avatar;
       img.alt = `${donor.displayName} avatar`;
       img.onerror = () => {
-        // Fallback to anonymous avatar if image fails to load
-        img.style.display = "none";
-        const fallback = document.createElement("div");
-        fallback.className = "anonymous-avatar";
-        fallback.setAttribute("aria-label", "Contributor avatar");
-        avatarContainer.appendChild(fallback);
+        // Batch fallback operations
+        this.batchManager.scheduleDOMUpdate(() => {
+          img.style.display = "none";
+          const fallbackData = {
+            tagName: "div",
+            className: "anonymous-avatar",
+            attributes: {
+              "aria-label": "Contributor avatar",
+            },
+          };
+          const fallback = this.batchManager.batchCreateElements([
+            fallbackData,
+          ]).firstChild;
+          avatarContainer.appendChild(fallback);
+        });
       };
-      avatarContainer.appendChild(img);
+      elementsToAppend.push(img);
     }
 
-    // Add tier badge
-    const badge = document.createElement("div");
-    badge.className = `donor-badge ${donor.tier}-tier`;
-    badge.setAttribute("aria-label", `${donor.tier} tier contributor`);
-    avatarContainer.appendChild(badge);
+    // Create tier badge
+    const badgeData = {
+      tagName: "div",
+      className: `donor-badge ${donor.tier}-tier`,
+      attributes: {
+        "aria-label": `${donor.tier} tier contributor`,
+      },
+    };
+    const badge = this.batchManager.batchCreateElements([badgeData]).firstChild;
+    elementsToAppend.push(badge);
+
+    // Batch append all elements
+    this.batchManager.scheduleDOMUpdate(() => {
+      elementsToAppend.forEach((element) => {
+        avatarContainer.appendChild(element);
+      });
+    });
 
     return avatarContainer;
   }
@@ -770,19 +1005,40 @@ class ProfessionalDonorWall {
   }
 
   /**
-   * Set active filter button with cached elements
+   * Set active filter button with batched class operations
    */
   setActiveFilter(clickedBtn) {
     const filterBtns = this.getCachedElement("filterBtns");
     if (filterBtns) {
+      // Batch class and attribute operations for all filter buttons
+      const buttonOperations = [];
+      const attributeUpdates = {};
+
       filterBtns.forEach((btn) => {
-        btn.classList.remove("active");
-        btn.setAttribute("aria-selected", "false");
+        buttonOperations.push({
+          elements: [btn],
+          action: "remove",
+          className: "active",
+        });
+        attributeUpdates[btn] = { "aria-selected": "false" };
+      });
+
+      // Add active state to clicked button
+      buttonOperations.push({
+        elements: [clickedBtn],
+        action: "add",
+        className: "active",
+      });
+      attributeUpdates[clickedBtn] = { "aria-selected": "true" };
+
+      // Execute batched operations
+      this.batchManager.batchClassOperations(buttonOperations);
+
+      // Batch attribute updates
+      Object.entries(attributeUpdates).forEach(([element, attributes]) => {
+        this.batchManager.batchSetAttributes([element], attributes);
       });
     }
-
-    clickedBtn.classList.add("active");
-    clickedBtn.setAttribute("aria-selected", "true");
   }
 
   /**
@@ -857,7 +1113,7 @@ class ProfessionalDonorWall {
   }
 
   /**
-   * Update carousel visual state with cached elements
+   * Update carousel visual state with batched operations
    */
   updateCarouselState() {
     const container = this.getCachedElement("container");
@@ -866,28 +1122,31 @@ class ProfessionalDonorWall {
 
     if (!container) return;
 
-    // Calculate transform
+    const maxSlides = this.getMaxSlides();
     const cardWidth = 280 + 24; // card width + gap
     const transform = -this.currentSlide * cardWidth * this.cardsPerView;
-    container.style.transform = `translateX(${transform}px)`;
 
-    // Update navigation buttons
-    const maxSlides = this.getMaxSlides();
+    // Batch all DOM updates
+    this.batchManager.scheduleDOMUpdate(() => {
+      // Update container transform
+      container.style.transform = `translateX(${transform}px)`;
 
-    if (prevBtn) {
-      prevBtn.disabled = this.currentSlide === 0;
-    }
+      // Update navigation buttons
+      if (prevBtn) {
+        prevBtn.disabled = this.currentSlide === 0;
+      }
 
-    if (nextBtn) {
-      nextBtn.disabled = this.currentSlide >= maxSlides;
-    }
+      if (nextBtn) {
+        nextBtn.disabled = this.currentSlide >= maxSlides;
+      }
+    });
 
     // Update indicators
     this.updateIndicators();
   }
 
   /**
-   * Update carousel indicators with cached elements
+   * Update carousel indicators with batched DOM operations
    */
   updateCarouselIndicators() {
     const indicatorsContainer = this.getCachedElement("indicators");
@@ -895,35 +1154,67 @@ class ProfessionalDonorWall {
 
     const maxSlides = this.getMaxSlides();
 
-    indicatorsContainer.innerHTML = "";
+    // Batch create all indicators using DocumentFragment
+    const indicatorElements = [];
 
     for (let i = 0; i <= maxSlides; i++) {
-      const indicator = document.createElement("button");
-      indicator.className = "indicator";
-      indicator.setAttribute("data-slide", i);
-      indicator.setAttribute("role", "tab");
-      indicator.setAttribute("aria-label", `Page ${i + 1}`);
-      indicator.setAttribute(
-        "aria-selected",
-        i === this.currentSlide ? "true" : "false",
-      );
-
-      if (i === this.currentSlide) {
-        indicator.classList.add("active");
-      }
-
-      indicatorsContainer.appendChild(indicator);
+      indicatorElements.push({
+        tagName: "button",
+        className: i === this.currentSlide ? "indicator active" : "indicator",
+        attributes: {
+          "data-slide": i.toString(),
+          role: "tab",
+          "aria-label": `Page ${i + 1}`,
+          "aria-selected": i === this.currentSlide ? "true" : "false",
+        },
+      });
     }
+
+    // Batch DOM operations
+    this.batchManager.scheduleDOMUpdate(() => {
+      indicatorsContainer.innerHTML = "";
+      const indicatorsFragment =
+        this.batchManager.batchCreateElements(indicatorElements);
+      indicatorsContainer.appendChild(indicatorsFragment);
+    });
   }
 
   /**
-   * Update individual indicators
+   * Update individual indicators with batched operations
    */
   updateIndicators() {
-    document.querySelectorAll(".indicator").forEach((indicator, index) => {
-      const isActive = index === this.currentSlide;
-      indicator.classList.toggle("active", isActive);
-      indicator.setAttribute("aria-selected", isActive ? "true" : "false");
+    const indicators = document.querySelectorAll(".indicator");
+    if (indicators.length === 0) return;
+
+    // Prepare batched class and attribute operations
+    const classOperations = [];
+    const allIndicators = Array.from(indicators);
+
+    // Batch remove active class from all indicators
+    classOperations.push({
+      elements: allIndicators,
+      action: "remove",
+      className: "active",
+    });
+
+    // Add active class to current indicator
+    if (indicators[this.currentSlide]) {
+      classOperations.push({
+        elements: [indicators[this.currentSlide]],
+        action: "add",
+        className: "active",
+      });
+    }
+
+    // Execute batched class operations
+    this.batchManager.batchClassOperations(classOperations);
+
+    // Batch attribute updates
+    this.batchManager.scheduleDOMUpdate(() => {
+      indicators.forEach((indicator, index) => {
+        const isActive = index === this.currentSlide;
+        indicator.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
     });
   }
 
@@ -1047,18 +1338,21 @@ class ProfessionalDonorWall {
   }
 
   /**
-   * Enhanced interaction tracking with DataHandler persistence
+   * Enhanced interaction tracking with batching performance metrics
    * @param {string} action - Type of interaction (click, navigate, filter, etc.)
    * @param {Object} data - Interaction details
    */
   async trackInteraction(action, data = {}) {
     const timestamp = new Date().toISOString();
+    const batchingMetrics = this.batchManager.getMetrics();
+
     const interaction = {
       timestamp,
       action,
       currentSlide: this.currentSlide,
       currentFilter: this.currentFilter,
-      visibleDonors: this.currentDonors.length,
+      visibleDonors: this.filteredDonors.length,
+      batchingMetrics,
       ...data,
     };
 
@@ -1076,11 +1370,61 @@ class ProfessionalDonorWall {
         window.gtag("event", action, {
           event_category: "donor_wall",
           event_label: JSON.stringify(data),
+          custom_parameters: {
+            batching_performance: batchingMetrics.domOperationsSaved,
+          },
         });
       }
     } catch (error) {
       console.warn("Failed to track donor wall interaction:", error);
     }
+  }
+
+  /**
+   * Get batching performance report
+   */
+  getBatchingReport() {
+    const metrics = this.batchManager.getMetrics();
+    return {
+      component: "professional-donor-wall",
+      metrics,
+      efficiency: {
+        operationsSaved: metrics.domOperationsSaved,
+        batchingEfficiency:
+          metrics.domOperationsSaved > 0
+            ? (metrics.domOperationsSaved /
+                (metrics.batchedOperations + metrics.domOperationsSaved)) *
+              100
+            : 0,
+        averageRenderTime: metrics.renderTime,
+        layoutRecalculations: metrics.layoutRecalculations,
+      },
+      recommendations: this.generateOptimizationRecommendations(metrics),
+    };
+  }
+
+  /**
+   * Generate optimization recommendations based on metrics
+   */
+  generateOptimizationRecommendations(metrics) {
+    const recommendations = [];
+
+    if (metrics.renderTime > 16) {
+      // > 1 frame at 60fps
+      recommendations.push(
+        "Consider reducing DOM complexity for faster rendering",
+      );
+    }
+
+    if (metrics.domOperationsSaved < 10) {
+      recommendations.push("More operations could benefit from batching");
+    }
+
+    if (metrics.layoutRecalculations > 5) {
+      recommendations.push("Consider reducing layout-triggering operations");
+    }
+
+    return recommendations;
   }
 
   /**
@@ -1096,12 +1440,37 @@ class ProfessionalDonorWall {
   }
 
   /**
-   * Clean up Firebase listeners when component is destroyed
+   * Clean up Firebase listeners and batching operations when component is destroyed
    */
   destroy() {
+    // Firebase cleanup
     if (this.unsubscribe) {
       this.unsubscribe();
     }
+
+    // Clear autoplay interval
+    if (this.autoplayInterval) {
+      clearInterval(this.autoplayInterval);
+    }
+
+    // Generate final batching report before cleanup
+    const finalReport = this.getBatchingReport();
+    console.log("[DonorWall] Final batching performance report:", finalReport);
+
+    // Save performance metrics if DataHandler is available
+    if (this.dataHandler) {
+      this.dataHandler
+        .saveData("donorWall_batchingMetrics", finalReport)
+        .catch((error) =>
+          console.warn("[DonorWall] Failed to save batching metrics:", error),
+        );
+    }
+
+    // Reset batching manager
+    this.batchManager.resetMetrics();
+
+    // Clear DOM cache
+    this.domCache.clear();
   }
 
   /**

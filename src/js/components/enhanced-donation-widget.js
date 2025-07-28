@@ -8,6 +8,12 @@ class EnhancedDonationWidget {
   constructor() {
     this.isAuthenticated = false;
     this.currentUser = null;
+
+    // Performance Optimization: DOM Element Cache
+    this.domCache = new Map();
+    this.updateScheduled = false;
+    this.boundEventHandler = null;
+
     this.donationTiers = [
       {
         id: 1,
@@ -63,9 +69,76 @@ class EnhancedDonationWidget {
     }
   }
 
+  // ========================================
+  // Performance Optimization Methods
+  // ========================================
+
+  /**
+   * Get cached DOM element (optimized querySelector)
+   */
+  getCachedElement(selector) {
+    if (!this.domCache.has(selector)) {
+      const element = document.querySelector(selector);
+      if (element) {
+        this.domCache.set(selector, element);
+      }
+    }
+    return this.domCache.get(selector) || null;
+  }
+
+  /**
+   * Get cached DOM elements (optimized querySelectorAll)
+   */
+  getCachedElements(selector) {
+    const cacheKey = `${selector}:all`;
+    if (!this.domCache.has(cacheKey)) {
+      const elements = Array.from(document.querySelectorAll(selector));
+      this.domCache.set(cacheKey, elements);
+    }
+    return this.domCache.get(cacheKey) || [];
+  }
+
+  /**
+   * Clear DOM cache (called when DOM structure changes)
+   */
+  clearDOMCache() {
+    this.domCache.clear();
+  }
+
+  /**
+   * Schedule DOM update for batching
+   */
+  scheduleDOMUpdate(updateFn) {
+    if (!this.updateScheduled) {
+      this.updateScheduled = true;
+      requestAnimationFrame(() => {
+        try {
+          updateFn();
+        } catch (error) {
+          console.error("[DonationWidget] DOM update failed:", error);
+        }
+        this.updateScheduled = false;
+      });
+    }
+  }
+
+  /**
+   * Batch multiple style updates to prevent layout thrashing
+   */
+  batchStyleUpdates(updates) {
+    this.scheduleDOMUpdate(() => {
+      updates.forEach(({ element, styles }) => {
+        Object.assign(element.style, styles);
+      });
+    });
+  }
+
   render(containerId, options = {}) {
     const container = document.getElementById(containerId);
     if (!container) return;
+
+    // Clear DOM cache before rendering new content
+    this.clearDOMCache();
 
     const defaultOptions = {
       title: "💖 Support SimulateAI Research",
@@ -318,163 +391,148 @@ class EnhancedDonationWidget {
   }
 
   attachEventListeners() {
-    // Use event delegation for buttons that might be inside collapsed accordion content
-    const container = document.body;
-
     // Remove any existing listeners to prevent duplicates
-    if (this.handleDelegatedClick) {
-      container.removeEventListener("click", this.handleDelegatedClick);
+    if (this.boundEventHandler) {
+      document.body.removeEventListener("click", this.boundEventHandler);
     }
 
-    // Bind the event handler to this instance
-    this.handleDelegatedClick = (e) => {
+    // Single optimized event handler using delegation
+    this.boundEventHandler = (e) => {
       // Donation type selector
       if (e.target.classList.contains("donation-type-btn")) {
-        document
-          .querySelectorAll(".donation-type-btn")
-          .forEach((b) => b.classList.remove("active"));
-        e.target.classList.add("active");
-        this.updateTierDisplay();
+        this.handleDonationTypeSelection(e.target);
         return;
       }
 
       // Tier selection - directly process donation
       if (e.target.closest(".tier-option")) {
-        const tierOption = e.target.closest(".tier-option");
-
-        document
-          .querySelectorAll(".tier-option")
-          .forEach((o) => o.classList.remove("selected"));
-        tierOption.classList.add("selected");
-
-        // Directly process the donation without needing submit button
-        const tierId = tierOption.dataset.tier;
-        const tier = this.donationTiers.find((t) => t.id == tierId);
-        if (tier) {
-          this.processTierSelection(tier);
-        }
+        this.handleTierSelection(e.target.closest(".tier-option"));
         return;
       }
 
-      // Submit donation (keeping for any legacy references)
-      if (
-        e.target.id === "submit-donation" ||
-        e.target.closest("#submit-donation")
-      ) {
-        e.preventDefault();
-        // Legacy fallback - shouldn't happen with new UI
-        return;
-      }
-
-      // Sign in link
-      if (e.target.id === "sign-in-link") {
-        e.preventDefault();
-        this.showSignInModal();
-        return;
-      }
-
-      // Recognition prompt actions
-      if (e.target.id === "create-account-btn") {
-        this.showSignUpModal();
-        return;
-      }
-
-      if (e.target.id === "skip-recognition-btn") {
-        this.hideRecognitionPrompt();
-        return;
-      }
+      // Handle other clicks
+      this.handleOtherClicks(e.target, e);
     };
 
-    container.addEventListener("click", this.handleDelegatedClick);
-
-    // Also add direct listeners as a fallback after a short delay to ensure DOM is ready
-    const DOM_READY_DELAY = 100;
-    setTimeout(() => {
-      this.addDirectEventListeners();
-    }, DOM_READY_DELAY);
+    document.body.addEventListener("click", this.boundEventHandler);
   }
 
-  addDirectEventListeners() {
-    // Direct event listeners as fallback
-    document.querySelectorAll(".tier-option").forEach((option) => {
-      option.addEventListener("click", () => {
-        document
-          .querySelectorAll(".tier-option")
-          .forEach((o) => o.classList.remove("selected"));
-        option.classList.add("selected");
+  /**
+   * Handle donation type button selection
+   */
+  handleDonationTypeSelection(target) {
+    this.getCachedElements(".donation-type-btn").forEach((btn) =>
+      btn.classList.remove("active"),
+    );
+    target.classList.add("active");
+    this.updateTierDisplay();
+  }
 
-        // Directly process the donation
-        const tierId = option.dataset.tier;
-        const tier = this.donationTiers.find((t) => t.id == tierId);
-        if (tier) {
-          this.processTierSelection(tier);
-        }
-      });
-    });
+  /**
+   * Handle tier option selection
+   */
+  handleTierSelection(tierOption) {
+    this.getCachedElements(".tier-option").forEach((option) =>
+      option.classList.remove("selected"),
+    );
+    tierOption.classList.add("selected");
 
-    document.querySelectorAll(".donation-type-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        document
-          .querySelectorAll(".donation-type-btn")
-          .forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        this.updateTierDisplay();
-      });
-    });
+    const tierId = tierOption.dataset.tier;
+    const tier = this.donationTiers.find((t) => t.id == tierId);
+    if (tier) {
+      this.processTierSelection(tier);
+    }
+  }
+
+  /**
+   * Handle other click events
+   */
+  handleOtherClicks(target, event) {
+    if (target.id === "sign-in-link") {
+      event.preventDefault();
+      this.showSignInModal();
+    } else if (target.id === "create-account-btn") {
+      this.showSignUpModal();
+    } else if (target.id === "skip-recognition-btn") {
+      this.hideRecognitionPrompt();
+    }
   }
 
   updateUI() {
-    const authBanner = document.getElementById("auth-status-banner");
+    const authBanner = this.getCachedElement("#auth-status-banner");
     if (authBanner) {
-      authBanner.innerHTML = this.renderAuthBanner();
+      this.scheduleDOMUpdate(() => {
+        authBanner.innerHTML = this.renderAuthBanner();
+      });
     }
 
-    // Update benefits section
-    const authenticatedBenefits = document.querySelectorAll(
-      ".authenticated-only",
-    );
-    authenticatedBenefits.forEach((element) => {
-      element.classList.toggle("hidden", !this.isAuthenticated);
-    });
+    // Batch update authenticated benefits visibility
+    const authenticatedBenefits = this.getCachedElements(".authenticated-only");
+    if (authenticatedBenefits.length > 0) {
+      this.scheduleDOMUpdate(() => {
+        authenticatedBenefits.forEach((element) => {
+          element.classList.toggle("hidden", !this.isAuthenticated);
+        });
+      });
+    }
 
     // Update donation type selection based on auth status
     this.updateDonationTypeSelection();
   }
 
   updateDonationTypeSelection() {
-    const quickBtn = document.getElementById("quick-donate-btn");
-    const recognizedBtn = document.getElementById("recognized-donate-btn");
-
     if (this.isAuthenticated) {
-      // If authenticated, default to recognized donation
-      if (quickBtn) quickBtn.classList.remove("active");
-      if (recognizedBtn) recognizedBtn.classList.add("active");
+      const quickBtn = this.getCachedElement("#quick-donate-btn");
+      const recognizedBtn = this.getCachedElement("#recognized-donate-btn");
+
+      this.scheduleDOMUpdate(() => {
+        if (quickBtn) quickBtn.classList.remove("active");
+        if (recognizedBtn) recognizedBtn.classList.add("active");
+      });
     }
   }
 
   updateTierDisplay() {
-    const selectedType = document.querySelector(".donation-type-btn.active")
+    const selectedType = this.getCachedElement(".donation-type-btn.active")
       ?.dataset.type;
-    const tierOptions = document.querySelectorAll(".tier-option");
+    const tierOptions = this.getCachedElements(".tier-option");
+
+    if (tierOptions.length === 0) return;
+
+    // Batch all style updates to prevent layout thrashing
+    const styleUpdates = [];
 
     tierOptions.forEach((option) => {
       const tierHeader = option.querySelector(".tier-header");
+      if (!tierHeader) return;
 
       if (selectedType === "recognized" && this.isAuthenticated) {
-        // Show flair for recognized donations
-        tierHeader.style.background =
-          "linear-gradient(135deg, #f8f9fa, #e3f2fd)";
-        option.style.border = "2px solid #2196f3";
+        styleUpdates.push({
+          element: tierHeader,
+          styles: { background: "linear-gradient(135deg, #f8f9fa, #e3f2fd)" },
+        });
+        styleUpdates.push({
+          element: option,
+          styles: { border: "2px solid #2196f3" },
+        });
       } else {
-        // Standard styling for quick donations
-        tierHeader.style.background = "";
-        option.style.border = "";
+        styleUpdates.push({
+          element: tierHeader,
+          styles: { background: "" },
+        });
+        styleUpdates.push({
+          element: option,
+          styles: { border: "" },
+        });
       }
     });
+
+    // Apply all style updates in a single batch
+    this.batchStyleUpdates(styleUpdates);
   }
 
   async processTierSelection(tier) {
-    const selectedType = document.querySelector(".donation-type-btn.active")
+    const selectedType = this.getCachedElement(".donation-type-btn.active")
       ?.dataset.type;
 
     try {
@@ -495,8 +553,8 @@ class EnhancedDonationWidget {
   }
 
   async processDonation() {
-    const selectedTier = document.querySelector(".tier-option.selected");
-    const selectedType = document.querySelector(".donation-type-btn.active")
+    const selectedTier = this.getCachedElement(".tier-option.selected");
+    const selectedType = this.getCachedElement(".donation-type-btn.active")
       ?.dataset.type;
 
     if (!selectedTier) {
@@ -740,27 +798,31 @@ class EnhancedDonationWidget {
   }
 
   showRecognitionPrompt() {
-    const prompt = document.getElementById("recognition-prompt");
+    const prompt = this.getCachedElement("#recognition-prompt");
     if (prompt) {
-      prompt.classList.remove("hidden");
+      this.scheduleDOMUpdate(() => {
+        prompt.classList.remove("hidden");
+      });
     }
   }
 
   hideRecognitionPrompt() {
-    const prompt = document.getElementById("recognition-prompt");
+    const prompt = this.getCachedElement("#recognition-prompt");
     if (prompt) {
-      prompt.classList.add("hidden");
+      this.scheduleDOMUpdate(() => {
+        prompt.classList.add("hidden");
+      });
     }
   }
 
   toggleDonationAccordion() {
-    const accordionHeader = document.querySelector(
+    const accordionHeader = this.getCachedElement(
       ".donation-accordion .accordion-header",
     );
-    const accordionContent = document.querySelector(
+    const accordionContent = this.getCachedElement(
       ".donation-accordion .accordion-content",
     );
-    const accordionIcon = document.querySelector(
+    const accordionIcon = this.getCachedElement(
       ".donation-accordion .accordion-icon",
     );
 
@@ -768,29 +830,29 @@ class EnhancedDonationWidget {
 
     const isExpanded = accordionHeader.getAttribute("aria-expanded") === "true";
 
-    if (isExpanded) {
-      // Collapse
-      accordionHeader.setAttribute("aria-expanded", "false");
-      accordionContent.classList.add("collapsed");
-      accordionIcon.textContent = "▶";
-    } else {
-      // Expand
-      accordionHeader.setAttribute("aria-expanded", "true");
-      accordionContent.classList.remove("collapsed");
-      accordionIcon.textContent = "▼";
+    this.scheduleDOMUpdate(() => {
+      if (isExpanded) {
+        // Collapse
+        accordionHeader.setAttribute("aria-expanded", "false");
+        accordionContent.classList.add("collapsed");
+        accordionIcon.textContent = "▶";
+      } else {
+        // Expand
+        accordionHeader.setAttribute("aria-expanded", "true");
+        accordionContent.classList.remove("collapsed");
+        accordionIcon.textContent = "▼";
+      }
+    });
 
-      // Re-attach event listeners after expanding to ensure buttons work
-      const ACCORDION_ANIMATION_DELAY = 50;
+    // Clear cache after accordion state change to ensure fresh DOM queries
+    if (!isExpanded) {
       setTimeout(() => {
-        this.addDirectEventListeners();
-      }, ACCORDION_ANIMATION_DELAY);
+        this.clearDOMCache();
+      }, 100);
     }
   }
 
   simulateStripeCheckout(tier, donationType, email = "") {
-    const randomStr = Math.random().toString(36).substring(2, 11);
-    const mockSessionId = `b1${randomStr}`;
-
     const flairText =
       donationType === "authenticated" && this.isAuthenticated
         ? ` with flair: ${tier.flair}`
@@ -829,6 +891,27 @@ class EnhancedDonationWidget {
       const dataUrl = `data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`;
       window.open(dataUrl, "_blank");
     }
+  }
+
+  /**
+   * Cleanup method for component destruction
+   */
+  cleanup() {
+    // Remove event listeners
+    if (this.boundEventHandler) {
+      document.body.removeEventListener("click", this.boundEventHandler);
+      this.boundEventHandler = null;
+    }
+
+    // Clear DOM cache
+    this.clearDOMCache();
+
+    // Cancel any pending DOM updates
+    this.updateScheduled = false;
+
+    // Clear component references
+    this.isAuthenticated = false;
+    this.currentUser = null;
   }
 
   // Static method for easy initialization
