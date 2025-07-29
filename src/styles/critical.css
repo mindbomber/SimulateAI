@@ -58,7 +58,7 @@
   }
 
   /* Critical navigation foundation */
-  .header {
+  header.header {
     height: var(--header-h);
     background: var(--bg);
     border-bottom: 1px solid #e5e7eb;

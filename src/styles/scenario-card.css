@@ -235,7 +235,7 @@
   }
 
   .scenario-quick-start-btn {
-    background: var(--color-secondary);
+    background: #00aa00;
     color: var(--color-white);
     border: none;
     border-radius: var(--radius-md);
@@ -252,12 +252,12 @@
   }
 
   .scenario-quick-start-btn:hover {
-    background: var(--color-secondary-dark);
+    background: #008800;
     transform: translateX(2px);
   }
 
   .scenario-quick-start-btn:focus-visible {
-    outline: 2px solid var(--color-secondary);
+    outline: 2px solid #00aa00;
     outline-offset: 2px;
   }
 

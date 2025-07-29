@@ -6,7 +6,7 @@
     <title>Support AI Ethics Research - Anonymous Donation</title>
     <style>
       body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         line-height: 1.6;
         margin: 0;
         padding: 20px;
@@ -23,18 +23,18 @@
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
       }
 
-      .header {
+      .page-header {
         text-align: center;
         margin-bottom: 40px;
       }
 
-      .header h1 {
+      .page-header h1 {
         color: #2c3e50;
         margin-bottom: 16px;
         font-size: 2.5em;
       }
 
-      .header p {
+      .page-header p {
         color: #7f8c8d;
         font-size: 1.2em;
         margin-bottom: 0;
@@ -94,10 +94,11 @@
     </style>
   </head>
   <body data-page-id="donate">
-    <!-- Shared navigation will be injected here -->
+    <!-- Navigation container for SharedNavigation component injection -->
+    <div id="navigation-container"></div>
 
     <div class="container">
-      <div class="header">
+      <div class="page-header">
         <h1>🎓 Support AI Ethics Research</h1>
         <p>
           Help advance the understanding of ethical decision-making in
@@ -183,18 +184,18 @@
       // Firebase configuration should use environment variables in production
       // For development/demo purposes only - DO NOT use hardcoded keys in production
       const firebaseConfig = {
-        apiKey: window.FIREBASE_CONFIG?.apiKey || 'PLACEHOLDER_API_KEY',
+        apiKey: window.FIREBASE_CONFIG?.apiKey || "PLACEHOLDER_API_KEY",
         authDomain:
           window.FIREBASE_CONFIG?.authDomain ||
-          'simulateai-research.firebaseapp.com',
-        projectId: window.FIREBASE_CONFIG?.projectId || 'simulateai-research',
+          "simulateai-research.firebaseapp.com",
+        projectId: window.FIREBASE_CONFIG?.projectId || "simulateai-research",
         storageBucket:
           window.FIREBASE_CONFIG?.storageBucket ||
-          'simulateai-research.appspot.com',
+          "simulateai-research.appspot.com",
         messagingSenderId:
-          window.FIREBASE_CONFIG?.messagingSenderId || 'PLACEHOLDER_SENDER_ID',
-        appId: window.FIREBASE_CONFIG?.appId || 'PLACEHOLDER_APP_ID',
-        measurementId: 'G-XXXXXXXXXX',
+          window.FIREBASE_CONFIG?.messagingSenderId || "PLACEHOLDER_SENDER_ID",
+        appId: window.FIREBASE_CONFIG?.appId || "PLACEHOLDER_APP_ID",
+        measurementId: "G-XXXXXXXXXX",
       };
 
       // Initialize Firebase
@@ -202,12 +203,12 @@
 
       // Check for donation success in URL parameters
       const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('donation_success') === 'true') {
-        document.getElementById('thank-you-message').classList.add('show');
+      if (urlParams.get("donation_success") === "true") {
+        document.getElementById("thank-you-message").classList.add("show");
         // Scroll to thank you message
         document
-          .getElementById('thank-you-message')
-          .scrollIntoView({ behavior: 'smooth' });
+          .getElementById("thank-you-message")
+          .scrollIntoView({ behavior: "smooth" });
       }
     </script>
 

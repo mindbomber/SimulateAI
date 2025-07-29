@@ -190,7 +190,7 @@ body:has(.pre-launch-modal) .floating-tour-tab-link {
   z-index: 2;
 }
 
-.floating-tab-icon {
+.floating-action-tab-icon {
   flex-shrink: 0;
   width: 24px;
   height: 24px;
@@ -198,25 +198,50 @@ body:has(.pre-launch-modal) .floating-tour-tab-link {
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 20px;
+  line-height: 1;
 }
 
-.heart-icon {
+/* Heart emoji styling - replaces SVG approach */
+.floating-action-tab-icon::before {
+  content: "💖";
+  font-size: 20px;
+  display: block;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 10%));
+  transition: all 0.3s ease;
+}
+
+.floating-action-tab-heart-icon {
   width: 24px;
   height: 24px;
   color: rgb(255 255 255 / 95%);
   filter: drop-shadow(0 1px 2px rgb(0 0 0 / 10%));
   transition: all 0.3s ease;
-  display: flex;
+  display: flex !important; /* Ensure visibility - override any conflicting styles */
   align-items: center;
   justify-content: center;
   font-size: 20px;
   line-height: 1;
 }
 
-.floating-action-tab:hover .heart-icon {
+/* Specific rule for SVG heart icons - force visibility */
+svg.heart-icon,
+svg.floating-action-tab-heart-icon {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.floating-action-tab:hover .floating-action-tab-heart-icon {
   transform: scale(1.1);
   color: #ff6b6b;
   filter: drop-shadow(0 2px 4px rgb(0 0 0 / 20%));
+}
+
+/* Hover effect for emoji heart icon */
+.floating-action-tab:hover .floating-action-tab-icon::before {
+  transform: scale(1.1);
+  filter: drop-shadow(0 2px 4px rgb(0 0 0 / 20%)) brightness(1.1);
 }
 
 .floating-tab-text {
@@ -268,14 +293,23 @@ body:has(.pre-launch-modal) .floating-tour-tab-link {
   transform: translateX(0);
 }
 
-.arrow-icon {
+.floating-action-tab-arrow-icon {
   width: 16px;
   height: 16px;
   color: rgb(255 255 255 / 90%);
   transition: transform 0.2s ease;
+  display: inline-block !important; /* Ensure visibility - override any conflicting styles */
 }
 
-.floating-action-tab:hover .arrow-icon {
+/* Specific rule for SVG arrow icons - force visibility */
+svg.arrow-icon,
+svg.floating-action-tab-arrow-icon {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.floating-action-tab:hover .floating-action-tab-arrow-icon {
   transform: translateX(2px);
 }
 
@@ -948,8 +982,8 @@ body.large-click-targets .floating-action-tab.component-style.expanded {
 .no-motion .floating-tab-text,
 .no-motion .floating-tab-arrow,
 .no-motion .floating-tab-ripple,
-.no-motion .heart-icon,
-.no-motion .arrow-icon {
+.no-motion .floating-action-tab-heart-icon,
+.no-motion .floating-action-tab-arrow-icon {
   transition: none !important;
   animation: none !important;
 }
@@ -975,8 +1009,8 @@ body.large-click-targets .floating-action-tab.component-style.expanded {
 
 .high-contrast-border .tab-title,
 .high-contrast-border .tab-subtitle,
-.high-contrast-border .heart-icon,
-.high-contrast-border .arrow-icon,
+.high-contrast-border .floating-action-tab-heart-icon,
+.high-contrast-border .floating-action-tab-arrow-icon,
 .high-contrast-border .surprise-tab-title,
 .high-contrast-border .surprise-tab-subtitle,
 .high-contrast-border .tour-tab-title,
@@ -1029,11 +1063,11 @@ body.dark-mode .floating-action-tab:hover {
     0 4px 12px rgb(0 0 0 / 25%);
 }
 
-body.dark-mode .heart-icon {
+body.dark-mode .floating-action-tab-heart-icon {
   color: var(--theme-text-on-accent);
 }
 
-body.dark-mode .floating-action-tab:hover .heart-icon {
+body.dark-mode .floating-action-tab:hover .floating-action-tab-heart-icon {
   color: var(--theme-text-on-accent);
 }
 
@@ -1045,7 +1079,7 @@ body.dark-mode .tab-subtitle {
   color: rgb(255 255 255 / 85%);
 }
 
-body.dark-mode .arrow-icon {
+body.dark-mode .floating-action-tab-arrow-icon {
   color: var(--theme-text-on-accent);
 }
 
@@ -1176,6 +1210,13 @@ body.dark-mode .floating-tour-tab.tour-unavailable {
    • Standardized responsive behavior using media.css utilities where applicable
    • Improved maintainability through centralized breakpoint management
    • Enhanced accessibility with consistent reduced-motion and high-contrast support
+   
+   🔧 NAMESPACE IMPROVEMENTS (Phase 3 Complete):
+   • .floating-tab-icon → .floating-action-tab-icon (better component isolation)
+   • .heart-icon → .floating-action-tab-heart-icon (prevents global conflicts)
+   • .arrow-icon → .floating-action-tab-arrow-icon (specific to action tab)
+   • Updated all references in reduced-motion, high-contrast, and dark-mode sections
+   • Maintained existing .floating-surprise-tab-icon and .floating-tour-tab-icon namespacing
    
    All floating tab related selectors are now consolidated into this single file
    for better maintainability and component organization.

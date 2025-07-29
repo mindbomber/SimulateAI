@@ -7,27 +7,32 @@
  * Contains global resets and accessibility rules for consistent behavior
  * 
  * OPTIMIZATION UPDATES:
- * ✅ Standardized breakpoint system (320px, 375px, 480px, 768px, 992px, 1200px, 1400px)
+ * ✅ Standardized breakpoint system aligned with media.css (360px, 375px, 390px, 428px, 768px, 1024px, 1280px)
  * ✅ Centralized z-index layering system using CSS custom properties
  * ✅ Reduced !important usage where CSS specificity can be used instead
  * ✅ Maintained !important for necessary JavaScript override scenarios
- * ✅ Improved consistency in media query syntax (removed "only screen" where not needed)
+ * ✅ Improved consistency in media query syntax with mobile-first approach
+ * ✅ Integrated media.css variables for responsive scaling and padding
  */
 
 /* Import required component styles - moved outside @layer for proper loading */
+@import url("./media.css"); /* Import first for responsive variables */
 @import url("./settings-menu.css");
 @import url("./footer.css");
 
 @layer components {
   /* ===== MODERN NAVIGATION DESIGN SYSTEM ===== */
   :root {
-    /* ===== STANDARDIZED BREAKPOINTS ===== */
-    --breakpoint-xs: 320px; /* Extra small devices */
-    --breakpoint-sm: 480px; /* Small devices (mobile) */
-    --breakpoint-md: 768px; /* Medium devices (tablet) */
-    --breakpoint-lg: 992px; /* Large devices (desktop) */
-    --breakpoint-xl: 1200px; /* Extra large devices */
-    --breakpoint-xxl: 1400px; /* Ultra large devices */
+    /* ===== STANDARDIZED BREAKPOINTS - ALIGNED WITH MEDIA.CSS ===== */
+    /* Use media.css breakpoints for consistency */
+    --breakpoint-mobile-xs: 360px; /* Samsung Galaxy S21 */
+    --breakpoint-mobile-sm: 375px; /* iPhone SE */
+    --breakpoint-mobile-md: 390px; /* iPhone 12/13/14 */
+    --breakpoint-mobile-lg: 428px; /* iPhone 12 Pro Max */
+    --breakpoint-tablet-sm: 768px; /* iPad Mini */
+    --breakpoint-tablet-lg: 1024px; /* iPad Pro */
+    --breakpoint-laptop-sm: 1280px; /* MacBook Air 13" */
+    --breakpoint-desktop-xl: 1920px; /* Full HD Desktop */
 
     /* ===== Z-INDEX LAYERING SYSTEM ===== */
     --z-base: 100; /* Base content */
@@ -192,7 +197,9 @@
 
   .dropdown.force-visible,
   .dropdown-menu.open,
-  .dropdown-menu.js-open {
+  .dropdown-menu.js-open,
+  .settings-menu.open,
+  .settings-menu.js-open {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
@@ -208,8 +215,7 @@
   }
 
   /* Settings dropdown container with highest z-index */
-  #settings-nav + .dropdown-menu,
-  #settings-nav + .settings-menu {
+  .settings-menu {
     z-index: var(--z-dropdown-hover); /* Higher than all other elements */
     transition:
       opacity 0.2s ease,
@@ -217,9 +223,7 @@
   }
 
   /* Keep settings menu open when hovering over trigger or menu */
-  #settings-nav:hover + .dropdown-menu,
   #settings-nav:hover + .settings-menu,
-  .nav-item-dropdown:hover .dropdown-menu,
   .nav-item-dropdown:hover .settings-menu {
     display: block !important;
     visibility: visible !important;
@@ -240,7 +244,7 @@
 
   /* Settings menu should close when user scrolls away */
   /* This will be handled by JavaScript, but we ensure it has proper positioning */
-  .nav-item-dropdown .settings-menu {
+  .settings-menu {
     position: absolute !important;
     top: calc(100% + 5px) !important;
     right: 0 !important;
@@ -274,8 +278,8 @@
     background: white !important;
   }
 
-  /* Enhanced Mobile Navigation for Smaller Viewports */
-  @media (width <= 480px) {
+  /* Enhanced Mobile Navigation for Smaller Viewports - Aligned with media.css */
+  @media only screen and (width <= 428px) {
     .main-nav.force-visible,
     .main-nav.open,
     .main-nav.mobile-force-visible,
@@ -295,8 +299,8 @@
     }
   }
 
-  /* Extra Small Viewports - Even more compact */
-  @media (width <= 375px) {
+  /* Extra Small Viewports - Even more compact - Aligned with media.css */
+  @media only screen and (width <= 375px) {
     .main-nav.force-visible,
     .main-nav.open,
     .main-nav.mobile-force-visible,
@@ -309,24 +313,25 @@
     /* Ensure navigation items are more compact */
     .main-nav .nav-group .nav-link {
       padding: 0.75rem !important;
-      font-size: 0.95rem !important;
+      font-size: calc(0.95rem * var(--font-scale, 1)) !important;
     }
   }
 
-  /* Very Small Viewports - Ultra compact */
-  @media (width <= 320px) {
+  /* Very Small Viewports - Ultra compact - Aligned with media.css */
+  @media only screen and (width <= 360px) {
     .main-nav.force-visible,
     .main-nav.open,
     .main-nav.mobile-force-visible,
     .main-nav.js-open {
       width: 95% !important;
       max-width: 260px !important;
-      padding: 1.5rem 0.75rem !important;
+      padding: calc(1.5rem * var(--font-scale, 1))
+        calc(0.75rem * var(--font-scale, 1)) !important;
     }
 
     .main-nav .nav-group .nav-link {
-      padding: 0.5rem !important;
-      font-size: 0.9rem !important;
+      padding: calc(0.5rem * var(--font-scale, 1)) !important;
+      font-size: calc(0.9rem * var(--font-scale, 1)) !important;
     }
   }
 
@@ -481,15 +486,16 @@
     border: 2px solid var(--color-primary) !important;
   }
 
-  /* Header Element - Consolidated Complete Styling */
-  .header {
-    /* Layout and dimensions */
+  /* Header Element - Consolidated Complete Styling with Responsive Integration */
+  header.header {
+    /* Layout and dimensions - Responsive scaling from media.css */
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--spacing-4);
+    gap: calc(var(--container-padding, 16px) * 0.5);
     height: var(--header-h);
-    padding: var(--spacing-3) var(--spacing-6);
+    padding: calc(var(--container-padding, 16px) * 0.5)
+      var(--container-padding, 16px);
 
     /* Positioning and layering */
     position: fixed;
@@ -517,11 +523,51 @@
     will-change: transform;
   }
 
+  /* Header Responsive Adjustments - Mobile First Approach */
+  /* Extra small mobile devices (≤360px) - Samsung Galaxy S21 */
+  @media only screen and (width <= 360px) {
+    header.header {
+      height: calc(var(--header-h) * 0.9);
+      padding: calc(var(--container-padding, 16px) * 0.375)
+        calc(var(--container-padding, 16px) * 0.75);
+      gap: calc(var(--container-padding, 16px) * 0.25);
+    }
+  }
+
+  /* Small mobile devices (375px) - iPhone SE */
+  @media only screen and (width >= 375px) and (width <= 428px) {
+    header.header {
+      height: calc(var(--header-h) * 0.95);
+      padding: calc(var(--container-padding, 16px) * 0.4)
+        calc(var(--container-padding, 16px) * 0.85);
+      gap: calc(var(--container-padding, 16px) * 0.35);
+    }
+  }
+
+  /* Tablet devices (768px+) - iPad Mini and larger */
+  @media only screen and (width >= 768px) {
+    header.header {
+      height: var(--header-h);
+      padding: calc(var(--container-padding, 16px) * 0.6)
+        calc(var(--container-padding, 16px) * 1.25);
+      gap: calc(var(--container-padding, 16px) * 0.75);
+    }
+  }
+
+  /* Desktop devices (1280px+) - Optimal header sizing */
+  @media only screen and (width >= 1280px) {
+    header.header {
+      padding: calc(var(--container-padding, 16px) * 0.75)
+        calc(var(--container-padding, 16px) * 1.5);
+      gap: var(--container-padding, 16px);
+    }
+  }
+
   /* Header Left Side - Groups logo and main navigation together */
   .header-left {
     display: flex;
     align-items: center;
-    gap: var(--spacing-6);
+    gap: calc(var(--container-padding, 16px) * 0.75);
     flex: 1;
     /* Ensure items stay on same row */
     flex-wrap: nowrap;
@@ -534,7 +580,28 @@
   .header-right {
     display: flex;
     align-items: center;
-    gap: var(--spacing-3);
+    gap: calc(var(--container-padding, 16px) * 0.5);
+  }
+
+  /* Header Components Responsive Adjustments */
+  @media only screen and (width <= 428px) {
+    .header-left {
+      gap: calc(var(--container-padding, 16px) * 0.5);
+    }
+
+    .header-right {
+      gap: calc(var(--container-padding, 16px) * 0.375);
+    }
+  }
+
+  @media only screen and (width >= 768px) {
+    .header-left {
+      gap: var(--container-padding, 16px);
+    }
+
+    .header-right {
+      gap: calc(var(--container-padding, 16px) * 0.75);
+    }
   }
 
   /* ===== LOGO COMPONENT STYLES ===== */
@@ -1001,7 +1068,7 @@
 
   /* Ensure scroll-aware navbar works properly on mobile */
   @media (width <= 768px) {
-    .header {
+    header.header {
       transition:
         transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
         box-shadow 0.25s ease,
@@ -1009,7 +1076,7 @@
     }
 
     /* Don't hide header when mobile nav is open */
-    .header:has(.main-nav.open) {
+    header.header:has(.main-nav.open) {
       transform: translateY(0) !important;
     }
 
@@ -1022,7 +1089,8 @@
     /* Combined mobile states for better scroll behavior */
     .header.scrolled.header-visible {
       transform: translateY(0);
-      padding: var(--spacing-2) var(--spacing-4); /* Reduced padding on mobile */
+      padding: calc(var(--container-padding, 16px) * 0.35)
+        calc(var(--container-padding, 16px) * 0.75); /* Responsive padding for mobile scrolled state */
       backdrop-filter: blur(8px); /* Reduced blur for mobile performance */
     }
 
@@ -1938,7 +2006,8 @@
       visibility: visible;
     }
 
-    .dropdown-menu:not(.open) {
+    .dropdown-menu:not(.open),
+    .settings-menu:not(.open) {
       display: none;
     }
 
@@ -2507,6 +2576,7 @@
   /* High Contrast Mode Support */
   @media (prefers-contrast: high) {
     .dropdown-menu,
+    .settings-menu,
     .mega-menu {
       border-color: #000;
       box-shadow: 0 4px 20px rgb(0 0 0 / 30%);
@@ -2526,6 +2596,7 @@
   /* Reduced Motion Support */
   @media (prefers-reduced-motion: reduce) {
     .dropdown-menu,
+    .settings-menu,
     .mega-menu,
     .mega-menu-item,
     .nav-toggle span,
@@ -2675,7 +2746,7 @@
 
   /* ===== DARK MODE SUPPORT ===== */
   /* Header Dark Mode - Consolidated */
-  body.dark-mode .header {
+  body.dark-mode header.header {
     background: #2d2d2d !important;
     border-bottom-color: #444 !important;
     color: #fff !important;
@@ -2726,7 +2797,8 @@
   }
 
   /* Dropdown menus */
-  body.dark-mode .dropdown-menu {
+  body.dark-mode .dropdown-menu,
+  body.dark-mode .settings-menu {
     background: var(--theme-bg-secondary);
     border: 1px solid var(--theme-border);
     box-shadow: 0 8px 20px var(--theme-shadow-hover);
@@ -3032,7 +3104,8 @@
   }
 
   /* Enhanced dropdown and mega menu dark mode */
-  body.dark-mode .dropdown-menu {
+  body.dark-mode .dropdown-menu,
+  body.dark-mode .settings-menu {
     background: var(--theme-bg-secondary, #2d2d2d);
     border: 1px solid var(--theme-border, #444);
     color: #fff !important;
@@ -3084,6 +3157,7 @@
   }
 
   body.high-contrast .dropdown-menu,
+  body.high-contrast .settings-menu,
   body.high-contrast .mega-menu {
     border-color: #000;
     box-shadow: 0 4px 20px rgb(0 0 0 / 30%);

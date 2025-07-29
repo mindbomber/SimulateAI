@@ -338,17 +338,13 @@ class FloatingActionTab {
     // Create the tab content
     this.container.innerHTML = `
       <div class="floating-tab-content">
-        <div class="floating-tab-icon">
-          <svg class="heart-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-          </svg>
-        </div>
+        <div class="floating-action-tab-icon"></div>
         <div class="floating-tab-text">
           <span class="tab-title">Support Our Mission</span>
           <span class="tab-subtitle">Help us continue developing ethical AI education</span>
         </div>
         <div class="floating-tab-arrow">
-          <svg class="arrow-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <svg class="floating-action-tab-arrow-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
           </svg>
         </div>

@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+/* Import media.css for responsive variables */
+@import url("./media.css");
+
 @layer components {
   /**
  * Settings Menu Component Styles
@@ -214,8 +217,8 @@
 
   /* ===== RESPONSIVE DESIGN WITH MEDIA.CSS INTEGRATION ===== */
 
-  /* Mobile devices (using media.css variables) */
-  @media only screen and (width <= 479px) {
+  /* Mobile devices (using media.css variables) - Aligned with media.css breakpoints */
+  @media only screen and (width <= 428px) {
     .settings-menu {
       min-width: calc(260px * var(--font-scale, 1)) !important;
       padding: var(--container-padding, 14px) !important;
@@ -250,15 +253,15 @@
     }
   }
 
-  /* Tablet devices */
-  @media only screen and (width >= 768px) and (width <= 1279px) {
+  /* Tablet devices - Aligned with media.css */
+  @media only screen and (width >= 768px) and (width <= 1024px) {
     .settings-menu {
       min-width: calc(340px * var(--font-scale, 1)) !important;
       padding: var(--container-padding, 20px) !important;
     }
   }
 
-  /* Laptop and desktop devices */
+  /* Laptop and desktop devices - Aligned with media.css */
   @media only screen and (width >= 1280px) {
     .settings-menu {
       min-width: calc(360px * var(--font-scale, 1)) !important;
