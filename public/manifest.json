@@ -18,7 +18,7 @@
       "purpose": "any"
     },
     {
-      "src": "/src/assets/icons/logo.svg",
+      "src": "/src/assets/icons/logo-square.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
@@ -61,9 +61,9 @@
       "url": "/#simulations",
       "icons": [
         {
-          "src": "/src/assets/icons/favicon.png",
+          "src": "/src/assets/icons/logo-square.svg",
           "sizes": "96x96",
-          "type": "image/png"
+          "type": "image/svg+xml"
         }
       ]
     },
@@ -74,9 +74,9 @@
       "url": "/#educator",
       "icons": [
         {
-          "src": "/src/assets/icons/favicon.png",
+          "src": "/src/assets/icons/logo-square.svg",
           "sizes": "96x96",
-          "type": "image/png"
+          "type": "image/svg+xml"
         }
       ]
     }

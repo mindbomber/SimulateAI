@@ -28,7 +28,7 @@ const CORE_FILES = [
   "/SimulateAI/src/assets/icons/Square Icon_192_x_192.png",
   "/SimulateAI/src/assets/icons/Square Icon_512_x_512.png",
   "/SimulateAI/src/assets/icons/favicon.svg",
-  "/SimulateAI/src/assets/icons/logo.svg",
+  "/SimulateAI/src/assets/icons/logo-square.svg",
 
   // Data files
   "/SimulateAI/src/data/categories.js",

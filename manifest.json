@@ -12,7 +12,7 @@
   "dir": "ltr",
   "icons": [
     {
-      "src": "./src/assets/icons/logo-symbol.svg",
+      "src": "./src/assets/icons/logo-square.svg",
       "sizes": "64x64",
       "type": "image/svg+xml",
       "purpose": "any"
