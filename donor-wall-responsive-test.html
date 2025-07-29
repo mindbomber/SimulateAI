@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Donor Wall Responsive Test</title>
+    <link rel="stylesheet" href="src/styles/shared.css" />
+    <link rel="stylesheet" href="src/styles/media.css" />
+    <link rel="stylesheet" href="src/styles/donor-wall.css" />
+    <style>
+      body {
+        margin: 0;
+        font-family: var(--font-family-default, system-ui);
+        background: var(--color-background-subtle, #f8fafc);
+      }
+
+      .test-header {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .test-header h1 {
+        margin: 0 0 0.5rem 0;
+        font-size: 2.5rem;
+        font-weight: 700;
+      }
+
+      .test-header p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 1.125rem;
+      }
+
+      .viewport-info {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        font-family: monospace;
+        font-size: 0.875rem;
+        z-index: 1000;
+        backdrop-filter: blur(10px);
+      }
+
+      .test-controls {
+        background: white;
+        padding: 1.5rem;
+        margin: 0 1rem 2rem 1rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+      }
+
+      .viewport-btn {
+        padding: 0.75rem 1.5rem;
+        border: 2px solid #e5e7eb;
+        background: white;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        color: #374151;
+      }
+
+      .viewport-btn:hover {
+        border-color: #3b82f6;
+        color: #3b82f6;
+        transform: translateY(-1px);
+      }
+
+      .viewport-btn.active {
+        background: #3b82f6;
+        border-color: #3b82f6;
+        color: white;
+      }
+
+      /* Sample donor data for testing */
+      .sample-donors {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+      }
+
+      .sample-donor-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        text-align: center;
+        border: 1px solid #e5e7eb;
+      }
+
+      .donor-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        margin: 0 auto 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1.5rem;
+      }
+
+      .donor-name {
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 0.5rem;
+      }
+
+      .donor-amount {
+        color: #059669;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .donor-message {
+        color: #6b7280;
+        font-size: 0.875rem;
+        font-style: italic;
+      }
+
+      /* Responsive test indicators */
+      .responsive-indicators {
+        position: fixed;
+        bottom: 1rem;
+        left: 1rem;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        max-width: 200px;
+      }
+
+      .indicator {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        font-size: 0.8rem;
+      }
+
+      .indicator-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 0.5rem;
+      }
+
+      .mobile { background: #ef4444; }
+      .tablet { background: #f59e0b; }
+      .laptop { background: #3b82f6; }
+      .desktop { background: #10b981; }
+
+      @media (width <= 767px) {
+        .mobile { background: #10b981; }
+      }
+
+      @media (width >= 768px) and (width <= 1279px) {
+        .tablet { background: #10b981; }
+      }
+
+      @media (width >= 1280px) and (width <= 1919px) {
+        .laptop { background: #10b981; }
+      }
+
+      @media (width >= 1920px) {
+        .desktop { background: #10b981; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="viewport-info">
+      <div>Viewport: <span id="viewport-width">0</span>px × <span id="viewport-height">0</span>px</div>
+      <div>Device: <span id="device-type">Unknown</span></div>
+    </div>
+
+    <div class="responsive-indicators">
+      <div class="indicator">
+        <div class="indicator-dot mobile"></div>
+        Mobile ≤767px
+      </div>
+      <div class="indicator">
+        <div class="indicator-dot tablet"></div>
+        Tablet 768-1279px
+      </div>
+      <div class="indicator">
+        <div class="indicator-dot laptop"></div>
+        Laptop 1280-1919px
+      </div>
+      <div class="indicator">
+        <div class="indicator-dot desktop"></div>
+        Desktop ≥1920px
+      </div>
+    </div>
+
+    <div class="test-header">
+      <h1>🎯 Donor Wall Responsive Test</h1>
+      <p>Testing centering, CSS layers, and responsive behavior across all viewport sizes</p>
+    </div>
+
+    <div class="test-controls">
+      <button class="viewport-btn" onclick="simulateViewport(360, 640)">Mobile Small</button>
+      <button class="viewport-btn" onclick="simulateViewport(375, 667)">iPhone SE</button>
+      <button class="viewport-btn" onclick="simulateViewport(768, 1024)">iPad Mini</button>
+      <button class="viewport-btn" onclick="simulateViewport(1024, 768)">iPad</button>
+      <button class="viewport-btn" onclick="simulateViewport(1280, 800)">Laptop</button>
+      <button class="viewport-btn" onclick="simulateViewport(1920, 1080)">Desktop FHD</button>
+      <button class="viewport-btn" onclick="simulateViewport(2560, 1440)">2K</button>
+      <button class="viewport-btn active" onclick="resetViewport()">Natural Size</button>
+    </div>
+
+    <!-- Main Test: Donor Appreciation Section -->
+    <div class="donor-appreciation-section container-responsive">
+      <div class="main-section-header">
+        <h3 class="main-section-title">
+          <span class="title-icon">💝</span>
+          Thank You to Our Supporters!
+        </h3>
+        <p class="main-section-description">
+          Supporting ethical AI education and research through your generous contributions
+        </p>
+      </div>
+
+      <!-- Donor Wall Stats -->
+      <div class="donor-wall-stats">
+        <div class="stat-card">
+          <div class="stat-number">127</div>
+          <div class="stat-label">Total Supporters</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">$12,450</div>
+          <div class="stat-label">Total Raised</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">23</div>
+          <div class="stat-label">This Month</div>
+        </div>
+      </div>
+
+      <!-- Donor Wall Filters -->
+      <div class="donor-wall-filters">
+        <button class="filter-btn active">Recent Supporters</button>
+        <button class="filter-btn">Top Contributors</button>
+        <button class="filter-btn">With Messages</button>
+      </div>
+
+      <!-- Sample Donor Cards for Visual Testing -->
+      <div class="sample-donors">
+        <div class="sample-donor-card">
+          <div class="donor-avatar">AS</div>
+          <div class="donor-name">Alex Schmidt</div>
+          <div class="donor-amount">$100</div>
+          <div class="donor-message">"Supporting ethical AI research!"</div>
+        </div>
+        <div class="sample-donor-card">
+          <div class="donor-avatar">MJ</div>
+          <div class="donor-name">Maria Johnson</div>
+          <div class="donor-amount">$50</div>
+          <div class="donor-message">"Keep up the great work!"</div>
+        </div>
+        <div class="sample-donor-card">
+          <div class="donor-avatar">DL</div>
+          <div class="donor-name">David Lee</div>
+          <div class="donor-amount">$25</div>
+          <div class="donor-message">"Excited to see the progress!"</div>
+        </div>
+        <div class="sample-donor-card">
+          <div class="donor-avatar">SR</div>
+          <div class="donor-name">Sarah Rodriguez</div>
+          <div class="donor-amount">$200</div>
+          <div class="donor-message">"Thank you for making AI education accessible."</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Update viewport info in real-time
+      function updateViewportInfo() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        document.getElementById('viewport-width').textContent = width;
+        document.getElementById('viewport-height').textContent = height;
+        
+        let deviceType = 'Unknown';
+        if (width <= 767) deviceType = 'Mobile';
+        else if (width <= 1279) deviceType = 'Tablet';
+        else if (width <= 1919) deviceType = 'Laptop';
+        else deviceType = 'Desktop';
+        
+        document.getElementById('device-type').textContent = deviceType;
+      }
+
+      // Simulate different viewport sizes
+      function simulateViewport(width, height) {
+        // Remove active class from all buttons
+        document.querySelectorAll('.viewport-btn').forEach(btn => btn.classList.remove('active'));
+        // Add active class to clicked button
+        event.target.classList.add('active');
+        
+        // This is a visual simulation - in a real test environment you'd resize the browser
+        document.body.style.maxWidth = width + 'px';
+        document.body.style.margin = '0 auto';
+        document.body.style.border = '2px solid #3b82f6';
+        document.body.style.borderRadius = '8px';
+        document.body.style.boxShadow = '0 8px 32px rgba(59, 130, 246, 0.2)';
+        
+        setTimeout(updateViewportInfo, 100);
+      }
+
+      function resetViewport() {
+        // Remove active class from all buttons
+        document.querySelectorAll('.viewport-btn').forEach(btn => btn.classList.remove('active'));
+        // Add active class to reset button
+        event.target.classList.add('active');
+        
+        document.body.style.maxWidth = '';
+        document.body.style.margin = '';
+        document.body.style.border = '';
+        document.body.style.borderRadius = '';
+        document.body.style.boxShadow = '';
+        
+        setTimeout(updateViewportInfo, 100);
+      }
+
+      // Initialize and update on resize
+      updateViewportInfo();
+      window.addEventListener('resize', updateViewportInfo);
+
+      // Test centering behavior
+      function testCentering() {
+        const section = document.querySelector('.donor-appreciation-section');
+        const rect = section.getBoundingClientRect();
+        const parentRect = section.parentElement.getBoundingClientRect();
+        
+        console.log('Donor Section Centering Test:', {
+          sectionWidth: rect.width,
+          parentWidth: parentRect.width,
+          leftMargin: rect.left - parentRect.left,
+          rightMargin: parentRect.right - rect.right,
+          isCentered: Math.abs((rect.left - parentRect.left) - (parentRect.right - rect.right)) < 5
+        });
+      }
+
+      // Run centering test on load and resize
+      window.addEventListener('load', testCentering);
+      window.addEventListener('resize', testCentering);
+    </script>
+  </body>
+</html>
