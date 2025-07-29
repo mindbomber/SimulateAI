@@ -358,10 +358,64 @@ class OnboardingTour {
             autoScroll: true,
           },
           {
+            id: "reflection-intro",
+            title: "Reflection & Research Portal 🔍",
+            content:
+              "Welcome to the Reflection and Research portion! Here you can reflect on your answer choice and explore deeper questions that help develop your understanding of the ethical dimensions involved.",
+            target: ".reflection-modal, .reusable-modal",
+            position: "center",
+            waitFor: "reflection-modal",
+            autoScroll: false,
+          },
+          {
+            id: "choice-analysis",
+            title: "Your Choice Analysis 📊",
+            content:
+              "This section analyzes your ethical decision, showing the reasoning behind your choice and its implications across different moral frameworks. Click 'Next' to continue exploring.",
+            target: 'button[data-action="next"]',
+            position: "left",
+            action: "wait-for-click",
+            highlightClick: true,
+            autoScroll: true,
+          },
+          {
+            id: "global-comparison",
+            title: "Global Community Comparison 🌍",
+            content:
+              "See how your choice compares to others in the global community! This data helps you understand different perspectives and decision patterns across diverse backgrounds. Click 'Next' to continue.",
+            target: 'button[data-action="next"]',
+            position: "left",
+            action: "wait-for-click",
+            highlightClick: true,
+            autoScroll: true,
+          },
+          {
+            id: "deeper-reflection",
+            title: "Deeper Reflection & Alternative Perspectives 💭",
+            content:
+              "This section presents alternative viewpoints and encourages deeper reflection on the ethical complexities. Consider how different stakeholders might view this scenario. Click 'Next' to continue.",
+            target: 'button[data-action="next"]',
+            position: "left",
+            action: "wait-for-click",
+            highlightClick: true,
+            autoScroll: true,
+          },
+          {
+            id: "key-insights",
+            title: "Key Insights & Takeaways ✨",
+            content:
+              "The final reflection step summarizes key insights and learning takeaways from this ethical scenario. These insights help build your ethical reasoning skills. Click 'Complete' to finish the reflection process.",
+            target: 'button[data-action="next"]',
+            position: "left",
+            action: "wait-for-click",
+            highlightClick: true,
+            autoScroll: true,
+          },
+          {
             id: "tutorial-complete",
             title: "Congratulations! 🎉",
             content:
-              "Excellent work! You've successfully completed your first ethical scenario exploration. You've learned how to navigate complex moral dilemmas, analyze different approaches, and understand the ethical implications through our interactive tools.<br><br>Would you like to continue with Tutorial 2 to explore the radar chart visualization in more detail?",
+              "Excellent work! You've successfully completed your first ethical scenario exploration, including the comprehensive reflection and research process. You've learned how to navigate complex moral dilemmas, analyze different approaches, understand the ethical implications through our interactive tools, and engage in deep reflection.<br><br>Would you like to continue with Tutorial 2 to explore the radar chart visualization in more detail?",
             buttons: [
               {
                 text: "📊 Continue to Tutorial 2",

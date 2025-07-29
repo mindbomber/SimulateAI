@@ -838,6 +838,43 @@
     position: relative !important;
   }
 
+  /* Special handling for tutorial 3 - force coach marks above pre-launch modal */
+  .pre-launch-modal .onboarding-coach-mark,
+  .pre-launch-modal-backdrop .onboarding-coach-mark,
+  body:has(.pre-launch-modal) .onboarding-coach-mark {
+    z-index: 16050 !important;
+    position: fixed !important;
+    isolation: isolate !important;
+  }
+
+  .pre-launch-modal .onboarding-overlay,
+  .pre-launch-modal-backdrop .onboarding-overlay,
+  body:has(.pre-launch-modal) .onboarding-overlay {
+    z-index: 16040 !important;
+  }
+
+  .pre-launch-modal .onboarding-spotlight,
+  .pre-launch-modal-backdrop .onboarding-spotlight,
+  body:has(.pre-launch-modal) .onboarding-spotlight {
+    z-index: 16045 !important;
+  }
+
+  /* Ensure all buttons and interactive elements in tutorial 3 are above modal */
+  .pre-launch-modal .onboarding-coach-mark button,
+  .pre-launch-modal .onboarding-coach-mark .coach-mark-btn,
+  .pre-launch-modal .onboarding-coach-mark .coach-mark-close,
+  .pre-launch-modal-backdrop .onboarding-coach-mark button,
+  .pre-launch-modal-backdrop .onboarding-coach-mark .coach-mark-btn,
+  .pre-launch-modal-backdrop .onboarding-coach-mark .coach-mark-close,
+  body:has(.pre-launch-modal) .onboarding-coach-mark button,
+  body:has(.pre-launch-modal) .onboarding-coach-mark .coach-mark-btn,
+  body:has(.pre-launch-modal) .onboarding-coach-mark .coach-mark-close {
+    z-index: 16055 !important;
+    pointer-events: auto !important;
+    position: relative !important;
+    isolation: isolate !important;
+  }
+
   /* Allow onboarding elements to be interactive even when modal backdrop is present */
   .modal-backdrop .onboarding-coach-mark,
   .modal-backdrop ~ .onboarding-coach-mark {
