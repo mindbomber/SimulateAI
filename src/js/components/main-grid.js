@@ -94,6 +94,10 @@ class MainGrid {
     this.scenarioCompletedHandler = null; // Store bound event handler
     this.scenarioReflectionCompletedHandler = null; // Store bound reflection handler
 
+    // Filter state protection flags
+    this._isApplyingFilters = false; // Prevent infinite loop in category filters
+    this._isApplyingScenarioFilters = false; // Prevent infinite loop in scenario filters
+
     // Initialize performance optimizations
     this.initializeEventDelegation();
 
@@ -5322,36 +5326,54 @@ class MainGrid {
 
     // Sort options functionality
     sortOptions.forEach((option) => {
-      option.addEventListener("click", (e) => {
+      option.addEventListener("click", async (e) => {
         e.preventDefault();
-        const sortValue = option.getAttribute("data-sort");
-        const sortText =
-          option.querySelector(".option-text")?.textContent.trim() ||
-          option.textContent.trim();
+        e.stopImmediatePropagation(); // Prevent duplicate event handling
 
-        // Update active state - batch operations for performance
-        sortOptions.forEach((opt) => {
-          this.setElementAttributes(opt, {
-            "aria-selected": "false",
-            class: opt.className.replace(/\bactive\b/, "").trim(),
-          });
-        });
-
-        this.setElementAttributes(option, {
-          "aria-selected": "true",
-          class: option.className + " active",
-        });
-
-        // Update button text
-        const sortTextElement = sortBtn.querySelector(".sort-text");
-        if (sortTextElement) {
-          sortTextElement.textContent = `Sort: ${sortText.replace("Alphabetical ", "").replace("Progress ", "").replace("Difficulty ", "")}`;
+        // Prevent rapid clicking
+        if (option.disabled) {
+          return;
         }
 
-        this.categoryFilters.sortBy = sortValue;
-        this.applyCategoryFilters();
-        sortDropdown.style.display = "none";
-        sortBtn.setAttribute("aria-expanded", "false");
+        option.disabled = true;
+
+        try {
+          const sortValue = option.getAttribute("data-sort");
+          const sortText =
+            option.querySelector(".option-text")?.textContent.trim() ||
+            option.textContent.trim();
+
+          // Update active state - batch operations for performance
+          sortOptions.forEach((opt) => {
+            this.setElementAttributes(opt, {
+              "aria-selected": "false",
+              class: opt.className.replace(/\bactive\b/, "").trim(),
+            });
+          });
+
+          this.setElementAttributes(option, {
+            "aria-selected": "true",
+            class: option.className + " active",
+          });
+
+          // Update button text
+          const sortTextElement = sortBtn.querySelector(".sort-text");
+          if (sortTextElement) {
+            sortTextElement.textContent = `Sort: ${sortText.replace("Alphabetical ", "").replace("Progress ", "").replace("Difficulty ", "")}`;
+          }
+
+          this.categoryFilters.sortBy = sortValue;
+          await this.applyCategoryFilters();
+          sortDropdown.style.display = "none";
+          sortBtn.setAttribute("aria-expanded", "false");
+        } catch (error) {
+          console.error("Error applying sort:", error);
+        } finally {
+          // Re-enable the option after a short delay
+          setTimeout(() => {
+            option.disabled = false;
+          }, 300);
+        }
       });
     });
 
@@ -5406,28 +5428,46 @@ class MainGrid {
    * Apply category filters and re-render
    */
   async applyCategoryFilters() {
-    // Get filtered and sorted categories using enhanced filters
-    const filteredCategories = this.getFilteredCategoriesEnhanced();
+    // Prevent infinite loops by tracking filter application state
+    if (this._isApplyingFilters) {
+      console.warn(
+        "Already applying category filters, skipping duplicate call",
+      );
+      return;
+    }
 
-    // Clear existing category sections (but preserve toolbar)
-    const existingSections =
-      this.categoryContainer.querySelectorAll(".category-section");
-    existingSections.forEach((section) => section.remove());
+    try {
+      this._isApplyingFilters = true;
 
-    // Render filtered categories
-    const categoryFragment = document.createDocumentFragment();
-    const categorySectionPromises = filteredCategories.map(async (category) => {
-      return await this.createCategorySection(category);
-    });
+      // Get filtered and sorted categories using enhanced filters
+      const filteredCategories = this.getFilteredCategoriesEnhanced();
 
-    const categorySections = await Promise.all(categorySectionPromises);
-    categorySections.forEach((section) =>
-      categoryFragment.appendChild(section),
-    );
-    this.categoryContainer.appendChild(categoryFragment);
+      // Clear existing category sections (but preserve toolbar)
+      const existingSections =
+        this.categoryContainer.querySelectorAll(".category-section");
+      existingSections.forEach((section) => section.remove());
 
-    // Update count display (if we add one later)
-    this.updateCategoryCount(filteredCategories.length);
+      // Render filtered categories
+      const categoryFragment = document.createDocumentFragment();
+      const categorySectionPromises = filteredCategories.map(
+        async (category) => {
+          return await this.createCategorySection(category);
+        },
+      );
+
+      const categorySections = await Promise.all(categorySectionPromises);
+      categorySections.forEach((section) =>
+        categoryFragment.appendChild(section),
+      );
+      this.categoryContainer.appendChild(categoryFragment);
+
+      // Update count display (if we add one later)
+      this.updateCategoryCount(filteredCategories.length);
+    } catch (error) {
+      console.error("Error applying category filters:", error);
+    } finally {
+      this._isApplyingFilters = false;
+    }
   }
 
   /**
@@ -5452,47 +5492,82 @@ class MainGrid {
       });
     }
 
-    // Apply sorting
-    switch (this.categoryFilters.sortBy) {
-      case "alphabetical":
-        filtered.sort((a, b) => a.title.localeCompare(b.title));
-        break;
-      case "alphabetical-desc":
-        filtered.sort((a, b) => b.title.localeCompare(a.title));
-        break;
-      case "progress":
-        filtered.sort((a, b) => {
-          const progressA = this.getCategoryProgress(a.id).percentage;
-          const progressB = this.getCategoryProgress(b.id).percentage;
-          return progressB - progressA; // Most complete first
-        });
-        break;
-      case "progress-desc":
-        filtered.sort((a, b) => {
-          const progressA = this.getCategoryProgress(a.id).percentage;
-          const progressB = this.getCategoryProgress(b.id).percentage;
-          return progressA - progressB; // Least complete first
-        });
-        break;
-      case "difficulty":
-        filtered.sort((a, b) => {
-          const difficultyOrder = { beginner: 1, intermediate: 2, advanced: 3 };
-          const diffA = difficultyOrder[a.difficulty] || 2;
-          const diffB = difficultyOrder[b.difficulty] || 2;
-          return diffA - diffB; // Beginner first
-        });
-        break;
-      case "difficulty-desc":
-        filtered.sort((a, b) => {
-          const difficultyOrder = { beginner: 1, intermediate: 2, advanced: 3 };
-          const diffA = difficultyOrder[a.difficulty] || 2;
-          const diffB = difficultyOrder[b.difficulty] || 2;
-          return diffB - diffA; // Advanced first
-        });
-        break;
-      default:
-        // Default to alphabetical
-        filtered.sort((a, b) => a.title.localeCompare(b.title));
+    // Apply sorting with error handling to prevent infinite loops
+    try {
+      switch (this.categoryFilters.sortBy) {
+        case "alphabetical":
+          filtered.sort((a, b) => {
+            const titleA = a.title || "";
+            const titleB = b.title || "";
+            return titleA.localeCompare(titleB);
+          });
+          break;
+        case "alphabetical-desc":
+          filtered.sort((a, b) => {
+            const titleA = a.title || "";
+            const titleB = b.title || "";
+            return titleB.localeCompare(titleA);
+          });
+          break;
+        case "progress":
+          filtered.sort((a, b) => {
+            try {
+              const progressA = this.getCategoryProgress(a.id)?.percentage || 0;
+              const progressB = this.getCategoryProgress(b.id)?.percentage || 0;
+              return progressB - progressA; // Most complete first
+            } catch (error) {
+              console.warn("Error calculating progress for sorting:", error);
+              return 0; // Keep original order if progress calculation fails
+            }
+          });
+          break;
+        case "progress-desc":
+          filtered.sort((a, b) => {
+            try {
+              const progressA = this.getCategoryProgress(a.id)?.percentage || 0;
+              const progressB = this.getCategoryProgress(b.id)?.percentage || 0;
+              return progressA - progressB; // Least complete first
+            } catch (error) {
+              console.warn("Error calculating progress for sorting:", error);
+              return 0; // Keep original order if progress calculation fails
+            }
+          });
+          break;
+        case "difficulty":
+          filtered.sort((a, b) => {
+            const difficultyOrder = {
+              beginner: 1,
+              intermediate: 2,
+              advanced: 3,
+            };
+            const diffA = difficultyOrder[a.difficulty] || 2;
+            const diffB = difficultyOrder[b.difficulty] || 2;
+            return diffA - diffB; // Beginner first
+          });
+          break;
+        case "difficulty-desc":
+          filtered.sort((a, b) => {
+            const difficultyOrder = {
+              beginner: 1,
+              intermediate: 2,
+              advanced: 3,
+            };
+            const diffA = difficultyOrder[a.difficulty] || 2;
+            const diffB = difficultyOrder[b.difficulty] || 2;
+            return diffB - diffA; // Advanced first
+          });
+          break;
+        default:
+          // Default to alphabetical
+          filtered.sort((a, b) => {
+            const titleA = a.title || "";
+            const titleB = b.title || "";
+            return titleA.localeCompare(titleB);
+          });
+      }
+    } catch (error) {
+      console.error("Error during category sorting:", error);
+      // Return original filtered array if sorting fails
     }
 
     return filtered;
