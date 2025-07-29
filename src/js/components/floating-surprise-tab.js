@@ -647,6 +647,7 @@ class FloatingSurpriseTab {
 
   /**
    * Launch a scenario using the unified architecture
+   * Enhanced with modal state checks and better fallback handling
    */
   launchScenario(scenario) {
     try {
@@ -655,6 +656,20 @@ class FloatingSurpriseTab {
         scenario.title,
       );
 
+      // AGGRESSIVE MODAL STATE CLEANUP: Always ensure clean state before launch
+      this.forceCleanModalState();
+
+      // Enhanced modal detection with specific selectors for different modal states
+      const existingModal = this.detectExistingModals();
+      if (existingModal) {
+        console.warn(
+          "FloatingSurpriseTab: Modal detected, aborting launch:",
+          existingModal.type,
+        );
+        this.addErrorFeedback();
+        return false;
+      }
+
       // Method 1: Try to use the main grid's unified launch system
       if (
         window.app &&
@@ -662,70 +677,25 @@ class FloatingSurpriseTab {
         window.app.categoryGrid.openScenarioModalDirect
       ) {
         console.log("FloatingSurpriseTab: Using MainGrid unified launch");
-        window.app.categoryGrid.openScenarioModalDirect(
-          scenario.categoryId,
-          scenario.id,
-        );
-        return true;
+
+        // Double-ensure clean state before launch
+        window.app.categoryGrid.isModalOpen = false;
+        window.app.categoryGrid.lastModalOpenTime = 0;
+
+        // Verify the modal launch actually works
+        const launchSuccess = this.attemptModalLaunch(scenario);
+        if (launchSuccess) {
+          return true;
+        } else {
+          console.warn(
+            "FloatingSurpriseTab: Main launch failed, trying fallbacks",
+          );
+          return this.tryFallbackMethods(scenario);
+        }
       }
 
-      // Method 2: Try to use the scenario browser's unified launch system
-      if (
-        window.scenarioBrowser &&
-        window.scenarioBrowser.openScenarioModalDirect
-      ) {
-        console.log(
-          "FloatingSurpriseTab: Using ScenarioBrowser unified launch",
-        );
-        window.scenarioBrowser.openScenarioModalDirect(
-          scenario.categoryId,
-          scenario.id,
-        );
-        return true;
-      }
-
-      // Method 3: Try direct ScenarioModal instantiation (same as Quick Start)
-      if (window.ScenarioModal || typeof ScenarioModal !== "undefined") {
-        console.log(
-          "FloatingSurpriseTab: Using direct ScenarioModal instantiation",
-        );
-        import("../components/scenario-modal.js")
-          .then(({ default: ScenarioModal }) => {
-            const scenarioModal = new ScenarioModal();
-            scenarioModal.open(scenario.id, scenario.categoryId);
-          })
-          .catch((error) => {
-            console.error(
-              "FloatingSurpriseTab: Failed to import ScenarioModal:",
-              error,
-            );
-            this.fallbackLaunchMethod(scenario);
-          });
-        return true;
-      }
-
-      // Method 4: Fallback to button simulation (original method)
-      const success = this.tryButtonSimulation(scenario);
-      if (success) {
-        return true;
-      }
-
-      // Method 5: Final fallback - custom event dispatch
-      const event = new CustomEvent("launchScenario", {
-        detail: {
-          scenarioId: scenario.id,
-          categoryId: scenario.categoryId,
-          source: "surprise_tab",
-          timestamp: Date.now(),
-        },
-      });
-      document.dispatchEvent(event);
-
-      console.log(
-        "FloatingSurpriseTab: Dispatched launchScenario event for:",
-        scenario.title,
-      );
-      return true;
+      // If main method fails, try fallbacks
+      return this.tryFallbackMethods(scenario);
     } catch (error) {
       console.error("FloatingSurpriseTab: Error launching scenario:", error);
       this.trackSurpriseInteraction("surprise_error", {
@@ -733,8 +703,181 @@ class FloatingSurpriseTab {
         scenarioId: scenario.id,
         error: error.message,
       });
+      this.addErrorFeedback();
+      return this.tryFallbackMethods(scenario);
+    }
+  }
+
+  /**
+   * Force clean all modal states - aggressive cleanup
+   */
+  forceCleanModalState() {
+    try {
+      // Clean up DOM remnants
+      const modalElements = document.querySelectorAll(
+        '.modal-backdrop, .scenario-modal, [data-modal="scenario"], .modal.show, .enhanced-modal',
+      );
+      modalElements.forEach((element) => {
+        if (
+          element.style.display === "none" ||
+          element.getAttribute("aria-hidden") === "true"
+        ) {
+          element.remove();
+          console.log("FloatingSurpriseTab: Removed orphaned modal element");
+        }
+      });
+
+      // Reset app state
+      if (window.app?.categoryGrid) {
+        window.app.categoryGrid.isModalOpen = false;
+        window.app.categoryGrid.lastModalOpenTime = 0;
+        window.app.categoryGrid.lastModalRequestKey = null;
+      }
+
+      // Reset surprise tab state
+      this.lastClickTime = Math.max(0, this.lastClickTime - 1000); // Allow immediate retry
+
+      console.log("FloatingSurpriseTab: Force cleaned modal state");
+    } catch (error) {
+      console.warn("FloatingSurpriseTab: Error during force cleanup:", error);
+    }
+  }
+
+  /**
+   * Enhanced modal detection with detailed reporting
+   */
+  detectExistingModals() {
+    // Check for visible scenario modals
+    const scenarioModal = document.querySelector(
+      '.scenario-modal:not([style*="display: none"])',
+    );
+    if (scenarioModal) {
+      return { type: "scenario-modal", element: scenarioModal };
+    }
+
+    // Check for visible modal backdrops
+    const modalBackdrop = document.querySelector(
+      '.modal-backdrop:not([aria-hidden="true"])',
+    );
+    if (modalBackdrop) {
+      return { type: "modal-backdrop", element: modalBackdrop };
+    }
+
+    // Check for any visible modals
+    const visibleModal = document.querySelector(
+      '.modal.show, .modal[style*="display: flex"], .modal[style*="display: block"]',
+    );
+    if (visibleModal) {
+      return { type: "visible-modal", element: visibleModal };
+    }
+
+    // Check app state
+    if (window.app?.categoryGrid?.isModalOpen) {
+      return { type: "app-state", state: window.app.categoryGrid.isModalOpen };
+    }
+
+    return null;
+  }
+
+  /**
+   * Attempt modal launch with verification
+   */
+  attemptModalLaunch(scenario) {
+    try {
+      // Call the main grid launch method
+      window.app.categoryGrid.openScenarioModalDirect(
+        scenario.categoryId,
+        scenario.id,
+      );
+
+      // Verify launch after a short delay
+      setTimeout(() => {
+        const modalOpened =
+          document.querySelector(".scenario-modal") ||
+          document.querySelector(".modal.show") ||
+          window.app?.categoryGrid?.isModalOpen;
+
+        if (modalOpened) {
+          console.log(
+            "FloatingSurpriseTab: Modal launch verified successfully",
+          );
+          this.trackSurpriseInteraction("surprise_success", {
+            method: "main_grid_direct",
+            scenarioId: scenario.id,
+            timestamp: Date.now(),
+          });
+        } else {
+          console.warn("FloatingSurpriseTab: Modal launch failed verification");
+          // Try fallback after verification failure
+          setTimeout(() => this.tryFallbackMethods(scenario), 100);
+        }
+      }, 500);
+
+      return true;
+    } catch (error) {
+      console.error("FloatingSurpriseTab: Modal launch attempt failed:", error);
       return false;
     }
+  }
+  tryFallbackMethods(scenario) {
+    console.log("FloatingSurpriseTab: Attempting fallback methods");
+
+    // Method 2: Try to use the scenario browser's unified launch system
+    if (
+      window.scenarioBrowser &&
+      window.scenarioBrowser.openScenarioModalDirect
+    ) {
+      console.log("FloatingSurpriseTab: Using ScenarioBrowser unified launch");
+      window.scenarioBrowser.openScenarioModalDirect(
+        scenario.categoryId,
+        scenario.id,
+      );
+      return true;
+    }
+
+    // Method 3: Try direct ScenarioModal instantiation
+    if (window.ScenarioModal || typeof ScenarioModal !== "undefined") {
+      console.log(
+        "FloatingSurpriseTab: Using direct ScenarioModal instantiation",
+      );
+
+      import("../components/scenario-modal.js")
+        .then(({ default: ScenarioModal }) => {
+          const scenarioModal = new ScenarioModal();
+          scenarioModal.open(scenario.id, scenario.categoryId);
+        })
+        .catch((error) => {
+          console.error(
+            "FloatingSurpriseTab: Failed to import ScenarioModal:",
+            error,
+          );
+          this.fallbackLaunchMethod(scenario);
+        });
+      return true;
+    }
+
+    // Method 4: Fallback to button simulation (original method)
+    const success = this.tryButtonSimulation(scenario);
+    if (success) {
+      return true;
+    }
+
+    // Method 5: Final fallback - custom event dispatch
+    const event = new CustomEvent("launchScenario", {
+      detail: {
+        scenarioId: scenario.id,
+        categoryId: scenario.categoryId,
+        source: "surprise_tab",
+        timestamp: Date.now(),
+      },
+    });
+    document.dispatchEvent(event);
+
+    console.log(
+      "FloatingSurpriseTab: Dispatched launchScenario event for:",
+      scenario.title,
+    );
+    return true;
   }
 
   /**

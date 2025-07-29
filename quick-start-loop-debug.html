@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quick Start Initialization Loop Debug</title>
+    <style>
+      body {
+        font-family: "Courier New", monospace;
+        background: #1a1a1a;
+        color: #00ff00;
+        margin: 0;
+        padding: 20px;
+      }
+      .debug-container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .debug-section {
+        background: #2a2a2a;
+        border: 1px solid #444;
+        margin: 10px 0;
+        padding: 15px;
+        border-radius: 5px;
+      }
+      .debug-section h3 {
+        margin-top: 0;
+        color: #ffff00;
+      }
+      .log-entry {
+        background: #333;
+        border-left: 3px solid #00ff00;
+        padding: 8px;
+        margin: 5px 0;
+        font-size: 12px;
+        white-space: pre-wrap;
+      }
+      .log-entry.warning {
+        border-left-color: #ffaa00;
+        color: #ffaa00;
+      }
+      .log-entry.error {
+        border-left-color: #ff0000;
+        color: #ff0000;
+      }
+      .log-entry.loop {
+        border-left-color: #ff00ff;
+        color: #ff00ff;
+        background: #2a1a2a;
+      }
+      .controls {
+        text-align: center;
+        margin: 20px 0;
+      }
+      .btn {
+        background: #00aa00;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin: 5px;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+      .btn:hover {
+        background: #00cc00;
+      }
+      .btn.danger {
+        background: #aa0000;
+      }
+      .btn.danger:hover {
+        background: #cc0000;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+        margin: 20px 0;
+      }
+      .stat {
+        background: #333;
+        padding: 10px;
+        border-radius: 3px;
+        text-align: center;
+      }
+      .stat-value {
+        font-size: 24px;
+        font-weight: bold;
+        color: #00ff00;
+      }
+      pre {
+        background: #1a1a1a;
+        padding: 10px;
+        border-radius: 3px;
+        overflow-x: auto;
+        font-size: 11px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="debug-container">
+      <h1>🐛 Quick Start Initialization Loop Debug</h1>
+
+      <div class="controls">
+        <button class="btn" onclick="testQuickStart()">
+          Test Quick Start Button
+        </button>
+        <button class="btn" onclick="simulateScenarioCompletion()">
+          Simulate Scenario Completion
+        </button>
+        <button class="btn" onclick="resetSystem()">Reset System State</button>
+        <button class="btn danger" onclick="clearLogs()">Clear Logs</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-value" id="quickStartAttempts">0</div>
+          <div>Quick Start Attempts</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="modalCreations">0</div>
+          <div>Modal Creations</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="moduleImports">0</div>
+          <div>Module Imports</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="loopDetections">0</div>
+          <div>Loop Detections</div>
+        </div>
+      </div>
+
+      <div class="debug-section">
+        <h3>📊 Real-time Event Log</h3>
+        <div id="eventLog"></div>
+      </div>
+
+      <div class="debug-section">
+        <h3>🔍 Module Import Tracking</h3>
+        <div id="importLog"></div>
+      </div>
+
+      <div class="debug-section">
+        <h3>⚠️ Loop Detection Alerts</h3>
+        <div id="loopLog"></div>
+      </div>
+
+      <div class="debug-section">
+        <h3>📈 System State</h3>
+        <pre id="systemState"></pre>
+      </div>
+    </div>
+
+    <script>
+      let stats = {
+        quickStartAttempts: 0,
+        modalCreations: 0,
+        moduleImports: 0,
+        loopDetections: 0,
+      };
+
+      let eventHistory = [];
+      let lastQuickStartTime = 0;
+      let importTracking = new Set();
+
+      // Intercept console methods to track initialization
+      const originalLog = console.log;
+      const originalWarn = console.warn;
+      const originalError = console.error;
+
+      console.log = function (...args) {
+        trackConsoleOutput("log", args);
+        originalLog.apply(console, args);
+      };
+
+      console.warn = function (...args) {
+        trackConsoleOutput("warning", args);
+        originalWarn.apply(console, args);
+      };
+
+      console.error = function (...args) {
+        trackConsoleOutput("error", args);
+        originalError.apply(console, args);
+      };
+
+      function trackConsoleOutput(level, args) {
+        const message = args.join(" ");
+        const timestamp = new Date().toLocaleTimeString();
+
+        // Check for module import patterns
+        if (
+          message.includes("import") ||
+          message.includes("loading") ||
+          message.includes("initialized")
+        ) {
+          stats.moduleImports++;
+          log("importLog", `[${timestamp}] ${message}`, level);
+        }
+
+        // Check for modal creation patterns
+        if (
+          message.includes("ScenarioModal") &&
+          (message.includes("Created") || message.includes("new"))
+        ) {
+          stats.modalCreations++;
+        }
+
+        // Check for potential loops
+        if (
+          message.includes("loop") ||
+          message.includes("rapid") ||
+          message.includes("debounced")
+        ) {
+          stats.loopDetections++;
+          log("loopLog", `[${timestamp}] LOOP DETECTED: ${message}`, "loop");
+        }
+
+        // Log to main event log
+        log("eventLog", `[${timestamp}] ${message}`, level);
+        updateStats();
+      }
+
+      function log(containerId, message, type = "info") {
+        const container = document.getElementById(containerId);
+        const logEntry = document.createElement("div");
+        logEntry.className = `log-entry ${type}`;
+        logEntry.textContent = message;
+        container.appendChild(logEntry);
+        container.scrollTop = container.scrollHeight;
+
+        // Keep only last 100 entries
+        while (container.children.length > 100) {
+          container.removeChild(container.firstChild);
+        }
+      }
+
+      function updateStats() {
+        Object.keys(stats).forEach((key) => {
+          const element = document.getElementById(key);
+          if (element) {
+            element.textContent = stats[key];
+          }
+        });
+        updateSystemState();
+      }
+
+      function updateSystemState() {
+        const state = {
+          timestamp: new Date().toISOString(),
+          windowApp: !!window.app,
+          categoryGrid: !!window.app?.categoryGrid,
+          modalState: window.app?.categoryGrid?.isModalOpen,
+          lastModalOpenTime: window.app?.categoryGrid?.lastModalOpenTime,
+          scenarioModalInstance: !!window.app?.categoryGrid?.scenarioModal,
+          existingModals: document.querySelectorAll(
+            ".scenario-modal, .modal.show",
+          ).length,
+          importedModules: Array.from(importTracking),
+          stats: stats,
+          recentEvents: eventHistory.slice(-10),
+        };
+
+        document.getElementById("systemState").textContent = JSON.stringify(
+          state,
+          null,
+          2,
+        );
+      }
+
+      function testQuickStart() {
+        const now = Date.now();
+        stats.quickStartAttempts++;
+
+        // Check for rapid successive calls (potential loop)
+        if (now - lastQuickStartTime < 100) {
+          stats.loopDetections++;
+          log(
+            "loopLog",
+            `RAPID QUICK START DETECTED: ${now - lastQuickStartTime}ms since last attempt`,
+            "loop",
+          );
+        }
+
+        lastQuickStartTime = now;
+
+        log(
+          "eventLog",
+          `Testing Quick Start button (attempt #${stats.quickStartAttempts})`,
+        );
+
+        try {
+          // Find the first scenario quick start button
+          const quickStartBtn = document.querySelector(
+            ".scenario-quick-start-btn",
+          );
+          if (quickStartBtn) {
+            log("eventLog", "Found Quick Start button, simulating click...");
+
+            // Monitor for attribute changes (breakpoint trigger)
+            const observer = new MutationObserver((mutations) => {
+              mutations.forEach((mutation) => {
+                if (mutation.type === "attributes") {
+                  log(
+                    "eventLog",
+                    `Attribute modified: ${mutation.attributeName} on ${mutation.target.tagName}`,
+                    "warning",
+                  );
+                }
+              });
+            });
+
+            observer.observe(document.body, {
+              attributes: true,
+              subtree: true,
+              attributeFilter: ["class", "style", "data-scenario-id"],
+            });
+
+            // Set a timeout to stop observing
+            setTimeout(() => observer.disconnect(), 5000);
+
+            quickStartBtn.click();
+          } else {
+            log("eventLog", "No Quick Start button found in DOM", "warning");
+          }
+        } catch (error) {
+          log(
+            "eventLog",
+            `Error testing Quick Start: ${error.message}`,
+            "error",
+          );
+        }
+
+        updateStats();
+      }
+
+      function simulateScenarioCompletion() {
+        log("eventLog", "Simulating scenario completion...");
+
+        // Trigger the scenario modal closed event
+        const event = new CustomEvent("scenario-modal-closed", {
+          detail: {
+            categoryId: "test-category",
+            scenarioId: "test-scenario",
+            completed: true,
+          },
+        });
+        document.dispatchEvent(event);
+
+        log("eventLog", "Scenario completion event dispatched");
+      }
+
+      function resetSystem() {
+        log("eventLog", "Resetting system state...");
+
+        try {
+          // Reset modal state if available
+          if (window.app?.categoryGrid) {
+            window.app.categoryGrid.isModalOpen = false;
+            window.app.categoryGrid.lastModalOpenTime = 0;
+            window.app.categoryGrid.lastModalRequestKey = null;
+
+            if (window.app.categoryGrid.scenarioModal) {
+              if (
+                typeof window.app.categoryGrid.scenarioModal.cleanup ===
+                "function"
+              ) {
+                window.app.categoryGrid.scenarioModal.cleanup();
+              }
+              window.app.categoryGrid.scenarioModal = null;
+            }
+
+            log("eventLog", "Modal state reset successfully");
+          } else {
+            log("eventLog", "No app.categoryGrid found to reset", "warning");
+          }
+
+          // Clear any existing modals from DOM
+          const existingModals = document.querySelectorAll(
+            ".scenario-modal, .modal, .modal-backdrop",
+          );
+          existingModals.forEach((modal) => modal.remove());
+
+          // Reset body styles
+          document.body.style.overflow = "";
+
+          log("eventLog", "System reset completed");
+        } catch (error) {
+          log("eventLog", `Error resetting system: ${error.message}`, "error");
+        }
+
+        updateStats();
+      }
+
+      function clearLogs() {
+        ["eventLog", "importLog", "loopLog"].forEach((id) => {
+          document.getElementById(id).innerHTML = "";
+        });
+
+        eventHistory = [];
+        importTracking.clear();
+
+        // Reset stats
+        Object.keys(stats).forEach((key) => {
+          stats[key] = 0;
+        });
+
+        updateStats();
+      }
+
+      // Monitor for module imports by intercepting fetch
+      const originalFetch = window.fetch;
+      window.fetch = function (...args) {
+        const url = args[0];
+        if (typeof url === "string" && url.includes(".js")) {
+          importTracking.add(url);
+          log("importLog", `Fetch detected: ${url}`);
+          stats.moduleImports++;
+          updateStats();
+        }
+        return originalFetch.apply(this, args);
+      };
+
+      // Monitor dynamic imports
+      const originalImport = window.eval("import");
+      if (originalImport) {
+        window.eval = function (...args) {
+          const code = args[0];
+          if (typeof code === "string" && code.includes("import")) {
+            log("importLog", `Dynamic import detected: ${code}`);
+            stats.moduleImports++;
+            updateStats();
+          }
+          return originalImport.apply(this, args);
+        };
+      }
+
+      // Initial state update
+      document.addEventListener("DOMContentLoaded", () => {
+        updateStats();
+        log("eventLog", "Debug interface initialized");
+      });
+
+      // Auto-refresh system state every 2 seconds
+      setInterval(updateSystemState, 2000);
+    </script>
+  </body>
+</html>

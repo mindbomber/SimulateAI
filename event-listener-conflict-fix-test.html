@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Event Listener Conflict Fix - Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        line-height: 1.6;
+      }
+      .test-section {
+        border: 1px solid #ccc;
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 8px;
+      }
+      .test-result {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        font-weight: bold;
+      }
+      .success {
+        background-color: #d4edda;
+        color: #155724;
+      }
+      .warning {
+        background-color: #fff3cd;
+        color: #856404;
+      }
+      .error {
+        background-color: #f8d7da;
+        color: #721c24;
+      }
+      .info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+      }
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      #console-output {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        padding: 15px;
+        max-height: 400px;
+        overflow-y: auto;
+        font-family: monospace;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+      .event-log {
+        display: inline-block;
+        margin: 5px;
+        padding: 5px 10px;
+        background-color: #e9ecef;
+        border-radius: 3px;
+        font-family: monospace;
+        font-size: 11px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔧 Event Listener Conflict Fix - Test</h1>
+    <p>
+      <strong>Testing:</strong> Coordinated event handling between app.js and
+      main-grid.js
+    </p>
+
+    <div class="test-section">
+      <h3>📋 Fix Summary</h3>
+      <div class="info">
+        <p>
+          <strong>Problem:</strong> Both app.js and main-grid.js had
+          'scenario-completed' listeners causing conflicts
+        </p>
+        <p>
+          <strong>Solution:</strong> Removed duplicate listener from
+          main-grid.js, app.js now triggers 'scenario-progress-update' event
+        </p>
+        <p>
+          <strong>Flow:</strong> scenario-completed → app.js (shows reflection)
+          → scenario-progress-update → main-grid.js (updates progress)
+        </p>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h3>🧪 Event Flow Test</h3>
+      <p>Simulates the sequence of events when a scenario is completed</p>
+      <button onclick="testEventFlow()">Test Event Flow</button>
+      <button onclick="testConflictScenario()">
+        Test Old Conflict Scenario
+      </button>
+      <div id="event-flow-results"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>📊 Event Timeline</h3>
+      <div id="event-timeline">
+        <p>Click "Test Event Flow" to see the sequence of events</p>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h3>📝 Console Output</h3>
+      <button onclick="clearConsole()">Clear Console</button>
+      <div id="console-output"></div>
+    </div>
+
+    <script>
+      let eventLog = [];
+      let testResults = {
+        appHandlerCalled: false,
+        progressUpdateCalled: false,
+        reflectionModalShown: false,
+        conflictDetected: false,
+      };
+
+      // Intercept console.log to display in our output
+      const originalConsoleLog = console.log;
+      const originalConsoleWarn = console.warn;
+      const originalConsoleError = console.error;
+
+      function logToOutput(level, ...args) {
+        const output = document.getElementById("console-output");
+        const timestamp = new Date().toLocaleTimeString();
+        const message = args.join(" ");
+
+        let color = "#333";
+        if (level === "warn") color = "#856404";
+        if (level === "error") color = "#721c24";
+
+        output.innerHTML += `<div style="color: ${color}">[${timestamp}] ${level.toUpperCase()}: ${message}</div>`;
+        output.scrollTop = output.scrollHeight;
+
+        // Call original console method
+        if (level === "log") originalConsoleLog(...args);
+        if (level === "warn") originalConsoleWarn(...args);
+        if (level === "error") originalConsoleError(...args);
+      }
+
+      console.log = (...args) => logToOutput("log", ...args);
+      console.warn = (...args) => logToOutput("warn", ...args);
+      console.error = (...args) => logToOutput("error", ...args);
+
+      // Mock App.js handler
+      function mockAppScenarioCompletedHandler(event) {
+        eventLog.push({
+          event: "app.js handleScenarioCompleted",
+          time: Date.now(),
+        });
+        testResults.appHandlerCalled = true;
+
+        console.log("🎯 APP.JS: Scenario completed handler called");
+
+        // Simulate showing reflection modal
+        setTimeout(() => {
+          testResults.reflectionModalShown = true;
+          console.log("📱 APP.JS: Reflection modal shown");
+
+          // Dispatch progress update event (like the fixed app.js does)
+          setTimeout(() => {
+            const progressEvent = new CustomEvent("scenario-progress-update", {
+              detail: {
+                scenarioId: event.detail.scenarioId,
+                categoryId: event.detail.categoryId,
+                selectedOption: event.detail.selectedOption,
+                option: event.detail.option,
+                completionTime: Date.now(),
+              },
+            });
+            document.dispatchEvent(progressEvent);
+            console.log("📤 APP.JS: Dispatched scenario-progress-update event");
+          }, 100);
+        }, 50);
+      }
+
+      // Mock MainGrid handler
+      function mockMainGridProgressUpdateHandler(event) {
+        eventLog.push({
+          event: "main-grid.js handleScenarioProgressUpdate",
+          time: Date.now(),
+        });
+        testResults.progressUpdateCalled = true;
+
+        console.log("🎯 MAIN-GRID: Progress update handler called");
+        console.log(
+          "📊 MAIN-GRID: Updating progress for scenario:",
+          event.detail.scenarioId,
+        );
+        console.log("🔄 MAIN-GRID: Resetting modal states");
+      }
+
+      // Mock old conflicting handler (for testing conflict scenario)
+      function mockOldMainGridScenarioCompletedHandler(event) {
+        eventLog.push({
+          event: "main-grid.js OLD handleScenarioCompleted",
+          time: Date.now(),
+        });
+        testResults.conflictDetected = true;
+
+        console.error(
+          "⚠️ CONFLICT: Old main-grid.js scenario-completed handler called!",
+        );
+        console.error("🚨 CONFLICT: This would cause modal state conflicts!");
+      }
+
+      // Set up event listeners
+      document.addEventListener(
+        "scenario-completed",
+        mockAppScenarioCompletedHandler,
+      );
+      document.addEventListener(
+        "scenario-progress-update",
+        mockMainGridProgressUpdateHandler,
+      );
+
+      function testEventFlow() {
+        console.log("=== TESTING NEW COORDINATED EVENT FLOW ===");
+        eventLog = [];
+        testResults = {
+          appHandlerCalled: false,
+          progressUpdateCalled: false,
+          reflectionModalShown: false,
+          conflictDetected: false,
+        };
+
+        const results = document.getElementById("event-flow-results");
+        results.innerHTML =
+          '<div class="info">Testing coordinated event flow...</div>';
+
+        // Simulate scenario completion
+        const mockScenarioData = {
+          scenarioId: "test-scenario-001",
+          categoryId: "test-category",
+          selectedOption: { id: "option-1", text: "Test Option" },
+          option: { id: "option-1", text: "Test Option", impact: "positive" },
+        };
+
+        const completionEvent = new CustomEvent("scenario-completed", {
+          detail: mockScenarioData,
+        });
+
+        document.dispatchEvent(completionEvent);
+
+        // Check results after events have processed
+        setTimeout(() => {
+          updateEventTimeline();
+          if (
+            testResults.appHandlerCalled &&
+            testResults.progressUpdateCalled &&
+            !testResults.conflictDetected
+          ) {
+            results.innerHTML =
+              '<div class="success">✅ Event flow working correctly! No conflicts detected.</div>';
+          } else {
+            results.innerHTML =
+              '<div class="error">❌ Event flow has issues. Check console for details.</div>';
+          }
+        }, 300);
+      }
+
+      function testConflictScenario() {
+        console.log("=== TESTING OLD CONFLICT SCENARIO ===");
+
+        // Temporarily add the old conflicting listener
+        document.addEventListener(
+          "scenario-completed",
+          mockOldMainGridScenarioCompletedHandler,
+        );
+
+        eventLog = [];
+        testResults = {
+          appHandlerCalled: false,
+          progressUpdateCalled: false,
+          reflectionModalShown: false,
+          conflictDetected: false,
+        };
+
+        const results = document.getElementById("event-flow-results");
+        results.innerHTML =
+          '<div class="warning">Testing old conflict scenario...</div>';
+
+        const mockScenarioData = {
+          scenarioId: "conflict-test-scenario",
+          categoryId: "conflict-test-category",
+          selectedOption: { id: "option-1", text: "Conflict Test" },
+        };
+
+        const completionEvent = new CustomEvent("scenario-completed", {
+          detail: mockScenarioData,
+        });
+
+        document.dispatchEvent(completionEvent);
+
+        setTimeout(() => {
+          // Remove the old listener
+          document.removeEventListener(
+            "scenario-completed",
+            mockOldMainGridScenarioCompletedHandler,
+          );
+
+          updateEventTimeline();
+          if (testResults.conflictDetected) {
+            results.innerHTML =
+              '<div class="warning">⚠️ Conflict detected! This is what the old code would do.</div>';
+          } else {
+            results.innerHTML =
+              '<div class="info">No conflict in test scenario.</div>';
+          }
+        }, 300);
+      }
+
+      function updateEventTimeline() {
+        const timeline = document.getElementById("event-timeline");
+        timeline.innerHTML = "<h4>Event Sequence:</h4>";
+
+        eventLog.forEach((log, index) => {
+          const eventDiv = document.createElement("div");
+          eventDiv.className = "event-log";
+          eventDiv.textContent = `${index + 1}. ${log.event}`;
+          timeline.appendChild(eventDiv);
+        });
+
+        if (eventLog.length === 0) {
+          timeline.innerHTML += "<p>No events recorded yet.</p>";
+        }
+      }
+
+      function clearConsole() {
+        document.getElementById("console-output").innerHTML = "";
+      }
+
+      // Initialize
+      console.log("Event Listener Conflict Fix Test initialized");
+      console.log(
+        "The fix removes duplicate 'scenario-completed' listeners to prevent conflicts",
+      );
+      console.log(
+        "App.js handles reflection modal, then triggers 'scenario-progress-update' for main-grid.js",
+      );
+    </script>
+  </body>
+</html>

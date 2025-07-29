@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🔧 Quick-Start Replay Fix Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background-color: #f5f5f5;
+      }
+      .test-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 14px;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .warning {
+        background: #fff3cd;
+        color: #856404;
+      }
+      .info {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+      .critical {
+        background: #f5c6cb;
+        color: #721c24;
+        font-weight: bold;
+      }
+      .btn {
+        background: #007acc;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        margin: 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      .btn:hover {
+        background: #005a9e;
+      }
+      .btn.big {
+        padding: 15px 30px;
+        font-size: 18px;
+        background: #28a745;
+      }
+      .btn.fix {
+        background: #dc3545;
+        color: white;
+      }
+      .highlight {
+        background: #ffeb3b;
+        padding: 2px 4px;
+        border-radius: 2px;
+      }
+      .code {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+        font-family: monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🔧 Quick-Start Replay Fix Test</h1>
+
+      <div
+        style="
+          background: #fff3cd;
+          padding: 15px;
+          border-radius: 5px;
+          margin: 20px 0;
+          border-left: 4px solid #ffc107;
+        "
+      >
+        <h3>🚨 Diagnosis: Replay Button Issue</h3>
+        <strong>Problem:</strong> After completing a scenario, buttons change
+        from "Start" to "Replay" but clicking doesn't work until page
+        refresh.<br /><br />
+        <strong>Root Cause:</strong> Modal state management and event listener
+        re-attachment issues after DOM re-rendering.
+      </div>
+
+      <div style="text-align: center; margin: 30px 0">
+        <button class="btn big" onclick="runReplayDiagnosis()">
+          🔍 DIAGNOSE REPLAY ISSUE
+        </button>
+        <button class="btn fix" onclick="applyReplayFix()">
+          🛠️ APPLY REPLAY FIX
+        </button>
+      </div>
+
+      <div style="margin: 20px 0">
+        <button class="btn" onclick="checkReplayStates()">
+          Check Replay States
+        </button>
+        <button class="btn" onclick="testReplayButtons()">
+          Test Replay Buttons
+        </button>
+        <button class="btn" onclick="forceEventReattachment()">
+          Force Event Re-attachment
+        </button>
+      </div>
+
+      <div id="results"></div>
+    </div>
+
+    <script>
+      function log(message, type = "info") {
+        const results = document.getElementById("results");
+        const timestamp = new Date().toLocaleTimeString();
+        results.innerHTML += `<div class="status ${type}">[${timestamp}] ${message}</div>`;
+      }
+
+      function clear() {
+        document.getElementById("results").innerHTML = "";
+      }
+
+      function runReplayDiagnosis() {
+        clear();
+        log("🔍 Running complete replay issue diagnosis...", "info");
+
+        setTimeout(() => checkReplayStates(), 100);
+        setTimeout(() => testReplayButtons(), 800);
+        setTimeout(() => checkEventDelegation(), 1500);
+      }
+
+      function checkReplayStates() {
+        log("🔍 Step 1: Checking replay button states...", "info");
+
+        try {
+          const mainGrid = window.app?.categoryGrid;
+          if (!mainGrid) {
+            log("❌ MainGrid not found", "error");
+            return;
+          }
+
+          // Check modal state management
+          log(
+            `Modal open flag: ${mainGrid.isModalOpen}`,
+            mainGrid.isModalOpen ? "warning" : "success",
+          );
+          log(`Last modal open time: ${mainGrid.lastModalOpenTime}`, "info");
+          log(`Modal cooldown: ${mainGrid.modalOpenCooldown}ms`, "info");
+
+          // Check for replay buttons specifically
+          const container = mainGrid.categoryContainer;
+          if (container) {
+            const replayButtons = container.querySelectorAll(
+              ".scenario-quick-start-btn",
+            );
+            const startButtons = Array.from(replayButtons).filter((btn) =>
+              btn.textContent.trim().toLowerCase().includes("start"),
+            );
+            const actualReplayButtons = Array.from(replayButtons).filter(
+              (btn) => btn.textContent.trim().toLowerCase().includes("replay"),
+            );
+
+            log(`Total quick-start buttons: ${replayButtons.length}`, "info");
+            log(`"Start" buttons: ${startButtons.length}`, "info");
+            log(
+              `"Replay" buttons: ${actualReplayButtons.length}`,
+              actualReplayButtons.length > 0 ? "warning" : "success",
+            );
+
+            if (actualReplayButtons.length > 0) {
+              log(
+                "🎯 Found replay buttons - this is likely the source of the issue!",
+                "critical",
+              );
+
+              // Test if event listeners are attached
+              actualReplayButtons.forEach((btn, index) => {
+                const card = btn.closest(".scenario-card");
+                const scenarioId = card?.getAttribute("data-scenario-id");
+                log(
+                  `Replay button ${index + 1}: scenario ${scenarioId}`,
+                  "info",
+                );
+              });
+            }
+          }
+        } catch (error) {
+          log(`❌ Error: ${error.message}`, "error");
+        }
+      }
+
+      function testReplayButtons() {
+        log("🔍 Step 2: Testing replay button clicks...", "info");
+
+        try {
+          const mainGrid = window.app?.categoryGrid;
+          const container = mainGrid?.categoryContainer;
+
+          if (!container) {
+            log("❌ Category container not found", "error");
+            return;
+          }
+
+          const replayButtons = Array.from(
+            container.querySelectorAll(".scenario-quick-start-btn"),
+          ).filter((btn) =>
+            btn.textContent.trim().toLowerCase().includes("replay"),
+          );
+
+          if (replayButtons.length === 0) {
+            log("ℹ️ No replay buttons found - all scenarios are fresh", "info");
+            return;
+          }
+
+          log(
+            `Found ${replayButtons.length} replay buttons to test`,
+            "warning",
+          );
+
+          // Test the first replay button
+          const testButton = replayButtons[0];
+          const card = testButton.closest(".scenario-card");
+          const scenarioId = card?.getAttribute("data-scenario-id");
+
+          log(`Testing replay button for scenario: ${scenarioId}`, "info");
+
+          // Monitor for event handler calls
+          const originalLog = console.log;
+          const logs = [];
+          console.log = function (...args) {
+            logs.push(args.join(" "));
+            originalLog.apply(console, args);
+          };
+
+          // Click the replay button
+          testButton.click();
+
+          setTimeout(() => {
+            console.log = originalLog;
+
+            const relevantLogs = logs.filter(
+              (log) =>
+                log.includes("handleScenarioClick") ||
+                log.includes("openScenarioModalDirect") ||
+                log.includes("MainGrid:") ||
+                log.includes("replay") ||
+                log.includes("Replay"),
+            );
+
+            if (relevantLogs.length > 0) {
+              log("✅ Replay button click triggered event handlers", "success");
+              relevantLogs.forEach((logEntry) => {
+                log(`Console: ${logEntry}`, "info");
+              });
+            } else {
+              log(
+                "❌ CRITICAL: Replay button click did NOT trigger any event handlers!",
+                "critical",
+              );
+              log(
+                "💡 This confirms the event delegation is broken for replay buttons",
+                "warning",
+              );
+            }
+          }, 500);
+        } catch (error) {
+          log(`❌ Error: ${error.message}`, "error");
+        }
+      }
+
+      function checkEventDelegation() {
+        log("🔍 Step 3: Checking event delegation system...", "info");
+
+        try {
+          const mainGrid = window.app?.categoryGrid;
+          if (!mainGrid) {
+            log("❌ MainGrid not found", "error");
+            return;
+          }
+
+          // Check if boundHandleScenarioClick exists
+          const hasHandler = !!mainGrid.boundHandleScenarioClick;
+          log(
+            `Bound click handler exists: ${hasHandler ? "✅" : "❌"}`,
+            hasHandler ? "success" : "error",
+          );
+
+          // Check if event listener is attached to container
+          const container = mainGrid.categoryContainer;
+          if (container && hasHandler) {
+            // Try to detect event listeners (Chrome DevTools method)
+            try {
+              const listeners = getEventListeners
+                ? getEventListeners(container)
+                : null;
+              if (listeners && listeners.click) {
+                log(
+                  `Event listeners on container: ${listeners.click.length} click listeners`,
+                  "success",
+                );
+              } else {
+                log(
+                  "⚠️ Cannot detect event listeners - use Chrome DevTools",
+                  "warning",
+                );
+              }
+            } catch (e) {
+              log("⚠️ Event listener detection not available", "warning");
+            }
+
+            // Test the handler directly
+            log("🧪 Testing event handler manually...", "info");
+
+            const replayButton = container.querySelector(
+              ".scenario-quick-start-btn",
+            );
+            if (replayButton) {
+              // Create a synthetic event
+              const syntheticEvent = {
+                target: replayButton,
+                preventDefault: () => {},
+                stopPropagation: () => {},
+              };
+
+              try {
+                mainGrid.boundHandleScenarioClick(syntheticEvent);
+                log("✅ Manual event handler call succeeded", "success");
+              } catch (error) {
+                log(
+                  `❌ Manual event handler call failed: ${error.message}`,
+                  "error",
+                );
+              }
+            }
+          }
+        } catch (error) {
+          log(`❌ Error: ${error.message}`, "error");
+        }
+      }
+
+      function applyReplayFix() {
+        log("🛠️ Applying replay button fix...", "info");
+
+        try {
+          const mainGrid = window.app?.categoryGrid;
+          if (!mainGrid) {
+            log("❌ MainGrid not found - cannot apply fix", "error");
+            return;
+          }
+
+          // Fix 1: Reset modal state completely
+          log("🔧 Fix 1: Resetting modal state...", "info");
+          mainGrid.isModalOpen = false;
+          mainGrid.lastModalOpenTime = 0;
+          log("✅ Modal state reset", "success");
+
+          // Fix 2: Force event listener re-attachment
+          log("🔧 Fix 2: Re-attaching event listeners...", "info");
+          if (mainGrid.categoryContainer && mainGrid.boundHandleScenarioClick) {
+            // Remove old listener (if any)
+            mainGrid.categoryContainer.removeEventListener(
+              "click",
+              mainGrid.boundHandleScenarioClick,
+            );
+
+            // Re-attach listener
+            mainGrid.categoryContainer.addEventListener(
+              "click",
+              mainGrid.boundHandleScenarioClick,
+            );
+            log(
+              "✅ Event listeners re-attached to category container",
+              "success",
+            );
+          }
+
+          // Fix 3: Clear any scenario modal instance locks
+          log("🔧 Fix 3: Clearing scenario modal locks...", "info");
+          if (mainGrid.scenarioModal) {
+            if (typeof mainGrid.scenarioModal.resetForReopen === "function") {
+              mainGrid.scenarioModal.resetForReopen();
+            }
+            if (typeof mainGrid.scenarioModal.hide === "function") {
+              mainGrid.scenarioModal.hide();
+            }
+          }
+          log("✅ Modal instance locks cleared", "success");
+
+          // Fix 4: Reset any cooldown timers
+          log("🔧 Fix 4: Resetting all cooldown timers...", "info");
+          mainGrid.modalOpenCooldown = 100; // Reduce cooldown for testing
+
+          // Reset surprise tab cooldown if available
+          const app =
+            window.simulateAIApp || window.app || window.simulateAI || null;
+          if (app && app.lastSurpriseTime) {
+            app.lastSurpriseTime = 0;
+          }
+          log("✅ Cooldown timers reset", "success");
+
+          log(
+            "🎉 Replay fix applied! Try clicking a replay button now.",
+            "success",
+          );
+        } catch (error) {
+          log(`❌ Error applying fix: ${error.message}`, "error");
+        }
+      }
+
+      function forceEventReattachment() {
+        log("🔧 Forcing complete event re-attachment...", "info");
+
+        try {
+          const mainGrid = window.app?.categoryGrid;
+          if (!mainGrid) {
+            log("❌ MainGrid not found", "error");
+            return;
+          }
+
+          // Call the internal method to re-initialize event delegation
+          if (typeof mainGrid.initializeEventDelegation === "function") {
+            mainGrid.initializeEventDelegation();
+            log("✅ Event delegation re-initialized", "success");
+          }
+
+          // Also try to call the attachment method directly
+          if (typeof mainGrid.attachEventListeners === "function") {
+            mainGrid.attachEventListeners();
+            log(
+              "✅ Event listeners re-attached via attachEventListeners",
+              "success",
+            );
+          }
+
+          log(
+            "🎯 Event re-attachment complete - test replay buttons now!",
+            "success",
+          );
+        } catch (error) {
+          log(`❌ Error: ${error.message}`, "error");
+        }
+      }
+
+      // Auto-run when loaded
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          log("🔧 Replay Fix Test loaded", "info");
+          log(
+            "💡 If you have completed scenarios, they should show 'Replay' buttons",
+            "info",
+          );
+          log(
+            "🎯 Click 'DIAGNOSE REPLAY ISSUE' to identify the problem",
+            "warning",
+          );
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>

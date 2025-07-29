@@ -2041,12 +2041,20 @@ class MainGrid {
       await this.categoryHeader.attachEventListeners(this.scenarioContainer);
     }
 
-    // Listen for scenario completion tracking - only add once
-    if (!this.scenarioCompletedHandler) {
-      this.scenarioCompletedHandler = this.handleScenarioCompleted.bind(this);
+    // NOTE: scenario-completed listener removed to prevent conflicts with app.js
+    // Progress updates now handled via 'scenario-progress-update' event from app.js
+    // after reflection modal is shown
+
+    // Listen for scenario progress updates (triggered by app.js after reflection modal)
+    if (!this.scenarioProgressUpdateHandler) {
+      this.scenarioProgressUpdateHandler =
+        this.handleScenarioProgressUpdate.bind(this);
       document.addEventListener(
-        "scenario-completed",
-        this.scenarioCompletedHandler,
+        "scenario-progress-update",
+        this.scenarioProgressUpdateHandler,
+      );
+      logger.info(
+        "🎯 MAIN-GRID: scenario-progress-update event listener attached",
       );
     }
 
@@ -2098,13 +2106,22 @@ class MainGrid {
       this.scenarioReflectionCompletedHandler = null;
     }
 
-    // Remove scenario completed event listener
-    if (this.scenarioCompletedHandler) {
+    // Remove scenario completed event listener (removed to prevent app.js conflicts)
+    // if (this.scenarioCompletedHandler) {
+    //   document.removeEventListener(
+    //     "scenario-completed",
+    //     this.scenarioCompletedHandler,
+    //   );
+    //   this.scenarioCompletedHandler = null;
+    // }
+
+    // Remove scenario progress update event listener
+    if (this.scenarioProgressUpdateHandler) {
       document.removeEventListener(
-        "scenario-completed",
-        this.scenarioCompletedHandler,
+        "scenario-progress-update",
+        this.scenarioProgressUpdateHandler,
       );
-      this.scenarioCompletedHandler = null;
+      this.scenarioProgressUpdateHandler = null;
     }
 
     // Remove launch scenario event listener
@@ -2124,6 +2141,105 @@ class MainGrid {
       }
       this.scenarioModal = null;
     }
+  }
+
+  /**
+   * Check if a modal is actually currently open and visible
+   * More robust than just checking for backdrop elements
+   */
+  isRealModalCurrentlyOpen() {
+    try {
+      // Check for visible modal backdrops that are actually displayed
+      const visibleBackdrops = document.querySelectorAll(".modal-backdrop");
+      for (const backdrop of visibleBackdrops) {
+        const computedStyle = window.getComputedStyle(backdrop);
+        if (
+          computedStyle.display !== "none" &&
+          computedStyle.visibility !== "hidden" &&
+          computedStyle.opacity !== "0" &&
+          backdrop.offsetParent !== null // Element is actually in the layout
+        ) {
+          return true;
+        }
+      }
+
+      // Check for open Bootstrap modals with show class
+      const openModals = document.querySelectorAll(".modal.show");
+      if (openModals.length > 0) {
+        return true;
+      }
+
+      // Check for any modal with display block (Bootstrap style)
+      const blockModals = document.querySelectorAll(
+        '.modal[style*="display: block"], .modal[style*="display:block"]',
+      );
+      if (blockModals.length > 0) {
+        return true;
+      }
+
+      // Check body classes that indicate modal is open
+      if (document.body.classList.contains("modal-open")) {
+        // Double check - body class might be stale, verify there's actually a visible modal
+        const activeModals = document.querySelectorAll(
+          '.modal.show, .modal[style*="display: block"]',
+        );
+        return activeModals.length > 0;
+      }
+
+      return false;
+    } catch (error) {
+      logger.warn("Error checking modal state, assuming no modal open:", error);
+      return false;
+    }
+  }
+
+  /**
+   * Ensure event listeners are properly attached to current container
+   * Critical for fixing replay button issues after scenario completion
+   */
+  ensureEventListenersAttached() {
+    logger.debug("MainGrid ensureEventListenersAttached called", {
+      currentView: this.currentView,
+      hasContainer: !!(this.currentView === "category"
+        ? this.categoryContainer
+        : this.scenarioContainer),
+      hasBoundHandler: !!this.boundHandleScenarioClick,
+      timestamp: Date.now(),
+    });
+
+    // Get the active container based on current view
+    const activeContainer =
+      this.currentView === "category"
+        ? this.categoryContainer
+        : this.scenarioContainer;
+
+    if (!activeContainer) {
+      logger.warn("ensureEventListenersAttached: No active container found");
+      return;
+    }
+
+    if (!this.boundHandleScenarioClick) {
+      logger.warn("ensureEventListenersAttached: No bound click handler found");
+      return;
+    }
+
+    // Remove existing listener first to prevent duplicates
+    activeContainer.removeEventListener("click", this.boundHandleScenarioClick);
+
+    // Re-attach the listener
+    activeContainer.addEventListener("click", this.boundHandleScenarioClick);
+
+    logger.debug("Event listeners re-attached to", {
+      view: this.currentView,
+      containerClass: activeContainer.className,
+      buttonsFound: activeContainer.querySelectorAll(
+        ".scenario-quick-start-btn",
+      ).length,
+      replayButtonsFound: Array.from(
+        activeContainer.querySelectorAll(".scenario-quick-start-btn"),
+      ).filter((btn) => btn.textContent.trim().toLowerCase().includes("replay"))
+        .length,
+    });
   }
 
   addTouchEventListeners(container) {
@@ -2198,15 +2314,33 @@ class MainGrid {
   }
 
   async handleScenarioClick(event) {
+    // Add debugging for troubleshooting category view button issues
+    console.log("🔍 MainGrid: handleScenarioClick called", {
+      target: event.target,
+      targetClass: event.target.className,
+      currentView: this.currentView,
+      timestamp: Date.now(),
+    });
+
     const scenarioCard = event.target.closest(".scenario-card");
-    if (!scenarioCard) return;
+    if (!scenarioCard) {
+      console.log("🔍 No scenario card found for click target");
+      return;
+    }
 
     // More robust button detection - check if click is inside any button
     const clickedButton = event.target.closest("button");
 
     if (!clickedButton) {
+      console.log("🔍 No button found for click target");
       return;
     }
+
+    console.log("🔍 Button found:", {
+      className: clickedButton.className,
+      textContent: clickedButton.textContent.trim(),
+      scenarioCard: !!scenarioCard,
+    });
 
     const isQuickStartBtn = clickedButton.classList.contains(
       "scenario-quick-start-btn",
@@ -2214,8 +2348,15 @@ class MainGrid {
     const isLearningLabBtn =
       clickedButton.classList.contains("scenario-start-btn");
 
+    console.log("🔍 Button type detection:", {
+      isQuickStartBtn,
+      isLearningLabBtn,
+      allClasses: clickedButton.className,
+    });
+
     // If the clicked button is not one of our scenario buttons, do nothing
     if (!isQuickStartBtn && !isLearningLabBtn) {
+      console.log("🔍 Button is not a scenario button, ignoring");
       return;
     }
 
@@ -2234,11 +2375,19 @@ class MainGrid {
     const scenarioId = scenarioCard.getAttribute("data-scenario-id");
     const categoryId = scenarioCard.getAttribute("data-category-id");
 
+    console.log("🔍 Attempting to launch scenario:", {
+      scenarioId,
+      categoryId,
+      buttonType: isQuickStartBtn ? "quick-start" : "learning-lab",
+    });
+
     if (isQuickStartBtn) {
       // Quick start button - direct to scenario modal
+      console.log("🔍 Calling openScenarioModalDirect");
       this.openScenarioModalDirect(categoryId, scenarioId);
     } else if (isLearningLabBtn) {
       // Learning Lab button - go through pre-launch modal
+      console.log("🔍 Calling openScenario");
       await this.openScenario(categoryId, scenarioId);
     }
   }
@@ -2446,35 +2595,71 @@ class MainGrid {
    * Open scenario modal directly, skipping pre-launch modal
    */
   openScenarioModalDirect(categoryId, scenarioId) {
+    console.log("🔍 MainGrid: openScenarioModalDirect called", {
+      categoryId,
+      scenarioId,
+      currentView: this.currentView,
+      isModalOpen: this.isModalOpen,
+      lastModalOpenTime: this.lastModalOpenTime,
+    });
+
     logger.debug("MainGrid: openScenarioModalDirect called", {
       categoryId,
       scenarioId,
     });
 
-    // Enhanced debounce to prevent rapid successive calls
+    // CRITICAL: Add protection against rapid successive calls or initialization loops
     const now = Date.now();
     const cooldown = this.modalOpenCooldown || 1000; // Increase default cooldown to 1 second
+    const loopProtectionKey = `${categoryId}-${scenarioId}`;
 
-    if (now - this.lastModalOpenTime < cooldown) {
-      logger.debug("Modal request debounced - too soon after last request");
+    // Check for potential initialization loop
+    if (
+      this.lastModalRequestKey === loopProtectionKey &&
+      now - this.lastModalOpenTime < 100
+    ) {
+      // Very short window indicates loop
+      logger.warn(
+        "MainGrid: Potential initialization loop detected, aborting request",
+        {
+          categoryId,
+          scenarioId,
+          timeSinceLastRequest: now - this.lastModalOpenTime,
+        },
+      );
+      console.log("🔍 Aborting: Potential initialization loop detected");
       return;
     }
 
-    // Check if a modal is already open
-    if (
-      this.isModalOpen ||
-      this.getCachedElement('.modal-backdrop:not([aria-hidden="true"])')
-    ) {
-      logger.debug("Modal already open, ignoring request", {
-        isModalOpenFlag: this.isModalOpen,
-        hasVisibleModalBackdrop: !!this.getCachedElement(
-          '.modal-backdrop:not([aria-hidden="true"])',
-        ),
+    if (now - this.lastModalOpenTime < cooldown) {
+      logger.debug("Modal request debounced - too soon after last request");
+      console.log("🔍 Aborting: Modal request debounced", {
+        timeSinceLastModal: now - this.lastModalOpenTime,
+        cooldown: cooldown,
       });
       return;
     }
 
+    // Check if a modal is already open - use more robust detection
+    const isActuallyModalOpen =
+      this.isModalOpen || this.isRealModalCurrentlyOpen();
+
+    if (isActuallyModalOpen) {
+      logger.debug("Modal already open, ignoring request", {
+        isModalOpenFlag: this.isModalOpen,
+        isRealModalOpen: this.isRealModalCurrentlyOpen(),
+      });
+      console.log("🔍 Aborting: Modal already open", {
+        isModalOpenFlag: this.isModalOpen,
+        isRealModalOpen: this.isRealModalCurrentlyOpen(),
+      });
+      return;
+    }
+
+    console.log("🔍 Checks passed, proceeding with modal launch");
+
     this.lastModalOpenTime = now;
+    this.lastModalRequestKey = loopProtectionKey;
     this.isModalOpen = true;
 
     const category = this.categories.find((c) => c.id === categoryId);
@@ -2482,8 +2667,18 @@ class MainGrid {
 
     if (!category || !scenario) {
       logger.error("Category or scenario not found:", categoryId, scenarioId);
+      console.log("🔍 Error: Category or scenario not found", {
+        categoryFound: !!category,
+        scenarioFound: !!scenario,
+        availableCategories: this.categories.map((c) => c.id),
+      });
       return;
     }
+
+    console.log("🔍 Found category and scenario:", {
+      categoryTitle: category.title,
+      scenarioTitle: scenario.title,
+    });
 
     logger.info("MainGrid", "Opening scenario modal directly for:", {
       title: scenario.title,
@@ -2521,37 +2716,55 @@ class MainGrid {
     });
     document.dispatchEvent(event);
 
-    // Open the scenario modal directly
-    this.openScenarioModal(scenarioId, categoryId);
+    // Open the scenario modal directly - use fresh instance for direct access
+    const scenarioModal = this.getScenarioModal();
+    scenarioModal.open(scenarioId, categoryId);
   }
 
   /**
-   * Get or create a reusable scenario modal instance
+   * Get or create a fresh scenario modal instance
+   * Creates new instance each time to prevent state corruption
    */
   getScenarioModal() {
-    if (!this.scenarioModal) {
-      this.scenarioModal = new ScenarioModal();
+    // Always create a fresh instance to prevent state corruption
+    // This fixes the issue where surprise tab and quick start stop working
+    // after completing a scenario with reflection modal
+    if (this.scenarioModal) {
+      try {
+        // Clean up the previous instance properly
+        this.scenarioModal.cleanup();
+      } catch (error) {
+        logger.warn("Error cleaning up previous scenario modal:", error);
+      }
     }
+
+    this.scenarioModal = new ScenarioModal();
+    logger.debug("MainGrid: Created fresh ScenarioModal instance");
     return this.scenarioModal;
   }
 
   /**
-   * Handle scenario completion event (immediate progress tracking)
+   * Handle scenario progress update event (triggered by app.js after reflection modal)
+   * This replaces the old handleScenarioCompleted to avoid conflicts with app.js
    */
-  handleScenarioCompleted(event) {
-    const { scenarioId, selectedOption, option } = event.detail;
+  handleScenarioProgressUpdate(event) {
+    const { scenarioId, categoryId, selectedOption, option, completionTime } =
+      event.detail;
 
-    logger.info("Scenario completed:", {
+    logger.info("MainGrid: Scenario progress update received:", {
       scenarioId,
+      categoryId,
       selectedOption,
-      optionText: option.text,
+      optionText: option?.text,
     });
 
     // Find the category that contains this scenario
-    const category = this.categories.find((cat) => {
-      const scenarios = getCategoryScenarios(cat.id);
-      return scenarios.some((scenario) => scenario.id === scenarioId);
-    });
+    const category =
+      this.categories.find((cat) => cat.id === categoryId) ||
+      this.categories.find((cat) => {
+        const scenarios = getCategoryScenarios(cat.id);
+        return scenarios.some((scenario) => scenario.id === scenarioId);
+      });
 
     if (category) {
       // Track scenario completion for system analytics
@@ -2561,10 +2774,10 @@ class MainGrid {
         action: "complete",
         metadata: {
           selectedOption,
-          optionText: option.text,
-          impact: option.impact,
-          completionTime: event.detail.completionTime || null,
-          source: "category-grid-completion",
+          optionText: option?.text,
+          impact: option?.impact,
+          completionTime: completionTime || null,
+          source: "category-grid-progress-update",
           timestamp: new Date().toISOString(),
         },
       });
@@ -2594,14 +2807,23 @@ class MainGrid {
         );
       }
 
+      // CRITICAL FIX: Re-attach event listeners after DOM re-rendering
+      // When scenario cards are re-rendered with "Replay" buttons, event delegation may break
+      setTimeout(() => {
+        this.ensureEventListenersAttached();
+        logger.debug(
+          "Re-attached event listeners after scenario completion and DOM update",
+        );
+      }, 100);
+
       // Track analytics if available
       if (window.AnalyticsManager) {
         window.AnalyticsManager.trackEvent("scenario_completed", {
           categoryId: category.id,
           scenarioId,
           selectedOption,
-          optionText: option.text,
-          impact: option.impact,
+          optionText: option?.text,
+          impact: option?.impact,
         });
       }
     }
@@ -2655,7 +2877,23 @@ class MainGrid {
     // Reset the last modal open time to allow immediate new opens after proper close
     this.lastModalOpenTime = 0;
 
-    logger.debug("MainGrid: Modal state reset, subsequent modals can now open");
+    // Additional cleanup: Clear the scenario modal instance reference
+    // This forces creation of a fresh instance on next open
+    if (this.scenarioModal) {
+      try {
+        // Let the modal clean itself up if it hasn't already
+        if (typeof this.scenarioModal.cleanup === "function") {
+          this.scenarioModal.cleanup();
+        }
+      } catch (error) {
+        logger.warn("Error during scenario modal cleanup:", error);
+      }
+      this.scenarioModal = null;
+    }
+
+    logger.debug(
+      "MainGrid: Modal state reset, subsequent modals can now open with fresh instance",
+    );
 
     // Only check for newly earned badges if scenario was actually completed
     if (completed && categoryId && scenarioId) {

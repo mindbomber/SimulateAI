@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🔍 Event Loop Detection Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background-color: #f5f5f5;
+      }
+      .test-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 14px;
+        max-height: 100px;
+        overflow-y: auto;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .warning {
+        background: #fff3cd;
+        color: #856404;
+      }
+      .info {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+      .critical {
+        background: #f5c6cb;
+        color: #721c24;
+        font-weight: bold;
+      }
+      .loop {
+        background: #dc3545;
+        color: white;
+        font-weight: bold;
+        animation: pulse 1s infinite;
+      }
+      @keyframes pulse {
+        0% {
+          background: #dc3545;
+        }
+        50% {
+          background: #c82333;
+        }
+        100% {
+          background: #dc3545;
+        }
+      }
+      .btn {
+        background: #007acc;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        margin: 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      .btn:hover {
+        background: #005a9e;
+      }
+      .btn.big {
+        padding: 15px 30px;
+        font-size: 18px;
+        background: #28a745;
+      }
+      .btn.danger {
+        background: #dc3545;
+        color: white;
+      }
+      .btn.stop {
+        background: #fd7e14;
+        color: white;
+      }
+      .stats {
+        background: #e9ecef;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 10px 0;
+        font-family: monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🔍 Event Loop Detection Test</h1>
+
+      <div
+        style="
+          background: #f8d7da;
+          padding: 15px;
+          border-radius: 5px;
+          margin: 20px 0;
+          border-left: 4px solid #dc3545;
+        "
+      >
+        <h3>🚨 Loop Detection Analysis</h3>
+        <strong>Issue:</strong> Scenario quick-start buttons may be stuck in an
+        infinite loop!<br />
+        <strong>Symptoms:</strong> Attribute modification breakpoints prevent
+        modal launch<br />
+        <strong>Diagnosis:</strong> Multiple event listeners or recursive event
+        firing
+      </div>
+
+      <div style="text-align: center; margin: 30px 0">
+        <button class="btn big" onclick="startLoopDetection()">
+          🔍 START LOOP DETECTION
+        </button>
+        <button class="btn danger" onclick="stopDetection()">
+          ⏹️ STOP DETECTION
+        </button>
+        <button class="btn" onclick="fixEventLoops()">
+          🛠️ FIX EVENT LOOPS
+        </button>
+      </div>
+
+      <div class="stats" id="stats">
+        <strong>Loop Detection Stats:</strong><br />
+        Event count: <span id="eventCount">0</span><br />
+        Loop alerts: <span id="loopCount">0</span><br />
+        Status: <span id="detectionStatus">Ready</span>
+      </div>
+
+      <div style="margin: 20px 0">
+        <button class="btn" onclick="testSingleClick()">
+          Test Single Click
+        </button>
+        <button class="btn" onclick="checkEventListeners()">
+          Check Event Listeners
+        </button>
+        <button class="btn" onclick="analyzeEventFlow()">
+          Analyze Event Flow
+        </button>
+        <button class="btn stop" onclick="clear()">Clear Results</button>
+      </div>
+
+      <div id="results"></div>
+    </div>
+
+    <script>
+      let eventDetectionActive = false;
+      let eventCounter = 0;
+      let loopCounter = 0;
+      let lastEventTime = 0;
+      let rapidEventThreshold = 50; // ms
+      let maxRapidEvents = 10;
+      let eventHistory = [];
+
+      function log(message, type = "info") {
+        const results = document.getElementById("results");
+        const timestamp = new Date().toLocaleTimeString();
+        results.innerHTML += `<div class="status ${type}">[${timestamp}] ${message}</div>`;
+        results.scrollTop = results.scrollHeight;
+      }
+
+      function updateStats() {
+        document.getElementById("eventCount").textContent = eventCounter;
+        document.getElementById("loopCount").textContent = loopCounter;
+        document.getElementById("detectionStatus").textContent =
+          eventDetectionActive ? "MONITORING" : "Stopped";
+      }
+
+      function clear() {
+        document.getElementById("results").innerHTML = "";
+        eventCounter = 0;
+        loopCounter = 0;
+        eventHistory = [];
+        updateStats();
+      }
+
+      function startLoopDetection() {
+        clear();
+        eventDetectionActive = true;
+        log(
+          "🔍 Starting loop detection on scenario-quick-start-btn elements...",
+          "info",
+        );
+
+        const mainGrid = window.app?.categoryGrid;
+        if (!mainGrid || !mainGrid.categoryContainer) {
+          log("❌ MainGrid or category container not found", "error");
+          return;
+        }
+
+        // Find all quick-start buttons
+        const buttons = mainGrid.categoryContainer.querySelectorAll(
+          ".scenario-quick-start-btn",
+        );
+        log(`Found ${buttons.length} quick-start buttons to monitor`, "info");
+
+        if (buttons.length === 0) {
+          log("❌ No quick-start buttons found", "error");
+          return;
+        }
+
+        // Monitor each button for events
+        buttons.forEach((button, index) => {
+          const scenarioCard = button.closest(".scenario-card");
+          const scenarioId = scenarioCard?.getAttribute("data-scenario-id");
+
+          // Add click event monitor
+          const clickMonitor = function (event) {
+            if (!eventDetectionActive) return;
+
+            eventCounter++;
+            const now = Date.now();
+
+            // Check for rapid events (potential loop)
+            if (now - lastEventTime < rapidEventThreshold) {
+              loopCounter++;
+              log(
+                `🚨 RAPID EVENT DETECTED on button ${index + 1} (scenario ${scenarioId})`,
+                "loop",
+              );
+              log(`Time since last event: ${now - lastEventTime}ms`, "warning");
+
+              // Check event history for patterns
+              eventHistory.push({
+                time: now,
+                button: index,
+                scenarioId: scenarioId,
+              });
+
+              // Detect loop pattern
+              if (eventHistory.length > maxRapidEvents) {
+                const recentEvents = eventHistory.slice(-maxRapidEvents);
+                const timeSpan =
+                  recentEvents[recentEvents.length - 1].time -
+                  recentEvents[0].time;
+
+                if (timeSpan < 1000) {
+                  // 10 events in 1 second = loop
+                  log(
+                    `🔥 INFINITE LOOP DETECTED! ${maxRapidEvents} events in ${timeSpan}ms`,
+                    "loop",
+                  );
+                  log(
+                    "🛑 Automatically stopping detection to prevent browser freeze",
+                    "critical",
+                  );
+                  stopDetection();
+                  return;
+                }
+              }
+            } else {
+              log(
+                `✅ Normal click on button ${index + 1} (scenario ${scenarioId})`,
+                "success",
+              );
+            }
+
+            lastEventTime = now;
+            updateStats();
+          };
+
+          // Add the monitor
+          button.addEventListener("click", clickMonitor, true); // Use capture phase
+
+          // Store the monitor for cleanup
+          button._loopMonitor = clickMonitor;
+        });
+
+        // Also monitor for attribute changes (the breakpoint issue)
+        if (window.MutationObserver) {
+          const observer = new MutationObserver(function (mutations) {
+            if (!eventDetectionActive) return;
+
+            mutations.forEach(function (mutation) {
+              if (
+                mutation.type === "attributes" &&
+                mutation.target.classList.contains("scenario-quick-start-btn")
+              ) {
+                log(
+                  `🔧 Attribute change detected: ${mutation.attributeName} on quick-start button`,
+                  "warning",
+                );
+                log(
+                  `New value: ${mutation.target.getAttribute(mutation.attributeName)}`,
+                  "info",
+                );
+              }
+            });
+          });
+
+          observer.observe(mainGrid.categoryContainer, {
+            attributes: true,
+            subtree: true,
+            attributeFilter: ["class", "style", "disabled", "aria-hidden"],
+          });
+
+          // Store observer for cleanup
+          window._loopDetectionObserver = observer;
+        }
+
+        updateStats();
+        log(
+          "🎯 Loop detection active! Click any quick-start button to test.",
+          "info",
+        );
+      }
+
+      function stopDetection() {
+        eventDetectionActive = false;
+        log("⏹️ Loop detection stopped", "warning");
+
+        // Clean up event monitors
+        const mainGrid = window.app?.categoryGrid;
+        if (mainGrid && mainGrid.categoryContainer) {
+          const buttons = mainGrid.categoryContainer.querySelectorAll(
+            ".scenario-quick-start-btn",
+          );
+          buttons.forEach((button) => {
+            if (button._loopMonitor) {
+              button.removeEventListener("click", button._loopMonitor, true);
+              delete button._loopMonitor;
+            }
+          });
+        }
+
+        // Clean up mutation observer
+        if (window._loopDetectionObserver) {
+          window._loopDetectionObserver.disconnect();
+          delete window._loopDetectionObserver;
+        }
+
+        updateStats();
+      }
+
+      function testSingleClick() {
+        log("🧪 Testing single button click...", "info");
+
+        const mainGrid = window.app?.categoryGrid;
+        if (!mainGrid || !mainGrid.categoryContainer) {
+          log("❌ MainGrid not found", "error");
+          return;
+        }
+
+        const button = mainGrid.categoryContainer.querySelector(
+          ".scenario-quick-start-btn",
+        );
+        if (!button) {
+          log("❌ No quick-start button found", "error");
+          return;
+        }
+
+        // Monitor console output during click
+        const originalLog = console.log;
+        const originalError = console.error;
+        const logs = [];
+
+        console.log = function (...args) {
+          logs.push({ type: "log", content: args.join(" "), time: Date.now() });
+          originalLog.apply(console, args);
+        };
+
+        console.error = function (...args) {
+          logs.push({
+            type: "error",
+            content: args.join(" "),
+            time: Date.now(),
+          });
+          originalError.apply(console, args);
+        };
+
+        // Click the button
+        const clickTime = Date.now();
+        button.click();
+
+        // Restore console and analyze
+        setTimeout(() => {
+          console.log = originalLog;
+          console.error = originalError;
+
+          const relevantLogs = logs.filter(
+            (entry) =>
+              entry.content.includes("handleScenarioClick") ||
+              entry.content.includes("openScenarioModalDirect") ||
+              entry.content.includes("MainGrid:") ||
+              entry.content.includes("loop") ||
+              entry.content.includes("recursive"),
+          );
+
+          log(
+            `Single click test completed - ${relevantLogs.length} relevant console entries`,
+            relevantLogs.length > 5 ? "warning" : "success",
+          );
+
+          relevantLogs.forEach((entry) => {
+            log(
+              `Console (${entry.type}): ${entry.content}`,
+              entry.type === "error" ? "error" : "info",
+            );
+          });
+
+          if (relevantLogs.length > 10) {
+            log(
+              "🚨 Excessive console output detected - possible loop!",
+              "critical",
+            );
+          }
+        }, 1000);
+      }
+
+      function checkEventListeners() {
+        log("🔍 Checking event listener attachment...", "info");
+
+        const mainGrid = window.app?.categoryGrid;
+        if (!mainGrid) {
+          log("❌ MainGrid not found", "error");
+          return;
+        }
+
+        // Check container listeners
+        const container = mainGrid.categoryContainer;
+        if (container) {
+          try {
+            const listeners = getEventListeners
+              ? getEventListeners(container)
+              : null;
+            if (listeners && listeners.click) {
+              log(
+                `Container has ${listeners.click.length} click listeners`,
+                listeners.click.length > 1 ? "warning" : "success",
+              );
+
+              if (listeners.click.length > 1) {
+                log(
+                  "🚨 Multiple click listeners detected - this can cause loops!",
+                  "critical",
+                );
+              }
+            }
+          } catch (e) {
+            log("⚠️ Cannot detect event listeners in this browser", "warning");
+          }
+        }
+
+        // Check individual buttons
+        const buttons =
+          container?.querySelectorAll(".scenario-quick-start-btn") || [];
+        let buttonsWithDirectListeners = 0;
+
+        buttons.forEach((button, index) => {
+          try {
+            const listeners = getEventListeners
+              ? getEventListeners(button)
+              : null;
+            if (listeners && listeners.click && listeners.click.length > 0) {
+              buttonsWithDirectListeners++;
+              log(
+                `Button ${index + 1} has ${listeners.click.length} direct listeners`,
+                "warning",
+              );
+            }
+          } catch (e) {
+            // Can't detect listeners
+          }
+        });
+
+        if (buttonsWithDirectListeners > 0) {
+          log(
+            `🚨 ${buttonsWithDirectListeners} buttons have direct listeners - should use delegation!`,
+            "critical",
+          );
+        } else {
+          log(
+            "✅ No direct button listeners found - using proper event delegation",
+            "success",
+          );
+        }
+      }
+
+      function fixEventLoops() {
+        log("🛠️ Applying event loop fixes...", "info");
+
+        const mainGrid = window.app?.categoryGrid;
+        if (!mainGrid) {
+          log("❌ MainGrid not found", "error");
+          return;
+        }
+
+        // Fix 1: Remove all direct event listeners from buttons
+        const buttons =
+          mainGrid.categoryContainer?.querySelectorAll(
+            ".scenario-quick-start-btn",
+          ) || [];
+        buttons.forEach((button, index) => {
+          // Clone and replace to remove all listeners
+          const newButton = button.cloneNode(true);
+          button.parentNode.replaceChild(newButton, button);
+          log(`✅ Cleaned button ${index + 1} listeners`, "success");
+        });
+
+        // Fix 2: Ensure only one container listener
+        if (mainGrid.boundHandleScenarioClick && mainGrid.categoryContainer) {
+          // Remove existing listeners
+          mainGrid.categoryContainer.removeEventListener(
+            "click",
+            mainGrid.boundHandleScenarioClick,
+          );
+
+          // Re-add single listener
+          mainGrid.categoryContainer.addEventListener(
+            "click",
+            mainGrid.boundHandleScenarioClick,
+          );
+          log("✅ Reset container event delegation", "success");
+        }
+
+        // Fix 3: Reset modal states
+        mainGrid.isModalOpen = false;
+        mainGrid.lastModalOpenTime = 0;
+        mainGrid.lastModalRequestKey = null;
+        log("✅ Reset modal state flags", "success");
+
+        // Fix 4: Increase cooldown to prevent rapid firing
+        mainGrid.modalOpenCooldown = 1000; // 1 second
+        log("✅ Increased modal cooldown to 1 second", "success");
+
+        log("🎉 Event loop fixes applied! Test your buttons now.", "success");
+      }
+
+      function analyzeEventFlow() {
+        log("🔍 Analyzing event flow patterns...", "info");
+
+        if (eventHistory.length === 0) {
+          log("ℹ️ No event history - start loop detection first", "info");
+          return;
+        }
+
+        // Analyze timing patterns
+        const timings = [];
+        for (let i = 1; i < eventHistory.length; i++) {
+          timings.push(eventHistory[i].time - eventHistory[i - 1].time);
+        }
+
+        const avgTiming = timings.reduce((a, b) => a + b, 0) / timings.length;
+        const minTiming = Math.min(...timings);
+        const maxTiming = Math.max(...timings);
+
+        log(`Event timing analysis:`, "info");
+        log(`  Average: ${avgTiming.toFixed(2)}ms`, "info");
+        log(`  Minimum: ${minTiming}ms`, minTiming < 10 ? "warning" : "info");
+        log(`  Maximum: ${maxTiming}ms`, "info");
+
+        if (minTiming < 10) {
+          log("🚨 Extremely rapid events detected - likely loop!", "critical");
+        }
+
+        // Check for same button repeated clicks
+        const buttonFreq = {};
+        eventHistory.forEach((event) => {
+          buttonFreq[event.button] = (buttonFreq[event.button] || 0) + 1;
+        });
+
+        Object.entries(buttonFreq).forEach(([button, count]) => {
+          if (count > 5) {
+            log(
+              `Button ${button} clicked ${count} times - potential stuck button`,
+              "warning",
+            );
+          }
+        });
+      }
+
+      // Auto-start
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          log("🔍 Event Loop Detection Test loaded", "info");
+          log(
+            "💡 Click 'START LOOP DETECTION' then test your quick-start buttons",
+            "warning",
+          );
+          updateStats();
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>

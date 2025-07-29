@@ -4285,13 +4285,34 @@ class SimulateAIApp {
       optionsCount: scenarioData?.options?.length || 0,
     });
 
-    // Show the scenario reflection modal
+    // Show the scenario reflection modal FIRST
     this.showScenarioReflectionModal({
       categoryId,
       scenarioId,
       selectedOption: selectedOption || option,
       scenarioData: scenarioData || {},
     });
+
+    // AFTER reflection modal is shown, trigger progress update for main-grid
+    // This prevents conflicts between modal state management
+    setTimeout(() => {
+      const progressUpdateEvent = new CustomEvent("scenario-progress-update", {
+        detail: {
+          scenarioId,
+          categoryId,
+          selectedOption,
+          option: selectedOption || option,
+          completionTime: event.detail.completionTime || null,
+          timestamp: new Date().toISOString(),
+        },
+      });
+      document.dispatchEvent(progressUpdateEvent);
+
+      AppDebug.log("Dispatched scenario-progress-update event to main-grid", {
+        scenarioId,
+        categoryId,
+      });
+    }, 100); // Small delay to ensure reflection modal is properly initialized
   }
 
   /**
