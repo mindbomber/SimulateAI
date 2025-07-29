@@ -726,7 +726,7 @@ class SharedNavigation {
 
       // Small delay to ensure page is fully loaded
       setTimeout(() => {
-        this.scrollToElement("#categories > div.section-header");
+        this.scrollToElement("#categories > div.main-section-header");
       }, 1000);
     }
   }
@@ -765,7 +765,7 @@ class SharedNavigation {
   navigateToSimulationHub() {
     const currentPage =
       window.location.pathname.split("/").pop() || "index.html";
-    const targetSelector = "#categories > div.section-header";
+    const targetSelector = "#categories > div.main-section-header";
 
     // Update active state to simulation-hub
     this.setActivePage("simulation-hub");

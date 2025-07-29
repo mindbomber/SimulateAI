@@ -518,14 +518,14 @@
     padding: 0 1.5rem;
   }
 
-  .section-header {
+  .main-section-header {
     text-align: center;
     margin-bottom: 3rem;
   }
 
   /* Blog page section titles - specific to blog content */
-  .blog-page .section-title,
-  .blog-content .section-title {
+  .blog-page .main-section-title,
+  .blog-content .main-section-title {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -540,7 +540,7 @@
     font-size: 2rem;
   }
 
-  .section-description {
+  .main-section-description {
     font-size: 1.125rem;
     color: var(--text-secondary);
     max-width: 600px;

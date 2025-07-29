@@ -589,7 +589,7 @@
     contain: layout style; /* Strict containment */
   }
 
-  .section-header {
+  .main-section-header {
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto;
@@ -601,14 +601,14 @@
   }
 
   /* Main content section titles - specific to main content areas */
-  .main-content .section-title {
+  .main-content .main-section-title {
     font-size: var(--font-size-3xl);
     font-weight: var(--font-weight-bold);
     color: var(--color-gray-900);
     margin-bottom: var(--spacing-4);
   }
 
-  .section-description {
+  .main-section-description {
     font-size: var(--font-size-lg);
     color: var(--color-gray-600);
     max-width: 600px;

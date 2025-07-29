@@ -198,7 +198,7 @@
       </div>
 
       <section class="pending-contributions">
-        <div class="section-header">
+        <div class="main-section-header">
           <h2>Pending Contributions</h2>
 
           <div class="filter-controls">
@@ -257,8 +257,8 @@
     <script type="module" src="src/js/components/shared-navigation.js"></script>
 
     <script type="module">
-      import AuthService from './src/js/services/auth-service.js';
-      import ContributionService from './src/js/services/contribution-service.js';
+      import AuthService from "./src/js/services/auth-service.js";
+      import ContributionService from "./src/js/services/contribution-service.js";
 
       class ModerationDashboard {
         constructor() {
@@ -274,8 +274,8 @@
 
           // Check if user has moderation privileges
           if (!this.canModerate()) {
-            alert('Access denied: Moderation privileges required');
-            window.location.href = 'app.html';
+            alert("Access denied: Moderation privileges required");
+            window.location.href = "app.html";
             return;
           }
 
@@ -287,8 +287,8 @@
           // Check if user is moderator or admin
           const userProfile = this.authService.userProfile;
           return (
-            userProfile?.role === 'moderator' ||
-            userProfile?.role === 'admin' ||
+            userProfile?.role === "moderator" ||
+            userProfile?.role === "admin" ||
             userProfile?.tier >= 3
           );
         }
@@ -301,7 +301,7 @@
             this.applyFilters();
             this.updateStats();
           } catch (error) {
-            this.showError('Failed to load pending contributions');
+            this.showError("Failed to load pending contributions");
           } finally {
             this.showLoading(false);
           }
@@ -311,17 +311,17 @@
           const stats = {
             total: this.pendingContributions.length,
             blogPosts: this.pendingContributions.filter(
-              c => c.type === 'blog_post'
+              (c) => c.type === "blog_post",
             ).length,
             forumPosts: this.pendingContributions.filter(
-              c => c.type === 'forum_post'
+              (c) => c.type === "forum_post",
             ).length,
             replies: this.pendingContributions.filter(
-              c => c.type === 'forum_reply'
+              (c) => c.type === "forum_reply",
             ).length,
           };
 
-          const statsContainer = document.getElementById('stats-grid');
+          const statsContainer = document.getElementById("stats-grid");
           statsContainer.innerHTML = `
             <div class="stat-card">
               <div class="stat-number">${stats.total}</div>
@@ -343,37 +343,37 @@
         }
 
         applyFilters() {
-          const typeFilter = document.getElementById('type-filter').value;
-          const donorFilter = document.getElementById('donor-filter').value;
-          const sortFilter = document.getElementById('sort-filter').value;
+          const typeFilter = document.getElementById("type-filter").value;
+          const donorFilter = document.getElementById("donor-filter").value;
+          const sortFilter = document.getElementById("sort-filter").value;
 
           this.filteredContributions = this.pendingContributions.filter(
-            contribution => {
+            (contribution) => {
               const matchesType =
                 !typeFilter || contribution.type === typeFilter;
               const matchesDonor =
                 !donorFilter ||
-                (donorFilter === 'donor' &&
-                  contribution.donorLevel !== 'none') ||
-                (donorFilter === 'non-donor' &&
-                  contribution.donorLevel === 'none');
+                (donorFilter === "donor" &&
+                  contribution.donorLevel !== "none") ||
+                (donorFilter === "non-donor" &&
+                  contribution.donorLevel === "none");
 
               return matchesType && matchesDonor;
-            }
+            },
           );
 
           // Sort contributions
           this.filteredContributions.sort((a, b) => {
             const dateA = new Date(a.submittedAt);
             const dateB = new Date(b.submittedAt);
-            return sortFilter === 'newest' ? dateB - dateA : dateA - dateB;
+            return sortFilter === "newest" ? dateB - dateA : dateA - dateB;
           });
 
           this.renderContributions();
         }
 
         renderContributions() {
-          const container = document.getElementById('contributions-container');
+          const container = document.getElementById("contributions-container");
 
           if (this.filteredContributions.length === 0) {
             container.innerHTML = `
@@ -387,21 +387,21 @@
 
           container.innerHTML = this.filteredContributions
             .map(
-              contribution => `
+              (contribution) => `
             <div class="contribution-item" data-id="${contribution.id}">
               <div class="contribution-header">
                 <div class="contribution-meta">
-                  <span class="type-badge type-${contribution.type.split('_')[0]}">${this.getTypeLabel(contribution.type)}</span>
-                  ${contribution.donorLevel !== 'none' ? `<span class="donor-level donor-${contribution.donorLevel}">${contribution.donorLevel}</span>` : ''}
+                  <span class="type-badge type-${contribution.type.split("_")[0]}">${this.getTypeLabel(contribution.type)}</span>
+                  ${contribution.donorLevel !== "none" ? `<span class="donor-level donor-${contribution.donorLevel}">${contribution.donorLevel}</span>` : ""}
                   <span class="author-name">${contribution.authorName}</span>
                   <span class="submission-date">${this.formatDate(new Date(contribution.submittedAt))}</span>
                 </div>
               </div>
               
               <div class="contribution-content">
-                <h3 class="contribution-title">${contribution.title || 'Forum Post'}</h3>
+                <h3 class="contribution-title">${contribution.title || "Forum Post"}</h3>
                 <p class="contribution-preview">${this.truncateText(contribution.content || contribution.summary, 200)}</p>
-                ${contribution.tags ? `<div class="tags">Tags: ${contribution.tags.join(', ')}</div>` : ''}
+                ${contribution.tags ? `<div class="tags">Tags: ${contribution.tags.join(", ")}</div>` : ""}
               </div>
               
               <div class="moderation-actions">
@@ -429,21 +429,21 @@
                 </div>
               </div>
             </div>
-          `
+          `,
             )
-            .join('');
+            .join("");
         }
 
         async approveContribution(contributionId) {
           try {
             await this.contributionService.approveContribution(
               contributionId,
-              'Approved by moderator'
+              "Approved by moderator",
             );
-            this.showSuccess('Contribution approved successfully');
+            this.showSuccess("Contribution approved successfully");
             await this.loadPendingContributions();
           } catch (error) {
-            this.showError('Failed to approve contribution');
+            this.showError("Failed to approve contribution");
           }
         }
 
@@ -453,36 +453,36 @@
               .getElementById(`rejection-reason-${contributionId}`)
               .value.trim();
             if (!reason) {
-              this.showError('Please provide a rejection reason');
+              this.showError("Please provide a rejection reason");
               return;
             }
 
             await this.contributionService.rejectContribution(
               contributionId,
-              reason
+              reason,
             );
-            this.showSuccess('Contribution rejected');
+            this.showSuccess("Contribution rejected");
             await this.loadPendingContributions();
           } catch (error) {
-            this.showError('Failed to reject contribution');
+            this.showError("Failed to reject contribution");
           }
         }
 
         showRejectionForm(contributionId) {
           document.getElementById(
-            `rejection-form-${contributionId}`
-          ).style.display = 'block';
+            `rejection-form-${contributionId}`,
+          ).style.display = "block";
         }
 
         hideRejectionForm(contributionId) {
           document.getElementById(
-            `rejection-form-${contributionId}`
-          ).style.display = 'none';
+            `rejection-form-${contributionId}`,
+          ).style.display = "none";
         }
 
         viewFullContent(contributionId) {
           const contribution = this.pendingContributions.find(
-            c => c.id === contributionId
+            (c) => c.id === contributionId,
           );
           if (contribution) {
             alert(`Full Content:\n\n${contribution.content}`);
@@ -491,32 +491,32 @@
 
         setupEventHandlers() {
           document
-            .getElementById('type-filter')
-            .addEventListener('change', () => this.applyFilters());
+            .getElementById("type-filter")
+            .addEventListener("change", () => this.applyFilters());
           document
-            .getElementById('donor-filter')
-            .addEventListener('change', () => this.applyFilters());
+            .getElementById("donor-filter")
+            .addEventListener("change", () => this.applyFilters());
           document
-            .getElementById('sort-filter')
-            .addEventListener('change', () => this.applyFilters());
+            .getElementById("sort-filter")
+            .addEventListener("change", () => this.applyFilters());
         }
 
         getTypeLabel(type) {
           const labels = {
-            blog_post: 'Blog Post',
-            forum_post: 'Forum Post',
-            forum_reply: 'Reply',
+            blog_post: "Blog Post",
+            forum_post: "Forum Post",
+            forum_reply: "Reply",
           };
           return labels[type] || type;
         }
 
         formatDate(date) {
-          return date.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
+          return date.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
           });
         }
 
@@ -526,14 +526,14 @@
         }
 
         showLoading(show) {
-          document.getElementById('loading').style.display = show
-            ? 'flex'
-            : 'none';
+          document.getElementById("loading").style.display = show
+            ? "flex"
+            : "none";
         }
 
         showError(message) {
           if (window.NotificationToast) {
-            window.NotificationToast.show(message, 'error');
+            window.NotificationToast.show(message, "error");
           } else {
             alert(`Error: ${message}`);
           }
@@ -541,7 +541,7 @@
 
         showSuccess(message) {
           if (window.NotificationToast) {
-            window.NotificationToast.show(message, 'success');
+            window.NotificationToast.show(message, "success");
           } else {
             alert(message);
           }
@@ -552,7 +552,7 @@
       const moderationDashboard = new ModerationDashboard();
       window.moderationDashboard = moderationDashboard;
 
-      document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener("DOMContentLoaded", () => {
         moderationDashboard.init();
       });
     </script>

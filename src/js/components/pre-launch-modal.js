@@ -1176,7 +1176,7 @@ export default class PreLaunchModal {
                 <div class="learning-objectives">
                     <div class="objectives-section">
                         <h4>Learning Objectives</h4>
-                        <p class="section-description">By the end of this exploration, you will be able to:</p>
+                        <p class="modal-modal-section-description">By the end of this exploration, you will be able to:</p>
                         <ul class="objectives-list">
                             ${info.learningObjectives
                               .map(
@@ -1193,7 +1193,7 @@ export default class PreLaunchModal {
                     
                     <div class="standards-section">
                         <h4>ISTE Standards Alignment</h4>
-                        <p class="section-description">This simulation supports these ISTE Standards for Students:</p>
+                        <p class="modal-modal-section-description">This simulation supports these ISTE Standards for Students:</p>
                         <ul class="standards-list">
                             ${info.isteCriteria
                               .map(
@@ -1213,7 +1213,7 @@ export default class PreLaunchModal {
                         ? `
                         <div class="prerequisites-section">
                             <h4>Prerequisites</h4>
-                            <p class="section-description">For the best experience, you should have:</p>
+                            <p class="modal-modal-section-description">For the best experience, you should have:</p>
                             <ul class="prerequisites-list">
                                 ${info.prerequisites
                                   .map(
@@ -1258,7 +1258,7 @@ export default class PreLaunchModal {
                   <div class="ethics-guide">
                       <div class="radar-explanation">
                           <h4>${radarInfo.title}</h4>
-                          <p class="section-description">${radarInfo.overview}</p>
+                          <p class="modal-modal-section-description">${radarInfo.overview}</p>
                           
                           <div class="ethics-features">
                               ${radarInfo.features
@@ -1281,7 +1281,7 @@ export default class PreLaunchModal {
                       
                       <div class="ethics-dimensions">
                           <h4>Ethical Dimensions Explained</h4>
-                          <p class="section-description">Each point on the radar chart represents one of these ethical considerations:</p>
+                          <p class="modal-modal-section-description">Each point on the radar chart represents one of these ethical considerations:</p>
                           
                           <div class="dimensions-grid">
                               ${glossary
@@ -1369,7 +1369,7 @@ export default class PreLaunchModal {
                 <div class="ethics-guide">
                     <div class="radar-explanation">
                         <h4>${radarInfo.title}</h4>
-                        <p class="section-description">${radarInfo.overview}</p>
+                        <p class="modal-section-description">${radarInfo.overview}</p>
                         
                         <div class="ethics-features">
                             ${radarInfo.features
@@ -1392,7 +1392,7 @@ export default class PreLaunchModal {
                     
                     <div class="ethics-dimensions">
                         <h4>Ethical Dimensions Explained</h4>
-                        <p class="section-description">Each point on the radar chart represents one of these ethical considerations:</p>
+                        <p class="modal-section-description">Each point on the radar chart represents one of these ethical considerations:</p>
                         
                         <div class="dimensions-grid">
                             ${fallbackDimensions
@@ -1438,7 +1438,7 @@ export default class PreLaunchModal {
                 <div class="preparation-content">
                     <div class="preparation-tips">
                         <h4>Preparation Tips</h4>
-                        <p class="section-description">Before you start exploring, consider these suggestions:</p>
+                        <p class="modal-section-description">Before you start exploring, consider these suggestions:</p>
                         <ul class="tips-list">
                             ${info.beforeYouStart.preparationTips
                               .map(
@@ -1455,7 +1455,7 @@ export default class PreLaunchModal {
                     
                     <div class="vocabulary-section">
                         <h4>Key Vocabulary</h4>
-                        <p class="section-description">Important terms you'll encounter:</p>
+                        <p class="modal-section-description">Important terms you'll encounter:</p>
                         <div class="vocabulary-grid">
                             ${info.beforeYouStart.vocabulary
                               .map(
@@ -1485,7 +1485,7 @@ export default class PreLaunchModal {
                 <div class="resources-content">
                     <div class="resources-intro">
                         <h4>Related Resources</h4>
-                        <p class="section-description">Explore these resources to deepen your understanding:</p>
+                        <p class="modal-section-description">Explore these resources to deepen your understanding:</p>
                     </div>
                     
                     <div class="resources-grid">
@@ -1513,7 +1513,7 @@ export default class PreLaunchModal {
                         ? `
                         <div class="connected-simulations">
                             <h4>Related Simulations</h4>
-                            <p class="section-description">Continue your learning journey with these connected explorations:</p>
+                            <p class="modal-section-description">Continue your learning journey with these connected explorations:</p>
                             <div class="connected-list">
                                 ${info.connectedSimulations
                                   .map(
@@ -1555,7 +1555,7 @@ export default class PreLaunchModal {
                 <div class="educator-content">
                     <div class="educator-intro">
                         <h4>📚 Educator Resources</h4>
-                        <p class="section-description">Tools and guidance for classroom implementation:</p>
+                        <p class="modal-section-description">Tools and guidance for classroom implementation:</p>
                     </div>
                     
                     ${this.generateEducationalContextSection()}
@@ -1825,7 +1825,7 @@ export default class PreLaunchModal {
       content += '<div class="educational-header">';
       content += "<h4>🤖 AI-Enhanced Educational Support</h4>";
       content +=
-        '<p class="section-description">This simulation includes comprehensive educational resources powered by AI:</p>';
+        '<p class="modal-section-description">This simulation includes comprehensive educational resources powered by AI:</p>';
       content += "</div>";
 
       let sectionsAdded = 0;
@@ -1933,7 +1933,7 @@ export default class PreLaunchModal {
           <h4>📚 Curriculum Standards Alignment</h4>
           <span class="section-badge">${curriculum.length} Standard${curriculum.length !== 1 ? "s" : ""}</span>
         </div>
-        <p class="section-description">This simulation aligns with key educational standards and frameworks</p>
+        <p class="modal-section-description">This simulation aligns with key educational standards and frameworks</p>
         <div class="standards-grid">
     `;
 
@@ -1985,7 +1985,7 @@ export default class PreLaunchModal {
           <h4>📝 Assessment Tools</h4>
           <span class="section-badge">${assessments.length} Tool${assessments.length !== 1 ? "s" : ""}</span>
         </div>
-        <p class="section-description">Comprehensive assessment methods for evaluating student learning</p>
+        <p class="modal-section-description">Comprehensive assessment methods for evaluating student learning</p>
         <div class="assessment-categories">
     `;
 
@@ -2059,7 +2059,7 @@ export default class PreLaunchModal {
           <h4>🔬 Virtual Lab Stations</h4>
           <span class="section-badge">${labStations.length} Station${labStations.length !== 1 ? "s" : ""}</span>
         </div>
-        <p class="section-description">Interactive virtual laboratories for hands-on AI ethics exploration</p>
+        <p class="modal-section-description">Interactive virtual laboratories for hands-on AI ethics exploration</p>
         <div class="lab-stations-grid">
     `;
 
@@ -2157,7 +2157,7 @@ export default class PreLaunchModal {
           <h5>📋 Additional Scenario Templates</h5>
           <span class="section-badge">${scenarioTemplates.length} Template${scenarioTemplates.length !== 1 ? "s" : ""}</span>
         </div>
-        <p class="section-description">Create custom scenarios using these AI-generated templates:</p>
+        <p class="modal-section-description">Create custom scenarios using these AI-generated templates:</p>
         <div class="templates-grid">
     `;
 
@@ -2194,7 +2194,7 @@ export default class PreLaunchModal {
           <h4>📊 Educator Dashboard</h4>
           <span class="section-badge">Real-time Analytics</span>
         </div>
-        <p class="section-description">Comprehensive classroom analytics and student progress tracking</p>
+        <p class="modal-section-description">Comprehensive classroom analytics and student progress tracking</p>
         
         <div class="dashboard-metrics">
           <div class="metric-card">
@@ -2245,7 +2245,7 @@ export default class PreLaunchModal {
           <h4>🎓 Professional Development</h4>
           <span class="section-badge">Educator Growth</span>
         </div>
-        <p class="section-description">Comprehensive training and certification programs for AI ethics education</p>
+        <p class="modal-section-description">Comprehensive training and certification programs for AI ethics education</p>
         
         <div class="development-features">
           <div class="development-feature">
@@ -2378,7 +2378,7 @@ export default class PreLaunchModal {
           ${
             errorMessage
               ? `<div class="error-notice">${errorMessage}</div>`
-              : '<p class="section-description">Educational resources are being prepared for this simulation.</p>'
+              : '<p class="modal-section-description">Educational resources are being prepared for this simulation.</p>'
           }
         </div>
         

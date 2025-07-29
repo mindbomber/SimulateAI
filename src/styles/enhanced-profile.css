@@ -594,7 +594,7 @@
     margin-bottom: 3rem;
   }
 
-  .section-header {
+  .main-section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -602,8 +602,8 @@
   }
 
   /* Profile page section titles - specific to profile content */
-  .profile-page .section-title,
-  .user-profile .section-title {
+  .profile-page .main-section-title,
+  .user-profile .main-section-title {
     display: flex;
     align-items: center;
     gap: var(--spacing-3);
@@ -1347,7 +1347,7 @@
     margin-bottom: 3rem;
   }
 
-  .section-header {
+  .main-section-header {
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -1854,8 +1854,8 @@
     border: 1px solid var(--theme-border);
   }
 
-  body.dark-mode .profile-page .section-title,
-  body.dark-mode .user-profile .section-title {
+  body.dark-mode .profile-page .main-section-title,
+  body.dark-mode .user-profile .main-section-title {
     color: var(--theme-text-primary);
   }
 

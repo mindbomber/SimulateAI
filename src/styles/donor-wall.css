@@ -28,13 +28,13 @@
   pointer-events: none;
 }
 
-.donor-appreciation-section .section-header {
+.donor-appreciation-section .main-section-header {
   text-align: center;
   margin-bottom: 3rem;
   position: relative;
 }
 
-.donor-appreciation-section .section-title {
+.donor-appreciation-section .main-section-title {
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
   color: var(--color-gray-900);
@@ -42,7 +42,7 @@
   letter-spacing: -0.02em;
 }
 
-.donor-appreciation-section .section-description {
+.donor-appreciation-section .main-section-description {
   font-size: 1.25rem;
   color: var(--color-text-secondary);
   max-width: 600px;
@@ -901,7 +901,7 @@
     padding: 3rem 1rem;
   }
 
-  .donor-appreciation-section .section-title {
+  .donor-appreciation-section .main-section-title {
     font-size: var(--font-size-2xl);
   }
 
@@ -1168,11 +1168,11 @@ body.dark-mode .donor-appreciation-section::before {
   );
 }
 
-body.dark-mode .donor-appreciation-section .section-title {
+body.dark-mode .donor-appreciation-section .main-section-title {
   color: var(--color-gray-900);
 }
 
-body.dark-mode .donor-appreciation-section .section-description {
+body.dark-mode .donor-appreciation-section .main-section-description {
   color: var(--theme-text-secondary);
 }
 
