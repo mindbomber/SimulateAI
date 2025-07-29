@@ -162,21 +162,6 @@
     scroll-behavior: smooth; /* Re-enable smooth scrolling after page loads */
   }
 
-  /* Enhanced animation trigger state */
-  html.loaded .hero .hero-content,
-  html.loaded .hero .hero-content h1,
-  html.loaded .hero .hero-content p,
-  html.loaded .hero .hero-simulation,
-  html.loaded .hero-title,
-  html.loaded .hero-description,
-  html.loaded .hero-actions,
-  html.loaded .hero-radar-demo,
-  html.loaded .hero-radar-demo h3,
-  html.loaded .hero-radar-demo p {
-    /* Ensure animations are properly triggered */
-    animation-play-state: running;
-  }
-
   body {
     font-family: var(--font-family-primary);
     font-size: var(--font-size-base);

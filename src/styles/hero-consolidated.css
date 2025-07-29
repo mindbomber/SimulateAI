@@ -224,6 +224,13 @@ html.loaded .hero-radar-demo p {
     grid-template-columns: repeat(4, 1fr);
     gap: 0.75rem; /* Slightly smaller gap on mobile */
   }
+
+  /* Mobile popover adjustments */
+  .demo-feedback-popover {
+    width: 280px; /* Smaller on mobile */
+    min-height: 100px;
+    font-size: 0.8rem;
+  }
 }
 
 /* Tablet (768px+) */
@@ -250,6 +257,13 @@ html.loaded .hero-radar-demo p {
   .demo-controls-grid {
     grid-template-columns: repeat(4, 1fr);
     gap: var(--spacing-sm, 1rem); /* Full gap on larger screens */
+  }
+
+  /* Tablet popover adjustments */
+  .demo-feedback-popover {
+    width: 320px; /* Full size on tablet and up */
+    min-height: 120px;
+    font-size: var(--font-size-sm, 0.875rem);
   }
 }
 
@@ -299,6 +313,65 @@ html.loaded .hero-radar-demo p {
   background: var(--demo-background, rgba(255, 255, 255, 0.1));
   border-radius: var(--border-radius-lg, 12px);
   backdrop-filter: blur(10px);
+  text-align: center;
+  position: relative;
+
+  /* Enhanced styling salvaged from radar-chart.css */
+  border: 2px solid var(--demo-border, rgba(255, 255, 255, 0.2));
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+
+  /* Ensure visibility by default with optional animation enhancement */
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: all var(--transition-duration, 0.3s) ease-out;
+}
+
+/* Enhanced typography from radar-chart.css */
+.hero-radar-demo h3 {
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+  font-weight: 700;
+  color: var(--hero-demo-title-color, inherit);
+  margin: 0 0 0.5rem;
+
+  /* Gradient text effect salvaged from radar-chart.css */
+  background: linear-gradient(
+    135deg,
+    var(--gradient-primary-start, #667eea) 0%,
+    var(--gradient-primary-end, #764ba2) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  /* Ensure visibility by default */
+  opacity: 1;
+  transform: translateY(0);
+  transition: all var(--transition-duration, 0.3s) ease-out;
+}
+
+.hero-radar-demo p {
+  color: var(--hero-demo-text-color, rgba(255, 255, 255, 0.9));
+  margin-bottom: var(--spacing-lg, 2rem);
+  font-size: clamp(0.875rem, 3vw, 0.95rem);
+  line-height: 1.6;
+
+  /* Ensure visibility by default */
+  opacity: 1;
+  transform: translateY(0);
+  transition: all var(--transition-duration, 0.3s) ease-out;
+}
+
+/* Hero radar container - salvaged from radar-chart.css */
+.hero-radar-container {
+  position: relative;
+  width: 100%;
+  max-width: 650px;
+  margin: 0 auto var(--spacing-lg, 2rem);
+  padding: var(--spacing-md, 1rem);
+  background: var(--demo-container-background, rgba(255, 255, 255, 0.8));
+  border-radius: var(--border-radius-md, 8px);
+  border: 1px solid var(--demo-container-border, rgba(255, 255, 255, 0.3));
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .hero-demo-controls {
@@ -315,18 +388,28 @@ html.loaded .hero-radar-demo p {
   position: relative; /* For popover positioning */
 }
 
+/* Demo button text centering */
+.demo-controls-grid .demo-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+  min-height: 48px; /* Ensure consistent button height */
+}
+
 /* Demo Feedback Popover */
 .demo-feedback-popover {
   position: absolute;
   bottom: calc(100% + 15px);
-  left: 0;
-  right: 0;
+  left: 50%;
+  transform: translateX(-50%);
   background: var(--popover-background, rgba(0, 0, 0, 0.9));
   color: var(--popover-color, #ffffff);
   padding: var(--spacing-sm, 1rem);
   border-radius: var(--border-radius-md, 8px);
-  max-width: 300px;
-  margin: 0 auto;
+  width: 320px; /* Fixed width for consistent shape */
+  min-height: 120px; /* Fixed minimum height */
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -335,6 +418,8 @@ html.loaded .hero-radar-demo p {
   z-index: 1000;
   text-align: center;
   font-size: var(--font-size-sm, 0.875rem);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .demo-feedback-popover.visible {
@@ -389,6 +474,33 @@ html.loaded .hero-radar-demo p {
 
 .dark-mode .hero-radar-demo {
   background: var(--demo-background-dark, rgba(0, 0, 0, 0.3));
+
+  /* Enhanced dark mode styling salvaged from radar-chart.css */
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  border-color: var(--demo-border-dark, #444);
+  color: var(--demo-text-dark, #fff);
+}
+
+/* Enhanced dark mode typography from radar-chart.css */
+.dark-mode .hero-radar-demo h3 {
+  color: var(--demo-title-dark, #fff);
+
+  /* Enhanced gradient for dark mode */
+  background: linear-gradient(135deg, #6bb4ff 0%, #9d4edd 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark-mode .hero-radar-demo p {
+  color: var(--demo-text-secondary-dark, #ccc);
+}
+
+/* Enhanced dark mode container from radar-chart.css */
+.dark-mode .hero-radar-container {
+  background: var(--demo-container-background-dark, rgba(45, 45, 45, 0.8));
+  border-color: var(--demo-container-border-dark, #444);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .dark-mode .demo-btn {
@@ -498,6 +610,7 @@ html.loaded .hero-radar-demo p {
 .dark-mode .demo-feedback-popover {
   background: rgba(0, 0, 0, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
 .dark-mode .demo-feedback-popover .popover-content {
@@ -627,4 +740,79 @@ html.loaded .hero-radar-demo p {
 .hero.hero-full-height {
   min-height: 100vh;
   padding: var(--hero-full-height-padding, 0);
+}
+
+/* ================================
+   ENHANCED ANIMATIONS & TRANSITIONS
+   ================================ */
+
+/* Enhanced animations and transitions from radar-chart.css */
+.hero-radar-demo {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-radar-demo:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Enhanced pulse animation for better visibility */
+@keyframes hero-radar-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--demo-primary-rgb, 74, 144, 226), 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(var(--demo-primary-rgb, 74, 144, 226), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--demo-primary-rgb, 74, 144, 226), 0);
+  }
+}
+
+.hero-radar-demo.pulse {
+  animation: hero-radar-pulse 2s infinite;
+}
+
+/* Enhanced fade-in animation for initial load */
+@keyframes hero-radar-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.hero-radar-demo.fade-in {
+  animation: hero-radar-fade-in 0.6s ease-out;
+}
+
+/* Accessibility enhancements from radar-chart.css */
+@media (prefers-reduced-motion: reduce) {
+  .hero-radar-demo,
+  .hero-radar-demo:hover {
+    transition: none;
+    animation: none;
+    transform: none;
+  }
+
+  .hero-radar-demo.pulse,
+  .hero-radar-demo.fade-in {
+    animation: none;
+  }
+}
+
+/* Enhanced focus indicators for keyboard navigation */
+.hero-radar-demo:focus-visible {
+  outline: 2px solid var(--demo-focus, #4a90e2);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(var(--demo-primary-rgb, 74, 144, 226), 0.2);
+}
+
+/* Interactive state improvements */
+.hero-radar-demo:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
