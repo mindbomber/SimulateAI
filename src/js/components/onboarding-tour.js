@@ -193,11 +193,17 @@ class OnboardingTour {
       this.isActive = false;
       this.isTransitioning = false; // Prevent race conditions in step transitions
       this.isProcessingAction = false; // Prevent rapid button clicks
+      this.isTransitioningTutorial = false; // Prevent multiple tutorial transitions
+      this.lastActionTime = null; // Timestamp-based action debouncing
       this.coachMark = null;
       this.overlay = null;
       this.spotlight = null;
       this.contentObserver = null; // For tracking dynamic content changes
       this.contentUpdateTimeout = null; // For debouncing content updates
+
+      // Event handler references to prevent duplicate listeners
+      this.currentClickHandler = null;
+      this.currentKeyHandler = null;
 
       // User interaction states
       this.userStates = {
@@ -1884,14 +1890,21 @@ class OnboardingTour {
       buttons: this.coachMark.querySelectorAll(".coach-mark-btn").length,
     });
 
-    // IMPROVED: Remove existing event listeners without DOM recreation
+    // IMPROVED: Remove ALL existing event listeners without DOM recreation
     // Store reference to avoid multiple listeners
     if (this.currentClickHandler) {
       this.coachMark.removeEventListener("click", this.currentClickHandler);
+      this.currentClickHandler = null;
     }
     if (this.currentKeyHandler) {
       this.coachMark.removeEventListener("keydown", this.currentKeyHandler);
+      this.currentKeyHandler = null;
     }
+
+    // CRITICAL: Remove any orphaned event listeners by cloning and replacing the element
+    const newCoachMark = this.coachMark.cloneNode(true);
+    this.coachMark.parentNode.replaceChild(newCoachMark, this.coachMark);
+    this.coachMark = newCoachMark;
 
     // Set up click handlers for coach mark buttons
     this.currentClickHandler = (e) => {
@@ -2167,20 +2180,32 @@ class OnboardingTour {
   }
 
   handleAction(action) {
-    // Prevent rapid-fire clicks with debouncing
-    if (this.isProcessingAction) {
+    // Prevent rapid-fire clicks with debouncing - with timestamp protection
+    const now = Date.now();
+    if (
+      this.isProcessingAction ||
+      (this.lastActionTime && now - this.lastActionTime < 100)
+    ) {
       logger.debug(
         "OnboardingTour",
-        `Action ${action} ignored - already processing another action`,
+        `Action ${action} ignored - already processing another action or too soon`,
+        {
+          isProcessingAction: this.isProcessingAction,
+          timeSinceLastAction: this.lastActionTime
+            ? now - this.lastActionTime
+            : "N/A",
+        },
       );
       return;
     }
 
     this.isProcessingAction = true;
+    this.lastActionTime = now;
 
     logger.info("OnboardingTour", `Handling action: ${action}`, {
       currentTutorial: this.currentTutorial,
       currentStep: this.currentStep,
+      actionTimestamp: now,
     });
 
     switch (action) {
@@ -2203,6 +2228,7 @@ class OnboardingTour {
           currentTutorial: this.currentTutorial,
           currentStep: this.currentStep,
           isActive: this.isActive,
+          actionTimestamp: now,
         });
         this.nextTutorial();
         // Flag will be reset in nextTutorial() method itself
@@ -2300,6 +2326,17 @@ class OnboardingTour {
   }
 
   nextTutorial() {
+    // Prevent multiple simultaneous calls
+    if (this.isTransitioningTutorial) {
+      logger.warn(
+        "OnboardingTour",
+        "nextTutorial called while already transitioning",
+      );
+      return;
+    }
+
+    this.isTransitioningTutorial = true;
+
     // Track tutorial completion
     simpleAnalytics.trackEvent("tour_tutorial_completed", {
       tutorial: this.currentTutorial,
@@ -2340,6 +2377,7 @@ class OnboardingTour {
           this.waitForModalClosure(() => {
             // After modal closes, scroll to hero demo and start tutorial
             this.scrollToHeroDemoAndStart();
+            this.isTransitioningTutorial = false;
           });
 
           // Close the modal
@@ -2365,6 +2403,7 @@ class OnboardingTour {
             "No modal detected, scrolling to hero demo for Tutorial 2",
           );
           this.scrollToHeroDemoAndStart();
+          this.isTransitioningTutorial = false;
         }
 
         // Reset processing flag immediately for Tutorial 2 since async operations will handle the rest
@@ -2387,6 +2426,7 @@ class OnboardingTour {
           );
           this.waitForModalClosure(() => {
             this.showStep();
+            this.isTransitioningTutorial = false;
           });
         } else {
           logger.info(
@@ -2394,6 +2434,7 @@ class OnboardingTour {
             "No modal detected, starting Tutorial 3 immediately",
           );
           this.showStep();
+          this.isTransitioningTutorial = false;
         }
 
         // Reset processing flag after initiating Tutorial 3
@@ -2404,6 +2445,7 @@ class OnboardingTour {
         );
       } else {
         this.showStep();
+        this.isTransitioningTutorial = false;
         // Reset processing flag for normal tutorial progression
         this.isProcessingAction = false;
         logger.debug(
@@ -2413,6 +2455,7 @@ class OnboardingTour {
       }
     } else {
       this.endTour();
+      this.isTransitioningTutorial = false;
       // Reset processing flag after tour ends
       this.isProcessingAction = false;
       logger.debug("OnboardingTour", "Processing flag reset after tour end");

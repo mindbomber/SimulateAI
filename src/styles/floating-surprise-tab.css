@@ -457,6 +457,14 @@
   justify-content: center;
   color: white;
   line-height: 1.2;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-surprise-tab.expanded .floating-surprise-tab-text {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .surprise-tab-title {
@@ -597,6 +605,14 @@
   flex: 1;
   min-width: 0;
   color: white;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-tour-tab.expanded .floating-tour-tab-text {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .tour-tab-title {
