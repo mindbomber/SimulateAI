@@ -1,0 +1,334 @@
+<!--
+Copyright 2025 Armando Sori
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blog Admin Dashboard - SimulateAI</title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="src/styles/main.css" />
+    <link rel="stylesheet" href="src/styles/shared-navigation.css" />
+    <link rel="stylesheet" href="src/styles/admin-dashboard.css" />
+
+    <!-- Icons and Favicons -->
+    <link rel="icon" type="image/svg+xml" href="src/assets/icons/favicon.svg" />
+    <link rel="icon" type="image/png" href="src/assets/icons/favicon.png" />
+  </head>
+
+  <body class="admin-dashboard-page">
+    <!-- Skip to content for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Navigation -->
+    <div id="navigation-container"></div>
+
+    <!-- Admin Authentication Check -->
+    <div id="auth-check" class="auth-overlay" style="display: none">
+      <div class="auth-container">
+        <div class="auth-content">
+          <h2>Admin Access Required</h2>
+          <p>
+            Please sign in with the research@simulateai.io account to access the
+            blog dashboard.
+          </p>
+          <button id="admin-sign-in-btn" class="btn-primary">
+            <span>🔐 Sign In with Google</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <main
+      id="main-content"
+      class="main-content"
+      role="main"
+      style="display: none"
+    >
+      <div class="dashboard-container">
+        <!-- Dashboard Header -->
+        <header class="dashboard-header">
+          <div class="header-content">
+            <div class="header-info">
+              <h1>📝 Blog Admin Dashboard</h1>
+              <p class="admin-welcome">
+                Welcome, <span id="admin-email">research@simulateai.io</span>
+              </p>
+            </div>
+            <div class="header-actions">
+              <button id="new-post-btn" class="btn-primary">
+                <span>✨ New Post</span>
+              </button>
+              <button id="admin-logout-btn" class="btn-outline">
+                <span>🚪 Sign Out</span>
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <!-- Dashboard Stats -->
+        <section class="dashboard-stats">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">📊</div>
+              <div class="stat-info">
+                <h3 id="total-posts-count">0</h3>
+                <p>Total Posts</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">📝</div>
+              <div class="stat-info">
+                <h3 id="draft-posts-count">0</h3>
+                <p>Draft Posts</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">👁️</div>
+              <div class="stat-info">
+                <h3 id="total-views-count">0</h3>
+                <p>Total Views</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">💬</div>
+              <div class="stat-info">
+                <h3 id="total-comments-count">0</h3>
+                <p>Comments</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Posts Management -->
+        <section class="posts-management">
+          <div class="section-header">
+            <h2>📋 Manage Posts</h2>
+            <div class="section-actions">
+              <input
+                type="search"
+                id="posts-search"
+                placeholder="Search posts..."
+                class="search-input"
+              />
+              <select id="posts-filter" class="filter-select">
+                <option value="all">All Posts</option>
+                <option value="published">Published</option>
+                <option value="draft">Drafts</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="posts-table-container">
+            <table class="posts-table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th>Views</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="posts-table-body">
+                <tr class="no-posts">
+                  <td colspan="5">No posts found. Create your first post!</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Post Editor Modal -->
+    <div id="post-editor-modal" class="modal-overlay" style="display: none">
+      <div class="modal-container large-modal">
+        <div class="modal-header">
+          <h3 id="editor-title">Create New Post</h3>
+          <button class="modal-close" aria-label="Close">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <form id="post-editor-form" class="post-form">
+            <!-- Post Title -->
+            <div class="form-group">
+              <label for="post-title">Title *</label>
+              <input
+                type="text"
+                id="post-title"
+                name="title"
+                required
+                maxlength="200"
+                placeholder="Enter post title..."
+              />
+              <div class="char-count"><span id="title-count">0</span>/200</div>
+            </div>
+
+            <!-- Post Body -->
+            <div class="form-group">
+              <label for="post-body">Content *</label>
+              <div class="editor-toolbar">
+                <button type="button" class="toolbar-btn" data-format="bold">
+                  <strong>B</strong>
+                </button>
+                <button type="button" class="toolbar-btn" data-format="italic">
+                  <em>I</em>
+                </button>
+                <button type="button" class="toolbar-btn" data-format="link">
+                  🔗
+                </button>
+                <button type="button" class="toolbar-btn" data-format="image">
+                  🖼️
+                </button>
+                <button type="button" class="toolbar-btn" data-format="youtube">
+                  📺
+                </button>
+              </div>
+              <textarea
+                id="post-body"
+                name="body"
+                required
+                rows="15"
+                placeholder="Write your post content here. You can use Markdown formatting and include YouTube embeds, links, and images."
+              ></textarea>
+              <div class="editor-help">
+                <details>
+                  <summary>Formatting Help</summary>
+                  <div class="help-content">
+                    <h4>Markdown Syntax:</h4>
+                    <ul>
+                      <li><code>**Bold text**</code> - for bold text</li>
+                      <li><code>*Italic text*</code> - for italic text</li>
+                      <li><code>[Link text](URL)</code> - for links</li>
+                      <li><code>![Alt text](image URL)</code> - for images</li>
+                      <li><code>## Heading 2</code> - for headings</li>
+                      <li><code>- List item</code> - for bullet lists</li>
+                    </ul>
+                    <h4>YouTube Embeds:</h4>
+                    <p>Use: <code>[youtube:VIDEO_ID]</code> to embed videos</p>
+                  </div>
+                </details>
+              </div>
+            </div>
+
+            <!-- Post Meta -->
+            <div class="form-row">
+              <div class="form-group">
+                <label for="post-tags">Tags</label>
+                <input
+                  type="text"
+                  id="post-tags"
+                  name="tags"
+                  placeholder="ai-ethics, research, philosophy (comma-separated)"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="post-category">Category</label>
+                <select id="post-category" name="category">
+                  <option value="research">🔬 Research</option>
+                  <option value="article">📰 Article</option>
+                  <option value="video">🎥 Video</option>
+                  <option value="podcast">🎧 Podcast</option>
+                  <option value="interview">🎤 Interview</option>
+                  <option value="analysis">📊 Analysis</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Image Upload -->
+            <div class="form-group">
+              <label for="post-image">Featured Image</label>
+              <div class="image-upload-area">
+                <input
+                  type="file"
+                  id="post-image"
+                  name="image"
+                  accept="image/*"
+                  style="display: none"
+                />
+                <div class="upload-placeholder" id="image-placeholder">
+                  <div class="upload-icon">🖼️</div>
+                  <p>Click to upload featured image</p>
+                  <small>Recommended: 1200x630px, max 2MB</small>
+                </div>
+                <div
+                  class="image-preview"
+                  id="image-preview"
+                  style="display: none"
+                >
+                  <img id="preview-img" src="" alt="Preview" />
+                  <button type="button" id="remove-image" class="remove-btn">
+                    &times;
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+              <div class="primary-actions">
+                <button type="button" id="save-draft-btn" class="btn-outline">
+                  💾 Save Draft
+                </button>
+                <button type="submit" id="publish-post-btn" class="btn-primary">
+                  🚀 Publish Post
+                </button>
+              </div>
+              <div class="secondary-actions">
+                <button type="button" id="preview-post-btn" class="btn-minimal">
+                  👁️ Preview
+                </button>
+                <button type="button" class="btn-minimal modal-cancel">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loading" class="loading-indicator" style="display: none">
+      <div class="loading-spinner"></div>
+      <p>Loading...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="src/js/services/firebase-service.js"></script>
+    <script type="module" src="src/js/services/auth-service.js"></script>
+    <script type="module" src="src/js/services/blog-service.js"></script>
+    <script
+      type="module"
+      src="src/js/components/notification-toast.js"
+    ></script>
+    <script type="module" src="src/js/admin/blog-admin-dashboard.js"></script>
+
+    <!-- Shared Navigation -->
+    <script type="module">
+      import { loadSharedNavigation } from "./src/js/components/shared-navigation.js";
+
+      // Load navigation with a slight delay to ensure proper initialization
+      setTimeout(() => {
+        loadSharedNavigation("admin-blog-dashboard");
+      }, 100);
+    </script>
+  </body>
+</html>

@@ -52,8 +52,15 @@ limitations under the License.
     <meta name="author" content="SimulateAI Educational Platform" />
     <meta name="page-id" content="blog" />
 
+    <!-- SEO Enhancement -->
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1"
+    />
+    <link rel="canonical" href="https://www.simulateai.io/blog.html" />
+
     <!-- Open Graph / Social Media -->
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content="blog" />
     <meta
       property="og:title"
       content="Blog - SimulateAI | Insights & Research on AI Ethics Education"
@@ -62,18 +69,24 @@ limitations under the License.
       property="og:description"
       content="Discover cutting-edge research, educational insights, and community discussions about AI ethics and simulation-based learning"
     />
-    <meta property="og:url" content="https://www.SimulateAI.io/blog.html" />
+    <meta property="og:url" content="https://www.simulateai.io/blog.html" />
     <meta
       property="og:image"
-      content="https://www.SimulateAI.io/src/assets/images/blog-preview.jpg"
+      content="https://www.simulateai.io/src/assets/images/blog-preview.jpg"
     />
+    <meta property="og:site_name" content="SimulateAI" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@SimulateAI" />
     <meta name="twitter:title" content="Blog - SimulateAI" />
     <meta
       name="twitter:description"
       content="Insights & Research on AI Ethics Education"
+    />
+    <meta
+      name="twitter:image"
+      content="https://www.simulateai.io/src/assets/images/blog-preview.jpg"
     />
 
     <!-- Accessibility -->
@@ -81,6 +94,26 @@ limitations under the License.
       name="accessibility-features"
       content="keyboard-navigation,skip-links,high-contrast,large-text,screen-reader-support"
     />
+
+    <!-- Structured Data for Blog -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Blog",
+        "name": "SimulateAI Blog",
+        "description": "Research insights and educational content about AI ethics and simulation-based learning",
+        "url": "https://www.simulateai.io/blog.html",
+        "publisher": {
+          "@type": "Organization",
+          "name": "SimulateAI",
+          "url": "https://www.simulateai.io"
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "https://www.simulateai.io/blog.html"
+        }
+      }
+    </script>
 
     <!-- Professional Blog Styles -->
     <link rel="stylesheet" href="src/styles/professional-blog.css" />
@@ -130,9 +163,21 @@ limitations under the License.
             </p>
           </div>
           <div class="blog-actions">
-            <button id="write-post-btn" class="btn-minimal">
-              <span>Contribute</span>
-            </button>
+            <div class="contribute-info">
+              <p class="contribute-text">Want to contribute?</p>
+              <a href="mailto:research@simulateai.io" class="btn-minimal">
+                <span>✉️ Email Us</span>
+              </a>
+            </div>
+            <div
+              id="admin-panel-btn"
+              class="admin-section"
+              style="display: none"
+            >
+              <button id="admin-dashboard-btn" class="btn-minimal admin-btn">
+                <span>📝 Admin Dashboard</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1045,10 +1090,24 @@ For research articles, consider including:
           this.authService.firebaseService.addAuthStateListener((user) => {
             this.currentUser = user;
             this.updateUIForAuth();
+            this.checkAdminAccess(); // Check admin access when auth state changes
           });
 
           this.setupEventHandlers();
           await this.loadBlogPosts();
+        }
+
+        checkAdminAccess() {
+          const adminSection = document.getElementById("admin-panel-btn");
+
+          if (
+            this.currentUser &&
+            this.currentUser.email === "research@simulateai.io"
+          ) {
+            adminSection.style.display = "block";
+          } else {
+            adminSection.style.display = "none";
+          }
         }
 
         async updateUIForAuth() {
@@ -1342,6 +1401,13 @@ For research articles, consider including:
             .getElementById("write-post-btn")
             ?.addEventListener("click", () => {
               this.showWritePostModal();
+            });
+
+          // Admin dashboard button
+          document
+            .getElementById("admin-dashboard-btn")
+            ?.addEventListener("click", () => {
+              window.location.href = "/admin-blog-dashboard.html";
             });
 
           // New submission modal event handlers

@@ -1,10 +1,11 @@
 /**
  * Blog Service for SimulateAI Research Community
- * Implements Firestore-based blog system with advanced features
+ * Implements Firestore-based blog system with advanced features and DataHandler integration
  * Based on Firebase/Firestore best practices for blog content
  */
 
 import FirebaseService from "./firebase-service.js";
+import DataHandler from "../core/data-handler.js";
 import {
   collection,
   doc,
@@ -33,6 +34,15 @@ class BlogService extends FirebaseService {
     this.activeListeners = new Map();
     this.lastDocument = null;
     this.postsPerPage = 10;
+
+    // Initialize DataHandler for centralized data management
+    this.dataHandler = new DataHandler({
+      appName: "SimulateAI-Blog",
+      version: "1.60",
+      firebaseService: this,
+      enableCaching: true,
+      enableOfflineQueue: true,
+    });
 
     // Configuration constants
     this.MAX_TITLE_LENGTH = 200;
@@ -786,7 +796,7 @@ class BlogService extends FirebaseService {
 
   logInfo(context, data) {
     if (window.location.hostname === "localhost") {
-      // eslint-disable-next-line no-console
+      console.log(`BlogService - ${context}:`, data);
     }
   }
 
@@ -795,6 +805,224 @@ class BlogService extends FirebaseService {
     this.activeListeners.forEach((unsubscribe) => unsubscribe());
     this.activeListeners.clear();
     this.postsCache.clear();
+  }
+
+  /**
+   * Admin-only methods for blog management
+   */
+
+  /**
+   * Check if current user is admin
+   */
+  isAdmin() {
+    return (
+      this.currentUser && this.currentUser.email === "research@simulateai.io"
+    );
+  }
+
+  /**
+   * Delete a blog post (admin only)
+   */
+  async deletePost(postId) {
+    try {
+      if (!this.currentUser) {
+        throw new Error("Authentication required to delete posts");
+      }
+
+      if (!this.isAdmin()) {
+        throw new Error("Admin privileges required to delete posts");
+      }
+
+      const postRef = doc(this.db, "blog_posts", postId);
+
+      // Get post data before deletion for logging
+      const postDoc = await getDoc(postRef);
+      if (!postDoc.exists()) {
+        throw new Error("Post not found");
+      }
+
+      const postData = postDoc.data();
+
+      // Delete the post
+      await deleteDoc(postRef);
+
+      // Log the deletion for audit trail
+      await this.logPostDeletion(postId, postData);
+
+      // Clear from cache
+      this.postsCache.delete(postId);
+
+      this.logInfo("Post deleted successfully", {
+        postId,
+        title: postData.title,
+      });
+      this.dispatchEvent("postDeleted", { postId, post: postData });
+
+      return true;
+    } catch (error) {
+      this.handleError("deletePost", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Log post deletion for audit trail
+   */
+  async logPostDeletion(postId, postData) {
+    try {
+      const logData = {
+        action: "post_deleted",
+        postId: postId,
+        postTitle: postData.title,
+        deletedBy: this.currentUser.email,
+        deletedAt: serverTimestamp(),
+        originalAuthor: postData.authorEmail,
+        deletedPostData: {
+          title: postData.title,
+          category: postData.category,
+          tags: postData.tags,
+          createdAt: postData.createdAt,
+          viewCount: postData.viewCount || 0,
+          likeCount: postData.likeCount || 0,
+        },
+      };
+
+      await addDoc(collection(this.db, "admin_audit_log"), logData);
+    } catch (error) {
+      console.error("Failed to log post deletion:", error);
+      // Don't throw error here as it shouldn't prevent the deletion
+    }
+  }
+
+  /**
+   * Get all posts including unpublished ones (admin only)
+   */
+  async getAllPosts(options = {}) {
+    try {
+      if (!this.isAdmin()) {
+        throw new Error("Admin privileges required to view all posts");
+      }
+
+      const {
+        limit: queryLimit = 100,
+        orderByField = "createdAt",
+        orderDirection = "desc",
+        includeUnpublished = true,
+      } = options;
+
+      let queryRef = collection(this.db, "blog_posts");
+
+      // Build query
+      const constraints = [];
+
+      if (!includeUnpublished) {
+        constraints.push(where("isPublished", "==", true));
+      }
+
+      constraints.push(orderBy(orderByField, orderDirection));
+      constraints.push(limit(queryLimit));
+
+      queryRef = query(queryRef, ...constraints);
+
+      const querySnapshot = await getDocs(queryRef);
+      const posts = [];
+
+      querySnapshot.forEach((doc) => {
+        const postData = this.processPostData({ id: doc.id, ...doc.data() });
+        posts.push(postData);
+      });
+
+      this.logInfo("Retrieved all posts for admin", { count: posts.length });
+
+      return posts;
+    } catch (error) {
+      this.handleError("getAllPosts", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update post status (admin only)
+   */
+  async updatePostStatus(postId, status) {
+    try {
+      if (!this.isAdmin()) {
+        throw new Error("Admin privileges required to update post status");
+      }
+
+      const postRef = doc(this.db, "blog_posts", postId);
+      const updateData = {
+        status: status,
+        isPublished: status === "published",
+        isDraft: status === "draft",
+        updatedAt: serverTimestamp(),
+      };
+
+      if (status === "published") {
+        updateData.publishedAt = serverTimestamp();
+      }
+
+      await updateDoc(postRef, updateData);
+
+      // Clear from cache
+      this.postsCache.delete(postId);
+
+      this.logInfo("Post status updated", { postId, status });
+      this.dispatchEvent("postStatusUpdated", { postId, status });
+
+      return true;
+    } catch (error) {
+      this.handleError("updatePostStatus", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get admin dashboard statistics
+   */
+  async getAdminStats() {
+    try {
+      if (!this.isAdmin()) {
+        throw new Error("Admin privileges required to view statistics");
+      }
+
+      const postsRef = collection(this.db, "blog_posts");
+
+      // Get all posts
+      const allPostsQuery = query(postsRef);
+      const allPostsSnapshot = await getDocs(allPostsQuery);
+
+      // Get published posts
+      const publishedPostsQuery = query(
+        postsRef,
+        where("isPublished", "==", true),
+      );
+      const publishedPostsSnapshot = await getDocs(publishedPostsQuery);
+
+      // Get draft posts
+      const draftPostsQuery = query(postsRef, where("isDraft", "==", true));
+      const draftPostsSnapshot = await getDocs(draftPostsQuery);
+
+      let totalViews = 0;
+      let totalComments = 0;
+
+      allPostsSnapshot.forEach((doc) => {
+        const data = doc.data();
+        totalViews += data.viewCount || 0;
+        totalComments += data.commentsCount || 0;
+      });
+
+      return {
+        totalPosts: allPostsSnapshot.size,
+        publishedPosts: publishedPostsSnapshot.size,
+        draftPosts: draftPostsSnapshot.size,
+        totalViews: totalViews,
+        totalComments: totalComments,
+      };
+    } catch (error) {
+      this.handleError("getAdminStats", error);
+      throw error;
+    }
   }
 }
 
