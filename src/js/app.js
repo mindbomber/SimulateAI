@@ -2345,8 +2345,14 @@ class SimulateAIApp {
    */
   handleDemoPattern(data) {
     const { pattern } = data;
-    if (window.simulateEthicsPattern) {
-      window.simulateEthicsPattern(pattern);
+    console.log("📡 handleDemoPattern called with:", pattern);
+
+    // Direct access to ethicsDemo to avoid circular calls
+    if (window.ethicsDemo) {
+      console.log("✅ Calling ethicsDemo.applyDemoPattern directly");
+      window.ethicsDemo.applyDemoPattern(pattern);
+    } else {
+      console.warn("❌ EthicsDemo not available in handleDemoPattern");
     }
   }
 
@@ -3511,6 +3517,9 @@ class SimulateAIApp {
           isDemo: true,
           context: "hero-demo",
         });
+
+        // Expose globally for access from other functions
+        window.ethicsDemo = ethicsDemo;
 
         // Wait for chart to be fully initialized
         await ethicsDemo.initializationPromise;
@@ -6426,7 +6435,15 @@ let currentActivePattern = null; // Track currently active pattern
 
 // Global functions for radar demo controls with toggle functionality
 window.simulateEthicsPattern = function (pattern, buttonElement) {
-  console.log("🎯 Button clicked:", pattern, "ethicsDemo:", ethicsDemo);
+  console.log("🎯 simulateEthicsPattern called!");
+  console.log(
+    "🎯 Button clicked:",
+    pattern,
+    "buttonElement:",
+    buttonElement,
+    "ethicsDemo:",
+    ethicsDemo,
+  );
 
   if (ethicsDemo) {
     console.log("✅ EthicsDemo found, processing pattern:", pattern);
@@ -6437,6 +6454,7 @@ window.simulateEthicsPattern = function (pattern, buttonElement) {
       ethicsDemo.resetScores();
       currentActivePattern = null;
       updateButtonStates(null);
+      hideDemoPopover(); // Hide popover when toggling off
     } else {
       // Otherwise, select the new pattern
       console.log("🎨 Applying new pattern:", pattern);
@@ -6561,6 +6579,7 @@ window.resetEthicsDemo = function () {
     ethicsDemo.resetScores();
     currentActivePattern = null;
     updateButtonStates(null);
+    hideDemoPopover(); // Hide popover when resetting
   }
 };
 
@@ -6573,10 +6592,26 @@ window.testChartDirect = function (pattern) {
   }
 };
 
-// Helper function to position popover above a specific button
+// Helper function to position and show popover above a specific button
 function positionPopoverAboveButton(button) {
+  console.log("🎯 positionPopoverAboveButton called with button:", button);
+
   const feedbackContainer = document.getElementById("hero-demo-feedback");
-  if (!feedbackContainer || !button) return;
+  console.log("📦 feedbackContainer found:", feedbackContainer);
+
+  if (!feedbackContainer || !button) {
+    console.warn("❌ Missing feedbackContainer or button");
+    return;
+  }
+
+  // Get the button pattern from data attribute or text content
+  const pattern =
+    button.dataset.pattern || getPatternFromButtonText(button.textContent);
+
+  console.log("🎨 Pattern determined:", pattern);
+
+  // Set popover content based on the pattern
+  showDemoPopoverContent(feedbackContainer, pattern);
 
   // Get button position and dimensions
   const buttonRect = button.getBoundingClientRect();
@@ -6589,6 +6624,97 @@ function positionPopoverAboveButton(button) {
   // Apply positioning
   feedbackContainer.style.left = `${leftOffset}px`;
   feedbackContainer.style.transform = "translateX(-50%)";
+  console.log("📍 Positioning applied:", { leftOffset });
+
+  // Show the popover with animation
+  feedbackContainer.classList.add("visible");
+  console.log(
+    "👁️ Made popover visible, classes:",
+    feedbackContainer.classList.toString(),
+  );
+
+  // Auto-hide after 3 seconds
+  clearTimeout(positionPopoverAboveButton.hideTimeout);
+  positionPopoverAboveButton.hideTimeout = setTimeout(() => {
+    hideDemoPopover();
+  }, 3000);
+}
+
+// Helper function to get pattern name from button text
+function getPatternFromButtonText(buttonText) {
+  const text = buttonText.toLowerCase();
+  if (text.includes("utilitarian")) return "utilitarian";
+  if (text.includes("rights-based")) return "deontological";
+  if (text.includes("virtue")) return "virtue";
+  if (text.includes("balanced")) return "balanced";
+  return "unknown";
+}
+
+// Function to show demo popover content
+function showDemoPopoverContent(container, pattern) {
+  console.log("📝 showDemoPopoverContent called with:", container, pattern);
+
+  const popoverContent = container.querySelector(".popover-content");
+  console.log("📦 popoverContent found:", popoverContent);
+
+  if (!popoverContent) {
+    console.warn("❌ No popover content element found");
+    return;
+  }
+
+  const patternInfo = {
+    utilitarian: {
+      title: "🎯 Utilitarian Ethics",
+      description:
+        "Focuses on maximizing overall happiness and well-being for the greatest number of people.",
+      emphasis: "Outcomes and consequences matter most",
+    },
+    deontological: {
+      title: "⚖️ Rights-Based Ethics",
+      description:
+        "Emphasizes individual rights, duties, and moral rules that must be respected regardless of consequences.",
+      emphasis: "Rights and duties are fundamental",
+    },
+    virtue: {
+      title: "🌟 Virtue Ethics",
+      description:
+        "Focuses on character traits and moral virtues like honesty, courage, and compassion.",
+      emphasis: "Character and intentions matter most",
+    },
+    balanced: {
+      title: "⚡ Balanced Approach",
+      description:
+        "Considers multiple ethical frameworks to find a thoughtful balance between competing values.",
+      emphasis: "Holistic consideration of all factors",
+    },
+    unknown: {
+      title: "🤔 Ethics Pattern",
+      description:
+        "This pattern demonstrates a different approach to ethical decision-making.",
+      emphasis: "Explore different ethical perspectives",
+    },
+  };
+
+  const info = patternInfo[pattern] || patternInfo.unknown;
+  console.log("ℹ️ Pattern info:", info);
+
+  popoverContent.innerHTML = `
+    <h5>${info.title}</h5>
+    <p>${info.description}</p>
+    <div class="pattern-emphasis">
+      <strong>${info.emphasis}</strong>
+    </div>
+  `;
+
+  console.log("✅ Popover content set successfully");
+}
+
+// Function to hide demo popover
+function hideDemoPopover() {
+  const feedbackContainer = document.getElementById("hero-demo-feedback");
+  if (feedbackContainer) {
+    feedbackContainer.classList.remove("visible");
+  }
 }
 
 // Helper function to update button visual states - optimized to prevent redundant DOM manipulation
@@ -6724,6 +6850,17 @@ document.addEventListener("DOMContentLoaded", () => {
       );
       if (!header || !header.contains(event.target)) {
         window.toggleEthicsGlossary();
+      }
+    }
+
+    // Add click-to-close functionality for demo popover
+    const demoPopover = document.getElementById("hero-demo-feedback");
+    const demoControls = document.querySelector(".hero-demo-controls");
+
+    if (demoPopover && demoPopover.classList.contains("visible")) {
+      // If clicking outside the demo controls area, hide popover
+      if (!demoControls || !demoControls.contains(event.target)) {
+        hideDemoPopover();
       }
     }
   });

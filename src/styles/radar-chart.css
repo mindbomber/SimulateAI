@@ -130,14 +130,17 @@
 
   /* ===== ORIGINAL RADAR CHART STYLES ===== */
 
-  /* Hero Radar Demo Section - Consolidated from hero-demo.css */
+  /* Hero Radar Demo Section - Enhanced with salvaged hero styles */
   .hero-radar-demo {
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     border: 2px solid #cbd5e0;
     border-radius: 16px;
-    padding: 2rem;
-    margin: 2rem 0 0;
+    padding: var(--container-padding, 2rem);
+    margin: var(--spacing-xl, 3rem) 0 0;
     text-align: center;
+    box-shadow: 0 10px 25px rgb(0 0 0 / 10%);
+    backdrop-filter: blur(10px);
+    position: relative;
 
     /* Ensure visibility by default with optional animation enhancement */
     opacity: 1;
@@ -151,14 +154,13 @@
   }
 
   .hero-radar-demo h3 {
-    font-size: 1.5rem;
+    font-size: calc(1.5rem * var(--font-scale, 1));
     font-weight: 700;
-    color: #1a202c;
-    margin: 0 0 1rem;
+    color: var(--color-gray-900, #1a202c);
+    margin: 0 0 0.5rem;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    background-clip: text;
 
     /* Ensure visibility by default with optional animation enhancement */
     opacity: 1;
@@ -172,9 +174,9 @@
   }
 
   .hero-radar-demo p {
-    color: #4a5568;
-    margin-bottom: 2rem;
-    font-size: 1rem;
+    color: var(--color-gray-600, #4a5568);
+    margin-bottom: var(--spacing-lg, 2rem);
+    font-size: calc(0.95rem * var(--font-scale, 1));
     line-height: 1.6;
 
     /* Ensure visibility by default with optional animation enhancement */
@@ -188,16 +190,169 @@
     animation: heroRadarElementEnter 0.6s ease-out forwards 1.2s;
   }
 
-  /* Hero Radar Container - Consolidated from hero-demo.css */
+  /* Hero Radar Container - Enhanced with hero-demo.css styles */
   .hero-radar-container {
     position: relative;
     width: 100%;
     max-width: 650px;
-    margin: 0 auto 2rem;
-    padding: 1rem;
+    margin: 0 auto var(--spacing-lg, 2rem);
+    padding: var(--spacing-md, 1rem);
     background: rgb(255 255 255 / 80%);
     border-radius: 16px;
     box-shadow: 0 4px 12px rgb(0 0 0 / 8%);
+  }
+
+  /* ===== HERO DEMO CONTROLS - Salvaged from hero-demo.css ===== */
+
+  /* Hero Demo Controls Container */
+  .hero-demo-controls {
+    position: relative;
+    margin: var(--spacing-lg, 2rem) 0;
+  }
+
+  .demo-controls-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-sm, 1rem);
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative; /* For popover positioning */
+  }
+
+  /* Enhanced Demo Button Styles - Salvaged from hero-demo.css */
+  .hero-demo-controls .demo-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+    color: white;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgb(79 70 229 / 25%);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgb(255 255 255 / 10%);
+    text-align: center;
+  }
+
+  .hero-demo-controls .demo-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(255 255 255 / 15%),
+      transparent
+    );
+    transition: left 0.5s ease;
+  }
+
+  .hero-demo-controls .demo-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgb(79 70 229 / 35%);
+    background: linear-gradient(135deg, #4338ca 0%, #5b21b6 100%);
+  }
+
+  .hero-demo-controls .demo-btn:hover::before {
+    left: 100%;
+  }
+
+  .hero-demo-controls .demo-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgb(79 70 229 / 25%);
+  }
+
+  /* Active/Selected state for demo buttons */
+  .hero-demo-controls .demo-btn.active {
+    background: linear-gradient(135deg, #1e40af 0%, #3730a3 100%);
+    box-shadow: 0 4px 16px rgb(30 64 175 / 40%);
+    transform: translateY(-1px);
+    border: 2px solid rgb(255 255 255 / 30%);
+  }
+
+  .hero-demo-controls .demo-btn.active::before {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(255 255 255 / 25%),
+      transparent
+    );
+  }
+
+  .hero-demo-controls .demo-btn.active:hover {
+    background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%);
+    box-shadow: 0 6px 20px rgb(30 64 175 / 45%);
+  }
+
+  /* Demo Feedback Popover - Enhanced from hero-consolidated.css */
+  .demo-feedback-popover {
+    position: absolute;
+    bottom: calc(100% + 15px);
+    left: 0;
+    right: 0;
+    background: var(--popover-background, rgba(0, 0, 0, 0.9));
+    color: var(--popover-color, #ffffff);
+    padding: var(--spacing-sm, 1rem);
+    border-radius: var(--border-radius-md, 8px);
+    max-width: 300px;
+    margin: 0 auto;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: all var(--transition-duration, 0.3s)
+      var(--transition-easing, ease);
+    z-index: 1000;
+    text-align: center;
+    font-size: var(--font-size-sm, 0.875rem);
+  }
+
+  .demo-feedback-popover.visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .demo-feedback-popover .popover-content h5 {
+    margin: 0 0 0.5rem 0;
+    font-size: var(--font-size-base, 1rem);
+    font-weight: 600;
+  }
+
+  .demo-feedback-popover .popover-content p {
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* Responsive demo controls - Salvaged from hero-consolidated.css */
+  @media (max-width: 480px) {
+    .demo-controls-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+
+    .hero-demo-controls .demo-btn {
+      padding: 0.6rem 1rem;
+      font-size: 0.8rem;
+    }
+  }
+
+  @media (min-width: 481px) and (max-width: 767px) {
+    .demo-controls-grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .demo-controls-grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--spacing-sm, 1rem);
+    }
   }
 
   /* Demo radar container - Consolidated from ethics-analysis.css (similar to .radar-demo-container) */
@@ -1064,6 +1219,58 @@
     box-shadow: 0 4px 12px rgb(0 0 0 / 40%);
   }
 
+  /* ===== HERO DEMO CONTROLS DARK MODE - Salvaged from hero-demo.css ===== */
+
+  /* Demo controls dark mode */
+  body.dark-mode .hero-demo-controls .demo-btn {
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+    color: #f9fafb;
+    border-color: rgb(156 163 175 / 30%);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 40%);
+  }
+
+  body.dark-mode .hero-demo-controls .demo-btn::before {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(255 255 255 / 8%),
+      transparent
+    );
+  }
+
+  body.dark-mode .hero-demo-controls .demo-btn:hover {
+    background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
+    box-shadow: 0 4px 16px rgb(0 0 0 / 50%);
+    border-color: rgb(156 163 175 / 50%);
+  }
+
+  body.dark-mode .hero-demo-controls .demo-btn.active {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    box-shadow: 0 4px 16px rgb(0 0 0 / 60%);
+    border-color: rgb(255 255 255 / 40%);
+  }
+
+  body.dark-mode .hero-demo-controls .demo-btn.active:hover {
+    background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+    box-shadow: 0 6px 20px rgb(0 0 0 / 70%);
+  }
+
+  /* Demo popover dark mode */
+  body.dark-mode .demo-feedback-popover {
+    background: var(--popover-background-dark, rgba(17, 24, 39, 0.95));
+    color: var(--popover-color-dark, #f9fafb);
+    border: 1px solid rgb(75 85 99 / 50%);
+    backdrop-filter: blur(12px);
+  }
+
+  body.dark-mode .demo-feedback-popover .popover-content h5 {
+    color: #f3f4f6;
+  }
+
+  body.dark-mode .demo-feedback-popover .popover-content p {
+    color: #d1d5db;
+  }
+
   /* Demo radar container dark mode */
   body.dark-mode .demo-radar-container {
     background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%);
@@ -1249,9 +1456,11 @@
   .scenario-modal .scenario-radar canvas,
   .scenario-modal .results-radar canvas,
   .scenario-modal #scenario-radar-chart canvas {
-    max-width: 100% !important;
-    width: 400px !important; /* Increased width for chart */
-    height: 400px !important; /* Increased height for chart */
+    max-width: 400px !important;
+    width: 400px !important; /* Force exact 400px width */
+    height: 400px !important; /* Force exact 400px height */
+    min-width: 400px !important; /* Prevent Chart.js from shrinking */
+    min-height: 400px !important; /* Prevent Chart.js from shrinking */
     display: block !important;
     margin: 0 auto !important;
 
@@ -1260,8 +1469,11 @@
     overflow: visible !important;
 
     /* Remove padding to give more space to the chart itself */
-    padding: 0;
-    box-sizing: border-box;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+
+    /* Force perfect square ratio */
+    aspect-ratio: 1 / 1 !important;
   }
 
   /* Scenario modal chart legend styles */
@@ -1373,6 +1585,21 @@
   .scenario-modal-dialog canvas[role="img"] {
     position: relative;
     z-index: 2;
+
+    /* Force exact 400x400 dimensions to override Chart.js inline styles */
+    width: 400px !important;
+    height: 400px !important;
+    max-width: 400px !important;
+    max-height: 400px !important;
+    min-width: 400px !important;
+    min-height: 400px !important;
+  }
+
+  /* Additional override for any Chart.js canvas in scenario modals */
+  .scenario-modal canvas[style*="width"],
+  .scenario-modal-dialog canvas[style*="width"] {
+    width: 400px !important;
+    height: 400px !important;
   }
 
   /* ===== INLINE STYLE CONFLICT PROTECTION ===== */
@@ -1412,4 +1639,90 @@
   }
 
   /* SIMPLIFIED: Chart.js tooltips are handled automatically - no complex overrides needed */
+
+  /* ===== ACCESSIBILITY AND MOTION PREFERENCES - Salvaged from hero-consolidated.css ===== */
+
+  /* High Contrast Mode Support */
+  @media (prefers-contrast: high) {
+    .hero-radar-demo {
+      background: var(--hero-background-high-contrast, #000000);
+      color: var(--hero-text-high-contrast, #ffffff);
+      border-color: #ffffff;
+    }
+
+    .hero-demo-controls .demo-btn {
+      border-width: 3px;
+      font-weight: var(--font-weight-bold, 700);
+      background: #000000;
+      color: #ffffff;
+      border-color: #ffffff;
+    }
+
+    .hero-demo-controls .demo-btn:hover,
+    .hero-demo-controls .demo-btn.active {
+      background: #ffffff;
+      color: #000000;
+      border-color: #000000;
+    }
+
+    .demo-feedback-popover {
+      background: #000000;
+      color: #ffffff;
+      border: 3px solid #ffffff;
+    }
+  }
+
+  /* Reduced Motion Support */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-radar-demo,
+    .hero-demo-controls .demo-btn,
+    .demo-feedback-popover,
+    .hero-radar-container {
+      transition: none;
+      animation: none;
+    }
+
+    .hero-demo-controls .demo-btn:hover,
+    .hero-demo-controls .demo-btn.active {
+      transform: none;
+    }
+
+    .hero-demo-controls .demo-btn::before {
+      transition: none;
+    }
+
+    html.loaded .hero-radar-demo,
+    html.loaded .hero-radar-demo h3,
+    html.loaded .hero-radar-demo p {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Focus and Keyboard Navigation Support */
+  .hero-demo-controls .demo-btn:focus-visible {
+    outline: 3px solid var(--focus-color, #4285f4);
+    outline-offset: 2px;
+    z-index: 10;
+  }
+
+  .demo-feedback-popover:focus-within {
+    outline: 2px solid var(--focus-color, #4285f4);
+    outline-offset: 2px;
+  }
+
+  /* Touch and Mobile Interaction Improvements */
+  @media (hover: none) and (pointer: coarse) {
+    .hero-demo-controls .demo-btn {
+      min-height: 44px; /* Minimum touch target size */
+      font-size: 1rem;
+    }
+
+    .hero-demo-controls .demo-btn:hover {
+      /* Remove hover effects on touch devices */
+      transform: none;
+      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+    }
+  }
 } /* End @layer components */

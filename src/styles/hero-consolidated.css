@@ -218,6 +218,12 @@ html.loaded .hero-radar-demo p {
   .hero-description {
     font-size: var(--hero-description-size-mobile-xl, 1.125rem);
   }
+
+  /* Responsive demo controls grid - maintain 4 columns */
+  .demo-controls-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem; /* Slightly smaller gap on mobile */
+  }
 }
 
 /* Tablet (768px+) */
@@ -238,6 +244,12 @@ html.loaded .hero-radar-demo p {
   .container-responsive {
     padding-left: var(--container-padding-x-tablet, 1.5rem);
     padding-right: var(--container-padding-x-tablet, 1.5rem);
+  }
+
+  /* Keep 4-column grid on tablet and up */
+  .demo-controls-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-sm, 1rem); /* Full gap on larger screens */
   }
 }
 
@@ -296,53 +308,28 @@ html.loaded .hero-radar-demo p {
 
 .demo-controls-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--spacing-sm, 1rem);
   max-width: 600px;
   margin: 0 auto;
-}
-
-.demo-btn {
-  padding: var(--spacing-sm, 1rem);
-  border: 2px solid var(--demo-btn-border, rgba(255, 255, 255, 0.3));
-  background: var(--demo-btn-background, rgba(255, 255, 255, 0.1));
-  color: var(--demo-btn-color, inherit);
-  border-radius: var(--border-radius-md, 8px);
-  font-weight: var(--font-weight-medium, 500);
-  cursor: pointer;
-  transition: all var(--transition-duration, 0.3s)
-    var(--transition-easing, ease);
-  backdrop-filter: blur(5px);
-}
-
-.demo-btn:hover {
-  background: var(--demo-btn-hover-background, rgba(255, 255, 255, 0.2));
-  border-color: var(--demo-btn-hover-border, rgba(255, 255, 255, 0.5));
-  transform: var(--demo-btn-hover-transform, translateY(-2px));
-}
-
-.demo-btn.active {
-  background: var(--demo-btn-active-background, rgba(255, 255, 255, 0.3));
-  border-color: var(--demo-btn-active-border, rgba(255, 255, 255, 0.7));
-}
-
-.balanced-btn {
-  grid-column: span 2;
+  position: relative; /* For popover positioning */
 }
 
 /* Demo Feedback Popover */
 .demo-feedback-popover {
   position: absolute;
-  bottom: calc(100% + 10px);
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: calc(100% + 15px);
+  left: 0;
+  right: 0;
   background: var(--popover-background, rgba(0, 0, 0, 0.9));
   color: var(--popover-color, #ffffff);
   padding: var(--spacing-sm, 1rem);
   border-radius: var(--border-radius-md, 8px);
   max-width: 300px;
+  margin: 0 auto;
   opacity: 0;
   visibility: hidden;
+  pointer-events: none;
   transition: all var(--transition-duration, 0.3s)
     var(--transition-easing, ease);
   z-index: 1000;
@@ -353,6 +340,26 @@ html.loaded .hero-radar-demo p {
 .demo-feedback-popover.visible {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
+}
+
+.demo-feedback-popover .popover-content h5 {
+  margin: 0 0 0.5rem 0;
+  font-size: var(--font-size-base, 1rem);
+  font-weight: 600;
+}
+
+.demo-feedback-popover .popover-content p {
+  margin: 0 0 0.75rem 0;
+  line-height: 1.4;
+}
+
+.demo-feedback-popover .pattern-emphasis {
+  font-size: var(--font-size-xs, 0.75rem);
+  color: var(--popover-accent, #e3f2fd);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding-top: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 .popover-arrow {
@@ -503,6 +510,11 @@ html.loaded .hero-radar-demo p {
 
 .dark-mode .demo-feedback-popover .popover-content p {
   color: #cccccc;
+}
+
+.dark-mode .demo-feedback-popover .pattern-emphasis {
+  color: #b3d9ff;
+  border-top-color: rgba(255, 255, 255, 0.1);
 }
 
 .dark-mode .demo-actions .btn {
