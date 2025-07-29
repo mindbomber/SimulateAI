@@ -88,7 +88,7 @@
 /* Layout Layer - Layout systems */
 @layer layout {
   /* Container and responsive layout styles */
-  .container-responsive {
+  .layout-container-responsive {
     width: 100%;
     max-width: var(--container-max-width, 1200px);
     margin: 0 auto;

@@ -67,9 +67,15 @@
         margin-right: 8px;
       }
 
-      .status-pass { background: #10b981; }
-      .status-fail { background: #ef4444; }
-      .status-warn { background: #f59e0b; }
+      .status-pass {
+        background: #10b981;
+      }
+      .status-fail {
+        background: #ef4444;
+      }
+      .status-warn {
+        background: #f59e0b;
+      }
 
       .css-layers-test {
         background: linear-gradient(135deg, #dbeafe, #ede9fe);
@@ -90,7 +96,10 @@
   <body>
     <div class="test-container">
       <h1>🧪 CSS Architecture Validation</h1>
-      <p>Comprehensive testing of CSS layers, responsive design, and donor wall implementation</p>
+      <p>
+        Comprehensive testing of CSS layers, responsive design, and donor wall
+        implementation
+      </p>
 
       <!-- CSS Layers Test -->
       <div class="test-section css-layers-test">
@@ -135,7 +144,9 @@
           </div>
           <div class="test-item">
             <div class="test-label">Container Padding</div>
-            <div class="test-value" id="container-padding-test">Checking...</div>
+            <div class="test-value" id="container-padding-test">
+              Checking...
+            </div>
           </div>
           <div class="test-item">
             <div class="test-label">Font Scaling</div>
@@ -171,7 +182,7 @@
       </div>
 
       <!-- Live Test: Actual Donor Wall -->
-      <div class="donor-appreciation-section container-responsive">
+      <div class="donor-appreciation-section layout-container-responsive">
         <div class="main-section-header">
           <h3 class="main-section-title">
             <span class="title-icon">💝</span>
@@ -202,91 +213,114 @@
     <script>
       // CSS Layers Test
       function testCSSLayers() {
-        const testElement = document.createElement('div');
-        testElement.className = 'donor-appreciation-section container-responsive';
+        const testElement = document.createElement("div");
+        testElement.className =
+          "donor-appreciation-section layout-container-responsive";
         document.body.appendChild(testElement);
 
         const computed = getComputedStyle(testElement);
-        
+
         // Test layer cascade
         const maxWidth = computed.maxWidth;
         const margin = computed.margin;
         const padding = computed.padding;
-        
-        document.getElementById('layer-order').textContent = 'Components → Utilities';
-        document.getElementById('components-layer').textContent = maxWidth === '1400px' ? '✅ Active' : '❌ Failed';
-        document.getElementById('utilities-layer').textContent = padding.includes('var(') ? '✅ Active' : '❌ Failed';
-        document.getElementById('namespace-check').textContent = '✅ No conflicts detected';
-        
+
+        document.getElementById("layer-order").textContent =
+          "Components → Utilities";
+        document.getElementById("components-layer").textContent =
+          maxWidth === "1400px" ? "✅ Active" : "❌ Failed";
+        document.getElementById("utilities-layer").textContent =
+          padding.includes("var(") ? "✅ Active" : "❌ Failed";
+        document.getElementById("namespace-check").textContent =
+          "✅ No conflicts detected";
+
         document.body.removeChild(testElement);
-        
-        document.getElementById('layers-status').className = 'status-indicator status-pass';
+
+        document.getElementById("layers-status").className =
+          "status-indicator status-pass";
       }
 
       // Responsive Design Test
       function testResponsiveDesign() {
         const width = window.innerWidth;
         const height = window.innerHeight;
-        
-        document.getElementById('current-viewport').textContent = `${width}×${height}px`;
-        
-        let deviceType = 'Unknown';
-        if (width <= 767) deviceType = 'Mobile';
-        else if (width <= 1279) deviceType = 'Tablet';
-        else if (width <= 1919) deviceType = 'Laptop';
-        else deviceType = 'Desktop';
-        
-        document.getElementById('device-type-test').textContent = deviceType;
-        
+
+        document.getElementById("current-viewport").textContent =
+          `${width}×${height}px`;
+
+        let deviceType = "Unknown";
+        if (width <= 767) deviceType = "Mobile";
+        else if (width <= 1279) deviceType = "Tablet";
+        else if (width <= 1919) deviceType = "Laptop";
+        else deviceType = "Desktop";
+
+        document.getElementById("device-type-test").textContent = deviceType;
+
         // Test CSS custom properties
         const rootStyles = getComputedStyle(document.documentElement);
-        const containerPadding = rootStyles.getPropertyValue('--container-padding').trim();
-        const fontScale = rootStyles.getPropertyValue('--font-scale').trim();
-        
-        document.getElementById('container-padding-test').textContent = containerPadding || '16px (fallback)';
-        document.getElementById('font-scale-test').textContent = fontScale || '1 (fallback)';
-        
-        document.getElementById('responsive-status').className = 'status-indicator status-pass';
+        const containerPadding = rootStyles
+          .getPropertyValue("--container-padding")
+          .trim();
+        const fontScale = rootStyles.getPropertyValue("--font-scale").trim();
+
+        document.getElementById("container-padding-test").textContent =
+          containerPadding || "16px (fallback)";
+        document.getElementById("font-scale-test").textContent =
+          fontScale || "1 (fallback)";
+
+        document.getElementById("responsive-status").className =
+          "status-indicator status-pass";
       }
 
       // Donor Wall Centering Test
       function testDonorWallCentering() {
-        const donorSection = document.querySelector('.donor-appreciation-section');
+        const donorSection = document.querySelector(
+          ".donor-appreciation-section",
+        );
         if (!donorSection) {
-          document.getElementById('centering-status').className = 'status-indicator status-fail';
+          document.getElementById("centering-status").className =
+            "status-indicator status-fail";
           return;
         }
 
         const computed = getComputedStyle(donorSection);
         const rect = donorSection.getBoundingClientRect();
         const parentRect = donorSection.parentElement.getBoundingClientRect();
-        
+
         // Test max-width constraint
         const maxWidth = computed.maxWidth;
-        document.getElementById('max-width-test').textContent = 
-          maxWidth === '1400px' ? '✅ 1400px' : `❌ ${maxWidth}`;
-        
+        document.getElementById("max-width-test").textContent =
+          maxWidth === "1400px" ? "✅ 1400px" : `❌ ${maxWidth}`;
+
         // Test centering
         const leftMargin = rect.left - parentRect.left;
         const rightMargin = parentRect.right - rect.right;
         const isCentered = Math.abs(leftMargin - rightMargin) < 5;
-        
-        document.getElementById('centering-test-result').textContent = 
-          isCentered ? '✅ Properly centered' : `❌ L:${leftMargin.toFixed(1)}px R:${rightMargin.toFixed(1)}px`;
-        
-        // Test container-responsive class
-        const hasClass = donorSection.classList.contains('container-responsive');
-        document.getElementById('container-class-test').textContent = 
-          hasClass ? '✅ Applied' : '❌ Missing';
-        
+
+        document.getElementById("centering-test-result").textContent =
+          isCentered
+            ? "✅ Properly centered"
+            : `❌ L:${leftMargin.toFixed(1)}px R:${rightMargin.toFixed(1)}px`;
+
+        // Test layout-container-responsive class
+        const hasClass = donorSection.classList.contains(
+          "layout-container-responsive",
+        );
+        document.getElementById("container-class-test").textContent = hasClass
+          ? "✅ Applied"
+          : "❌ Missing";
+
         // Test wide viewport behavior
         const isConstrained = rect.width <= 1400;
-        document.getElementById('wide-viewport-test').textContent = 
-          isConstrained ? '✅ Width constrained' : `❌ Too wide: ${rect.width.toFixed(0)}px`;
-        
-        const allPassed = maxWidth === '1400px' && isCentered && hasClass && isConstrained;
-        document.getElementById('centering-status').className = 
-          `status-indicator ${allPassed ? 'status-pass' : 'status-warn'}`;
+        document.getElementById("wide-viewport-test").textContent =
+          isConstrained
+            ? "✅ Width constrained"
+            : `❌ Too wide: ${rect.width.toFixed(0)}px`;
+
+        const allPassed =
+          maxWidth === "1400px" && isCentered && hasClass && isConstrained;
+        document.getElementById("centering-status").className =
+          `status-indicator ${allPassed ? "status-pass" : "status-warn"}`;
       }
 
       // Run all tests
@@ -297,8 +331,8 @@
       }
 
       // Initialize tests
-      document.addEventListener('DOMContentLoaded', runAllTests);
-      window.addEventListener('resize', runAllTests);
+      document.addEventListener("DOMContentLoaded", runAllTests);
+      window.addEventListener("resize", runAllTests);
 
       // Auto-refresh tests every 2 seconds
       setInterval(runAllTests, 2000);

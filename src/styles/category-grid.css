@@ -425,6 +425,80 @@
    - Context-specific overrides and responsive design
    ============================================= */
 
+  /* ===== CATEGORIES SECTION PARENT CONTAINER ===== */
+  /* Parent container for both .categories-grid and .scenarios-grid */
+  .categories-section {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    min-height: fit-content;
+    /* Ensure proper grid container behavior */
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    gap: var(--spacing-6);
+    /* Enhanced responsive padding using CSS custom properties */
+    padding: var(--container-padding, 16px);
+    box-sizing: border-box;
+  }
+
+  /* Main section header within categories section */
+  .categories-section .main-section-header {
+    /* Ensure header takes full width and stays at top */
+    width: 100%;
+    max-width: 100%;
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: stretch;
+    align-self: start;
+  }
+
+  /* Grid containers - both categories and scenarios grids */
+  .categories-section .categories-grid,
+  .categories-section .scenarios-grid {
+    /* Grid items are centered by parent's place-items */
+    grid-column: 1;
+    grid-row: 2;
+    width: 100%;
+    max-width: 100%;
+    /* Remove redundant centering since parent handles it */
+    margin: 0;
+    padding: 0;
+    justify-self: center;
+    align-self: start;
+  }
+
+  /* Responsive adjustments for categories section */
+  @media (width >= 769px) {
+    .categories-section {
+      padding: calc(var(--container-padding, 24px) * 1.5)
+        var(--container-padding, 24px);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+  }
+
+  @media (width >= 1024px) {
+    .categories-section {
+      padding: calc(var(--container-padding, 32px) * 2)
+        var(--container-padding, 32px);
+      max-width: 1300px;
+    }
+  }
+
+  @media (width >= 1280px) {
+    .categories-section {
+      padding: calc(var(--container-padding, 40px) * 2)
+        var(--container-padding, 40px);
+      max-width: 1400px;
+    }
+  }
+
+  @media (width >= 1600px) {
+    .categories-section {
+      max-width: 1500px;
+    }
+  }
+
   /* Category Sections */
 
   /* Category Section Layout */
@@ -440,7 +514,8 @@
     flex-direction: column;
     gap: var(--spacing-12);
     margin-bottom: var(--spacing-12);
-    padding: 0 var(--spacing-4);
+    /* Simplified padding since parent handles responsive spacing */
+    padding: 0;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
@@ -449,41 +524,37 @@
     overflow-x: hidden;
   }
 
-  /* Desktop layout improvements - Consider using .container-responsive utility */
-  /* These specific responsive breakpoints are kept for precise layout control */
+  /* Desktop layout improvements - Parent container handles centering and max-width */
+  /* These responsive breakpoints are simplified since parent handles layout */
   @media (width >= 769px) {
     .categories-grid,
     .simulations-grid {
-      padding: 0 var(--spacing-8);
-      margin: 0 auto var(--spacing-12);
-      max-width: 1200px; /* Reduced max width for better scrolling experience */
+      /* Parent handles padding and centering */
+      padding: 0;
     }
   }
 
   @media (width >= 1024px) {
     .categories-grid,
     .simulations-grid {
-      padding: 0 var(--spacing-12);
-      margin: 0 var(--spacing-16) var(--spacing-12); /* Added horizontal margins */
-      max-width: 1300px;
+      /* Parent handles margins and max-width */
+      margin: 0 0 var(--spacing-12) 0;
     }
   }
 
   @media (width >= 1280px) {
     .categories-grid,
     .simulations-grid {
-      padding: 0 var(--spacing-16);
-      margin: 0 var(--spacing-20) var(--spacing-12); /* Larger horizontal margins */
-      max-width: 1400px;
+      /* Maintained for consistency */
+      margin: 0 0 var(--spacing-12) 0;
     }
   }
 
   @media (width >= 1600px) {
     .categories-grid,
     .simulations-grid {
-      padding: 0 var(--spacing-20);
-      margin: 0 var(--spacing-20) var(--spacing-12); /* Use available spacing variable */
-      max-width: 1500px;
+      /* Parent handles max-width constraints */
+      margin: 0 0 var(--spacing-12) 0;
     }
   }
 
@@ -617,7 +688,8 @@
   @media (width <= 768px) {
     .simulations-grid {
       gap: var(--spacing-8);
-      padding: 0 var(--spacing-3);
+      /* Parent handles padding through layout-container-responsive */
+      padding: 0;
     }
 
     /* Category header responsive styles moved to category-header.css */
@@ -639,6 +711,13 @@
 
     .scenario-card {
       min-height: 250px;
+    }
+
+    /* Mobile adjustments for categories section */
+    .categories-section {
+      gap: var(--spacing-4);
+      padding: calc(var(--container-padding, 12px) * 1.5)
+        var(--container-padding, 12px);
     }
   }
 
@@ -686,10 +765,17 @@
 
   @media (width <= 480px) {
     .simulations-grid {
-      padding: 0 var(--spacing-2); /* Further reduce padding */
+      /* Parent handles padding */
+      padding: 0;
     }
 
     /* .scenarios-grid styles moved to scenario-browser.css for consolidation */
+
+    /* Smaller gap and padding for very small screens */
+    .categories-section {
+      gap: var(--spacing-3);
+      padding: var(--container-padding, 8px);
+    }
   }
 
   /* Tablet responsive adjustments - maintain uniform rectangular shapes */
@@ -804,6 +890,11 @@
 
   /* ===== DARK MODE SUPPORT ===== */
   body.dark-mode .categories-grid {
+    background: var(--theme-bg-primary);
+  }
+
+  /* Categories section dark mode */
+  body.dark-mode .categories-section {
     background: var(--theme-bg-primary);
   }
 

@@ -22,6 +22,18 @@
     font-size: calc(1rem * var(--font-scale, 1));
   }
 
+  /* Specific ID selector for enhanced centering */
+  #donor-appreciation {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Override donor-flair-display.css margin with higher specificity */
+  #donor-appreciation.donor-appreciation-section {
+    margin: 32px auto; /* Keep top/bottom margin from donor-flair, set left/right to auto */
+    max-width: 1000px; /* Define max-width for auto margins to work */
+  }
+
   .donor-appreciation-section::before {
     content: "";
     position: absolute;
@@ -936,6 +948,15 @@
       padding: calc(var(--container-padding, 12px) * 2) var(--container-padding, 12px);
     }
 
+    /* Enhanced mobile centering for ID selector */
+    #donor-appreciation {
+      margin-left: auto;
+      margin-right: auto;
+      /* Ensure responsive width on mobile while maintaining centering */
+      width: 100%;
+      max-width: calc(100% - 40px); /* Maintain some margin on very small screens */
+    }
+
     .donor-appreciation-section .main-section-title {
       /* Use responsive font scaling */
       font-size: calc(var(--font-size-2xl, 1.5rem) * var(--font-scale, 0.9));
@@ -1061,6 +1082,14 @@
     .donor-carousel-container {
       padding: calc(var(--container-padding, 8px) * 1.5) var(--container-padding, 8px);
       border-radius: calc(var(--container-padding, 8px) * 1.8);
+    }
+
+    /* Maintain centering on very small screens */
+    #donor-appreciation {
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: calc(var(--container-padding, 8px) * 0.5);
+      padding-right: calc(var(--container-padding, 8px) * 0.5);
     }
 
     .donor-cards-container {
@@ -1191,6 +1220,12 @@
       var(--theme-bg-secondary) 50%,
       var(--theme-bg-primary) 100%
     );
+  }
+
+  /* Dark mode centering for ID selector */
+  body.dark-mode #donor-appreciation {
+    margin-left: auto;
+    margin-right: auto;
   }
 
   body.dark-mode .donor-appreciation-section::before {

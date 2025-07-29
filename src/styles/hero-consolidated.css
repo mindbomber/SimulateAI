@@ -154,7 +154,7 @@ html.loaded .hero-radar-demo p {
      CONTAINER RESPONSIVE STYLES
      ================================ */
 
-  .container-responsive {
+  .layout-container-responsive {
     width: 100%;
     max-width: var(--container-max-width, 1200px);
     margin: 0 auto;
@@ -182,7 +182,7 @@ html.loaded .hero-radar-demo p {
     font-size: var(--hero-description-size-mobile-sm, 1rem);
   }
 
-  .container-responsive {
+  .layout-container-responsive {
     padding-left: var(--container-padding-x-mobile-sm, 1rem);
     padding-right: var(--container-padding-x-mobile-sm, 1rem);
   }
@@ -198,7 +198,7 @@ html.loaded .hero-radar-demo p {
     font-size: var(--hero-title-size-mobile-lg, 2.25rem);
   }
 
-  .container-responsive {
+  .layout-container-responsive {
     padding-left: var(--container-padding-x-mobile-lg, 1.25rem);
     padding-right: var(--container-padding-x-mobile-lg, 1.25rem);
   }
@@ -241,7 +241,7 @@ html.loaded .hero-radar-demo p {
     font-size: var(--hero-description-size-tablet, 1.25rem);
   }
 
-  .container-responsive {
+  .layout-container-responsive {
     padding-left: var(--container-padding-x-tablet, 1.5rem);
     padding-right: var(--container-padding-x-tablet, 1.5rem);
   }
@@ -264,7 +264,7 @@ html.loaded .hero-radar-demo p {
     font-size: var(--hero-title-size-desktop, 3.5rem);
   }
 
-  .container-responsive {
+  .layout-container-responsive {
     padding-left: var(--container-padding-x-desktop, 2rem);
     padding-right: var(--container-padding-x-desktop, 2rem);
   }
@@ -284,7 +284,7 @@ html.loaded .hero-radar-demo p {
 
 /* XL Desktop (1400px+) */
 @media (min-width: 1400px) {
-  .container-responsive {
+  .layout-container-responsive {
     max-width: var(--container-max-width-xl, 1320px);
   }
 }

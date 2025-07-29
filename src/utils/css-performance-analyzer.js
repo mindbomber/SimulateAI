@@ -40,7 +40,7 @@ class CSSPerformanceAnalyzer {
       after: {
         heroFiles: ["hero-consolidated.css"],
         containerFiles: [
-          "hero-consolidated.css", // Contains .container-responsive
+          "hero-consolidated.css", // Contains .layout-container-responsive
           "css-layers.css",
         ],
         totalFiles: 1,

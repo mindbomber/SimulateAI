@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Categories Section Grid Layout Test</title>
+    <link rel="stylesheet" href="src/styles/shared.css" />
+    <link rel="stylesheet" href="src/styles/media.css" />
+    <link rel="stylesheet" href="src/styles/category-grid.css" />
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+        background: var(--color-background-subtle, #f8fafc);
+      }
+
+      .test-header {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .test-info {
+        background: white;
+        padding: 1.5rem;
+        margin: 1rem auto;
+        max-width: 800px;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      }
+
+      .test-properties {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .property-item {
+        background: #f9fafb;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+      }
+
+      .property-label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.25rem;
+      }
+
+      .property-value {
+        font-family: monospace;
+        color: #059669;
+        background: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        border: 1px solid #d1fae5;
+        font-size: 0.875rem;
+      }
+
+      /* Test visualization styles */
+      .test-categories-section {
+        /* Add visual indicators for testing */
+        outline: 3px dashed #3b82f6;
+        outline-offset: -3px;
+        position: relative;
+      }
+
+      .test-categories-section::before {
+        content: "🎯 Parent Grid Container";
+        position: absolute;
+        top: -1.5rem;
+        left: 1rem;
+        background: #3b82f6;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        z-index: 10;
+      }
+
+      .test-grid-child {
+        outline: 2px dashed #10b981;
+        outline-offset: -2px;
+        position: relative;
+      }
+
+      .test-grid-child::before {
+        content: "📐 Grid Child";
+        position: absolute;
+        top: -1.25rem;
+        right: 1rem;
+        background: #10b981;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        z-index: 10;
+      }
+
+      .sample-content {
+        background: #fef3c7;
+        padding: 2rem;
+        margin: 1rem;
+        border-radius: 8px;
+        text-align: center;
+        color: #92400e;
+        font-weight: 600;
+        border: 2px solid #f59e0b;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-header">
+      <h1>🧪 Categories Section Grid Layout Test</h1>
+      <p>
+        Testing <code>display: grid</code> and
+        <code>place-items: center</code> implementation
+      </p>
+    </div>
+
+    <div class="test-info">
+      <h2>🔍 Layout Analysis</h2>
+      <p>
+        The categories section now uses CSS Grid with
+        <code>place-items: center</code> for optimal child centering.
+      </p>
+
+      <div class="test-properties" id="grid-properties">
+        <div class="property-item">
+          <div class="property-label">Display Type</div>
+          <div class="property-value" id="display-value">Checking...</div>
+        </div>
+        <div class="property-item">
+          <div class="property-label">Place Items</div>
+          <div class="property-value" id="place-items-value">Checking...</div>
+        </div>
+        <div class="property-item">
+          <div class="property-label">Grid Template Columns</div>
+          <div class="property-value" id="grid-columns-value">Checking...</div>
+        </div>
+        <div class="property-item">
+          <div class="property-label">Grid Template Rows</div>
+          <div class="property-value" id="grid-rows-value">Checking...</div>
+        </div>
+        <div class="property-item">
+          <div class="property-label">Gap</div>
+          <div class="property-value" id="gap-value">Checking...</div>
+        </div>
+        <div class="property-item">
+          <div class="property-label">Max Width</div>
+          <div class="property-value" id="max-width-value">Checking...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Test Implementation -->
+    <section
+      class="categories-section container-responsive test-categories-section"
+      id="test-categories"
+    >
+      <div class="main-section-header">
+        <h2 class="main-section-title">Grid Layout Test</h2>
+        <p class="main-section-description">
+          This section demonstrates the new grid layout implementation for
+          categories section.
+        </p>
+      </div>
+
+      <!-- Test Categories Grid -->
+      <div class="categories-grid view-content active test-grid-child">
+        <div class="sample-content">
+          <h3>📂 Categories Grid</h3>
+          <p>This is where category sections would be displayed</p>
+          <p><strong>Grid Position:</strong> Column 1, Row 2</p>
+          <p><strong>Justify Self:</strong> center</p>
+          <p><strong>Align Self:</strong> start</p>
+        </div>
+      </div>
+
+      <!-- Test Scenarios Grid (hidden by default) -->
+      <div
+        class="scenarios-grid view-content test-grid-child"
+        style="display: none"
+      >
+        <div class="sample-content">
+          <h3>🎯 Scenarios Grid</h3>
+          <p>This is where individual scenario cards would be displayed</p>
+          <p><strong>Grid Position:</strong> Column 1, Row 2</p>
+          <p><strong>Justify Self:</strong> center</p>
+          <p><strong>Align Self:</strong> start</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="test-info">
+      <h2>✅ Implementation Benefits</h2>
+      <ul>
+        <li>
+          <strong>Perfect Centering:</strong>
+          <code>place-items: center</code> handles both horizontal and vertical
+          alignment
+        </li>
+        <li>
+          <strong>Responsive Grid:</strong> Uses CSS custom properties for
+          adaptive spacing
+        </li>
+        <li>
+          <strong>Clean Structure:</strong> Parent handles layout, children
+          focus on content
+        </li>
+        <li>
+          <strong>Consistent Spacing:</strong> Grid gap ensures uniform spacing
+          between elements
+        </li>
+        <li>
+          <strong>Mobile Optimized:</strong> Responsive padding and gap
+          adjustments for all screen sizes
+        </li>
+      </ul>
+    </div>
+
+    <script>
+      function analyzeGridProperties() {
+        const categoriesSection = document.getElementById("test-categories");
+        const computed = getComputedStyle(categoriesSection);
+
+        // Update property values
+        document.getElementById("display-value").textContent = computed.display;
+        document.getElementById("place-items-value").textContent =
+          computed.placeItems;
+        document.getElementById("grid-columns-value").textContent =
+          computed.gridTemplateColumns;
+        document.getElementById("grid-rows-value").textContent =
+          computed.gridTemplateRows;
+        document.getElementById("gap-value").textContent = computed.gap;
+        document.getElementById("max-width-value").textContent =
+          computed.maxWidth;
+
+        // Log for debugging
+        console.log("Categories Section Grid Analysis:", {
+          display: computed.display,
+          placeItems: computed.placeItems,
+          gridTemplateColumns: computed.gridTemplateColumns,
+          gridTemplateRows: computed.gridTemplateRows,
+          gap: computed.gap,
+          maxWidth: computed.maxWidth,
+          width: computed.width,
+          justifyItems: computed.justifyItems,
+          alignItems: computed.alignItems,
+        });
+      }
+
+      // Run analysis on load and resize
+      document.addEventListener("DOMContentLoaded", analyzeGridProperties);
+      window.addEventListener("resize", analyzeGridProperties);
+
+      // Test view toggle
+      function toggleView() {
+        const categoriesGrid = document.querySelector(".categories-grid");
+        const scenariosGrid = document.querySelector(".scenarios-grid");
+
+        if (categoriesGrid.style.display === "none") {
+          categoriesGrid.style.display = "flex";
+          scenariosGrid.style.display = "none";
+          console.log("Showing categories grid");
+        } else {
+          categoriesGrid.style.display = "none";
+          scenariosGrid.style.display = "flex";
+          console.log("Showing scenarios grid");
+        }
+      }
+
+      // Add toggle button
+      const toggleButton = document.createElement("button");
+      toggleButton.textContent = "Toggle Grid View";
+      toggleButton.style.cssText = `
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        padding: 0.75rem 1.5rem;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        z-index: 1000;
+      `;
+      toggleButton.onclick = toggleView;
+      document.body.appendChild(toggleButton);
+    </script>
+  </body>
+</html>
