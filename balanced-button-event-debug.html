@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🔍 Balanced Button Event Listener Debug</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f7fafc;
+      }
+      .debug-container {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .test-button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin: 5px;
+        font-size: 14px;
+      }
+      .test-button:hover {
+        background: #0056b3;
+      }
+      .test-button.active {
+        background: #28a745;
+      }
+      .log-output {
+        background: #1a1a1a;
+        color: #00ff00;
+        padding: 20px;
+        border-radius: 8px;
+        font-family: "Consolas", monospace;
+        font-size: 13px;
+        height: 400px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        margin-top: 20px;
+      }
+      .chart-container {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+      }
+      .status {
+        padding: 10px;
+        border-radius: 6px;
+        margin: 10px 0;
+        font-weight: 500;
+      }
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+      }
+      .status.warning {
+        background: #fff3cd;
+        color: #856404;
+      }
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="debug-container">
+      <h1>🔍 Balanced Button Event Listener Debug</h1>
+      <p>
+        <strong>Purpose:</strong> Detect if there are duplicate/stuck event
+        listeners on the balanced button
+      </p>
+
+      <div class="status" id="status">Initializing debug environment...</div>
+
+      <div class="chart-container">
+        <canvas id="hero-ethics-chart" width="400" height="400"></canvas>
+      </div>
+
+      <div class="demo-controls">
+        <button
+          class="test-button"
+          onclick="testBalancedButton(this)"
+          data-pattern="balanced"
+        >
+          ⚡ Balanced (Test Target)
+        </button>
+        <button
+          class="test-button"
+          onclick="testOtherButton('utilitarian', this)"
+          data-pattern="utilitarian"
+        >
+          🎯 Utilitarian (Control)
+        </button>
+        <button
+          class="test-button"
+          onclick="testOtherButton('virtue', this)"
+          data-pattern="virtue"
+        >
+          🌟 Virtue (Control)
+        </button>
+        <button class="test-button" onclick="testReset()">
+          🔄 Reset Chart
+        </button>
+      </div>
+
+      <div class="debug-controls">
+        <h3>Debug Actions</h3>
+        <button class="test-button" onclick="inspectBalancedButton()">
+          🔬 Inspect Balanced Button
+        </button>
+        <button class="test-button" onclick="countEventListeners()">
+          📊 Count Event Listeners
+        </button>
+        <button class="test-button" onclick="testDoubleClick()">
+          ⚡⚡ Test Double Click
+        </button>
+        <button class="test-button" onclick="clearLog()">🧹 Clear Log</button>
+      </div>
+
+      <div class="log-output" id="debug-log">
+        Starting event listener analysis...\n
+      </div>
+    </div>
+
+    <script type="module">
+      import { RadarChart } from "./src/js/components/radar-chart.js";
+
+      let testChart = null;
+      let clickCount = 0;
+      let eventListenerCount = 0;
+
+      // Enhanced logging function
+      function log(message, type = "info") {
+        const timestamp = new Date().toTimeString().split(" ")[0];
+        const logEl = document.getElementById("debug-log");
+        const prefix =
+          type === "error"
+            ? "❌"
+            : type === "warning"
+              ? "⚠️"
+              : type === "success"
+                ? "✅"
+                : "ℹ️";
+        logEl.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+        logEl.scrollTop = logEl.scrollHeight;
+        console.log(`${prefix} ${message}`);
+      }
+
+      // Initialize chart
+      async function initChart() {
+        try {
+          testChart = new RadarChart("hero-ethics-chart", {
+            title: "Event Listener Debug Chart",
+            width: 400,
+            height: 400,
+            context: "hero-demo",
+            realTime: false,
+            showLabels: true,
+            animated: true,
+            isDemo: true,
+          });
+
+          log("✅ Test chart initialized successfully", "success");
+          document.getElementById("status").textContent =
+            "Chart ready - Start testing balanced button";
+          document.getElementById("status").className = "status success";
+
+          // Store original resetScores method to track calls
+          const originalReset = testChart.resetScores.bind(testChart);
+          testChart.resetScores = function () {
+            log("🔄 resetScores() called!", "warning");
+            return originalReset();
+          };
+
+          // Store original setScores method to track calls
+          const originalSetScores = testChart.setScores.bind(testChart);
+          testChart.setScores = function (scores) {
+            log(
+              `🎯 setScores() called with: ${JSON.stringify(scores)}`,
+              "info",
+            );
+            return originalSetScores(scores);
+          };
+        } catch (error) {
+          log(`❌ Failed to initialize chart: ${error.message}`, "error");
+          document.getElementById("status").textContent =
+            "Chart initialization failed";
+          document.getElementById("status").className = "status error";
+        }
+      }
+
+      // Test the balanced button specifically
+      window.testBalancedButton = function (buttonElement) {
+        clickCount++;
+        log(`🖱️ Balanced button clicked (click #${clickCount})`, "info");
+
+        // Check if button is currently active
+        const isActive = buttonElement.classList.contains("active");
+        log(`📊 Button state: ${isActive ? "ACTIVE" : "INACTIVE"}`, "info");
+
+        if (isActive) {
+          log("🔄 Should reset to default scores...", "info");
+          buttonElement.classList.remove("active");
+          if (testChart) {
+            testChart.resetScores();
+          }
+        } else {
+          log("🎨 Should apply balanced pattern...", "info");
+          // Clear other buttons
+          document.querySelectorAll(".test-button").forEach((btn) => {
+            btn.classList.remove("active");
+          });
+          buttonElement.classList.add("active");
+
+          if (testChart) {
+            const balancedPattern = {
+              fairness: 4,
+              sustainability: 4,
+              autonomy: 4,
+              beneficence: 4,
+              transparency: 4,
+              accountability: 4,
+              privacy: 4,
+              proportionality: 4,
+            };
+            testChart.setScores(balancedPattern);
+          }
+        }
+
+        log("📋 Finished processing balanced button click", "info");
+      };
+
+      // Test other buttons for comparison
+      window.testOtherButton = function (pattern, buttonElement) {
+        log(`🖱️ ${pattern} button clicked for comparison`, "info");
+
+        // Clear all buttons
+        document.querySelectorAll(".test-button").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+        buttonElement.classList.add("active");
+
+        if (testChart) {
+          const patterns = {
+            utilitarian: {
+              fairness: 3,
+              sustainability: 4,
+              autonomy: 2,
+              beneficence: 5,
+              transparency: 3,
+              accountability: 4,
+              privacy: 2,
+              proportionality: 4,
+            },
+            virtue: {
+              fairness: 4,
+              sustainability: 4,
+              autonomy: 4,
+              beneficence: 4,
+              transparency: 3,
+              accountability: 4,
+              privacy: 3,
+              proportionality: 4,
+            },
+          };
+          testChart.setScores(patterns[pattern]);
+        }
+      };
+
+      // Test reset function
+      window.testReset = function () {
+        log("🔄 Manual reset button clicked", "info");
+        document.querySelectorAll(".test-button").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+        if (testChart) {
+          testChart.resetScores();
+        }
+      };
+
+      // Inspect the balanced button for event listeners
+      window.inspectBalancedButton = function () {
+        log("🔬 Inspecting balanced button for event listeners...", "info");
+
+        const balancedBtn = document.querySelector('[data-pattern="balanced"]');
+        if (balancedBtn) {
+          log(`🎯 Found balanced button: ${balancedBtn.outerHTML}`, "info");
+
+          // Check for onclick attribute
+          if (balancedBtn.onclick) {
+            log(
+              `📌 onclick attribute: ${balancedBtn.onclick.toString()}`,
+              "info",
+            );
+          } else {
+            log("📌 No onclick attribute found", "warning");
+          }
+
+          // Try to detect event listeners (this is limited in modern browsers)
+          const listeners = getEventListeners
+            ? getEventListeners(balancedBtn)
+            : null;
+          if (listeners) {
+            log(
+              `📋 Event listeners: ${JSON.stringify(Object.keys(listeners))}`,
+              "info",
+            );
+          } else {
+            log(
+              "📋 Cannot access getEventListeners (Chrome DevTools only)",
+              "warning",
+            );
+          }
+
+          // Check if element has been cloned (which can cause duplicate listeners)
+          log(`🆔 Element ID: ${balancedBtn.id || "none"}`, "info");
+          log(`🏷️ Element classes: ${balancedBtn.className}`, "info");
+        } else {
+          log("❌ Balanced button not found!", "error");
+        }
+      };
+
+      // Count total event listeners in document
+      window.countEventListeners = function () {
+        log("📊 Attempting to count event listeners...", "info");
+
+        // Count elements with onclick attributes
+        const elementsWithOnclick = document.querySelectorAll("[onclick]");
+        log(`📌 Elements with onclick: ${elementsWithOnclick.length}`, "info");
+
+        // Count all buttons
+        const allButtons = document.querySelectorAll("button");
+        log(`🔘 Total buttons: ${allButtons.length}`, "info");
+
+        // Count demo buttons specifically
+        const demoButtons = document.querySelectorAll("[data-pattern]");
+        log(`🎯 Demo pattern buttons: ${demoButtons.length}`, "info");
+
+        demoButtons.forEach((btn, index) => {
+          log(
+            `  Button ${index + 1}: pattern="${btn.dataset.pattern}" onclick="${!!btn.onclick}"`,
+            "info",
+          );
+        });
+      };
+
+      // Test double click to see if events stack
+      window.testDoubleClick = function () {
+        log("⚡⚡ Testing double click on balanced button...", "info");
+        const balancedBtn = document.querySelector('[data-pattern="balanced"]');
+        if (balancedBtn) {
+          log("🖱️ First click...", "info");
+          balancedBtn.click();
+
+          setTimeout(() => {
+            log("🖱️ Second click (after 100ms)...", "info");
+            balancedBtn.click();
+          }, 100);
+        } else {
+          log("❌ Balanced button not found for double click test", "error");
+        }
+      };
+
+      // Clear log
+      window.clearLog = function () {
+        document.getElementById("debug-log").textContent = "Log cleared.\n";
+        clickCount = 0;
+        log("🧹 Debug log cleared", "info");
+      };
+
+      // Initialize when DOM is ready
+      document.addEventListener("DOMContentLoaded", () => {
+        log("🚀 Debug environment initializing...", "info");
+        initChart();
+      });
+
+      // Global error handler
+      window.addEventListener("error", (event) => {
+        log(`❌ Global error: ${event.error.message}`, "error");
+      });
+
+      // Log all clicks on the document to detect unexpected handlers
+      document.addEventListener(
+        "click",
+        (event) => {
+          if (event.target.tagName === "BUTTON") {
+            log(
+              `🖱️ Document click detected on button: ${event.target.textContent.trim()}`,
+              "info",
+            );
+          }
+        },
+        true,
+      ); // Use capture phase to catch early
+    </script>
+  </body>
+</html>

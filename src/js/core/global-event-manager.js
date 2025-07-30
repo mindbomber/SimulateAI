@@ -214,13 +214,13 @@ class GlobalEventManager {
       return;
     }
 
-    // Pattern demo buttons
-    const pattern = target.getAttribute("data-pattern");
-    if (pattern) {
-      event.preventDefault();
-      this.notifyComponents("demo.pattern", { pattern, event, target });
-      return;
-    }
+    // Pattern demo buttons - DISABLED: Conflicts with inline onclick handlers
+    // const pattern = target.getAttribute("data-pattern");
+    // if (pattern) {
+    //   event.preventDefault();
+    //   this.notifyComponents("demo.pattern", { pattern, event, target });
+    //   return;
+    // }
 
     // Navigation events
     if (target.closest("[data-nav-item]")) {
@@ -258,11 +258,11 @@ class GlobalEventManager {
       return;
     }
 
-    // Demo controls
-    if (target.closest(".demo-btn")) {
-      this.handleDemoClick(event);
-      return;
-    }
+    // Demo controls - Let inline onclick handlers manage these
+    // if (target.closest(".demo-btn")) {
+    //   this.handleDemoClick(event);
+    //   return;
+    // }
 
     // Generic button handling
     if (target.closest("button") && !target.closest(".modal-backdrop")) {
@@ -438,28 +438,8 @@ class GlobalEventManager {
       this.notifyComponents("demo", { pattern, event });
       this.trackEvent("demo_pattern", { pattern });
 
-      // Call simulateEthicsPattern directly instead of relying on inline handlers
-      if (typeof window.simulateEthicsPattern === "function") {
-        try {
-          window.simulateEthicsPattern(pattern, btn);
-        } catch (error) {
-          console.error("Error executing simulateEthicsPattern:", error);
-        }
-      } else {
-        console.warn("simulateEthicsPattern function not found on window");
-      }
-
-      // Alternative: Look for onclick attribute and execute it
-      const onclickAttr = btn.getAttribute("onclick");
-      if (onclickAttr) {
-        try {
-          // Create a function that executes in the button's context
-          const onclickFunction = new Function("event", onclickAttr);
-          onclickFunction.call(btn, event);
-        } catch (error) {
-          console.error("Error executing onclick attribute:", error);
-        }
-      }
+      // Let the inline onclick handlers handle the actual functionality
+      // We only track the event here for analytics
     }
   }
 

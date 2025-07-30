@@ -1006,7 +1006,7 @@ export default class RadarChart {
    */
   resetScores() {
     this.currentScores = { ...this.DEFAULT_SCORES };
-    this.refreshChart();
+    this.refreshChart(true); // Force refresh for reset
   }
 
   /**
@@ -1033,15 +1033,15 @@ export default class RadarChart {
   /**
    * Refresh the chart display
    */
-  refreshChart() {
+  refreshChart(forceUpdate = false) {
     if (!this.chart) return;
 
     // OPTIMIZED: Check if data actually changed before updating
     const newData = Object.values(this.currentScores);
     const currentData = this.chart.data.datasets[0].data;
 
-    // Skip update if data hasn't changed
-    if (this._arraysEqual(newData, currentData)) {
+    // Skip update if data hasn't changed (unless forced)
+    if (!forceUpdate && this._arraysEqual(newData, currentData)) {
       return;
     }
 

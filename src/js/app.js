@@ -2253,7 +2253,7 @@ class SimulateAIApp {
       "modal.close": this.handleModalClose.bind(this),
       "modal.backdrop-click": this.handleModalBackdropClick.bind(this),
       "modal.tab-trap": this.handleModalTabTrap.bind(this),
-      "demo.pattern": this.handleDemoPattern.bind(this),
+      // "demo.pattern": this.handleDemoPattern.bind(this), // DISABLED: Conflicts with inline onclick handlers
       "scenario.launch": this.handleScenarioLaunch.bind(this),
       "system.escape": this.handleEscapeKey.bind(this),
       "system.scroll": this.handleScrollEvent.bind(this),
@@ -6431,65 +6431,60 @@ class SimulateAIApp {
 
 // Initialize the ethics radar demo when DOM is ready
 let ethicsDemo = null;
-let currentActivePattern = null; // Track currently active pattern
-
-// Global functions for radar demo controls with toggle functionality
+// Global functions for radar demo controls - uniform logic for all buttons
 window.simulateEthicsPattern = function (pattern, buttonElement) {
-  console.log("🎯 simulateEthicsPattern called!");
-  console.log(
-    "🎯 Button clicked:",
-    pattern,
-    "buttonElement:",
-    buttonElement,
-    "ethicsDemo:",
-    ethicsDemo,
-  );
+  console.log("🎯 simulateEthicsPattern called:", pattern);
 
-  if (ethicsDemo) {
-    console.log("✅ EthicsDemo found, processing pattern:", pattern);
+  if (!ethicsDemo) {
+    console.error("❌ EthicsDemo not initialized");
+    return;
+  }
 
-    // If clicking the same pattern, toggle it off (deselect)
-    if (currentActivePattern === pattern) {
-      console.log("🔄 Toggling off current pattern:", pattern);
-      ethicsDemo.resetScores();
-      currentActivePattern = null;
-      updateButtonStates(null);
-      hideDemoPopover(); // Hide popover when toggling off
-    } else {
-      // Otherwise, select the new pattern
-      console.log("🎨 Applying new pattern:", pattern);
+  if (!buttonElement) {
+    console.error("❌ Button element not provided");
+    return;
+  }
 
-      // Use RadarChart's built-in demo pattern system
-      const success = ethicsDemo.applyDemoPattern(pattern);
+  // Simple uniform logic: check if THIS button is currently active
+  const isCurrentlyActive = buttonElement.classList.contains("active");
 
-      if (success) {
-        currentActivePattern = pattern;
-        updateButtonStates(pattern);
-
-        // Add visual feedback for pattern application
-        highlightChartChange(pattern);
-
-        // Position and show popover above the clicked button
-        if (buttonElement) {
-          positionPopoverAboveButton(buttonElement);
-        }
-      } else {
-        console.error("❌ Failed to apply demo pattern:", pattern);
-        // Fallback: show error notification
-        if (window.showNotification) {
-          window.showNotification(
-            `Failed to apply ${pattern} pattern. Please try again.`,
-            "error",
-          );
-        }
-      }
-    }
+  if (isCurrentlyActive) {
+    // Button is active -> Deactivate: Reset chart to default state
+    console.log("🔄 Deactivating pattern:", pattern);
+    ethicsDemo.resetScores();
+    buttonElement.classList.remove("active");
+    hideDemoPopover();
   } else {
-    console.error(
-      "❌ EthicsDemo not initialized - chart may have failed to load",
-    );
+    // Button is not active -> Activate: Apply pattern to chart
+    console.log("🎨 Activating pattern:", pattern);
+
+    // Clear all other buttons first
+    clearAllButtonStates();
+
+    // Apply the pattern
+    console.log("🎨 Applying pattern:", pattern);
+    const success = ethicsDemo.applyDemoPattern(pattern);
+
+    if (success) {
+      // Activate this button
+      buttonElement.classList.add("active");
+
+      // Show visual feedback
+      highlightChartChange(pattern);
+      positionPopoverAboveButton(buttonElement);
+    } else {
+      console.error("❌ Failed to apply pattern:", pattern);
+    }
   }
 };
+
+// Simplified function to clear all button states
+function clearAllButtonStates() {
+  const buttons = document.querySelectorAll(".demo-controls-grid .demo-btn");
+  buttons.forEach((button) => {
+    button.classList.remove("active");
+  });
+}
 
 // Visual feedback function for pattern changes - optimized to prevent unnecessary DOM creation
 function highlightChartChange(pattern) {
@@ -6577,8 +6572,7 @@ highlightChartChange.cleanup = function () {
 window.resetEthicsDemo = function () {
   if (ethicsDemo) {
     ethicsDemo.resetScores();
-    currentActivePattern = null;
-    updateButtonStates(null);
+    clearAllButtonStates();
     hideDemoPopover(); // Hide popover when resetting
   }
 };
@@ -6722,7 +6716,7 @@ function updateButtonStates(activePattern) {
   // Cache the button selection to avoid repeated queries
   if (!updateButtonStates.cachedButtons) {
     updateButtonStates.cachedButtons = document.querySelectorAll(
-      ".hero-demo-controls .demo-btn",
+      ".demo-controls-grid .demo-btn",
     );
   }
 
@@ -6855,7 +6849,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Add click-to-close functionality for demo popover
     const demoPopover = document.getElementById("hero-demo-feedback");
-    const demoControls = document.querySelector(".hero-demo-controls");
+    const demoControls = document.querySelector(".demo-controls-panel");
 
     if (demoPopover && demoPopover.classList.contains("visible")) {
       // If clicking outside the demo controls area, hide popover

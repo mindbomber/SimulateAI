@@ -1,0 +1,475 @@
+/*
+ * Ethics Demo Section Styles
+ * Copyright 2025 Armando Sori - Licensed under Apache License, Version 2.0
+ * 
+ * Horizontal layout for the interactive ethics radar chart demo
+ * Separated from hero section for better visual balance and dedicated focus
+ * Maintains onboarding tour compatibility with preserved IDs
+ */
+
+/* ================================
+   ETHICS DEMO SECTION BASE
+   ================================ */
+
+@layer components {
+  .ethics-demo-section {
+    background: linear-gradient(
+      135deg,
+      var(--color-gray-50, #f8fafc) 0%,
+      var(--color-gray-100, #f1f5f9) 100%
+    );
+    padding: var(--spacing-2xl, 4rem) 0;
+    margin: 0;
+    border-top: 1px solid var(--color-gray-200, #e2e8f0);
+    border-bottom: 1px solid var(--color-gray-200, #e2e8f0);
+  }
+
+  /* Enhanced centering for desktop layout when using layout-container-responsive */
+  .ethics-demo-section.layout-container-responsive {
+    /* Ensure proper centering and max-width constraint */
+    width: 100%;
+    max-width: var(--container-max-width, 1600px);
+    margin: 0 auto;
+    padding: var(--spacing-2xl, 4rem) var(--container-padding-x, 1.5rem);
+
+    /* Add extra centering for desktop */
+    display: block;
+    position: relative;
+  }
+
+  /* Desktop-specific centering improvements */
+  @media (min-width: 1024px) {
+    .ethics-demo-section.layout-container-responsive {
+      max-width: 1400px; /* Slightly smaller for better centering */
+      padding-left: max(var(--container-padding-x, 1.5rem), 2rem);
+      padding-right: max(var(--container-padding-x, 1.5rem), 2rem);
+    }
+  }
+
+  /* Large desktop optimization */
+  @media (min-width: 1440px) {
+    .ethics-demo-section.layout-container-responsive {
+      max-width: 1200px; /* Even more focused for ultra-wide screens */
+      padding-left: 3rem;
+      padding-right: 3rem;
+    }
+  }
+
+  /* Section Header */
+  .demo-section-header {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto var(--spacing-2xl, 4rem);
+  }
+
+  .demo-section-title {
+    font-size: clamp(2rem, 5vw, 2.5rem);
+    font-weight: 700;
+    color: var(--color-gray-900, #1f2937);
+    margin: 0 0 var(--spacing-md, 1.5rem);
+    background: linear-gradient(
+      135deg,
+      var(--color-primary, #1a73e8) 0%,
+      var(--color-primary-dark, #1557b0) 100%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .demo-section-description {
+    font-size: clamp(1.125rem, 2.5vw, 1.25rem);
+    color: var(--color-gray-600, #6b7280);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ================================
+     HORIZONTAL LAYOUT CONTAINER
+     ================================ */
+
+  .demo-horizontal-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-2xl, 4rem);
+    align-items: start;
+    max-width: 100%; /* Use full container width */
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* Desktop layout optimizations */
+  @media (min-width: 1024px) {
+    .demo-horizontal-layout {
+      gap: 3rem; /* Slightly tighter gap on desktop */
+      max-width: 1200px; /* Match container constraints */
+    }
+  }
+
+  /* Large desktop optimization */
+  @media (min-width: 1440px) {
+    .demo-horizontal-layout {
+      gap: 4rem; /* Restore full gap on large screens */
+      max-width: 1000px; /* More focused layout */
+    }
+  }
+
+  /* ================================
+     DEMO CONTROLS PANEL
+     ================================ */
+
+  .demo-controls-panel {
+    background: var(--color-white, #ffffff);
+    border-radius: var(--radius-lg, 12px);
+    padding: var(--spacing-xl, 3rem);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--color-gray-200, #e5e7eb);
+    height: fit-content;
+  }
+
+  .controls-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-gray-900, #1f2937);
+    margin: 0 0 var(--spacing-sm, 0.75rem);
+  }
+
+  .controls-description {
+    font-size: 1rem;
+    color: var(--color-gray-600, #6b7280);
+    line-height: 1.5;
+    margin: 0 0 var(--spacing-xl, 3rem);
+  }
+
+  /* ================================
+     HORIZONTAL DEMO CONTROLS GRID
+     ================================ */
+
+  .demo-controls-grid.horizontal {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md, 1.5rem);
+    position: relative;
+  }
+
+  .demo-controls-grid.horizontal .demo-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    padding: var(--spacing-lg, 2rem);
+    border-radius: var(--radius-md, 8px);
+    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .demo-controls-grid.horizontal .demo-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  }
+
+  .demo-controls-grid.horizontal .demo-btn:active {
+    transform: translateY(0);
+  }
+
+  .demo-controls-grid.horizontal .demo-btn.active {
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+  }
+
+  .demo-btn .btn-label {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs, 0.5rem);
+  }
+
+  .demo-btn .btn-description {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    line-height: 1.4;
+  }
+
+  /* ================================
+     RADAR CHART PANEL
+     ================================ */
+
+  .radar-chart-panel {
+    background: var(--color-white, #ffffff);
+    border-radius: var(--radius-lg, 12px);
+    padding: var(--spacing-xl, 3rem);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--color-gray-200, #e5e7eb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 500px;
+  }
+
+  .radar-chart-wrapper {
+    width: 100%;
+    height: 400px;
+    position: relative;
+  }
+
+  /* ================================
+     HELP SECTIONS
+     ================================ */
+
+  .demo-help-sections {
+    margin-top: var(--spacing-2xl, 4rem);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg, 2rem);
+    max-width: 100%; /* Use full container width */
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+  }
+
+  /* Desktop layout optimizations for help sections */
+  @media (min-width: 1024px) {
+    .demo-help-sections {
+      max-width: 1200px; /* Match main container */
+      gap: 2.5rem;
+    }
+  }
+
+  /* Large desktop optimization for help sections */
+  @media (min-width: 1440px) {
+    .demo-help-sections {
+      max-width: 1000px; /* Match horizontal layout */
+    }
+  }
+
+  /* Accordion Styles */
+  .radar-instructions-accordion,
+  .ethics-glossary-accordion {
+    background: var(--color-white, #ffffff);
+    border-radius: var(--radius-md, 8px);
+    border: 1px solid var(--color-gray-200, #e5e7eb);
+    overflow: hidden;
+  }
+
+  .accordion-header {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-lg, 2rem);
+    background: var(--color-gray-50, #f9fafb);
+    cursor: pointer;
+    border: none;
+    width: 100%;
+    text-align: left;
+    transition: background-color 0.2s ease;
+  }
+
+  .accordion-header:hover {
+    background: var(--color-gray-100, #f3f4f6);
+  }
+
+  .accordion-icon {
+    margin-right: var(--spacing-md, 1.5rem);
+    transition: transform 0.2s ease;
+    font-size: 0.875rem;
+  }
+
+  .accordion-header[aria-expanded="true"] .accordion-icon {
+    transform: rotate(90deg);
+  }
+
+  .accordion-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-gray-900, #1f2937);
+  }
+
+  .accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .accordion-content:not(.collapsed) {
+    max-height: 1000px;
+  }
+
+  .accordion-content-inner {
+    padding: var(--spacing-lg, 2rem);
+    color: var(--color-gray-700, #374151);
+    line-height: 1.6;
+  }
+
+  /* Glossary Grid */
+  .glossary-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg, 2rem);
+    margin-bottom: var(--spacing-lg, 2rem);
+  }
+
+  .glossary-item h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-gray-900, #1f2937);
+    margin: 0 0 var(--spacing-sm, 0.75rem);
+  }
+
+  .glossary-item p {
+    font-size: 0.875rem;
+    color: var(--color-gray-600, #6b7280);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .glossary-note {
+    padding: var(--spacing-lg, 2rem);
+    background: var(--color-blue-50, #eff6ff);
+    border-radius: var(--radius-md, 8px);
+    border: 1px solid var(--color-blue-200, #bfdbfe);
+  }
+
+  .glossary-note p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--color-blue-800, #1e40af);
+    line-height: 1.5;
+  }
+
+  /* Orientation Suggestion */
+  .orientation-suggestion {
+    background: var(--color-amber-50, #fffbeb);
+    border: 1px solid var(--color-amber-200, #fde68a);
+    border-radius: var(--radius-md, 8px);
+    padding: var(--spacing-md, 1.5rem);
+    margin-top: var(--spacing-lg, 2rem);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm, 0.75rem);
+  }
+
+  .rotate-icon {
+    font-size: 1.25rem;
+  }
+
+  .message-text {
+    font-size: 0.875rem;
+    color: var(--color-amber-800, #92400e);
+  }
+
+  /* ================================
+     RESPONSIVE DESIGN
+     ================================ */
+
+  /* Tablet */
+  @media (max-width: 1024px) {
+    .demo-horizontal-layout {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-xl, 3rem);
+    }
+
+    .demo-help-sections {
+      grid-template-columns: 1fr;
+    }
+
+    .radar-chart-panel {
+      order: -1;
+    }
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .ethics-demo-section {
+      padding: var(--spacing-xl, 3rem) 0;
+    }
+
+    .demo-controls-panel,
+    .radar-chart-panel {
+      padding: var(--spacing-lg, 2rem);
+    }
+
+    .demo-section-header {
+      margin-bottom: var(--spacing-xl, 3rem);
+    }
+
+    .controls-title {
+      font-size: 1.25rem;
+    }
+
+    .radar-chart-wrapper {
+      height: 300px;
+    }
+
+    .demo-help-sections {
+      margin-top: var(--spacing-xl, 3rem);
+    }
+
+    .accordion-header {
+      padding: var(--spacing-md, 1.5rem);
+    }
+
+    .accordion-content-inner {
+      padding: var(--spacing-md, 1.5rem);
+    }
+  }
+
+  /* Small Mobile */
+  @media (max-width: 480px) {
+    .demo-horizontal-layout {
+      gap: var(--spacing-lg, 2rem);
+    }
+
+    .demo-controls-grid.horizontal .demo-btn {
+      padding: var(--spacing-md, 1.5rem);
+    }
+
+    .radar-chart-wrapper {
+      height: 250px;
+    }
+  }
+}
+
+/* ================================
+   DEMO FEEDBACK POPOVER
+   ================================ */
+
+@layer utilities {
+  .demo-feedback-popover {
+    position: absolute;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-gray-900, #1f2937);
+    color: white;
+    padding: var(--spacing-sm, 0.75rem) var(--spacing-md, 1.5rem);
+    border-radius: var(--radius-md, 8px);
+    font-size: 0.875rem;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .demo-feedback-popover.visible {
+    opacity: 1;
+    pointer-events: auto;
+    animation: fadeInOut 2s ease-in-out;
+  }
+
+  .popover-arrow {
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid var(--color-gray-900, #1f2937);
+  }
+}

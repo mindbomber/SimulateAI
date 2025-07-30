@@ -330,7 +330,7 @@
     max-width: 100%;
     height: auto;
     display: block;
-    margin: 0 auto;
+    margin: 0; /* Remove auto centering margins */
     border-radius: 0; /* No border radius for cleaner look */
     background: transparent;
 
@@ -1311,15 +1311,19 @@
 
     /* Tooltip positioning */
     z-index: auto !important; /* Don't create new stacking context */
-
-    /* Prevent any text content from showing */
   }
 
-  /* Canvas specific styling for scenario modal radar charts - consolidated selectors */
+  /* ===== CONSOLIDATED SCENARIO MODAL RADAR CHART STYLING ===== */
+
+  /* All scenario modal radar chart canvas elements - consolidated */
   .scenario-modal .radar-chart-container canvas,
   .scenario-modal .radar-chart-scenario canvas,
   .scenario-modal .radar-chart-results canvas,
-  .scenario-modal #scenario-radar-chart canvas {
+  .scenario-modal #scenario-radar-chart canvas,
+  .scenario-modal canvas[role="img"],
+  .scenario-modal-dialog canvas[role="img"],
+  .scenario-modal canvas[style*="width"],
+  .scenario-modal-dialog canvas[style*="width"] {
     max-width: 400px !important;
     width: 400px !important; /* Force exact 400px width */
     height: 400px !important; /* Force exact 400px height */
@@ -1338,9 +1342,32 @@
 
     /* Force perfect square ratio */
     aspect-ratio: 1 / 1 !important;
+
+    /* Chart.js override positioning */
+    position: relative;
+    z-index: 2;
+
+    /* CRITICAL: Ensure crisp rendering for chart graphics with browser fallbacks */
+    image-rendering: auto; /* Default fallback */
+    image-rendering: -moz-crisp-edges; /* Firefox */
+    image-rendering: -webkit-optimize-contrast; /* WebKit */
+    image-rendering: pixelated; /* Modern browsers */
   }
 
-  /* Scenario modal chart legend styles */
+  /* Ensure no unwanted text content displays in radar charts - consolidated */
+  .scenario-modal .radar-chart-container:empty::before,
+  .scenario-modal .radar-chart-scenario:empty::before,
+  .scenario-modal .radar-chart-results:empty::before,
+  .scenario-modal #scenario-radar-chart:empty::before,
+  .scenario-modal .radar-chart-container:empty::after,
+  .scenario-modal .radar-chart-scenario:empty::after,
+  .scenario-modal .radar-chart-results:empty::after,
+  .scenario-modal #scenario-radar-chart:empty::after {
+    content: "";
+    display: none;
+  }
+
+  /* ===== SCENARIO MODAL CHART LEGEND STYLES ===== */
   .scenario-modal .chart-legend h3 {
     font-size: 1.25rem;
     font-weight: 700;
@@ -1370,24 +1397,7 @@
     border: 1px solid rgb(102 126 234 / 10%);
   }
 
-  /* Ensure no unwanted text content displays in radar charts - consolidated selectors */
-  .scenario-modal .radar-chart-container:empty::before,
-  .scenario-modal .radar-chart-scenario:empty::before,
-  .scenario-modal .radar-chart-results:empty::before,
-  .scenario-modal #scenario-radar-chart:empty::before {
-    content: "";
-    display: none;
-  }
-
-  .scenario-modal .radar-chart-container:empty::after,
-  .scenario-modal .radar-chart-scenario:empty::after,
-  .scenario-modal .radar-chart-results:empty::after,
-  .scenario-modal #scenario-radar-chart:empty::after {
-    content: "";
-    display: none;
-  }
-
-  /* Chart.js Tooltip Support - Consolidated from scenario-modal.css */
+  /* ===== CHART.JS TOOLTIP SUPPORT ===== */
 
   /* Chart.js canvas tooltips - alternative tooltip implementation */
   .scenario-modal canvas[role="img"] + div[style*="position: absolute"],
@@ -1424,13 +1434,7 @@
     pointer-events: none !important;
   }
 
-  /* Additional tooltip fixes for scenario modals - consolidated radar selectors */
-  .scenario-modal .radar-chart-container,
-  .scenario-modal .radar-chart-scenario,
-  .scenario-modal .radar-chart-results,
-  .scenario-modal #scenario-radar-chart {
-    overflow: visible !important;
-  }
+  /* Additional tooltip fixes for scenario modals - now handled by consolidated selectors above */
 
   /* Ensure all radar chart containers allow tooltip overflow */
   .radar-chart-demo-container,
@@ -1438,32 +1442,6 @@
   .radar-chart-scenario,
   .radar-chart-results {
     overflow: visible !important;
-  }
-
-  /* Override any conflicting z-index rules from scenario modal - consolidated radar selectors */
-  .scenario-modal .radar-chart-container canvas[role="img"],
-  .scenario-modal .radar-chart-scenario canvas[role="img"],
-  .scenario-modal .radar-chart-results canvas[role="img"],
-  .scenario-modal #scenario-radar-chart canvas[role="img"],
-  .scenario-modal canvas[role="img"],
-  .scenario-modal-dialog canvas[role="img"] {
-    position: relative;
-    z-index: 2;
-
-    /* Force exact 400x400 dimensions to override Chart.js inline styles */
-    width: 400px !important;
-    height: 400px !important;
-    max-width: 400px !important;
-    max-height: 400px !important;
-    min-width: 400px !important;
-    min-height: 400px !important;
-  }
-
-  /* Additional override for any Chart.js canvas in scenario modals */
-  .scenario-modal canvas[style*="width"],
-  .scenario-modal-dialog canvas[style*="width"] {
-    width: 400px !important;
-    height: 400px !important;
   }
 
   /* ===== INLINE STYLE CONFLICT PROTECTION ===== */

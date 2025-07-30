@@ -183,6 +183,7 @@ class SettingsManager {
     const targetSelectors = [
       ".radar-chart-container",
       ".hero-radar-demo",
+      ".ethics-demo-section",
       ".scenario-card",
       ".view-toggle-controls",
       ".main-nav",
@@ -251,6 +252,7 @@ class SettingsManager {
     // Use cached selectors and batch operations
     const radarCharts = this.getCachedElements(".radar-chart-container");
     const heroRadarDemos = this.getCachedElements(".hero-radar-demo");
+    const ethicsDemoSections = this.getCachedElements(".ethics-demo-section");
     const scenarioCards = this.getCachedElements(".scenario-card");
     const viewToggleButtons = this.getCachedElements(".view-toggle-btn");
     const kbdElements = this.getCachedElements("kbd");
@@ -286,6 +288,47 @@ class SettingsManager {
       if (p) {
         p.style.color = "#cccccc";
       }
+    });
+
+    // Batch apply ethics demo section styles
+    this.applyBatchedStyles(ethicsDemoSections, {
+      background: "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)",
+      "border-color": "#444444",
+    });
+
+    // Handle ethics demo section nested elements
+    ethicsDemoSections.forEach((section) => {
+      const title = section.querySelector(".demo-section-title");
+      const description = section.querySelector(".demo-section-description");
+      const controlsPanel = section.querySelector(".demo-controls-panel");
+      const radarPanel = section.querySelector(".radar-chart-panel");
+      const accordions = section.querySelectorAll(".accordion-item");
+
+      if (title) {
+        title.style.cssText += `; color: #ffffff; background: linear-gradient(135deg, #6bb4ff 0%, #9d4edd 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text`;
+      }
+      if (description) {
+        description.style.color = "#cccccc";
+      }
+      if (controlsPanel) {
+        controlsPanel.style.cssText += `; background: #2d2d2d; border-color: #444444; color: #ffffff`;
+      }
+      if (radarPanel) {
+        radarPanel.style.cssText += `; background: #2d2d2d; border-color: #444444`;
+      }
+
+      // Style accordion items
+      accordions.forEach((accordion) => {
+        accordion.style.cssText += `; background: #2d2d2d; border-color: #444444`;
+        const header = accordion.querySelector(".accordion-header");
+        const content = accordion.querySelector(".accordion-content-inner");
+        if (header) {
+          header.style.cssText += `; background: #3d3d3d; color: #ffffff`;
+        }
+        if (content) {
+          content.style.color = "#cccccc";
+        }
+      });
     });
 
     // Batch apply scenario card styles

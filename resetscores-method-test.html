@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🧪 resetScores Method Test</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f7fafc;
+      }
+      .test-container {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .test-button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 5px;
+        font-size: 14px;
+      }
+      .test-button:hover {
+        background: #0056b3;
+      }
+      .result {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 10px 0;
+        border-left: 4px solid #17a2b8;
+      }
+      .log-output {
+        background: #1a1a1a;
+        color: #00ff00;
+        padding: 15px;
+        border-radius: 8px;
+        font-family: "Consolas", monospace;
+        font-size: 12px;
+        height: 300px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        margin-top: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🧪 resetScores Method Test</h1>
+      <p>
+        <strong>Goal:</strong> Verify resetScores() method works correctly for
+        balanced pattern
+      </p>
+
+      <div>
+        <button class="test-button" onclick="testResetScoresMethod()">
+          🔬 Test resetScores() Method
+        </button>
+        <button class="test-button" onclick="testBalancedPatternCycle()">
+          🔄 Test Balanced Pattern Cycle
+        </button>
+        <button class="test-button" onclick="clearLog()">🧹 Clear Log</button>
+      </div>
+
+      <div class="result" id="test-result">
+        Click "Test resetScores() Method" to begin testing
+      </div>
+
+      <div class="log-output" id="debug-log">
+        Ready to test resetScores method...\n
+      </div>
+    </div>
+
+    <script type="module">
+      import { RadarChart } from "./src/js/components/radar-chart.js";
+
+      let testChart = null;
+
+      function log(message) {
+        const timestamp = new Date().toTimeString().split(" ")[0];
+        const logEl = document.getElementById("debug-log");
+        logEl.textContent += `[${timestamp}] ${message}\n`;
+        logEl.scrollTop = logEl.scrollHeight;
+        console.log(message);
+      }
+
+      function updateResult(message, isSuccess = true) {
+        const resultEl = document.getElementById("test-result");
+        resultEl.textContent = message;
+        resultEl.style.borderLeftColor = isSuccess ? "#28a745" : "#dc3545";
+      }
+
+      // Initialize chart
+      async function initChart() {
+        try {
+          testChart = new RadarChart("chart-placeholder", {
+            title: "Test Chart",
+            width: 1, // Minimal chart just for testing
+            height: 1,
+            context: "hero-demo",
+            realTime: false,
+            isDemo: true,
+          });
+          log("✅ Test chart initialized");
+          return true;
+        } catch (error) {
+          log(`❌ Failed to initialize chart: ${error.message}`);
+          return false;
+        }
+      }
+
+      // Test the resetScores method specifically
+      window.testResetScoresMethod = async function () {
+        log("🧪 Starting resetScores method test...");
+
+        if (!testChart) {
+          const initialized = await initChart();
+          if (!initialized) {
+            updateResult("❌ Failed to initialize chart", false);
+            return;
+          }
+        }
+
+        try {
+          // Step 1: Get default scores
+          const defaultScores = { ...testChart.DEFAULT_SCORES };
+          log(`📋 Default scores: ${JSON.stringify(defaultScores)}`);
+
+          // Step 2: Apply balanced pattern scores manually
+          const balancedScores = {
+            fairness: 4,
+            sustainability: 4,
+            autonomy: 4,
+            beneficence: 4,
+            transparency: 4,
+            accountability: 4,
+            privacy: 4,
+            proportionality: 4,
+          };
+
+          log(`⚡ Setting balanced scores: ${JSON.stringify(balancedScores)}`);
+          testChart.setScores(balancedScores);
+
+          // Verify balanced scores were set
+          const currentAfterSet = { ...testChart.currentScores };
+          log(
+            `📊 Current scores after setScores: ${JSON.stringify(currentAfterSet)}`,
+          );
+
+          const balancedSetCorrectly =
+            JSON.stringify(currentAfterSet) === JSON.stringify(balancedScores);
+          log(`✅ Balanced scores set correctly: ${balancedSetCorrectly}`);
+
+          // Step 3: Call resetScores
+          log("🔄 Calling resetScores()...");
+          testChart.resetScores();
+
+          // Step 4: Check if reset worked
+          const currentAfterReset = { ...testChart.currentScores };
+          log(
+            `📊 Current scores after reset: ${JSON.stringify(currentAfterReset)}`,
+          );
+
+          // Step 5: Compare with default
+          const resetWorked =
+            JSON.stringify(currentAfterReset) === JSON.stringify(defaultScores);
+          log(`✅ Reset worked correctly: ${resetWorked}`);
+
+          if (resetWorked) {
+            updateResult("✅ resetScores() method works correctly!", true);
+          } else {
+            updateResult(
+              "❌ resetScores() method is NOT working correctly!",
+              false,
+            );
+            log("🔍 Analyzing the difference...");
+
+            Object.keys(defaultScores).forEach((key) => {
+              if (currentAfterReset[key] !== defaultScores[key]) {
+                log(
+                  `❌ ${key}: expected ${defaultScores[key]}, got ${currentAfterReset[key]}`,
+                );
+              }
+            });
+          }
+        } catch (error) {
+          log(`❌ Test failed with error: ${error.message}`);
+          updateResult(`❌ Test failed: ${error.message}`, false);
+        }
+      };
+
+      // Test the full balanced pattern cycle
+      window.testBalancedPatternCycle = async function () {
+        log("🔄 Starting balanced pattern cycle test...");
+
+        if (!testChart) {
+          const initialized = await initChart();
+          if (!initialized) {
+            updateResult("❌ Failed to initialize chart", false);
+            return;
+          }
+        }
+
+        try {
+          // Step 1: Start with default
+          testChart.resetScores();
+          const startScores = { ...testChart.currentScores };
+          log(`📊 Starting scores: ${JSON.stringify(startScores)}`);
+
+          // Step 2: Apply balanced pattern via applyDemoPattern
+          log("⚡ Applying balanced pattern via applyDemoPattern...");
+          const success = testChart.applyDemoPattern("balanced");
+          log(`✅ applyDemoPattern success: ${success}`);
+
+          const afterPattern = { ...testChart.currentScores };
+          log(`📊 Scores after pattern: ${JSON.stringify(afterPattern)}`);
+
+          // Step 3: Reset via resetScores
+          log("🔄 Resetting via resetScores...");
+          testChart.resetScores();
+
+          const afterReset = { ...testChart.currentScores };
+          log(`📊 Scores after reset: ${JSON.stringify(afterReset)}`);
+
+          // Step 4: Check if we're back to start
+          const cycleWorked =
+            JSON.stringify(afterReset) === JSON.stringify(startScores);
+          log(`✅ Full cycle worked: ${cycleWorked}`);
+
+          if (cycleWorked) {
+            updateResult("✅ Balanced pattern cycle works correctly!", true);
+          } else {
+            updateResult("❌ Balanced pattern cycle is broken!", false);
+          }
+        } catch (error) {
+          log(`❌ Cycle test failed: ${error.message}`);
+          updateResult(`❌ Cycle test failed: ${error.message}`, false);
+        }
+      };
+
+      window.clearLog = function () {
+        document.getElementById("debug-log").textContent = "Log cleared.\n";
+      };
+
+      // Add a placeholder canvas for the chart (even though we won't see it)
+      const placeholder = document.createElement("canvas");
+      placeholder.id = "chart-placeholder";
+      placeholder.style.display = "none";
+      document.body.appendChild(placeholder);
+
+      log("🚀 Test environment ready");
+    </script>
+  </body>
+</html>

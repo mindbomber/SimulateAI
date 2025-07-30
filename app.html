@@ -277,6 +277,7 @@ limitations under the License.
 
     <!-- 8. Page-specific and theme styles -->
     <link rel="stylesheet" href="src/styles/hero-consolidated.css" />
+    <link rel="stylesheet" href="src/styles/ethics-demo-section.css" />
     <link
       rel="stylesheet"
       href="src/styles/state-management-consolidated.css"
@@ -446,27 +447,33 @@ limitations under the License.
             <div id="homepage-donation-button"></div>
           </div>
         </div>
+      </section>
 
-        <!-- Interactive Radar Chart Demo moved to hero -->
-        <div class="hero-radar-demo">
-          <h3>Interactive Ethics Radar Chart</h3>
-          <p>
+      <!-- Interactive Ethics Demo Section -->
+      <section
+        class="ethics-demo-section layout-container-responsive"
+        id="ethics-demo"
+      >
+        <div class="demo-section-header">
+          <h2 class="demo-section-title">Interactive Ethics Radar Chart</h2>
+          <p class="demo-section-description">
             Experience how ethical decisions affect multiple dimensions
-            simultaneously. Click the buttons to see different decision
-            patterns:
+            simultaneously. Click the buttons to see different decision patterns
+            and understand the complex relationships between ethical principles.
           </p>
+        </div>
 
-          <!-- Polite orientation suggestion for mobile users -->
-          <div class="orientation-suggestion">
-            <span class="rotate-icon">📱↻</span>
-            <span class="message-text"
-              >For the best experience, try rotating your device to landscape
-              mode!</span
-            >
-          </div>
+        <div class="demo-horizontal-layout">
+          <!-- Demo Controls Panel -->
+          <div class="demo-controls-panel">
+            <h3 class="controls-title">Try Different Ethical Approaches</h3>
+            <p class="controls-description">
+              Each button represents a different ethical framework. Watch how
+              the radar chart changes to show their unique priorities:
+            </p>
 
-          <div class="hero-demo-controls">
-            <div class="demo-controls-grid">
+            <!-- Demo Control Buttons -->
+            <div class="demo-controls-grid horizontal">
               <!-- Feedback popover positioned within grid -->
               <div id="hero-demo-feedback" class="demo-feedback-popover">
                 <div class="popover-content"></div>
@@ -479,7 +486,10 @@ limitations under the License.
                 aria-label="Apply utilitarian ethics pattern to the radar chart"
                 onclick="simulateEthicsPattern('utilitarian', this)"
               >
-                Utilitarian
+                <span class="btn-label">Utilitarian</span>
+                <span class="btn-description"
+                  >Greatest good for greatest number</span
+                >
               </button>
               <button
                 class="demo-btn"
@@ -487,7 +497,10 @@ limitations under the License.
                 aria-label="Apply rights-based ethics pattern to the radar chart"
                 onclick="simulateEthicsPattern('deontological', this)"
               >
-                Rights-Based
+                <span class="btn-label">Rights-Based</span>
+                <span class="btn-description"
+                  >Universal moral rules and duties</span
+                >
               </button>
               <button
                 class="demo-btn"
@@ -495,7 +508,10 @@ limitations under the License.
                 aria-label="Apply virtue ethics pattern to the radar chart"
                 onclick="simulateEthicsPattern('virtue', this)"
               >
-                Virtue Ethics
+                <span class="btn-label">Virtue Ethics</span>
+                <span class="btn-description"
+                  >Character-based moral excellence</span
+                >
               </button>
               <button
                 class="demo-btn"
@@ -503,14 +519,32 @@ limitations under the License.
                 aria-label="Apply balanced ethics pattern to the radar chart"
                 onclick="simulateEthicsPattern('balanced', this)"
               >
-                Balanced
+                <span class="btn-label">Balanced</span>
+                <span class="btn-description"
+                  >Integrative multi-principle approach</span
+                >
               </button>
+            </div>
+
+            <!-- Polite orientation suggestion for mobile users -->
+            <div class="orientation-suggestion">
+              <span class="rotate-icon">📱↻</span>
+              <span class="message-text"
+                >For the best experience, try rotating your device to landscape
+                mode!</span
+              >
             </div>
           </div>
 
-          <div id="hero-ethics-chart" class="radar-chart-wrapper"></div>
+          <!-- Radar Chart Panel -->
+          <div class="radar-chart-panel">
+            <div id="hero-ethics-chart" class="radar-chart-wrapper"></div>
+          </div>
+        </div>
 
-          <!-- Accordion for instructions -->
+        <!-- Collapsible Help Sections -->
+        <div class="demo-help-sections">
+          <!-- Instructions Accordion -->
           <div class="radar-instructions-accordion">
             <div class="accordion-item">
               <div
@@ -560,7 +594,7 @@ limitations under the License.
             </div>
           </div>
 
-          <!-- Accordion for ethics glossary -->
+          <!-- Ethics Glossary Accordion -->
           <div class="ethics-glossary-accordion">
             <div class="accordion-item">
               <div
