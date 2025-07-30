@@ -17,39 +17,53 @@
    HERO ANIMATIONS
    ================================ */
 
-/* Subtle gradient shift animation */
+/* Subtle gradient shift animation - enhanced smoothness */
 @keyframes gradientShift {
   0% {
     background-position: 0% 50%;
   }
+  25% {
+    background-position: 50% 25%;
+  }
   50% {
     background-position: 100% 50%;
+  }
+  75% {
+    background-position: 50% 75%;
   }
   100% {
     background-position: 0% 50%;
   }
 }
 
-/* Enhanced hero entrance animations */
+/* Enhanced hero entrance animations with smooth easing */
 @keyframes heroContentEnter {
-  from {
+  0% {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(40px) scale(0.96);
   }
-  to {
+  60% {
+    opacity: 0.8;
+    transform: translateY(-2px) scale(1.01);
+  }
+  100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
 @keyframes heroElementEnter {
-  from {
+  0% {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px) scale(0.95);
   }
-  to {
+  40% {
+    opacity: 0.6;
+    transform: translateY(-3px) scale(1.02);
+  }
+  100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -96,9 +110,9 @@
     font-size: calc(1rem * var(--font-scale, 1));
     overflow: hidden;
 
-    /* Add subtle texture overlay */
+    /* Add subtle texture overlay with smooth animation */
     background-size: 400% 400%;
-    animation: gradientShift 15s ease infinite;
+    animation: gradientShift 20s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
   }
 
   .hero::before {
@@ -159,32 +173,33 @@
   }
 
   /* ===== HERO CONTENT COMPONENTS ===== */
-  /* Hero content alignment - responsive text scaling */
+  /* Hero content alignment - smooth entrance animations */
   .hero .hero-content {
     text-align: center;
     /* Initial state for entrance animation */
     opacity: 0;
-    transform: translateY(30px);
-    animation: heroContentEnter 0.8s ease-out forwards;
-    animation-delay: 0.2s;
+    transform: translateY(40px) scale(0.96);
+    animation: heroContentEnter 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+      forwards;
+    animation-delay: 0.3s;
   }
 
   .hero .hero-content h1 {
     font-size: calc(2.5rem * var(--font-scale, 1));
     /* Individual animation for title */
     opacity: 0;
-    transform: translateY(20px);
-    animation: heroElementEnter 0.6s ease-out forwards;
-    animation-delay: 0.4s;
+    transform: translateY(30px) scale(0.95);
+    animation: heroElementEnter 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    animation-delay: 0.5s;
   }
 
   .hero .hero-content p {
     font-size: calc(1.125rem * var(--font-scale, 1));
     /* Individual animation for description */
     opacity: 0;
-    transform: translateY(15px);
-    animation: heroElementEnter 0.6s ease-out forwards;
-    animation-delay: 0.6s;
+    transform: translateY(25px) scale(0.96);
+    animation: heroElementEnter 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    animation-delay: 0.7s;
   }
 
   /* ===== HERO SIMULATION COMPONENTS ===== */
@@ -292,11 +307,11 @@
     max-width: 600px;
     margin: 0 auto;
 
-    /* Animation */
+    /* Smooth animation */
     opacity: 0;
-    transform: translateY(15px);
-    animation: heroElementEnter 0.6s ease-out forwards;
-    animation-delay: 0.8s;
+    transform: translateY(20px) scale(0.97);
+    animation: heroElementEnter 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    animation-delay: 0.9s;
   }
 
   .hero-actions .btn {

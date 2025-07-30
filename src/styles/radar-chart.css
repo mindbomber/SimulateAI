@@ -338,7 +338,6 @@
     image-rendering: auto; /* Default fallback */
     image-rendering: -moz-crisp-edges; /* Firefox */
     image-rendering: -webkit-optimize-contrast; /* WebKit */
-    image-rendering: pixelated; /* Modern browsers */
   }
 
   /* Mobile optimization for radar demo */
@@ -464,7 +463,6 @@
     image-rendering: auto; /* Default fallback */
     image-rendering: -moz-crisp-edges; /* Firefox */
     image-rendering: -webkit-optimize-contrast; /* WebKit */
-    image-rendering: pixelated; /* Modern browsers */
   }
 
   /* Chart.js Tooltip Support - Ensure tooltips appear above all content */
@@ -1277,92 +1275,54 @@
 
   /* ===== CHART.JS TOOLTIP CONFLICT RESOLUTION ===== */
 
-  /* Scenario Modal Context - Consolidated radar chart selectors */
+  /* Scenario Modal Context - Simplified radar chart containers */
   .scenario-modal .radar-chart-container,
-  .scenario-modal .radar-chart-scenario,
-  .scenario-modal .radar-chart-results,
   .scenario-modal #scenario-radar-chart {
     text-align: center;
     position: relative !important;
     width: 100% !important;
-    max-width: 420px !important; /* Increased max-width for larger chart */
+    max-width: 420px !important;
     margin: 1rem auto !important;
-    padding: 0.5rem !important; /* Reduce padding to give more space to chart */
+    padding: 0.5rem !important;
     background: none !important;
     border-radius: 0 !important;
     box-shadow: none !important;
     border: none !important;
-    backdrop-filter: none !important;
-
-    /* Force grid placement */
-    grid-area: auto;
-
-    /* Ensure proper sizing for chart - increased min-height for labels */
     min-height: 450px;
     overflow: visible !important;
-
-    /* Ensure container can accommodate chart labels */
     display: flex !important;
     flex-direction: column;
     justify-content: center;
-
-    /* Ensure visibility and proper sizing */
     visibility: visible !important;
-
-    /* Tooltip positioning */
-    z-index: auto !important; /* Don't create new stacking context */
+    z-index: auto !important;
   }
 
   /* ===== CONSOLIDATED SCENARIO MODAL RADAR CHART STYLING ===== */
 
-  /* All scenario modal radar chart canvas elements - consolidated */
-  .scenario-modal .radar-chart-container canvas,
-  .scenario-modal .radar-chart-scenario canvas,
-  .scenario-modal .radar-chart-results canvas,
-  .scenario-modal #scenario-radar-chart canvas,
-  .scenario-modal canvas[role="img"],
-  .scenario-modal-dialog canvas[role="img"],
-  .scenario-modal canvas[style*="width"],
-  .scenario-modal-dialog canvas[style*="width"] {
+  /* All scenario modal radar chart canvas elements - simplified */
+  .scenario-modal canvas,
+  .scenario-modal-dialog canvas {
     max-width: 400px !important;
-    width: 400px !important; /* Force exact 400px width */
-    height: 400px !important; /* Force exact 400px height */
-    min-width: 400px !important; /* Prevent Chart.js from shrinking */
-    min-height: 400px !important; /* Prevent Chart.js from shrinking */
+    width: 400px !important;
+    height: 400px !important;
     display: block !important;
     margin: 0 auto !important;
-
-    /* Prevent clipping - ensure Chart.js has space for labels */
-    transform: none !important;
     overflow: visible !important;
-
-    /* Remove padding to give more space to the chart itself */
     padding: 0 !important;
     box-sizing: border-box !important;
-
-    /* Force perfect square ratio */
     aspect-ratio: 1 / 1 !important;
-
-    /* Chart.js override positioning */
     position: relative;
     z-index: 2;
 
     /* CRITICAL: Ensure crisp rendering for chart graphics with browser fallbacks */
-    image-rendering: auto; /* Default fallback */
+    image-rendering: auto;
     image-rendering: -moz-crisp-edges; /* Firefox */
     image-rendering: -webkit-optimize-contrast; /* WebKit */
-    image-rendering: pixelated; /* Modern browsers */
   }
 
-  /* Ensure no unwanted text content displays in radar charts - consolidated */
+  /* Ensure no unwanted text content displays in radar charts */
   .scenario-modal .radar-chart-container:empty::before,
-  .scenario-modal .radar-chart-scenario:empty::before,
-  .scenario-modal .radar-chart-results:empty::before,
-  .scenario-modal #scenario-radar-chart:empty::before,
-  .scenario-modal .radar-chart-container:empty::after,
-  .scenario-modal .radar-chart-scenario:empty::after,
-  .scenario-modal .radar-chart-results:empty::after,
-  .scenario-modal #scenario-radar-chart:empty::after {
+  .scenario-modal .radar-chart-container:empty::after {
     content: "";
     display: none;
   }

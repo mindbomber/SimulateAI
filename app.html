@@ -350,19 +350,90 @@ limitations under the License.
 
     <!-- Scroll restoration configuration -->
     <script>
+      // Debug tracker for initialization - helps identify multiple DOM loads
+      window.debugInitTracker = window.debugInitTracker || {
+        initCount: 0,
+        events: [],
+      };
+
+      // Immediate debug output to confirm tracker is working
+      console.log("🐛 Debug tracker initialized:", window.debugInitTracker);
+      console.log("🐛 Tracker accessible at: window.debugInitTracker");
+      console.log("🐛 Use getDebugInfo() function for detailed status");
+
       // Configure scroll restoration (safe to do in head)
       if ("scrollRestoration" in history) {
         history.scrollRestoration = "manual";
       }
 
-      // Defer scroll reset until DOM is ready
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", () => {
-          window.scrollTo(0, 0);
+      // Single initialization function to prevent duplicate calls
+      let pageInitialized = false;
+
+      function initializePage() {
+        if (pageInitialized) {
+          console.warn(
+            "⚠️ initializePage() called again - preventing duplicate execution",
+          );
+          return; // Prevent duplicate initialization
+        }
+        pageInitialized = true;
+
+        // Debug logging
+        window.debugInitTracker.initCount++;
+        window.debugInitTracker.events.push({
+          time: Date.now(),
+          event: "initializePage",
+          readyState: document.readyState,
         });
+
+        console.log(
+          "✅ Page initialization started (count:",
+          window.debugInitTracker.initCount,
+          ")",
+        );
+
+        // Reset scroll position
+        window.scrollTo(0, 0);
+
+        // Set loaded state for animations
+        if (window.DOMClassManager) {
+          window.DOMClassManager.setLoadedState(true);
+        } else {
+          document.documentElement.classList.add("loaded");
+        }
+
+        console.log("✅ Page initialization completed");
+      }
+
+      // Helper function to inspect debug tracker - accessible from console
+      window.getDebugInfo = function () {
+        console.log("🔍 Debug Tracker Status:");
+        console.log(
+          "- Init Count:",
+          window.debugInitTracker?.initCount || "undefined",
+        );
+        console.log(
+          "- Events Count:",
+          window.debugInitTracker?.events?.length || "undefined",
+        );
+        console.log("- Page Initialized:", pageInitialized);
+        console.log(
+          "- Events Timeline:",
+          window.debugInitTracker?.events || "undefined",
+        );
+        return window.debugInitTracker;
+      };
+
+      // Single event listener setup
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initializePage, {
+          once: true,
+        });
+        console.log("📝 DOMContentLoaded listener added");
       } else {
         // DOM already loaded
-        window.scrollTo(0, 0);
+        console.log("📝 DOM already loaded, initializing immediately");
+        initializePage();
       }
     </script>
 
@@ -418,12 +489,9 @@ limitations under the License.
         <div class="hero-content">
           <h2 class="hero-title">Welcome to SimulateAI</h2>
           <p class="hero-description">
-            Ready to explore ethical decision-making in AI? Choose from
-            interactive simulations below that let you experience real-world
-            scenarios, see the consequences of different choices, and discover
-            how ethical frameworks apply to emerging technologies. Each
-            simulation adapts to your decisions and provides insights into the
-            complex balance between innovation and responsibility.
+            Explore ethical decision-making in AI through interactive
+            simulations. Experience real-world scenarios and discover how
+            ethical frameworks apply to emerging technologies.
           </p>
           <div class="hero-actions">
             <button
@@ -1332,8 +1400,18 @@ limitations under the License.
     <link rel="stylesheet" href="src/styles/donor-wall.css" />
 
     <script type="module">
-      // Initialize enhanced donation widget and donor flair after DOM is loaded
-      document.addEventListener("DOMContentLoaded", () => {
+      // Initialize enhanced donation widget and donor flair - consolidated initialization
+      function initializeDonationComponents() {
+        // Debug tracking
+        if (window.debugInitTracker) {
+          window.debugInitTracker.events.push({
+            time: Date.now(),
+            event: "initializeDonationComponents",
+            readyState: document.readyState,
+          });
+        }
+        console.log("🎁 Initializing donation components...");
+
         if (window.EnhancedDonationWidget) {
           window.EnhancedDonationWidget.init("homepage-donation-button", {
             title: "💖 Support SimulateAI Research",
@@ -1342,6 +1420,7 @@ limitations under the License.
             style: "accordion",
             showBenefits: true,
           });
+          console.log("✅ Enhanced donation widget initialized");
         }
 
         // Initialize donor appreciation section
@@ -1381,8 +1460,25 @@ limitations under the License.
             "#donor-appreciation-container",
             sampleDonors,
           );
+          console.log("✅ Donor flair display initialized");
         }
-      });
+      }
+
+      // Use a more efficient initialization approach
+      if (document.readyState === "loading") {
+        document.addEventListener(
+          "DOMContentLoaded",
+          initializeDonationComponents,
+          { once: true },
+        );
+        console.log("📝 Donation component DOMContentLoaded listener added");
+      } else {
+        // DOM already loaded, initialize immediately
+        console.log(
+          "📝 DOM already loaded, initializing donation components immediately",
+        );
+        initializeDonationComponents();
+      }
     </script>
 
     <!-- Donation Preferences Component -->
@@ -1413,44 +1509,24 @@ limitations under the License.
       if ("performance" in window && "mark" in performance) {
         performance.mark("page-start");
 
-        window.addEventListener("load", () => {
-          performance.mark("page-loaded");
-          performance.measure("page-load-time", "page-start", "page-loaded");
+        window.addEventListener(
+          "load",
+          () => {
+            performance.mark("page-loaded");
+            performance.measure("page-load-time", "page-start", "page-loaded");
 
-          // Report to our analytics system
-          const measure = performance.getEntriesByName("page-load-time")[0];
-          if (measure && window.SimpleAnalytics) {
-            window.SimpleAnalytics.trackPerformance(
-              "page-load",
-              measure.duration,
-            );
-          }
-        });
+            // Report to our analytics system
+            const measure = performance.getEntriesByName("page-load-time")[0];
+            if (measure && window.SimpleAnalytics) {
+              window.SimpleAnalytics.trackPerformance(
+                "page-load",
+                measure.duration,
+              );
+            }
+          },
+          { once: true },
+        );
       }
-
-      // Centralized loaded state management - runs only once
-      function setLoadedState() {
-        if (document.documentElement.classList.contains("loaded")) {
-          return; // Already set, prevent duplicate operations
-        }
-
-        if (window.DOMClassManager) {
-          window.DOMClassManager.setLoadedState(true);
-        } else {
-          document.documentElement.classList.add("loaded");
-        }
-      }
-
-      // Set loaded state based on document readiness
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", setLoadedState);
-      } else {
-        // DOM already loaded
-        setLoadedState();
-      }
-
-      // Also set on window load for animations that need it
-      window.addEventListener("load", setLoadedState);
 
       // Enhanced error handling
       window.addEventListener("error", (event) => {
