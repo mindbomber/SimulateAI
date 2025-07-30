@@ -707,7 +707,7 @@ body.dark-mode .accordion-header:hover {
   background: var(--theme-bg-primary);
 }
 
-body.dark-mode .accordion-title {
+body.dark-mode .donation-accordion .accordion-title {
   color: var(--theme-text-primary);
 }
 

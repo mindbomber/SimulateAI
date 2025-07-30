@@ -118,6 +118,24 @@
     z-index: 1;
   }
 
+  /* Subtle grid pattern overlay for light mode visual enhancement */
+  /* Creates a delicate 90px grid using CSS gradients for modern design appeal */
+  .hero::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 90px 90px;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0.6;
+  }
+
   .hero > * {
     position: relative;
     z-index: 2;
@@ -135,6 +153,9 @@
     justify-content: center;
     text-align: center;
     gap: var(--spacing-lg, 2rem);
+    /* Ensure content appears above grid pattern */
+    position: relative;
+    z-index: 3;
   }
 
   /* ===== HERO CONTENT COMPONENTS ===== */
@@ -474,6 +495,9 @@
     padding-left: 0 !important;
     padding-right: 0 !important;
 
+    /* Remove gradient animation for responsive layout containers */
+    animation: none !important;
+
     /* Ensure hero section adapts to all viewport sizes */
     padding: calc(var(--spacing-2xl, 4rem) * 1.5) var(--spacing-lg, 2rem);
     /* Minimum padding for very small screens */
@@ -644,7 +668,7 @@
   }
 
   .hero .hero-content {
-    text-align: left; /* Left-align on larger screens */
+    text-align: center; /* Center-align on larger screens */
   }
 
   .hero .hero-simulation {
@@ -685,7 +709,7 @@
   }
 
   .hero .hero-content {
-    text-align: left; /* Left-align for desktop experience */
+    text-align: center; /* Center-align for desktop experience */
   }
 
   .hero .hero-simulation {
@@ -1671,6 +1695,11 @@
 
   .dark-mode .hero::before {
     opacity: 0.1;
+  }
+
+  /* Hide grid pattern in dark mode for cleaner appearance */
+  .dark-mode .hero::after {
+    display: none;
   }
 
   .dark-mode .hero-content {

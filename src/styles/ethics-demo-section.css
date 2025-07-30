@@ -264,7 +264,6 @@
     cursor: pointer;
     border: none;
     width: 100%;
-    text-align: left;
     transition: background-color 0.2s ease;
   }
 
@@ -282,7 +281,7 @@
     transform: rotate(90deg);
   }
 
-  .accordion-title {
+  .demo-help-sections .accordion-title {
     font-size: 1.125rem;
     font-weight: 600;
     color: var(--color-gray-900, #1f2937);

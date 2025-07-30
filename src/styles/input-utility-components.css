@@ -349,7 +349,7 @@
     transform: rotate(90deg);
   }
 
-  .accordion-title {
+  .accordion .accordion-title {
     flex: 1;
     font-weight: 500;
     font-size: 14px;
