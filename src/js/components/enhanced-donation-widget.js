@@ -619,7 +619,7 @@ class EnhancedDonationWidget {
   }
 
   async processAnonymousDonation(tier) {
-    const email = this.promptForEmail();
+    // Removed email prompt - Stripe handles receipt emails automatically during checkout
     const message = this.promptForMessage();
 
     try {
@@ -630,7 +630,7 @@ class EnhancedDonationWidget {
 
       const result = await createAnonymousCheckout({
         tier: tier.id.toString(),
-        email,
+        email: "", // Let Stripe collect email during checkout for receipts
         message,
         amount: tier.amount,
       });
@@ -646,10 +646,10 @@ class EnhancedDonationWidget {
       }
     } catch (error) {
       // Fallback for local development
-      this.simulateStripeCheckout(tier, "anonymous", email);
+      this.simulateStripeCheckout(tier, "anonymous", ""); // Empty email, Stripe will collect
 
       // Simulate adding to donor wall in development
-      await this.simulateAddToDonorWall(tier, "anonymous", email, message);
+      await this.simulateAddToDonorWall(tier, "anonymous", "", message); // Empty email
     }
   }
 
@@ -736,11 +736,6 @@ class EnhancedDonationWidget {
         }, 300);
       }
     }, 5000);
-  }
-
-  promptForEmail() {
-    // Simple email prompt - could be enhanced with a modal
-    return prompt("Email address for receipt (optional):") || "";
   }
 
   /**

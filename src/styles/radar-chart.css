@@ -53,7 +53,7 @@
   /* Base theme class modifications for radar charts */
   .radar-chart-container.theme-light,
   .hero-radar-chart.theme-light,
-  .scenario-radar.theme-light {
+  .radar-chart-scenario.theme-light {
     background-color: var(--radar-theme-light-background, #ffffff);
     border-color: var(--radar-theme-light-border, #e2e8f0);
     color: var(--radar-theme-light-text, #333333);
@@ -61,7 +61,7 @@
 
   .radar-chart-container.theme-dark,
   .hero-radar-chart.theme-dark,
-  .scenario-radar.theme-dark {
+  .radar-chart-scenario.theme-dark {
     background-color: var(--radar-theme-dark-background, #1a1a1a);
     border-color: var(--radar-theme-dark-border, #444444);
     color: var(--radar-theme-dark-text, #ffffff);
@@ -69,7 +69,7 @@
 
   .radar-chart-container.theme-high-contrast,
   .hero-radar-chart.theme-high-contrast,
-  .scenario-radar.theme-high-contrast {
+  .radar-chart-scenario.theme-high-contrast {
     background-color: var(--radar-theme-high-contrast-background, #000000);
     border-color: var(--radar-theme-high-contrast-border, #ffffff);
     color: var(--radar-theme-high-contrast-text, #ffffff);
@@ -114,11 +114,11 @@
   }
 
   @media (max-width: var(--radar-tablet-breakpoint, 1024px)) {
-    .radar-demo-container {
+    .radar-chart-demo-container {
       max-width: 90%;
     }
 
-    .scenario-radar {
+    .radar-chart-scenario {
       padding: 1.25rem;
     }
   }
@@ -313,7 +313,7 @@
   }
 
   /* Minimal container for demo radar charts - gives more room */
-  .radar-demo-container {
+  .radar-chart-demo-container {
     position: relative;
     width: 100%;
     max-width: 700px; /* Even larger for better label visibility */
@@ -326,7 +326,7 @@
     border: none; /* No border */
   }
 
-  .radar-demo-container canvas {
+  .radar-chart-demo-container canvas {
     max-width: 100%;
     height: auto;
     display: block;
@@ -334,18 +334,21 @@
     border-radius: 0; /* No border radius for cleaner look */
     background: transparent;
 
-    /* CRITICAL: Ensure crisp rendering without forcing pixelation */
-    image-rendering: optimizeQuality;
+    /* CRITICAL: Ensure crisp rendering for chart graphics with browser fallbacks */
+    image-rendering: auto; /* Default fallback */
+    image-rendering: -moz-crisp-edges; /* Firefox */
+    image-rendering: -webkit-optimize-contrast; /* WebKit */
+    image-rendering: pixelated; /* Modern browsers */
   }
 
   /* Mobile optimization for radar demo */
   @media (width <= 768px) {
-    .radar-demo-container {
+    .radar-chart-demo-container {
       padding: 0.5rem; /* Minimal padding on mobile */
       max-width: 100%; /* Use full width on mobile */
     }
 
-    .radar-demo-container canvas {
+    .radar-chart-demo-container canvas {
       max-width: 100%;
       width: 100%;
       height: auto;
@@ -486,8 +489,11 @@
 
     /* Removed overflow: hidden to allow Chart.js tooltips to show */
 
-    /* CRITICAL: Ensure crisp rendering without forcing pixelation */
-    image-rendering: optimizeQuality;
+    /* CRITICAL: Ensure crisp rendering for chart graphics with browser fallbacks */
+    image-rendering: auto; /* Default fallback */
+    image-rendering: -moz-crisp-edges; /* Firefox */
+    image-rendering: -webkit-optimize-contrast; /* WebKit */
+    image-rendering: pixelated; /* Modern browsers */
   }
 
   /* Chart.js Tooltip Support - Ensure tooltips appear above all content */
@@ -522,9 +528,9 @@
 
   /* CRITICAL: Scenario grid view protection - ensure radar charts show even when grid is hidden */
   .scenarios-grid[style*="display: none"] .radar-chart-container,
-  .scenarios-grid[style*="display: none"] .scenario-radar,
+  .scenarios-grid[style*="display: none"] .radar-chart-scenario,
   .view-content[style*="display: none"] .radar-chart-container,
-  .view-content[style*="display: none"] .scenario-radar {
+  .view-content[style*="display: none"] .radar-chart-scenario {
     /* Override parent container inline display:none for radar charts */
     display: block !important;
     visibility: visible !important;
@@ -608,7 +614,7 @@
   }
 
   /* Real-time radar chart for scenarios */
-  .scenario-radar {
+  .radar-chart-scenario {
     top: 2rem;
     background: linear-gradient(
       135deg,
@@ -632,7 +638,7 @@
     overflow: visible;
   }
 
-  .scenario-radar::before {
+  .radar-chart-scenario::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -645,7 +651,7 @@
     z-index: -1;
   }
 
-  .scenario-radar::after {
+  .radar-chart-scenario::after {
     content: "";
     position: absolute;
     top: 0;
@@ -663,7 +669,7 @@
     border-radius: 24px 24px 0 0;
   }
 
-  .scenario-radar:hover {
+  .radar-chart-scenario:hover {
     box-shadow:
       0 35px 70px -12px rgb(102 126 234 / 40%),
       0 12px 48px rgb(0 0 0 / 18%),
@@ -672,7 +678,7 @@
     border-color: rgb(102 126 234 / 30%);
   }
 
-  .scenario-radar .radar-title {
+  .radar-chart-scenario .radar-title {
     font-size: 1.25rem;
     font-weight: 800;
     margin-bottom: 0.75rem;
@@ -686,7 +692,7 @@
     text-shadow: 0 2px 4px rgb(0 0 0 / 10%);
   }
 
-  .scenario-radar .radar-subtitle {
+  .radar-chart-scenario .radar-subtitle {
     font-size: 0.95rem;
     color: #4a5568;
     text-align: center;
@@ -696,7 +702,7 @@
   }
 
   /* Results radar chart for category completion */
-  .results-radar {
+  .radar-chart-results {
     background: linear-gradient(
       135deg,
       var(--card-bg, #fff) 0%,
@@ -714,7 +720,7 @@
     overflow: visible;
   }
 
-  .results-radar::before {
+  .radar-chart-results::before {
     content: "";
     position: absolute;
     top: 0;
@@ -731,7 +737,7 @@
     );
   }
 
-  .results-radar .radar-title {
+  .radar-chart-results .radar-title {
     font-size: 1.75rem;
     font-weight: 800;
     margin-bottom: 0.75rem;
@@ -744,7 +750,7 @@
     letter-spacing: -0.025em;
   }
 
-  .results-radar .radar-subtitle {
+  .radar-chart-results .radar-subtitle {
     font-size: 1.1rem;
     color: var(--text-secondary, #4a5568);
     text-align: center;
@@ -803,12 +809,12 @@
       margin: 0.5rem;
     }
 
-    .scenario-radar {
+    .radar-chart-scenario {
       position: static;
       margin: 1rem 0;
     }
 
-    .results-radar {
+    .radar-chart-results {
       padding: 1.5rem;
       margin: 1rem 0;
     }
@@ -832,7 +838,7 @@
       font-size: 0.8rem;
     }
 
-    .radar-demo-container {
+    .radar-chart-demo-container {
       max-width: 100%;
       padding: 1rem;
     }
@@ -859,11 +865,11 @@
       border-radius: 6px;
     }
 
-    .results-radar .radar-title {
+    .radar-chart-results .radar-title {
       font-size: 1.25rem;
     }
 
-    .scenario-radar .radar-title {
+    .radar-chart-scenario .radar-title {
       font-size: 0.9rem;
     }
 
@@ -882,14 +888,14 @@
       width: 100%;
     }
 
-    .radar-demo-container {
+    .radar-chart-demo-container {
       padding: 0.5rem;
     }
   }
 
   /* Manual dark mode support only - no system preference detection */
-  .dark-mode .scenario-radar,
-  .dark-mode .results-radar {
+  .dark-mode .radar-chart-scenario,
+  .dark-mode .radar-chart-results {
     background: var(--card-bg-dark, #2d3748);
     border-color: var(--border-color-dark, #4a5568);
   }
@@ -1092,7 +1098,7 @@
   }
 
   /* Dark mode support for radar charts - Enhanced with consolidation from appearance-settings.css */
-  body.dark-mode .radar-demo-container {
+  body.dark-mode .radar-chart-demo-container {
     background: transparent;
     box-shadow: -4px 4px 8px var(--theme-shadow);
   }
@@ -1222,7 +1228,7 @@
     );
   }
 
-  body.dark-mode .scenario-radar {
+  body.dark-mode .radar-chart-scenario {
     background: linear-gradient(
       135deg,
       var(--theme-bg-secondary) 0%,
@@ -1232,12 +1238,12 @@
     box-shadow: 0 8px 25px var(--theme-shadow);
   }
 
-  body.dark-mode .scenario-radar:hover {
+  body.dark-mode .radar-chart-scenario:hover {
     box-shadow: 0 12px 30px var(--theme-shadow-heavy);
     border-color: var(--theme-accent);
   }
 
-  body.dark-mode .scenario-radar .radar-title {
+  body.dark-mode .radar-chart-scenario .radar-title {
     color: var(--theme-text-primary);
     background: linear-gradient(
       135deg,
@@ -1249,11 +1255,11 @@
     background-clip: text;
   }
 
-  body.dark-mode .scenario-radar .radar-subtitle {
+  body.dark-mode .radar-chart-scenario .radar-subtitle {
     color: var(--theme-text-secondary);
   }
 
-  body.dark-mode .results-radar {
+  body.dark-mode .radar-chart-results {
     background: linear-gradient(
       135deg,
       var(--theme-bg-secondary) 0%,
@@ -1263,7 +1269,7 @@
     box-shadow: 0 10px 10px -5px var(--theme-shadow);
   }
 
-  body.dark-mode .results-radar .radar-title {
+  body.dark-mode .radar-chart-results .radar-title {
     color: var(--theme-text-primary);
     background: linear-gradient(
       135deg,
@@ -1275,7 +1281,7 @@
     background-clip: text;
   }
 
-  body.dark-mode .results-radar .radar-subtitle {
+  body.dark-mode .radar-chart-results .radar-subtitle {
     color: var(--theme-text-secondary);
   }
 
@@ -1313,8 +1319,8 @@
 
   /* Scenario Modal Context - Consolidated radar chart selectors */
   .scenario-modal .radar-chart-container,
-  .scenario-modal .scenario-radar,
-  .scenario-modal .results-radar,
+  .scenario-modal .radar-chart-scenario,
+  .scenario-modal .radar-chart-results,
   .scenario-modal #scenario-radar-chart {
     text-align: center;
     position: relative !important;
@@ -1351,8 +1357,8 @@
 
   /* Canvas specific styling for scenario modal radar charts - consolidated selectors */
   .scenario-modal .radar-chart-container canvas,
-  .scenario-modal .scenario-radar canvas,
-  .scenario-modal .results-radar canvas,
+  .scenario-modal .radar-chart-scenario canvas,
+  .scenario-modal .radar-chart-results canvas,
   .scenario-modal #scenario-radar-chart canvas {
     max-width: 400px !important;
     width: 400px !important; /* Force exact 400px width */
@@ -1406,16 +1412,16 @@
 
   /* Ensure no unwanted text content displays in radar charts - consolidated selectors */
   .scenario-modal .radar-chart-container:empty::before,
-  .scenario-modal .scenario-radar:empty::before,
-  .scenario-modal .results-radar:empty::before,
+  .scenario-modal .radar-chart-scenario:empty::before,
+  .scenario-modal .radar-chart-results:empty::before,
   .scenario-modal #scenario-radar-chart:empty::before {
     content: "";
     display: none;
   }
 
   .scenario-modal .radar-chart-container:empty::after,
-  .scenario-modal .scenario-radar:empty::after,
-  .scenario-modal .results-radar:empty::after,
+  .scenario-modal .radar-chart-scenario:empty::after,
+  .scenario-modal .radar-chart-results:empty::after,
   .scenario-modal #scenario-radar-chart:empty::after {
     content: "";
     display: none;
@@ -1460,24 +1466,24 @@
 
   /* Additional tooltip fixes for scenario modals - consolidated radar selectors */
   .scenario-modal .radar-chart-container,
-  .scenario-modal .scenario-radar,
-  .scenario-modal .results-radar,
+  .scenario-modal .radar-chart-scenario,
+  .scenario-modal .radar-chart-results,
   .scenario-modal #scenario-radar-chart {
     overflow: visible !important;
   }
 
   /* Ensure all radar chart containers allow tooltip overflow */
-  .radar-demo-container,
+  .radar-chart-demo-container,
   .radar-chart-container,
-  .scenario-radar,
-  .results-radar {
+  .radar-chart-scenario,
+  .radar-chart-results {
     overflow: visible !important;
   }
 
   /* Override any conflicting z-index rules from scenario modal - consolidated radar selectors */
   .scenario-modal .radar-chart-container canvas[role="img"],
-  .scenario-modal .scenario-radar canvas[role="img"],
-  .scenario-modal .results-radar canvas[role="img"],
+  .scenario-modal .radar-chart-scenario canvas[role="img"],
+  .scenario-modal .radar-chart-results canvas[role="img"],
   .scenario-modal #scenario-radar-chart canvas[role="img"],
   .scenario-modal canvas[role="img"],
   .scenario-modal-dialog canvas[role="img"] {
@@ -1512,12 +1518,12 @@
   }
 
   /* Protect radar charts in hidden containers (like scenarios-grid with style="display: none") */
-  [style*="display: none"] .radar-demo-container,
+  [style*="display: none"] .radar-chart-demo-container,
   [style*="display: none"] .radar-chart-container,
-  [style*="display: none"] .scenario-radar,
-  [style*="display: none"] .radar-demo-container canvas,
+  [style*="display: none"] .radar-chart-scenario,
+  [style*="display: none"] .radar-chart-demo-container canvas,
   [style*="display: none"] .radar-chart-container canvas,
-  [style*="display: none"] .scenario-radar canvas,
+  [style*="display: none"] .radar-chart-scenario canvas,
   [style*="display: none"] canvas[id*="radar"],
   [style*="display: none"] canvas[class*="radar"] {
     /* Override parent inline display:none specifically for radar charts */

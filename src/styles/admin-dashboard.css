@@ -164,7 +164,7 @@
   align-items: center;
 }
 
-.search-input {
+.admin-dashboard-page .search-input {
   padding: 0.75rem 1rem;
   border: 2px solid #e1e8ed;
   border-radius: 8px;
@@ -173,7 +173,7 @@
   transition: border-color 0.3s ease;
 }
 
-.search-input:focus {
+.admin-dashboard-page .search-input:focus {
   outline: none;
   border-color: #4a90e2;
 }
@@ -700,7 +700,7 @@
     flex-direction: column;
   }
 
-  .search-input {
+  .admin-dashboard-page .search-input {
     width: 100%;
   }
 

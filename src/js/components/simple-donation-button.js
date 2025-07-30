@@ -176,20 +176,9 @@ function openDonationModal() {
       </button>
     </div>
 
-    <input 
-      type="email" 
-      id="modal-donor-email" 
-      placeholder="Email (optional - for receipt)"
-      style="
-        width: 100%;
-        padding: 12px;
-        border: 2px solid #e9ecef;
-        border-radius: 6px;
-        font-size: 1em;
-        box-sizing: border-box;
-        margin-bottom: 20px;
-      "
-    >
+    <div style="margin-bottom: 20px; text-align: center; color: #6c757d; font-size: 0.9em;">
+      💳 Secure checkout with Stripe - receipt email will be collected during payment
+    </div>
 
     <div class="modal-status" style="
       min-height: 20px;
@@ -216,7 +205,7 @@ function openDonationModal() {
   modalButtons.forEach((button) => {
     button.addEventListener("click", async (e) => {
       const { tier } = e.target.closest("button").dataset;
-      const donorEmail = modal.querySelector("#modal-donor-email").value;
+      const donorEmail = ""; // Removed email collection - Stripe will handle receipts
 
       // Disable buttons and show loading
       modalButtons.forEach((btn) => (btn.disabled = true));

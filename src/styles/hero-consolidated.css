@@ -208,6 +208,22 @@ html.loaded .hero-radar-demo p {
     padding-left: var(--container-padding, 16px);
     padding-right: var(--container-padding, 16px);
   }
+
+  /* Hero radar demo responsive sizing */
+  .hero-radar-demo {
+    width: 95%;
+    min-height: 350px;
+    padding: calc(var(--spacing-lg, 2rem) * var(--font-scale, 1))
+      calc(var(--spacing-md, 1rem) * var(--font-scale, 1));
+    margin-top: calc(var(--spacing-lg, 2rem) * var(--font-scale, 1));
+    margin-bottom: calc(var(--spacing-lg, 2rem) * var(--font-scale, 1));
+  }
+
+  .hero-radar-container {
+    max-width: 100%;
+    min-height: 280px;
+    padding: calc(var(--spacing-md, 1rem) * var(--font-scale, 1));
+  }
 }
 
 /* Mobile Large (428px+) - iPhone 12 Pro Max - Aligned with media.css */
@@ -237,6 +253,19 @@ html.loaded .hero-radar-demo p {
     width: calc(280px * var(--font-scale, 1)); /* Responsive width */
     min-height: calc(100px * var(--font-scale, 1));
     font-size: calc(0.8rem * var(--font-scale, 1));
+  }
+
+  /* Enhanced hero radar demo sizing for mobile large */
+  .hero-radar-demo {
+    width: 92%;
+    min-height: calc(420px * var(--font-scale, 1));
+    padding: calc(var(--spacing-xl, 3rem) * var(--font-scale, 1))
+      calc(var(--spacing-lg, 2rem) * var(--font-scale, 1));
+  }
+
+  .hero-radar-container {
+    max-width: calc(600px * var(--font-scale, 1));
+    min-height: calc(320px * var(--font-scale, 1));
   }
 }
 
@@ -273,6 +302,19 @@ html.loaded .hero-radar-demo p {
     min-height: calc(120px * var(--font-scale, 1));
     font-size: calc(0.875rem * var(--font-scale, 1));
   }
+
+  /* Enhanced hero radar demo sizing for tablet */
+  .hero-radar-demo {
+    width: 88%;
+    min-height: calc(520px * var(--font-scale, 1));
+    padding: calc(var(--spacing-xl, 3.5rem) * var(--font-scale, 1))
+      calc(var(--spacing-lg, 2.5rem) * var(--font-scale, 1));
+  }
+
+  .hero-radar-container {
+    max-width: calc(750px * var(--font-scale, 1));
+    min-height: calc(380px * var(--font-scale, 1));
+  }
 }
 
 /* Laptop Small (1280px+) - MacBook Air 13" - Aligned with media.css */
@@ -290,6 +332,19 @@ html.loaded .hero-radar-demo p {
   .layout-container-responsive {
     padding-left: var(--container-padding, 32px);
     padding-right: var(--container-padding, 32px);
+  }
+
+  /* Enhanced hero radar demo sizing for laptop */
+  .hero-radar-demo {
+    width: 85%;
+    min-height: calc(580px * var(--font-scale, 1));
+    padding: calc(var(--spacing-xl, 4rem) * var(--font-scale, 1))
+      calc(var(--spacing-xl, 3rem) * var(--font-scale, 1));
+  }
+
+  .hero-radar-container {
+    max-width: calc(850px * var(--font-scale, 1));
+    min-height: calc(420px * var(--font-scale, 1));
   }
 }
 
@@ -310,6 +365,109 @@ html.loaded .hero-radar-demo p {
     padding-left: var(--container-padding, 48px);
     padding-right: var(--container-padding, 48px);
   }
+
+  /* Enhanced hero radar demo sizing for desktop full HD */
+  .hero-radar-demo {
+    width: 80%;
+    min-height: calc(650px * var(--font-scale, 1));
+    padding: calc(var(--spacing-xl, 5rem) * var(--font-scale, 1))
+      calc(var(--spacing-xl, 4rem) * var(--font-scale, 1));
+  }
+
+  .hero-radar-container {
+    max-width: calc(950px * var(--font-scale, 1));
+    min-height: calc(480px * var(--font-scale, 1));
+  }
+}
+
+/* ================================
+   ORIENTATION SUGGESTION MESSAGE
+   ================================ */
+
+/* Polite orientation suggestion for mobile devices */
+.orientation-suggestion {
+  display: none;
+  position: relative;
+  background: var(--orientation-bg, rgba(74, 158, 255, 0.1));
+  border: 2px solid var(--orientation-border, rgba(74, 158, 255, 0.3));
+  border-radius: var(--border-radius-md, 8px);
+  padding: var(--spacing-md, 1rem);
+  margin: var(--spacing-md, 1rem) auto var(--spacing-lg, 2rem);
+  max-width: 400px;
+  text-align: center;
+  color: var(--orientation-text, rgba(255, 255, 255, 0.9));
+  font-size: var(--font-size-sm, 0.875rem);
+  line-height: 1.4;
+  backdrop-filter: blur(10px);
+  animation: gentle-pulse 3s infinite;
+}
+
+.orientation-suggestion .rotate-icon {
+  display: inline-block;
+  font-size: 1.2em;
+  margin-right: 0.5rem;
+  animation: gentle-rotate 2s infinite ease-in-out;
+}
+
+.orientation-suggestion .message-text {
+  display: block;
+  margin-top: 0.25rem;
+}
+
+/* Gentle animations for the orientation suggestion */
+@keyframes gentle-pulse {
+  0%,
+  100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes gentle-rotate {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(5deg);
+  }
+  75% {
+    transform: rotate(-5deg);
+  }
+}
+
+/* Show orientation suggestion on mobile portrait mode */
+@media only screen and (max-width: 768px) and (orientation: portrait) {
+  .orientation-suggestion {
+    display: block;
+  }
+}
+
+/* Hide on landscape or larger screens */
+@media only screen and (min-width: 769px),
+  only screen and (max-width: 768px) and (orientation: landscape) {
+  .orientation-suggestion {
+    display: none;
+  }
+}
+
+/* Dark mode styling for orientation suggestion */
+.dark-mode .orientation-suggestion {
+  background: var(--orientation-bg-dark, rgba(74, 158, 255, 0.15));
+  border-color: var(--orientation-border-dark, rgba(74, 158, 255, 0.4));
+  color: var(--orientation-text-dark, #ffffff);
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .orientation-suggestion,
+  .orientation-suggestion .rotate-icon {
+    animation: none;
+  }
 }
 
 /* ================================
@@ -317,17 +475,23 @@ html.loaded .hero-radar-demo p {
    ================================ */
 
 .hero-radar-demo {
-  margin-top: var(--spacing-xl, 3rem);
-  padding: var(--spacing-lg, 2rem);
+  margin-top: var(--spacing-xl, 4rem);
+  margin-bottom: var(--spacing-xl, 4rem);
+  padding: var(--spacing-xl, 4rem) var(--spacing-lg, 3rem);
+  max-width: 1000px;
+  min-height: 600px;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
   background: var(--demo-background, rgba(255, 255, 255, 0.1));
-  border-radius: var(--border-radius-lg, 12px);
-  backdrop-filter: blur(10px);
+  border-radius: var(--border-radius-lg, 16px);
+  backdrop-filter: blur(15px);
   text-align: center;
   position: relative;
 
   /* Enhanced styling salvaged from radar-chart.css */
-  border: 2px solid var(--demo-border, rgba(255, 255, 255, 0.2));
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border: 3px solid var(--demo-border, rgba(255, 255, 255, 0.2));
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
 
   /* Ensure visibility by default with optional animation enhancement */
   opacity: 1;
@@ -337,10 +501,10 @@ html.loaded .hero-radar-demo p {
 
 /* Enhanced typography from radar-chart.css */
 .hero-radar-demo h3 {
-  font-size: clamp(1.25rem, 4vw, 1.5rem);
+  font-size: clamp(1.75rem, 5vw, 2.25rem);
   font-weight: 700;
   color: var(--hero-demo-title-color, inherit);
-  margin: 0 0 0.5rem;
+  margin: 0 0 1rem;
 
   /* Gradient text effect salvaged from radar-chart.css */
   background: linear-gradient(
@@ -360,9 +524,12 @@ html.loaded .hero-radar-demo p {
 
 .hero-radar-demo p {
   color: var(--hero-demo-text-color, rgba(255, 255, 255, 0.9));
-  margin-bottom: var(--spacing-lg, 2rem);
-  font-size: clamp(0.875rem, 3vw, 0.95rem);
+  margin-bottom: var(--spacing-xl, 3rem);
+  font-size: clamp(1rem, 3.5vw, 1.25rem);
   line-height: 1.6;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
 
   /* Ensure visibility by default */
   opacity: 1;
@@ -374,13 +541,14 @@ html.loaded .hero-radar-demo p {
 .hero-radar-container {
   position: relative;
   width: 100%;
-  max-width: 650px;
-  margin: 0 auto var(--spacing-lg, 2rem);
-  padding: var(--spacing-md, 1rem);
+  max-width: 800px;
+  min-height: 400px;
+  margin: 0 auto var(--spacing-xl, 3rem);
+  padding: var(--spacing-lg, 2rem);
   background: var(--demo-container-background, rgba(255, 255, 255, 0.8));
-  border-radius: var(--border-radius-md, 8px);
-  border: 1px solid var(--demo-container-border, rgba(255, 255, 255, 0.3));
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: var(--border-radius-lg, 12px);
+  border: 2px solid var(--demo-container-border, rgba(255, 255, 255, 0.3));
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .hero-demo-controls {

@@ -386,7 +386,7 @@ export function initializeCSSIntegration(config, options = {}) {
     if (autoTheme && themeName) {
       // Cache query result to avoid duplicate DOM queries
       const containers = document.querySelectorAll(
-        ".radar-chart-container, .hero-radar-chart, .scenario-radar",
+        ".radar-chart-container, .hero-radar-chart, .radar-chart-scenario",
       );
       containersFound = containers.length;
 

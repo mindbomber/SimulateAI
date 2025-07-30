@@ -4,15 +4,15 @@
  */
 
 @layer components {
-  /* Main Donor Appreciation Section */
-  .donor-appreciation-section {
-    padding: calc(var(--container-padding, 16px) * 2.5) var(--container-padding, 16px);
+  /* Main Donor Appreciation Section - Higher specificity to override donor-flair-display.css */
+  .donor-appreciation-section.donor-appreciation-section {
+    padding: calc(var(--container-padding, 16px) * 1.5) var(--container-padding, 16px) !important;
     background: linear-gradient(
       135deg,
       var(--color-background-subtle) 0%,
       var(--color-background-elevation-1) 50%,
       var(--color-background-subtle) 100%
-    );
+    ) !important;
     position: relative;
     overflow: hidden;
     max-width: 1400px;
@@ -20,6 +20,8 @@
     width: 100%;
     /* Enhanced responsive scaling */
     font-size: calc(1rem * var(--font-scale, 1));
+    border-radius: 12px; /* Match donor-flair-display.css */
+    text-align: center; /* Match donor-flair-display.css */
   }
 
   /* Specific ID selector for enhanced centering */
@@ -30,7 +32,7 @@
 
   /* Override donor-flair-display.css margin with higher specificity */
   #donor-appreciation.donor-appreciation-section {
-    margin: 32px auto; /* Keep top/bottom margin from donor-flair, set left/right to auto */
+    margin: 24px auto !important; /* Reduced from 32px to 24px, !important to override donor-flair */
     max-width: 1000px; /* Define max-width for auto margins to work */
   }
 
@@ -915,8 +917,8 @@
 
   /* Large Desktop Layout - Wide Screens */
   @media (width >= 1440px) {
-    .donor-appreciation-section {
-      padding: 5rem 3rem;
+    .donor-appreciation-section.donor-appreciation-section {
+      padding: 3rem 3rem !important;
       max-width: 1600px;
     }
 
@@ -943,9 +945,9 @@
 
   /* Responsive Design - Integrated with CSS Custom Properties */
   @media (width <= 768px) {
-    .donor-appreciation-section {
-      /* Use responsive padding that auto-adjusts per device */
-      padding: calc(var(--container-padding, 12px) * 2) var(--container-padding, 12px);
+    .donor-appreciation-section.donor-appreciation-section {
+      /* Use responsive padding that auto-adjusts per device - !important to override donor-flair */
+      padding: calc(var(--container-padding, 12px) * 2) var(--container-padding, 12px) !important;
     }
 
     /* Enhanced mobile centering for ID selector */

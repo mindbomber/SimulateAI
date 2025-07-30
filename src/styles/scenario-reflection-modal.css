@@ -716,7 +716,7 @@
       0 1px 1px rgba(0, 0, 0, 0.05);
   }
 
-  .option-text {
+  .scenario-reflection-modal .option-text {
     font-weight: 600;
     color: var(--lab-charcoal);
     margin-bottom: var(--lab-space-2);
@@ -2644,7 +2644,7 @@
     border-color: #475569 !important;
   }
 
-  .dark-mode .option-text,
+  .dark-mode .scenario-reflection-modal .option-text,
   .dark-mode .option-reasoning {
     color: #f1f5f9 !important;
   }

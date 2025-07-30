@@ -139,7 +139,7 @@
   margin-top: 1rem;
 }
 
-.option-text {
+.scenario-reflection-modal .option-text {
   font-size: 1.1rem;
   font-weight: 600;
   color: #2c3e50;
@@ -610,7 +610,7 @@
   color: #ffffff;
 }
 
-.dark-mode .option-text {
+.dark-mode .scenario-reflection-modal .option-text {
   color: #ffffff;
 }
 

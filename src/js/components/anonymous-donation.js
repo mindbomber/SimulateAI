@@ -91,23 +91,8 @@ class AnonymousDonation {
           </button>
         </div>
 
-        <div class="email-input" style="margin-bottom: 16px;">
-          <input 
-            type="email" 
-            id="donor-email" 
-            placeholder="Email (optional - for receipt)"
-            style="
-              width: 100%;
-              padding: 12px;
-              border: none;
-              border-radius: 6px;
-              font-size: 0.95em;
-              box-sizing: border-box;
-              background: rgba(255,255,255,0.1);
-              color: white;
-              backdrop-filter: blur(10px);
-            "
-          >
+        <div class="donation-message" style="margin-bottom: 16px; text-align: center; color: rgba(255,255,255,0.8); font-size: 0.9em;">
+          💳 Secure checkout with Stripe - receipt email will be collected during payment
         </div>
 
         <div class="donation-status" style="
@@ -152,7 +137,8 @@ class AnonymousDonation {
 
         if (!tier) return;
 
-        const donorEmail = document.getElementById("donor-email").value;
+        // Removed email collection - Stripe will handle receipt emails during checkout
+        const donorEmail = ""; // Let Stripe collect email for receipts
 
         // Disable buttons and show loading
         buttons.forEach((btn) => (btn.disabled = true));

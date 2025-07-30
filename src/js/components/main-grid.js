@@ -1372,7 +1372,7 @@ class MainGrid {
             </button>
           </div>
         </div>
-        <div class="controls-group">
+        <div class="category-controls-group">
           <div class="sort-container">
             <button class="sort-btn" aria-expanded="false" aria-haspopup="true">
               <span class="sort-text">Sort: A-Z</span>
@@ -1509,20 +1509,20 @@ class MainGrid {
             </div>
           </div>
         </div>
-        <div class="controls-group">
+        <div class="category-controls-group">
           <div class="sort-container">
             <button class="sort-btn" aria-expanded="false">
               <svg class="sort-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path fill-rule="evenodd" d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z" clip-rule="evenodd"/>
               </svg>
-              <span class="sort-text">Alphabetical</span>
+              <span class="sort-text">Sort: A-Z</span>
               <svg class="chevron-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
               </svg>
             </button>
             <div class="sort-dropdown" style="display: none;">
               <button type="button" class="sort-option active" data-sort="alphabetical" role="option" aria-selected="true">
-                <span class="option-text">Alphabetical</span>
+                <span class="option-text">Sort: A-Z</span>
                 <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/>
                 </svg>
@@ -1557,26 +1557,6 @@ class MainGrid {
                   <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/>
                 </svg>
               </button>
-            </div>
-          </div>
-          <div class="filter-container">
-            <button class="filter-btn" aria-expanded="false">
-              <svg class="filter-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M2.628 1.601C5.028 1.206 7.49 1 10 1s4.973.206 7.372.601a.75.75 0 01.628.74v2.288a2.25 2.25 0 01-.659 1.59l-4.682 4.683a2.25 2.25 0 00-.659 1.59v3.037c0 .684-.31 1.33-.844 1.757l-1.937 1.55A.75.75 0 018 18.25v-5.757a2.25 2.25 0 00-.659-1.591L2.659 6.22A2.25 2.25 0 012 4.629V2.34a.75.75 0 01.628-.739z" clip-rule="evenodd"/>
-              </svg>
-              <span class="filter-text">All Categories</span>
-              <svg class="chevron-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
-              </svg>
-            </button>
-            <div class="filter-dropdown" style="display: none;">
-              <button type="button" class="filter-option active" data-category="all" role="option" aria-selected="true">
-                <span class="option-text">All Categories</span>
-                <svg class="check-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/>
-                </svg>
-              </button>
-              <!-- Category options will be populated dynamically -->
             </div>
           </div>
           <div class="clear-all-container">
@@ -3623,8 +3603,8 @@ class MainGrid {
     // Setup search input with autocomplete
     this.setupSearchInput();
 
-    // Setup filter dropdown
-    this.setupFilterDropdown();
+    // Setup filter dropdown (DISABLED - filter container removed)
+    // this.setupFilterDropdown();
 
     // Setup sort dropdown
     this.setupSortDropdown();
@@ -3633,8 +3613,8 @@ class MainGrid {
     this.setupClearAllButton();
     console.log("✅ All controls setup complete");
 
-    // Populate category filter options
-    this.populateCategoryFilter();
+    // Populate category filter options (DISABLED - filter container removed)
+    // this.populateCategoryFilter();
 
     // Initial render with current state
     await this.renderFilteredScenarios();
@@ -4397,14 +4377,14 @@ class MainGrid {
       option.setAttribute("aria-selected", isAllOption ? "true" : "false");
     });
 
-    // Reset sort dropdown to "Alphabetical"
+    // Reset sort dropdown to "Sort: A-Z"
     const sortBtn = this.scenarioContainer.querySelector(".sort-btn");
     const sortOptions = this.scenarioContainer.querySelectorAll(".sort-option");
 
     if (sortBtn) {
       const sortText = sortBtn.querySelector(".sort-text");
       if (sortText) {
-        sortText.textContent = "Alphabetical";
+        sortText.textContent = "Sort: A-Z";
       }
     }
 
@@ -5635,7 +5615,7 @@ class MainGrid {
 
     // Sort options
     if (target.closest(".sort-option")) {
-      this.handleSortOptionClick(target.closest(".sort-option"), event);
+      this.handleSortOptionClick(target.closest(".sort-option"));
       return;
     }
 
@@ -5644,6 +5624,50 @@ class MainGrid {
       this.handleAutocompleteClick(target.closest(".autocomplete-item"), event);
       return;
     }
+  }
+
+  /**
+   * Handle sort option click events
+   */
+  handleSortOptionClick(sortOption) {
+    if (!sortOption) return;
+
+    const sortValue = sortOption.dataset.value;
+    const sortText = sortOption.textContent.trim();
+
+    // Find the parent sort dropdown and button
+    const sortDropdown = sortOption.closest(".sort-options");
+    const sortBtn = sortDropdown ? sortDropdown.previousElementSibling : null;
+
+    if (!sortBtn || !sortDropdown) return;
+
+    // Update all options to inactive
+    const allOptions = sortDropdown.querySelectorAll(".sort-option");
+    allOptions.forEach((option) => {
+      this.setElementAttributes(option, {
+        "aria-selected": "false",
+        class: option.className.replace(" active", ""),
+      });
+    });
+
+    // Set clicked option as active
+    this.setElementAttributes(sortOption, {
+      "aria-selected": "true",
+      class: sortOption.className + " active",
+    });
+
+    // Update button text to show selected sort option
+    const sortTextElement = sortBtn.querySelector(".sort-text");
+    if (sortTextElement) {
+      sortTextElement.textContent = sortText;
+    }
+
+    // Apply the sorting
+    this.applySorting(sortValue);
+
+    // Close dropdown
+    sortDropdown.style.display = "none";
+    sortBtn.setAttribute("aria-expanded", "false");
   }
 
   /**
@@ -6072,7 +6096,28 @@ class MainGrid {
     if (!this.batchingMetrics) this.batchingMetrics = {};
     this.batchingMetrics.elementCreationBatches =
       (this.batchingMetrics.elementCreationBatches || 0) + 1;
-  } /**
+  }
+
+  /**
+   * Set multiple attributes on an element in a batch operation
+   * @param {HTMLElement} element - The element to set attributes on
+   * @param {Object} attributes - Object with attribute name/value pairs
+   */
+  setElementAttributes(element, attributes) {
+    if (!element || !attributes) return;
+
+    Object.entries(attributes).forEach(([key, value]) => {
+      if (key === "class") {
+        element.className = value;
+      } else if (key.startsWith("aria-") || key.startsWith("data-")) {
+        element.setAttribute(key, value);
+      } else {
+        element.setAttribute(key, value);
+      }
+    });
+  }
+
+  /**
    * Performance cleanup method for component destruction
    */
   performanceCleanup() {

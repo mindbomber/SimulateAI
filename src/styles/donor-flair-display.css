@@ -67,8 +67,8 @@
 .donor-appreciation-section {
   background: linear-gradient(135deg, #f8f9fa, #e9ecef);
   border-radius: 12px;
-  padding: 24px;
-  margin: 32px auto; /* Changed from '32px 0' to '32px auto' for centering */
+  padding: 16px;
+  margin: 24px auto; /* Reduced from 32px to 24px */
   max-width: 1000px; /* Define max-width for auto margins to work */
   text-align: center;
 }
@@ -268,8 +268,8 @@
 /* Mobile Responsiveness */
 @media (width <= 768px) {
   .donor-appreciation-section {
-    padding: 16px;
-    margin: 20px auto; /* Changed from '20px 0' to '20px auto' for mobile centering */
+    padding: 12px;
+    margin: 16px auto; /* Reduced from 20px to 16px */
     max-width: 100%; /* Ensure it doesn't exceed container on mobile */
   }
 

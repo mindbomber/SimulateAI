@@ -283,13 +283,23 @@
   }
 
   /* ===== SCENARIO CONTROLS TOOLBAR ===== */
+  /* Enhanced toolbar styling inspired by category-controls-toolbar */
   .scenario-controls-toolbar {
-    display: none;
+    display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: var(--spacing-4);
-    padding: var(--spacing-4) 0 var(--spacing-6) 0;
-    margin-bottom: var(--spacing-2);
-    border-bottom: 1px solid var(--color-gray-200);
+    padding: var(--spacing-4) var(--spacing-6);
+    margin-bottom: var(--spacing-6);
+    background: var(--color-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    position: sticky;
+    top: var(--spacing-4);
+    z-index: 10;
+    max-width: 100%;
+    box-sizing: border-box;
     /* Ensure toolbar is always on its own row, outside grid layout */
     grid-column: 1 / -1; /* Span full width when inside a grid container */
     order: -1; /* Ensure it appears before grid items */
@@ -297,6 +307,34 @@
 
   .scenarios-grid[data-view="scenario"] .scenario-controls-toolbar {
     display: flex !important;
+  }
+
+  /* Search container for scenario search - takes available space on desktop */
+  .scenario-controls-toolbar .search-container {
+    flex: 1;
+    min-width: 200px;
+    max-width: 400px;
+    position: relative;
+  }
+
+  /* Controls group for sort and clear actions - fixed size on right */
+  .scenario-controls-toolbar .scenario-controls-group,
+  .scenario-controls-toolbar .controls-group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    flex-shrink: 0;
+  }
+
+  /* Sort container - minimal scenario sorting */
+  .scenario-controls-toolbar .sort-container {
+    position: relative;
+    display: inline-flex;
+  }
+
+  /* Clear all container - reset scenario filters */
+  .scenario-controls-toolbar .clear-all-container {
+    display: inline-flex;
   }
 
   /* Additional selector for view-content compatibility */
@@ -344,208 +382,141 @@
     display: inline-flex !important;
   }
 
-  /* Enhanced button visibility for debugging */
+  /* Enhanced search input for scenario filtering */
   .scenario-controls-toolbar .search-input {
-    background: white !important;
-    border: 2px solid #333 !important;
-    color: #333 !important;
-    font-size: 14px !important;
-    /* Fixed: Preserve left padding for search icon */
-    padding: 8px 12px 8px 2.75rem !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
+    background: white;
+    border: 1px solid var(--color-gray-300);
+    color: var(--color-gray-800);
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 475;
+    letter-spacing: -0.005em;
+    line-height: 1.4;
+    /* Preserve left padding for search icon */
+    padding: var(--spacing-3) var(--spacing-4) var(--spacing-3) 2.75rem;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: var(--radius-md);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   }
 
+  .scenario-controls-toolbar .search-input:focus {
+    border-color: var(--color-primary-500);
+    box-shadow:
+      0 0 0 3px rgba(var(--color-primary-500-rgb), 0.1),
+      0 1px 3px rgba(0, 0, 0, 0.1);
+    outline: none;
+    transform: translateY(-1px);
+  }
+
+  .scenario-controls-toolbar .search-input::placeholder {
+    color: var(--color-gray-500);
+    font-weight: 425;
+  }
+
+  /* Enhanced scenario control buttons */
   .scenario-controls-toolbar .filter-btn,
   .scenario-controls-toolbar .sort-btn {
-    background: #f0f0f0 !important;
-    border: 2px solid #333 !important;
-    color: #333 !important;
-    font-size: 14px !important;
-    padding: 8px 12px !important;
-    cursor: pointer !important;
-    pointer-events: auto !important;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-3) var(--spacing-4);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+    color: var(--color-gray-800);
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.08),
+      0 1px 2px rgba(0, 0, 0, 0.06);
+    text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.02);
   }
 
   .scenario-controls-toolbar .clear-all-btn {
-    background: #ff6b6b !important;
-    border: 2px solid #d63447 !important;
-    color: white !important;
-    font-size: 14px !important;
-    padding: 8px 12px !important;
-    cursor: pointer !important;
-    pointer-events: auto !important;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-3) var(--spacing-4);
+    border: 1px solid var(--color-red-300);
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%);
+    color: var(--color-red-600);
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    box-shadow:
+      0 1px 3px rgba(239, 68, 68, 0.12),
+      0 1px 2px rgba(0, 0, 0, 0.06);
+    text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.02);
   }
 
-  /* COMPLETE OVERRIDE: Force search input to proper width on larger screens */
-  @media (width >= 769px) {
-    /* Override at the toolbar level */
-    .scenarios-grid[data-view="scenario"] .scenario-controls-toolbar {
-      width: 100% !important;
-      max-width: none !important;
-    }
-
-    /* Force search container to expand */
-    .scenarios-grid[data-view="scenario"]
-      .scenario-controls-toolbar
-      .search-container {
-      flex: 1 !important;
-      min-width: 250px !important;
-      max-width: 450px !important;
-      width: 100% !important;
-    }
-
-    /* Force input wrapper to expand */
-    .scenarios-grid[data-view="scenario"]
-      .scenario-controls-toolbar
-      .search-input-wrapper {
-      width: 100% !important;
-      min-width: 250px !important;
-      flex: 1 !important;
-      flex-grow: 1 !important;
-      flex-shrink: 0 !important;
-      box-sizing: border-box !important;
-    }
-
-    /* Force the actual input to expand */
-    .scenarios-grid[data-view="scenario"]
-      .scenario-controls-toolbar
-      .search-input {
-      width: 100% !important;
-      min-width: 250px !important;
-      flex: 1 !important;
-      flex-grow: 1 !important;
-      flex-shrink: 0 !important;
-      box-sizing: border-box !important;
-      max-width: none !important;
-    }
-  }
-
-  @media (width >= 1024px) {
-    .scenarios-grid[data-view="scenario"]
-      .scenario-controls-toolbar
-      .search-container {
-      min-width: 300px !important;
-      max-width: 550px !important;
-    }
-
-    .scenarios-grid[data-view="scenario"]
-      .scenario-controls-toolbar
-      .search-input-wrapper {
-      min-width: 300px !important;
-    }
-
-    .scenarios-grid[data-view="scenario"]
-      .scenario-controls-toolbar
-      .search-input {
-      min-width: 300px !important;
-    }
-  }
-
-  @media (width >= 1200px) {
-    .scenarios-grid[data-view="scenario"]
-      .scenario-controls-toolbar
-      .search-container {
-      min-width: 350px !important;
-      max-width: 650px !important;
-    }
-
-    .scenarios-grid[data-view="scenario"]
-      .scenario-controls-toolbar
-      .search-input-wrapper {
-      min-width: 350px !important;
-    }
-
-    .scenarios-grid[data-view="scenario"]
-      .scenario-controls-toolbar
-      .search-input {
-      min-width: 350px !important;
-    }
-  }
-
-  /* ===== MOBILE RESPONSIVE LAYOUT FOR SCENARIO TOOLBAR ===== */
-  /* Mobile responsive layout for search toolbar */
+  /* Mobile responsive design for scenario toolbar */
   @media (width <= 768px) {
-    /* Stack search and controls vertically on mobile */
-    .scenarios-grid[data-view="scenario"] .scenario-controls-toolbar {
-      flex-direction: column !important;
-      align-items: stretch !important;
-      gap: var(--spacing-3) !important;
-      padding: var(--spacing-3) 0 var(--spacing-4) 0 !important;
+    .scenario-controls-toolbar {
+      flex-direction: column;
+      gap: var(--spacing-3);
+      padding: var(--spacing-3);
+      position: static; /* Remove sticky on mobile */
     }
 
-    /* Search container takes full width on mobile */
-    .scenarios-grid[data-view="scenario"]
-      .scenario-controls-toolbar
-      .search-container {
-      width: 100% !important;
-      max-width: none !important;
-      min-width: 0 !important;
-      order: 1 !important; /* Search appears first */
-      margin-bottom: var(--spacing-2) !important;
+    .scenario-controls-toolbar .search-container {
+      width: 100%;
+      max-width: none;
+      order: 1;
     }
 
-    /* Controls group appears below search */
-    .scenarios-grid[data-view="scenario"]
-      .scenario-controls-toolbar
-      .controls-group {
-      width: 100% !important;
-      justify-content: center !important;
-      order: 2 !important; /* Controls appear second */
-      gap: var(--spacing-4) !important;
+    .scenario-controls-toolbar .scenario-controls-group,
+    .scenario-controls-toolbar .controls-group {
+      width: 100%;
+      justify-content: space-between;
+      order: 2;
     }
 
-    /* Clear all button responsive adjustments */
-    .scenarios-grid[data-view="scenario"]
-      .scenario-controls-toolbar
-      .clear-all-container {
-      margin-left: 0 !important;
-    }
-
-    /* Mobile search input adjustments */
-    .scenarios-grid[data-view="scenario"]
-      .scenario-controls-toolbar
-      .search-input-wrapper {
-      width: 100% !important;
-      min-width: 0 !important;
-    }
-
-    .scenarios-grid[data-view="scenario"]
-      .scenario-controls-toolbar
-      .search-input {
-      width: 100% !important;
-      min-width: 0 !important;
-      font-size: 16px !important; /* Prevent zoom on iOS */
+    .scenario-controls-toolbar .sort-btn,
+    .scenario-controls-toolbar .clear-all-btn {
+      flex: 1;
+      justify-content: center;
+      padding: var(--spacing-3) var(--spacing-2);
+      font-size: 0.875rem;
     }
   }
 
-  /* Extra small mobile adjustments */
   @media (width <= 480px) {
-    .scenarios-grid[data-view="scenario"] .scenario-controls-toolbar {
-      padding: var(--spacing-2) 0 var(--spacing-3) 0 !important;
+    .scenario-controls-toolbar .scenario-controls-group,
+    .scenario-controls-toolbar .controls-group {
+      flex-direction: column;
+      gap: var(--spacing-2);
     }
 
-    .scenarios-grid[data-view="scenario"]
-      .scenario-controls-toolbar
-      .controls-group {
-      flex-wrap: wrap !important;
-      justify-content: space-around !important;
+    .scenario-controls-toolbar .sort-btn,
+    .scenario-controls-toolbar .clear-all-btn {
+      width: 100%;
     }
+  }
 
-    /* Clear all button on extra small screens */
-    .clear-all-btn {
-      padding: var(--spacing-2) var(--spacing-3) !important;
-      font-size: var(--font-size-xs) !important;
-    }
-
-    .clear-all-text {
-      display: none !important; /* Hide text on very small screens */
-    }
-
-    .clear-all-icon {
-      width: 14px !important;
-      height: 14px !important;
-    }
+  /* ===== SCENARIO GRID CONTAINER ===== */
+  .scenarios-grid {
+    display: flex;
+    gap: var(--spacing-4);
+    padding: var(--spacing-8) 0;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
   }
 
   /* ===== SEARCH COMPONENTS ===== */
@@ -566,7 +537,7 @@
     pointer-events: none;
   }
 
-  .search-input {
+  .scenario-controls-toolbar .search-input {
     width: 100%;
     padding: var(--spacing-3) var(--spacing-10) var(--spacing-3) 2.75rem;
     border: 1px solid var(--color-gray-300);
@@ -577,13 +548,13 @@
     box-sizing: border-box;
   }
 
-  .search-input:focus {
+  .scenario-controls-toolbar .search-input:focus {
     outline: none;
     border-color: var(--color-primary);
     box-shadow: 0 0 0 3px var(--color-primary-light);
   }
 
-  .search-input::placeholder {
+  .scenario-controls-toolbar .search-input::placeholder {
     color: var(--color-gray-500);
   }
 
@@ -856,8 +827,8 @@
   }
 
   /* Ensure all filter/sort containers have proper dropdown positioning */
-  .filter-container,
-  .sort-container {
+  .scenario-controls-toolbar .filter-container,
+  .scenario-controls-toolbar .sort-container {
     position: relative;
     /* Ensure container includes dropdown area for seamless hovering */
     min-height: 40px; /* Minimum height to avoid layout shifts */
@@ -944,81 +915,59 @@
     border-radius: var(--radius-md);
     background: var(--color-white);
     cursor: pointer;
-    transition: all var(--transition-base);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     white-space: nowrap;
     position: relative;
     overflow: hidden;
 
-    /* Typography for analytical authority and precision */
+    /* Enhanced typography matching category-controls-toolbar */
     font-family:
-      -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue",
-      Arial, sans-serif; /* Clean, readable system fonts for interface clarity */
-    font-size: 0.9375rem; /* 15px - slightly larger for better readability and presence */
-    font-weight: 500; /* Medium weight for gentle authority without aggression */
-    letter-spacing: -0.01em; /* Subtle tightening for precision and sophistication */
-    line-height: 1.4; /* Comfortable line height for easy reading */
-    color: var(--color-gray-800); /* Darker for better contrast and authority */
+      -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    font-size: 0.9375rem; /* 15px */
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.4;
+    color: var(--color-gray-800);
 
-    /* Subtle text shadow for depth and premium feel */
-    text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.02);
-
-    /* Enhanced visual hierarchy with subtle gradient */
+    /* Enhanced visual styling with gradients and shadows */
     background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
     box-shadow:
       0 1px 3px rgba(0, 0, 0, 0.08),
       0 1px 2px rgba(0, 0, 0, 0.06);
+    text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.02);
   }
 
-  /* Sort button specific enhancements - conveying organizational intelligence */
+  /* Sort button specific enhancements */
   .sort-btn {
-    /* Slightly more authoritative styling to distinguish from filters */
-    font-weight: 550; /* Between medium and semibold for organizational authority */
-    color: var(--color-gray-900); /* Stronger color for sorting hierarchy */
-    border: 1px solid var(--color-gray-400); /* More defined border for importance */
-
-    /* Enhanced gradient for sorting authority */
+    font-weight: 575;
+    color: var(--color-gray-900);
+    border: 1px solid var(--color-gray-400);
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-
-    /* Subtle text effects for analytical sophistication */
     text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.04);
-
-    /* Letter spacing optimized for analytical scanning */
-    letter-spacing: -0.005em; /* Very subtle tightening for precision */
+    letter-spacing: -0.005em;
   }
 
   .filter-btn:hover,
   .sort-btn:hover {
     border-color: var(--color-gray-500);
-    transform: translateY(-1px); /* Subtle lift for engagement */
-
-    /* Enhanced hover background with sophistication */
+    transform: translateY(-1px);
     background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-
-    /* Improved shadow for hover state */
     box-shadow:
       0 4px 12px rgba(0, 0, 0, 0.12),
       0 2px 4px rgba(0, 0, 0, 0.08);
-
-    /* Text becomes more defined on hover */
     color: var(--color-gray-900);
     text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.06);
   }
 
-  /* Sort button hover - enhanced analytical engagement */
+  /* Sort button enhanced hover state */
   .sort-btn:hover {
     border-color: var(--color-gray-600);
-    color: var(--color-gray-950); /* Maximum contrast for active engagement */
-
-    /* Premium gradient for active sorting state */
+    color: var(--color-gray-950);
     background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-
-    /* Enhanced shadow for sorting authority */
     box-shadow:
-      0 4px 16px rgba(0, 0, 0, 0.15),
-      0 2px 6px rgba(0, 0, 0, 0.1);
-
-    /* Slightly more defined text shadow for active state */
-    text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.08);
+      0 6px 16px rgba(0, 0, 0, 0.15),
+      0 3px 6px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
   }
 
   .filter-btn:focus,
@@ -1166,8 +1115,12 @@
   }
 
   /* Enhanced hover states - work with JavaScript display control */
-  .filter-container:hover .filter-dropdown[style*="display: block"],
-  .sort-container:hover .sort-dropdown[style*="display: block"],
+  .scenario-controls-toolbar
+    .filter-container:hover
+    .filter-dropdown[style*="display: block"],
+  .scenario-controls-toolbar
+    .sort-container:hover
+    .sort-dropdown[style*="display: block"],
   .filter-dropdown[style*="display: block"]:hover,
   .sort-dropdown[style*="display: block"]:hover {
     /* When JS has set display:block, ensure hover keeps it visible */
@@ -1178,8 +1131,8 @@
   }
 
   /* Alternative: Show dropdown on container hover regardless of JS state */
-  .filter-container:hover .filter-dropdown,
-  .sort-container:hover .sort-dropdown {
+  .scenario-controls-toolbar .filter-container:hover .filter-dropdown,
+  .scenario-controls-toolbar .sort-container:hover .sort-dropdown {
     /* Force display and visibility when hovering container */
     display: block !important;
     opacity: 1 !important;
@@ -1200,8 +1153,8 @@
   }
 
   /* Keep button in expanded visual state during container hover */
-  .filter-container:hover .filter-btn,
-  .sort-container:hover .sort-btn {
+  .scenario-controls-toolbar .filter-container:hover .filter-btn,
+  .scenario-controls-toolbar .sort-container:hover .sort-btn {
     /* Visual feedback that dropdown area is active */
     border-color: var(--color-primary-600);
     background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
@@ -1407,8 +1360,8 @@
     border-left: inherit;
   }
 
-  .filter-option .option-text,
-  .sort-option .option-text {
+  .scenario-controls-toolbar .filter-option .option-text,
+  .scenario-controls-toolbar .sort-option .option-text {
     flex: 1;
 
     /* Enhanced typography for option text clarity */
@@ -1423,14 +1376,14 @@
   }
 
   /* Sort option text - enhanced for analytical scanning */
-  .sort-option .option-text {
+  .scenario-controls-toolbar .sort-option .option-text {
     /* Slightly enhanced for sorting importance */
     font-weight: inherit;
     color: inherit;
   }
 
-  .filter-option .check-icon,
-  .sort-option .check-icon {
+  .scenario-controls-toolbar .filter-option .check-icon,
+  .scenario-controls-toolbar .sort-option .check-icon {
     width: 16px;
     height: 16px;
     color: var(--color-primary);
@@ -1600,33 +1553,61 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-2);
-    padding: var(--spacing-2) var(--spacing-4);
+    padding: var(--spacing-3) var(--spacing-5);
     border: 1px solid var(--color-red-300);
     border-radius: var(--radius-md);
     background: var(--color-white);
     color: var(--color-red-600);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
     cursor: pointer;
-    transition: all var(--transition-base);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+
+    /* Enhanced typography matching other buttons */
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.4;
+
+    /* Enhanced visual styling */
+    background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%);
+    box-shadow:
+      0 1px 3px rgba(239, 68, 68, 0.12),
+      0 1px 2px rgba(0, 0, 0, 0.06);
+    text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.02);
   }
 
   .clear-all-btn:hover {
     border-color: var(--color-red-400);
-    background: var(--color-red-50);
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
     color: var(--color-red-700);
+    transform: translateY(-1px);
+    box-shadow:
+      0 4px 12px rgba(239, 68, 68, 0.15),
+      0 2px 4px rgba(0, 0, 0, 0.08);
+    text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.06);
   }
 
   .clear-all-btn:focus {
     outline: none;
     border-color: var(--color-red-500);
-    box-shadow: 0 0 0 3px var(--color-red-100);
+    box-shadow:
+      0 0 0 3px rgba(239, 68, 68, 0.1),
+      0 4px 12px rgba(239, 68, 68, 0.12),
+      0 2px 4px rgba(0, 0, 0, 0.08);
+    color: var(--color-red-700);
+    text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.06);
   }
 
   .clear-all-btn:active {
-    background: var(--color-red-100);
-    transform: translateY(1px);
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    transform: translateY(0);
+    box-shadow:
+      0 2px 6px rgba(239, 68, 68, 0.2),
+      0 1px 2px rgba(0, 0, 0, 0.1);
   }
 
   .clear-all-icon {
@@ -1869,18 +1850,18 @@
   }
 
   /* Dark mode for search and filter components */
-  body.dark-mode .search-input {
+  body.dark-mode .scenario-controls-toolbar .search-input {
     background: var(--theme-bg-secondary);
     border-color: var(--theme-border);
     color: var(--theme-text-primary);
   }
 
-  body.dark-mode .search-input:focus {
+  body.dark-mode .scenario-controls-toolbar .search-input:focus {
     border-color: var(--theme-accent);
     box-shadow: 0 0 0 3px var(--theme-accent-light);
   }
 
-  body.dark-mode .search-input::placeholder {
+  body.dark-mode .scenario-controls-toolbar .search-input::placeholder {
     color: var(--theme-text-secondary);
   }
 
@@ -2310,7 +2291,7 @@
   }
 
   @media (width <= 480px) {
-    .filter-container,
+    .scenario-controls-toolbar .filter-container,
     .results-container {
       padding: 0 var(--spacing-4);
     }
@@ -2360,7 +2341,7 @@
 
   /* High contrast mode support */
   @media (prefers-contrast: high) {
-    .search-input,
+    .scenario-controls-toolbar .search-input,
     .filter-btn,
     .sort-btn {
       border-width: 2px;

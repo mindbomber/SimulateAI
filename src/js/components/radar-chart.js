@@ -1141,7 +1141,7 @@ export default class RadarChart {
     switch (this.options.context) {
       case "hero-demo":
         this.container.classList.add(
-          "radar-demo-container",
+          "radar-chart-demo-container",
           "hero-radar-chart",
         );
         logger.info("RadarChart", "Applied hero demo styling classes");
@@ -1163,7 +1163,7 @@ export default class RadarChart {
       default:
         // Fallback to legacy behavior
         if (this.options.isDemo) {
-          this.container.classList.add("radar-demo-container");
+          this.container.classList.add("radar-chart-demo-container");
         } else {
           this.container.classList.add("radar-chart-container");
         }

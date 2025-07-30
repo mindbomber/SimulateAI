@@ -155,7 +155,7 @@
   }
 
   /* Controls group for sort and clear actions */
-  .category-controls-toolbar .controls-group {
+  .category-controls-toolbar .category-controls-group {
     display: flex;
     align-items: center;
     gap: var(--spacing-2);
@@ -373,7 +373,7 @@
       order: 1;
     }
 
-    .category-controls-toolbar .controls-group {
+    .category-controls-toolbar .category-controls-group {
       width: 100%;
       justify-content: space-between;
       order: 2;
@@ -389,7 +389,7 @@
   }
 
   @media (width <= 480px) {
-    .category-controls-toolbar .controls-group {
+    .category-controls-toolbar .category-controls-group {
       flex-direction: column;
       gap: var(--spacing-2);
     }
@@ -820,6 +820,7 @@
 
   /* Controls Group - MOVED TO scenario-browser.css for consolidation */
   /* .controls-group styles now handled by .scenario-controls-toolbar .controls-group */
+  /* Category controls use .category-controls-toolbar .category-controls-group for namespace organization */
 
   /* Filter and Sort Containers - moved to scenario-browser.css for consolidation */
 

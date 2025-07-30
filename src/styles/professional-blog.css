@@ -129,7 +129,7 @@ Clean, minimal, intelligent design for thoughtful discourse
     min-width: 200px;
   }
 
-  .search-input {
+  .filter-section .search-input {
     width: 100%;
     padding: 10px 12px;
     border: 1px solid #ddd;
@@ -139,7 +139,7 @@ Clean, minimal, intelligent design for thoughtful discourse
     transition: all 0.2s ease;
   }
 
-  .search-input:focus {
+  .filter-section .search-input:focus {
     outline: none;
     border-color: #06c;
     background: #fff;
@@ -661,7 +661,7 @@ Clean, minimal, intelligent design for thoughtful discourse
 
   /* Focus Styles for Accessibility */
   .btn-minimal:focus,
-  .search-input:focus,
+  .filter-section .search-input:focus,
   .filter-select:focus,
   .sort-select:focus,
   .article-card:focus {

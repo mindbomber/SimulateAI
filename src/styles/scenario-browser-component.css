@@ -165,7 +165,7 @@
   pointer-events: none;
 }
 
-.search-input {
+.scenario-controls-toolbar .search-input {
   width: 100%;
   padding: var(--spacing-3) var(--spacing-10) var(--spacing-3) 2.75rem;
   border: 1px solid var(--color-gray-300);
@@ -176,13 +176,13 @@
   box-sizing: border-box;
 }
 
-.search-input:focus {
+.scenario-controls-toolbar .search-input:focus {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px var(--color-primary-light);
 }
 
-.search-input::placeholder {
+.scenario-controls-toolbar .search-input::placeholder {
   color: var(--color-gray-500);
 }
 
@@ -365,8 +365,8 @@
 }
 
 /* Emergency override: Show dropdowns on hover for testing */
-.filter-container:hover .filter-dropdown,
-.sort-container:hover .sort-dropdown {
+.scenario-controls-toolbar .filter-container:hover .filter-dropdown,
+.scenario-controls-toolbar .sort-container:hover .sort-dropdown {
   opacity: 1 !important;
   visibility: visible !important;
   transform: translateY(0);
@@ -397,19 +397,19 @@
   background: var(--color-gray-50);
 }
 
-.filter-option.active,
-.sort-option.active {
+.scenario-controls-toolbar .filter-option.active,
+.scenario-controls-toolbar .sort-option.active {
   background: var(--color-primary-50);
   color: var(--color-primary-700);
 }
 
-.filter-option .option-text,
-.sort-option .option-text {
+.scenario-controls-toolbar .filter-option .option-text,
+.scenario-controls-toolbar .sort-option .option-text {
   flex: 1;
 }
 
-.filter-option .check-icon,
-.sort-option .check-icon {
+.scenario-controls-toolbar .filter-option .check-icon,
+.scenario-controls-toolbar .sort-option .check-icon {
   width: 16px;
   height: 16px;
   color: var(--color-primary);
@@ -743,18 +743,18 @@
   border-color: var(--color-gray-600);
 }
 
-[data-theme="dark"] .search-input {
+[data-theme="dark"] .scenario-controls-toolbar .search-input {
   background: var(--color-gray-800);
   border-color: var(--color-gray-600);
   color: var(--color-gray-100);
 }
 
-[data-theme="dark"] .search-input:focus {
+[data-theme="dark"] .scenario-controls-toolbar .search-input:focus {
   border-color: var(--color-primary-400);
   box-shadow: 0 0 0 3px var(--color-primary-900);
 }
 
-[data-theme="dark"] .search-input::placeholder {
+[data-theme="dark"] .scenario-controls-toolbar .search-input::placeholder {
   color: var(--color-gray-400);
 }
 
@@ -820,7 +820,7 @@
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
-  .search-input,
+  .scenario-controls-toolbar .search-input,
   .filter-btn,
   .sort-btn {
     border-width: 2px;
