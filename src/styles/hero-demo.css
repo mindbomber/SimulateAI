@@ -7,17 +7,8 @@
 /* Import media.css for responsive variables */
 @import url("./media.css");
 
-/* Hero Demo Container */
-.hero-demo-container {
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  border-radius: calc(16px * var(--font-scale, 1));
-  padding: var(--container-padding, 16px);
-  box-shadow: 0 10px 25px rgb(0 0 0 / 10%);
-  border: 1px solid rgb(255 255 255 / 20%);
-  max-width: 100%;
-  margin: 0 auto;
-  position: relative; /* Added for absolute positioning of actions */
-}
+/* Hero Demo Container - MOVED TO hero-consolidated.css for semantic ownership */
+/* .hero-demo-container styles moved to hero-consolidated.css */
 
 .demo-header {
   text-align: center;
@@ -257,10 +248,8 @@
 }
 
 /* Ensure demo controls container has relative positioning for popover */
-.hero-demo-controls {
-  position: relative;
-  margin-bottom: 2rem;
-}
+/* Hero Demo Controls - MOVED TO hero-consolidated.css for semantic ownership */
+/* .hero-demo-controls styles moved to hero-consolidated.css */
 
 .demo-controls-grid {
   display: grid;
@@ -348,9 +337,8 @@
 /* .hero-radar-demo p styles moved to radar-chart.css for component ownership */
 
 /* Demo Controls Grid for Better Layout */
-.hero-demo-controls {
-  margin-bottom: 2rem;
-}
+/* Hero Demo Controls - MOVED TO hero-consolidated.css for semantic ownership */
+/* .hero-demo-controls styles moved to hero-consolidated.css */
 
 .demo-controls-grid {
   display: grid;
@@ -363,7 +351,11 @@
 /* Hero Radar Container - Consolidated to radar-chart.css */
 /* .hero-radar-container styles moved to radar-chart.css for component ownership */
 
-/* Accordion Styles for Instructions */
+/* ACCORDION STYLES MOVED TO hero-consolidated.css for semantic ownership */
+/* .radar-instructions-accordion and .ethics-glossary-accordion styles moved to hero-consolidated.css */
+/* These accordions are used in hero sections (app.html lines 514, 564) and belong with hero components */
+
+/* Accordion Styles for Instructions - MOVED TO hero-consolidated.css */
 .radar-instructions-accordion {
   max-width: 600px;
   margin: 1.5rem auto;
@@ -554,75 +546,10 @@
 }
 
 /* Import demo button styles from ethics-analysis.css for consistency */
-.hero-demo-controls .demo-btn {
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-  color: white;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgb(79 70 229 / 25%);
-  position: relative;
-  overflow: hidden;
-  border: 1px solid rgb(255 255 255 / 10%);
-}
+/* Hero Demo Button Styles - MOVED TO hero-consolidated.css for semantic ownership */
+/* .hero-demo-controls .demo-btn styles moved to hero-consolidated.css */
 
-.hero-demo-controls .demo-btn::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgb(255 255 255 / 15%),
-    transparent
-  );
-  transition: left 0.5s ease;
-}
-
-.hero-demo-controls .demo-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgb(79 70 229 / 35%);
-  background: linear-gradient(135deg, #4338ca 0%, #5b21b6 100%);
-}
-
-.hero-demo-controls .demo-btn:hover::before {
-  left: 100%;
-}
-
-.hero-demo-controls .demo-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgb(79 70 229 / 25%);
-}
-
-/* Active/Selected state for demo buttons */
-.hero-demo-controls .demo-btn.active {
-  background: linear-gradient(135deg, #1e40af 0%, #3730a3 100%);
-  box-shadow: 0 4px 16px rgb(30 64 175 / 40%);
-  transform: translateY(-1px);
-  border: 2px solid rgb(255 255 255 / 30%);
-}
-
-.hero-demo-controls .demo-btn.active::before {
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgb(255 255 255 / 25%),
-    transparent
-  );
-}
-
-.hero-demo-controls .demo-btn.active:hover {
-  background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%);
-  box-shadow: 0 6px 20px rgb(30 64 175 / 45%);
-}
-
-/* Ethics Glossary Accordion Styles */
+/* Ethics Glossary Accordion Styles - MOVED TO hero-consolidated.css */
 .ethics-glossary-accordion {
   max-width: 600px;
   margin: 1.5rem auto;
@@ -756,16 +683,8 @@
   }
 }
 
-/* Dark mode support for hero demo */
-body.dark-mode .hero-demo-container {
-  background: linear-gradient(
-    135deg,
-    var(--theme-bg-secondary) 0%,
-    var(--theme-bg-tertiary) 100%
-  );
-  border-color: var(--theme-border);
-  box-shadow: 0 10px 25px var(--theme-shadow);
-}
+/* Dark mode support for hero demo - MOVED TO hero-consolidated.css for semantic ownership */
+/* body.dark-mode .hero-demo-container styles moved to hero-consolidated.css */
 
 body.dark-mode .demo-title {
   color: var(--theme-text-primary);

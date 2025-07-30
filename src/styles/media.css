@@ -383,20 +383,6 @@
     }
   }
 
-  /* Hero-specific responsive enhancements */
-  .hero.layout-container-responsive {
-    /* Ensure hero section adapts to all viewport sizes */
-    padding: calc(var(--container-padding) * 1.5) var(--container-padding);
-    /* Minimum padding for very small screens */
-    padding: max(calc(var(--container-padding) * 1.5), 12px)
-      max(var(--container-padding), 8px);
-    /* Responsive typography scaling */
-    font-size: calc(1rem * var(--font-scale));
-    /* Prevent content overflow */
-    overflow-x: hidden;
-    width: 100%;
-  }
-
   /* Additional responsive container variants */
   .layout-container-tight {
     padding-left: calc(var(--container-padding) * 0.75);
@@ -433,12 +419,6 @@
       font-size: calc(
         1.25rem * var(--font-scale)
       ); /* Smaller headings on tiny screens */
-    }
-
-    .hero.layout-container-responsive .text-responsive-heading {
-      font-size: calc(
-        1.375rem * var(--font-scale)
-      ); /* Hero headings slightly larger */
     }
   }
 
@@ -867,12 +847,6 @@
       padding-right: 6px;
     }
 
-    .hero.layout-container-responsive {
-      /* Reduce hero padding on tiny screens */
-      padding: 8px 6px;
-      min-height: 280px; /* Smaller minimum height */
-    }
-
     .layout-container-tight {
       padding-left: 4px;
       padding-right: 4px;
@@ -881,11 +855,7 @@
 
   /* Landscape mobile adjustments */
   @media only screen and (width <= 667px) and (orientation: landscape) {
-    .hero.layout-container-responsive {
-      /* Adjust hero for landscape mobile */
-      padding: var(--container-padding) calc(var(--container-padding) * 1.25);
-      min-height: 200px; /* Smaller height in landscape */
-    }
+    /* Additional landscape adjustments can be added here for general layout containers */
   }
 
   /* ===== DEBUGGING UTILITIES (Remove in production) ===== */

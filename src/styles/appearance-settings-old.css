@@ -1,0 +1,848 @@
+/**
+ * Copyright 2025 Armando Sori
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Theme & Appearance Settings Styles
+ * Handles dark mode, font sizes, and accessibility options
+ * 
+ * ARCHITECTURE NOTES:
+ * - Uses CSS layers architecture from css-layers.css for proper cascade management
+ * - Theme variables are centralized in design-tokens.css
+ * - Theme overrides placed in @layer overrides for highest specificity
+ * - Component-specific styles in @layer components
+ * - Utilities for accessibility features in @layer utilities
+ * - Eliminates need for !important declarations through proper layer ordering
+ */
+
+/* ===== THEME OVERRIDES - Highest Priority ===== */
+@layer overrides {
+  /* Dark Mode Base Theme Application */
+  body.dark-mode {
+    background-color: var(--theme-bg-primary);
+    color: var(--theme-text-primary);
+  }
+
+  /* Explicit Theme Classes for JavaScript Integration */
+  body.theme-dark {
+    background-color: var(--theme-bg-primary);
+    color: var(--theme-text-primary);
+  }
+
+  body.theme-light {
+    background-color: var(--color-white, #fff);
+    color: var(--color-gray-900, #333);
+  }
+
+  body.theme-high-contrast {
+    background-color: #000;
+    color: #fff;
+  }
+}
+
+/* ===== COMPONENT-SPECIFIC DARK MODE STYLES ===== */
+@layer components {
+  /* Gradient Override Patterns - Component Level */
+  body.dark-mode *[style*="linear-gradient"][style*="var(--color-primary-light)"] {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  }
+
+  /* Hero Section Components */
+  body.dark-mode .hero-section,
+  body.dark-mode *[style*="linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)"],
+  body.dark-mode *[style*="linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)"] {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    color: #fff;
+    border-color: #444;
+  }
+
+  body.dark-mode .hero::before {
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23444444" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    opacity: 0.3;
+  }
+
+  /* Scenario Card Components - Using Theme Variables */
+  body.dark-mode .scenario-card,
+  body.dark-mode .scenarios-grid .scenario-card,
+  body.dark-mode .category-section .scenario-card,
+  body.dark-mode .categories-grid .scenario-card,
+  body.dark-mode .simulations-grid .scenario-card {
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+    color: var(--theme-text-primary);
+    box-shadow: 0 4px 12px var(--theme-shadow);
+  }
+
+  body.dark-mode .scenario-card:hover,
+  body.dark-mode .scenarios-grid .scenario-card:hover,
+  body.dark-mode .category-section .scenario-card:hover,
+  body.dark-mode .categories-grid .scenario-card:hover,
+  body.dark-mode .simulations-grid .scenario-card:hover {
+    background: var(--theme-bg-tertiary);
+    border-color: var(--theme-border-hover);
+    box-shadow: 0 8px 20px var(--theme-shadow-hover);
+  }
+
+  /* Scenario Content */
+  body.dark-mode .scenario-header {
+    background: transparent;
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .scenario-footer {
+    color: var(--theme-text-secondary);
+  }
+
+  /* Scenario Buttons Dark Mode */
+  body.dark-mode .scenario-start-btn,
+  body.dark-mode .scenario-quick-start-btn {
+    background-color: var(--theme-accent);
+    color: var(--theme-text-on-accent);
+    border: 1px solid var(--theme-accent);
+  }
+
+  body.dark-mode .scenario-start-btn:hover,
+  body.dark-mode .scenario-quick-start-btn:hover {
+    background-color: var(--theme-accent-dark);
+    border-color: var(--theme-accent-dark);
+  }
+
+  /* View Toggle Controls Dark Mode */
+  body.dark-mode .view-toggle-controls {
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+  }
+
+  body.dark-mode .view-toggle-btn {
+    color: var(--theme-text-secondary);
+    background: transparent;
+  }
+
+  body.dark-mode .view-toggle-btn:hover {
+    background: var(--theme-bg-tertiary);
+    color: var(--theme-text-primary);
+    box-shadow: 0 4px 12px var(--theme-shadow);
+  }
+
+  body.dark-mode .view-toggle-btn.active {
+    background: var(--theme-bg-tertiary);
+    color: var(--theme-accent);
+    box-shadow: 0 4px 12px var(--theme-shadow);
+  }
+
+  body.dark-mode .view-toggle-btn:focus-visible {
+    outline: 2px solid var(--theme-accent);
+  }
+
+  /* Keyboard Hint Dark Mode */
+  body.dark-mode .keyboard-hint {
+    color: #ccc !important;
+  }
+
+  body.dark-mode .keyboard-hint .hint-text {
+    color: #ccc !important;
+  }
+
+  body.dark-mode kbd {
+    background: #3d3d3d !important;
+    color: #fff !important;
+    border: 1px solid #555 !important;
+    box-shadow: 0 2px 4px rgb(0 0 0 / 30%) !important;
+  }
+
+  /* Font Size Settings - Enhanced with media.css responsive scaling */
+  html.font-size-small {
+    font-size: calc(14px * var(--font-scale, 1)); /* Responsive base size */
+  }
+
+  html.font-size-medium {
+    font-size: calc(16px * var(--font-scale, 1)); /* Responsive base size */
+  }
+
+  html.font-size-large {
+    font-size: calc(18px * var(--font-scale, 1)); /* Responsive base size */
+  }
+
+  html.font-size-extra-large {
+    font-size: calc(20px * var(--font-scale, 1)); /* Responsive base size */
+  }
+
+  /* ===== RESPONSIVE THEMING ENHANCEMENTS ===== */
+
+  /* Device-specific theming adjustments using media.css integration */
+
+  /* Settings Menu Responsive Sizing */
+  body.dark-mode .settings-menu,
+  body.high-contrast .settings-menu {
+    padding: var(--container-padding, 16px);
+    font-size: calc(1rem * var(--font-scale, 1));
+  }
+
+  body.dark-mode .settings-title,
+  body.high-contrast .settings-title {
+    padding-bottom: calc(var(--container-padding, 16px) * 0.5);
+    font-size: calc(1.125rem * var(--font-scale, 1));
+  }
+
+  /* Responsive Touch Targets for Theme Controls */
+  body.dark-mode .toggle-slider,
+  body.high-contrast .toggle-slider {
+    min-width: var(--touch-target-min, 44px);
+    min-height: calc(var(--touch-target-min, 44px) * 0.75);
+  }
+
+  /* Container Responsive Padding */
+  body.dark-mode .container,
+  body.dark-mode .main-container,
+  body.dark-mode .content-container,
+  body.dark-mode .page-container {
+    padding-left: var(--container-padding, 16px);
+    padding-right: var(--container-padding, 16px);
+    background-color: #1a1a1a !important;
+    color: #fff !important;
+  }
+
+  /* Responsive Modal Sizing */
+  body.dark-mode .modal-content {
+    padding: var(--container-padding, 16px);
+    font-size: calc(1rem * var(--font-scale, 1));
+    background-color: var(--background-color, #2d2d2d) !important;
+    color: #fff !important;
+    border-color: var(--border-color, #444) !important;
+  }
+
+  /* Responsive Card Spacing */
+  body.dark-mode .card {
+    padding: var(--container-padding, 16px);
+    margin-bottom: calc(var(--container-padding, 16px) * 0.75);
+    background-color: var(--theme-bg-secondary) !important;
+    border-color: var(--theme-border) !important;
+    color: var(--theme-text-primary) !important;
+  }
+
+  body.dark-mode .card h2,
+  body.dark-mode .card h3,
+  body.dark-mode .card h4 {
+    font-size: calc(1.25rem * var(--font-scale, 1));
+    margin-bottom: calc(var(--container-padding, 16px) * 0.5);
+    color: var(--theme-text-primary) !important;
+  }
+
+  /* ===== END RESPONSIVE THEMING ENHANCEMENTS ===== */
+
+  /* Ensure html element also gets dark background */
+  body.dark-mode html {
+    background-color: #1a1a1a !important;
+  }
+
+  /* Header Dark Mode styles moved to shared-navigation.css for better component architecture */
+
+  /* Blog header (sticky) */
+  body.dark-mode .blog-header {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+    border-bottom-color: #4a9eff !important;
+  }
+
+  /* ===============================================
+   NAVIGATION DARK MODE STYLES MOVED TO shared-navigation.css
+   ===============================================
+   
+   All navigation dark mode styles (.header-content, .header-nav,
+   .nav-links, .nav-container, .nav-brand, .nav-link, .nav-toggle,
+   .dropdown-menu, .dropdown-item, etc.) have been consolidated 
+   into src/styles/shared-navigation.css for better component 
+   architecture and maintainability.
+*/
+
+  /* Main Content Areas Dark Mode */
+  body.dark-mode .hero-section {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+    color: #fff !important;
+    min-height: auto !important;
+    padding: 4rem 0 !important;
+  }
+
+  body.dark-mode .hero-content {
+    background: transparent !important;
+    color: #fff !important;
+  }
+
+  body.dark-mode .hero-section h1 {
+    color: #fff !important;
+  }
+
+  body.dark-mode .hero-section h2 {
+    color: #fff !important;
+  }
+
+  body.dark-mode .hero-section p {
+    color: #ccc !important;
+  }
+
+  /* Fix any potential overlay issues */
+  body.dark-mode .hero-section::after {
+    display: none !important;
+  }
+
+  /* Make sure no dark overlays are interfering */
+  body.dark-mode .hero-section > * {
+    background: transparent !important;
+    z-index: auto !important;
+  }
+
+  body.dark-mode .section {
+    background-color: #1a1a1a !important;
+    color: #fff !important;
+  }
+
+  /* Hero section elements */
+  body.dark-mode .hero-section * {
+    color: inherit !important;
+  }
+
+  body.dark-mode .hero-section .hero-container * {
+    background: transparent !important;
+  }
+
+  body.dark-mode .hero-section .hero-content * {
+    background: transparent !important;
+  }
+
+  /* Hero section specific elements */
+  body.dark-mode .hero-badge {
+    background: linear-gradient(135deg, #4a9eff, #3a8eef) !important;
+    color: #fff !important;
+  }
+
+  body.dark-mode .hero-title {
+    color: #fff !important;
+    background: linear-gradient(135deg, #fff, #4a9eff) !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+  }
+
+  body.dark-mode .hero-description {
+    color: #ccc !important;
+  }
+
+  body.dark-mode .stat-item {
+    background: #2d2d2d !important;
+    color: #fff !important;
+  }
+
+  body.dark-mode .stat-number {
+    color: #4a9eff !important;
+  }
+
+  body.dark-mode .stat-label {
+    color: #ccc !important;
+  }
+
+  body.dark-mode .card p {
+    color: var(--theme-text-secondary) !important;
+  }
+
+  body.dark-mode .btn {
+    background-color: var(--theme-accent) !important;
+    color: var(--theme-text-on-accent) !important;
+    border-color: var(--theme-accent) !important;
+  }
+
+  body.dark-mode .btn:hover {
+    background-color: var(--theme-accent-dark) !important;
+    border-color: var(--theme-accent-dark) !important;
+  }
+
+  body.dark-mode .btn-secondary {
+    background-color: var(--theme-bg-secondary) !important;
+    color: var(--theme-text-primary) !important;
+    border-color: var(--theme-border) !important;
+  }
+
+  body.dark-mode .btn-secondary:hover {
+    background-color: var(--theme-bg-tertiary) !important;
+  }
+
+  body.dark-mode input,
+  body.dark-mode textarea,
+  body.dark-mode select {
+    background-color: var(--theme-bg-secondary) !important;
+    color: var(--theme-text-primary) !important;
+    border-color: var(--theme-border) !important;
+  }
+
+  body.dark-mode input:focus,
+  body.dark-mode textarea:focus,
+  body.dark-mode select:focus {
+    border-color: var(--theme-accent) !important;
+    box-shadow: 0 0 0 2px rgb(74 158 255 / 20%) !important;
+  }
+
+  /* Footer Dark Mode */
+  body.dark-mode .footer {
+    background-color: var(--background-color, #2d2d2d) !important;
+    color: #fff !important;
+    border-top-color: var(--border-color, #444) !important;
+  }
+
+  body.dark-mode .footer a {
+    color: var(--primary-color, #4a9eff) !important;
+  }
+
+  body.dark-mode .footer a:hover {
+    color: #fff !important;
+  }
+
+  /* Dark mode navigation toggle styles moved to shared-navigation.css for component ownership */
+
+  /* Dark mode dropdown styles moved to shared-navigation.css for component ownership */
+
+  /* Tables Dark Mode */
+  body.dark-mode table {
+    background-color: var(--background-color, #2d2d2d) !important;
+    color: #fff !important;
+  }
+
+  body.dark-mode th {
+    background-color: #3d3d3d !important;
+    color: #fff !important;
+    border-color: var(--border-color, #444) !important;
+  }
+
+  body.dark-mode td {
+    border-color: var(--border-color, #444) !important;
+  }
+
+  body.dark-mode tr:hover {
+    background-color: var(--hover-bg, #3d3d3d) !important;
+  }
+
+  /* Modals Dark Mode */
+  body.dark-mode .modal {
+    background-color: rgb(26 26 26 / 80%) !important;
+  }
+
+  body.dark-mode .modal-overlay {
+    background: rgb(0 0 0 / 90%) !important;
+  }
+
+  /* General modal component dark mode styles consolidated to pre-launch-modal.css for component ownership */
+  /* body.dark-mode .modal-container styles moved to pre-launch-modal.css */
+  /* body.dark-mode .modal-header styles moved to pre-launch-modal.css */
+  /* body.dark-mode .modal-footer styles moved to pre-launch-modal.css */
+
+  /* Loading screens */
+  body.dark-mode .loading-enhanced {
+    background: rgb(26 26 26 / 95%) !important;
+  }
+
+  body.dark-mode .loading-container {
+    background: #2d2d2d !important;
+    color: #fff !important;
+  }
+
+  /* Floating Action Tabs Dark Mode */
+  body.dark-mode .floating-action-tab {
+    background-color: var(--background-color, #2d2d2d) !important;
+    color: #fff !important;
+    border-color: var(--border-color, #444) !important;
+  }
+
+  body.dark-mode .floating-action-tab:hover {
+    background-color: var(--hover-bg, #3d3d3d) !important;
+  }
+
+  body.dark-mode .floating-action-tab .icon {
+    color: var(--primary-color, #4a9eff) !important;
+  }
+
+  /* Scrollbar Dark Mode */
+  body.dark-mode::-webkit-scrollbar {
+    background-color: #1a1a1a !important;
+  }
+
+  body.dark-mode::-webkit-scrollbar-thumb {
+    background-color: #555 !important;
+    border-radius: 4px;
+  }
+
+  body.dark-mode::-webkit-scrollbar-thumb:hover {
+    background-color: #666 !important;
+  }
+
+  body.dark-mode::-webkit-scrollbar-track {
+    background-color: #2d2d2d !important;
+  }
+
+  /* Dark mode dropdown styles moved to shared-navigation.css for component ownership */
+
+  body.dark-mode .settings-menu {
+    background-color: #2d2d2d !important;
+    border-color: #444 !important;
+  }
+
+  body.dark-mode .settings-title {
+    color: #fff !important;
+    border-bottom-color: #444 !important;
+  }
+
+  body.dark-mode .toggle-label,
+  body.dark-mode .settings-select-label {
+    color: #fff !important;
+  }
+
+  body.dark-mode .settings-select {
+    background-color: #3d3d3d !important;
+    border-color: #555 !important;
+    color: #fff !important;
+  }
+
+  body.dark-mode .settings-select:focus {
+    border-color: #4a9eff !important;
+  }
+
+  body.dark-mode .toggle-slider {
+    background-color: #555;
+  }
+
+  body.dark-mode
+    .settings-toggle
+    input[type="checkbox"]:checked
+    + .toggle-slider {
+    background: #4a9eff;
+  }
+
+  /* High Contrast Mode */
+  body.high-contrast {
+    background-color: #fff !important;
+    color: #000 !important;
+  }
+
+  /* High contrast navigation styles moved to shared-navigation.css for component ownership */
+
+  body.high-contrast .settings-menu {
+    background-color: #fff !important;
+    color: #000 !important;
+    border-color: #000 !important;
+  }
+
+  body.high-contrast .settings-title {
+    color: #000 !important;
+    border-bottom-color: #000 !important;
+  }
+
+  body.high-contrast .toggle-label,
+  body.high-contrast .settings-select-label {
+    color: #000 !important;
+  }
+
+  body.high-contrast .settings-select {
+    background-color: #fff !important;
+    color: #000 !important;
+    border-color: #000 !important;
+  }
+
+  body.high-contrast .toggle-slider {
+    background-color: #fff !important;
+    border: 2px solid #000 !important;
+  }
+
+  body.high-contrast
+    .settings-toggle
+    input[type="checkbox"]:checked
+    + .toggle-slider {
+    background-color: #000 !important;
+  }
+
+  body.high-contrast
+    .settings-toggle
+    input[type="checkbox"]:checked
+    + .toggle-slider::before {
+    background-color: #fff !important;
+  }
+
+  /* Reduced Motion - Consolidated universal selector moved to design-tokens.css */
+  /* Body-scoped overrides for user preference settings */
+  body.reduced-motion {
+    scroll-behavior: auto !important;
+  }
+
+  /* Large Click Targets - Enhanced with media.css responsive scaling */
+  body.large-click-targets .nav-link {
+    min-height: var(
+      --touch-target-min,
+      48px
+    ); /* Uses media.css touch targets */
+    padding: calc(var(--container-padding, 16px) * 0.75)
+      var(--container-padding, 16px);
+    display: flex;
+    align-items: center;
+  }
+
+  body.large-click-targets .settings-toggle {
+    min-height: var(
+      --touch-target-min,
+      48px
+    ); /* Uses media.css touch targets */
+    padding: calc(var(--container-padding, 16px) * 0.75) 0;
+  }
+
+  body.large-click-targets .toggle-slider {
+    width: calc(56px * var(--font-scale, 1)); /* Responsive toggle width */
+    height: calc(32px * var(--font-scale, 1)); /* Responsive toggle height */
+  }
+
+  body.large-click-targets .toggle-slider::before {
+    width: calc(28px * var(--font-scale, 1)); /* Responsive toggle thumb */
+    height: calc(28px * var(--font-scale, 1)); /* Responsive toggle thumb */
+    top: calc(2px * var(--font-scale, 1));
+    left: calc(2px * var(--font-scale, 1));
+  }
+
+  body.large-click-targets
+    .settings-toggle
+    input[type="checkbox"]:checked
+    + .toggle-slider::before {
+    transform: translateX(
+      calc(24px * var(--font-scale, 1))
+    ); /* Responsive translate */
+  }
+
+  body.large-click-targets .settings-select {
+    min-height: var(
+      --touch-target-min,
+      48px
+    ); /* Uses media.css touch targets */
+    padding: calc(var(--container-padding, 16px) * 0.75)
+      var(--container-padding, 16px);
+  }
+
+  body.large-click-targets .floating-tab-link {
+    min-width: var(
+      --floating-tab-width,
+      72px
+    ); /* Uses media.css floating tab sizes */
+
+    min-height: var(
+      --floating-tab-height,
+      72px
+    ); /* Uses media.css floating tab sizes */
+  }
+
+  /* Manual dark mode only - no system preference detection */
+
+  @media (prefers-reduced-motion: reduce) {
+    body.theme-auto *,
+    body.theme-auto *::before,
+    body.theme-auto *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Focus indicators for accessibility */
+  body.high-contrast *:focus {
+    outline: 3px solid #000 !important;
+    outline-offset: 2px !important;
+  }
+
+  body.dark-mode *:focus {
+    outline: 2px solid #4a9eff !important;
+    outline-offset: 2px !important;
+  }
+
+  /* Ensure settings menu stays visible in all themes */
+  body.dark-mode .settings-menu[style*="display: block"] {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  body.high-contrast .settings-menu[style*="display: block"] {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* Theme System Integration - Relies on CSS Custom Properties Cascade */
+
+  /* Light mode is the default - no overrides needed, rely on :root variables */
+
+  /* This section intentionally removed to prevent CSS specificity conflicts */
+
+  /* Badge Modal Preservation - These need specific handling */
+  .badge-quote,
+  .badge-reason,
+  .badge-timestamp {
+    color: rgb(255 255 255 / 90%);
+  }
+
+  /* ===== MISSING THEME CLASSES FOR HELPERS.JS INTEGRATION ===== */
+
+  /* Explicit Light Theme Class (uses default light theme variables) */
+  body.theme-light {
+    /* Force light theme regardless of system preference */
+    --theme-bg-primary: var(--color-white, #fff);
+    --theme-bg-secondary: var(--color-gray-50, #f8fafc);
+    --theme-bg-tertiary: var(--color-gray-100, #f1f5f9);
+    --theme-text-primary: var(--color-gray-900, #333);
+    --theme-text-secondary: var(--color-gray-600, #666);
+    --theme-text-muted: #9ca3af;
+    --theme-border: var(--color-gray-200, #e2e8f0);
+    --theme-border-hover: var(--color-gray-300, #d1d5db);
+    --theme-shadow: rgb(0 0 0 / 10%);
+    --theme-shadow-hover: rgb(0 0 0 / 15%);
+    --theme-accent: var(--color-primary, #4a9eff);
+    --theme-accent-dark: var(--color-primary-dark, #3a8eef);
+    --theme-text-on-accent: var(--color-white, #fff);
+
+    background-color: #fff !important;
+    color: #333 !important;
+  }
+
+  /* Explicit Dark Theme Class (mirrors body.dark-mode) */
+  body.theme-dark {
+    /* Override theme system variables for dark mode */
+    --theme-bg-primary: #1a1a1a;
+    --theme-bg-secondary: #2d2d2d;
+    --theme-bg-tertiary: #3d3d3d;
+    --theme-text-primary: #fff;
+    --theme-text-secondary: #ccc;
+    --theme-text-muted: #9ca3af;
+    --theme-border: #444;
+    --theme-border-hover: #555;
+    --theme-shadow: rgb(0 0 0 / 40%);
+    --theme-shadow-hover: rgb(0 0 0 / 50%);
+    --theme-accent: #4a9eff;
+    --theme-accent-dark: #3a8eef;
+    --theme-text-on-accent: #fff;
+
+    /* Override main color system variables */
+    --color-white: #1a1a1a;
+    --color-gray-50: #2d2d2d;
+    --color-gray-100: #3d3d3d;
+    --color-gray-200: #444;
+    --color-gray-300: #555;
+    --color-gray-600: #ccc;
+    --color-gray-800: #ccc;
+    --color-gray-900: #fff;
+    --color-primary: #4a9eff;
+    --color-primary-dark: #3a8eef;
+
+    background-color: #1a1a1a !important;
+    color: #fff !important;
+  }
+
+  /* High Contrast Theme Class (enhanced accessibility) */
+  body.theme-high-contrast {
+    /* High contrast theme with maximum accessibility */
+    --theme-bg-primary: #000;
+    --theme-bg-secondary: #111;
+    --theme-bg-tertiary: #222;
+    --theme-text-primary: #fff;
+    --theme-text-secondary: #fff;
+    --theme-text-muted: #ccc;
+    --theme-border: #fff;
+    --theme-border-hover: #ccc;
+    --theme-shadow: rgb(255 255 255 / 20%);
+    --theme-shadow-hover: rgb(255 255 255 / 30%);
+    --theme-accent: #ffff00; /* High contrast yellow */
+    --theme-accent-dark: #ffcc00;
+    --theme-text-on-accent: #000;
+
+    /* Override main color system variables for high contrast */
+    --color-white: #000;
+    --color-gray-50: #111;
+    --color-gray-100: #222;
+    --color-gray-200: #fff;
+    --color-gray-300: #ccc;
+    --color-gray-600: #fff;
+    --color-gray-800: #fff;
+    --color-gray-900: #fff;
+    --color-primary: #ffff00;
+    --color-primary-dark: #ffcc00;
+
+    background-color: #000 !important;
+    color: #fff !important;
+  }
+
+  /* High contrast focus indicators */
+  body.theme-high-contrast *:focus {
+    outline: 4px solid #ffff00 !important;
+    outline-offset: 2px !important;
+    background-color: #ffff00 !important;
+    color: #000 !important;
+  }
+
+  /* High contrast links */
+  body.theme-high-contrast a {
+    color: #ffff00 !important;
+    text-decoration: underline !important;
+  }
+
+  body.theme-high-contrast a:hover,
+  body.theme-high-contrast a:focus {
+    background-color: #ffff00 !important;
+    color: #000 !important;
+  }
+
+  /* ===== REDUCE MOTION CLASS FOR HELPERS.JS INTEGRATION ===== */
+
+  /* Reduce Motion Class (for JavaScript-applied accessibility preference) */
+  .reduce-motion,
+  .reduce-motion *,
+  .reduce-motion *::before,
+  .reduce-motion *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+    transform: none !important;
+  }
+
+  /* Specific element animations to disable */
+  .reduce-motion .fade-in,
+  .reduce-motion .slide-in,
+  .reduce-motion .bounce,
+  .reduce-motion .pulse,
+  .reduce-motion .spin {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  /* Tooltip animations */
+  .reduce-motion .tooltip {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* Modal animations */
+  .reduce-motion .modal,
+  .reduce-motion .modal-backdrop {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* Chart animations */
+  .reduce-motion .chart-animation,
+  .reduce-motion .radar-chart,
+  .reduce-motion .progress-bar {
+    animation: none !important;
+    transition: none !important;
+  }
+} /* End @layer components */

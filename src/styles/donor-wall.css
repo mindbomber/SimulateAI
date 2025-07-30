@@ -1,39 +1,42 @@
-/**
- * Professional Donor Wall Styles
- * Elegant donor appreciation section with carousel, filters, and personalization
+/*
+ * Donor Wall Component Styles
+ * Copyright 2025 Armando Sori - Licensed under Apache License, Version 2.0
+ * 
+ * Utilizes CSS Layers Architecture for better organization
+ * Requires css-layers.css to be loaded first
+ * 
+ * Layer Usage:
+ * - components: Main donor wall component styles
+ * - utilities: Helper classes and responsive utilities
+ * - overrides: Dark mode and theme overrides
  */
 
 @layer components {
-  /* Main Donor Appreciation Section - Higher specificity to override donor-flair-display.css */
-  .donor-appreciation-section.donor-appreciation-section {
-    padding: calc(var(--container-padding, 16px) * 1.5) var(--container-padding, 16px) !important;
+  /* Main Donor Appreciation Section - Uses CSS layers for proper cascade */
+  .donor-appreciation-section {
+    padding: calc(var(--container-padding, 16px) * 1.5)
+      var(--container-padding, 16px);
     background: linear-gradient(
       135deg,
       var(--color-background-subtle) 0%,
       var(--color-background-elevation-1) 50%,
       var(--color-background-subtle) 100%
-    ) !important;
+    );
     position: relative;
     overflow: hidden;
     max-width: 1400px;
-    margin: 0 auto;
+    margin: 24px auto; /* Consolidated margin */
     width: 100%;
     /* Enhanced responsive scaling */
     font-size: calc(1rem * var(--font-scale, 1));
-    border-radius: 12px; /* Match donor-flair-display.css */
-    text-align: center; /* Match donor-flair-display.css */
+    border-radius: 12px;
+    text-align: center;
   }
 
   /* Specific ID selector for enhanced centering */
   #donor-appreciation {
     margin-left: auto;
     margin-right: auto;
-  }
-
-  /* Override donor-flair-display.css margin with higher specificity */
-  #donor-appreciation.donor-appreciation-section {
-    margin: 24px auto !important; /* Reduced from 32px to 24px, !important to override donor-flair */
-    max-width: 1000px; /* Define max-width for auto margins to work */
   }
 
   .donor-appreciation-section::before {
@@ -917,8 +920,8 @@
 
   /* Large Desktop Layout - Wide Screens */
   @media (width >= 1440px) {
-    .donor-appreciation-section.donor-appreciation-section {
-      padding: 3rem 3rem !important;
+    .donor-appreciation-section {
+      padding: 3rem 3rem;
       max-width: 1600px;
     }
 
@@ -945,9 +948,10 @@
 
   /* Responsive Design - Integrated with CSS Custom Properties */
   @media (width <= 768px) {
-    .donor-appreciation-section.donor-appreciation-section {
-      /* Use responsive padding that auto-adjusts per device - !important to override donor-flair */
-      padding: calc(var(--container-padding, 12px) * 2) var(--container-padding, 12px) !important;
+    .donor-appreciation-section {
+      /* Use responsive padding that auto-adjusts per device */
+      padding: calc(var(--container-padding, 12px) * 2)
+        var(--container-padding, 12px);
     }
 
     /* Enhanced mobile centering for ID selector */
@@ -956,7 +960,9 @@
       margin-right: auto;
       /* Ensure responsive width on mobile while maintaining centering */
       width: 100%;
-      max-width: calc(100% - 40px); /* Maintain some margin on very small screens */
+      max-width: calc(
+        100% - 40px
+      ); /* Maintain some margin on very small screens */
     }
 
     .donor-appreciation-section .main-section-title {
@@ -969,12 +975,15 @@
     }
 
     .donor-wall-filters .filter-btn {
-      padding: calc(var(--container-padding, 12px) * 0.4) calc(var(--container-padding, 12px) * 0.8);
+      padding: calc(var(--container-padding, 12px) * 0.4)
+        calc(var(--container-padding, 12px) * 0.8);
       font-size: calc(0.9rem * var(--font-scale, 0.9));
     }
 
     .donor-carousel-container {
-      padding: calc(var(--container-padding, 12px) * 1.5) calc(var(--container-padding, 12px) * 1.2) calc(var(--container-padding, 12px) * 1.2);
+      padding: calc(var(--container-padding, 12px) * 1.5)
+        calc(var(--container-padding, 12px) * 1.2)
+        calc(var(--container-padding, 12px) * 1.2);
       border-radius: 20px;
     }
 
@@ -1082,7 +1091,8 @@
 
   @media (width <= 480px) {
     .donor-carousel-container {
-      padding: calc(var(--container-padding, 8px) * 1.5) var(--container-padding, 8px);
+      padding: calc(var(--container-padding, 8px) * 1.5)
+        var(--container-padding, 8px);
       border-radius: calc(var(--container-padding, 8px) * 1.8);
     }
 
@@ -1096,7 +1106,8 @@
 
     .donor-cards-container {
       gap: var(--container-padding, 8px);
-      padding: var(--container-padding, 8px) calc(var(--container-padding, 8px) * 0.25);
+      padding: var(--container-padding, 8px)
+        calc(var(--container-padding, 8px) * 0.25);
     }
 
     .donor-card {
@@ -1157,7 +1168,10 @@
       border-radius: 14px;
     }
   }
+} /* End @layer components */
 
+/* Responsive and accessibility utilities */
+@layer utilities {
   /* Animation Classes */
   @keyframes slideInFromRight {
     from {
@@ -1175,7 +1189,7 @@
     animation: slideInFromRight 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
 
-  /* Accessibility Enhancements - Use utility classes from media.css */
+  /* Accessibility Enhancements */
   .donor-card.no-motion,
   .carousel-nav.no-motion,
   .filter-btn.no-motion,
@@ -1187,7 +1201,7 @@
     animation: none;
   }
 
-  /* High Contrast Mode - Use utility classes from media.css */
+  /* High Contrast Mode */
   .donor-card.high-contrast-border {
     border-width: 3px;
   }
@@ -1196,6 +1210,7 @@
     border-width: 4px;
   }
 
+  @media (prefers-contrast: high) {
     .filter-btn.active {
       outline: 3px solid var(--color-primary);
     }
@@ -1213,7 +1228,10 @@
     outline: 3px solid var(--color-primary);
     outline-offset: 2px;
   }
+}
 
+/* Dark mode and theme overrides */
+@layer overrides {
   /* Dark mode support for donor wall */
   body.dark-mode .donor-appreciation-section {
     background: linear-gradient(
@@ -1582,4 +1600,4 @@
   body.dark-mode .indicator:focus {
     outline-color: var(--theme-accent);
   }
-} /* End @layer components */
+}

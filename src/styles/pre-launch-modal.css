@@ -254,11 +254,11 @@
 
   /* Pre-launch modal specific tab content rules - show active tabs by default */
   .pre-launch-modal .tab-content {
-    display: block !important; /* Show by default */
+    display: block; /* Show by default */
   }
 
   .pre-launch-modal .tab-content:not(.active) {
-    display: none !important; /* Only hide non-active tabs */
+    display: none; /* Only hide non-active tabs */
   }
 
   /* Overview Tab */
@@ -918,8 +918,8 @@
   /* General modal container dark mode - applies to all modals including pre-launch */
   body.dark-mode .modal-container,
   body.dark-mode .pre-launch-modal {
-    background: #2d2d2d !important;
-    color: #fff !important;
+    background: #2d2d2d;
+    color: #fff;
   }
 
   /* General modal header dark mode - consolidated with pre-launch specific styles */

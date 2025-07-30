@@ -63,15 +63,8 @@
   opacity: 0.3;
 }
 
-/* Donor Appreciation Section */
-.donor-appreciation-section {
-  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-  border-radius: 12px;
-  padding: 16px;
-  margin: 24px auto; /* Reduced from 32px to 24px */
-  max-width: 1000px; /* Define max-width for auto margins to work */
-  text-align: center;
-}
+/* Donor Appreciation Section - Basic fallback styles only */
+/* Main styles are defined in donor-wall.css with CSS layers */
 
 .appreciation-title {
   color: #2c3e50;
@@ -328,6 +321,108 @@
   .donor-card {
     border: 2px solid var(--flair-color, #007bff);
   }
+}
+
+/* Dark Mode Support */
+body.dark-mode .donor-flair-badge.floating {
+  background: var(--theme-bg-secondary, #2d3748);
+  box-shadow: 0 2px 4px var(--theme-shadow, rgb(0 0 0 / 30%));
+}
+
+body.dark-mode .has-donor-flair::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--flair-color, var(--theme-accent, #007bff)),
+    transparent
+  );
+}
+
+body.dark-mode .donor-appreciation-section {
+  background: linear-gradient(
+    135deg,
+    var(--theme-bg-primary, #1a202c),
+    var(--theme-bg-secondary, #2d3748)
+  );
+  color: var(--theme-text-primary, #f7fafc);
+}
+
+body.dark-mode .appreciation-title {
+  color: var(--theme-text-primary, #f7fafc);
+}
+
+body.dark-mode .donor-placeholder {
+  color: var(--theme-text-secondary, #a0aec0);
+}
+
+body.dark-mode .donor-tier-group {
+  background: var(--theme-bg-secondary, #2d3748);
+  box-shadow: 0 2px 8px var(--theme-shadow, rgb(0 0 0 / 20%));
+}
+
+body.dark-mode .tier-title {
+  color: var(--theme-text-primary, #f7fafc);
+}
+
+body.dark-mode .donor-card {
+  background: var(--theme-bg-secondary, #2d3748);
+  border-left-color: var(--flair-color, var(--theme-accent, #007bff));
+}
+
+body.dark-mode .donor-name {
+  color: var(--theme-text-primary, #f7fafc);
+}
+
+body.dark-mode .donor-date {
+  color: var(--theme-text-secondary, #a0aec0);
+}
+
+body.dark-mode .become-supporter {
+  background: var(--theme-bg-secondary, #2d3748);
+}
+
+body.dark-mode .become-supporter p {
+  color: var(--theme-text-secondary, #a0aec0);
+}
+
+body.dark-mode .become-supporter-btn {
+  background: linear-gradient(
+    135deg,
+    var(--theme-accent, #007bff),
+    var(--theme-accent-dark, #0056b3)
+  );
+}
+
+body.dark-mode .become-supporter-btn:hover {
+  background: linear-gradient(
+    135deg,
+    var(--theme-accent-dark, #0056b3),
+    var(--theme-accent-darker, #004085)
+  );
+  box-shadow: 0 4px 12px var(--theme-shadow-accent, rgb(0 123 255 / 40%));
+}
+
+body.dark-mode .nav-link.has-donor-flair::before {
+  border-color: var(--theme-bg-secondary, #2d3748);
+}
+
+body.dark-mode .profile-header .has-donor-flair {
+  background: linear-gradient(
+    135deg,
+    var(--theme-bg-secondary, #2d3748),
+    var(--theme-bg-tertiary, #4a5568)
+  );
+  color: var(--theme-text-primary, #f7fafc);
+}
+
+body.dark-mode .comment-author.has-donor-flair,
+body.dark-mode .forum-post-author.has-donor-flair {
+  background: linear-gradient(
+    135deg,
+    rgb(var(--theme-accent-rgb, 0 123 255) / 15%),
+    rgb(var(--theme-accent-dark-rgb, 0 86 179) / 15%)
+  );
+  color: var(--theme-text-primary, #f7fafc);
 }
 
 /* Print Styles */

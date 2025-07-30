@@ -2,6 +2,9 @@
  * Radar Chart Component Styles
  * Styling for ethical impact visualization charts
  * Consolidated from hero-demo.css, ethics-analysis.css, appearance-settings.css, and scenario-modal.css
+ * 
+ * NOTE: .hero-radar-chart styles have been moved to hero-consolidated.css for true hero consolidation
+ * This file now focuses on general radar charts and scenario-specific contexts
  */
 
 @layer components {
@@ -52,7 +55,6 @@
 
   /* Base theme class modifications for radar charts */
   .radar-chart-container.theme-light,
-  .hero-radar-chart.theme-light,
   .radar-chart-scenario.theme-light {
     background-color: var(--radar-theme-light-background, #ffffff);
     border-color: var(--radar-theme-light-border, #e2e8f0);
@@ -60,7 +62,6 @@
   }
 
   .radar-chart-container.theme-dark,
-  .hero-radar-chart.theme-dark,
   .radar-chart-scenario.theme-dark {
     background-color: var(--radar-theme-dark-background, #1a1a1a);
     border-color: var(--radar-theme-dark-border, #444444);
@@ -68,7 +69,6 @@
   }
 
   .radar-chart-container.theme-high-contrast,
-  .hero-radar-chart.theme-high-contrast,
   .radar-chart-scenario.theme-high-contrast {
     background-color: var(--radar-theme-high-contrast-background, #000000);
     border-color: var(--radar-theme-high-contrast-border, #ffffff);
@@ -372,35 +372,6 @@
   }
 
   /* ===== CONTEXT-SPECIFIC RADAR CHART CONTAINERS ===== */
-
-  /* Hero demo context radar chart */
-  .hero-radar-chart {
-    position: relative;
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 2rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 20px;
-    box-shadow:
-      0 8px 32px rgb(102 126 234 / 25%),
-      0 4px 16px rgb(0 0 0 / 10%);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid rgb(255 255 255 / 20%);
-  }
-
-  .hero-radar-chart:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow:
-      0 12px 48px rgb(102 126 234 / 35%),
-      0 8px 24px rgb(0 0 0 / 15%);
-  }
-
-  .hero-radar-chart canvas {
-    border-radius: 12px;
-    background: rgb(255 255 255 / 95%);
-    backdrop-filter: blur(10px);
-  }
 
   /* Scenario modal context radar chart */
   .scenario-radar-chart {
@@ -791,12 +762,6 @@
     }
 
     /* Context-specific mobile responsive styles */
-    .hero-radar-chart {
-      padding: 1.5rem;
-      max-width: 100%;
-      margin: 0.5rem;
-    }
-
     .scenario-radar-chart {
       padding: 1rem;
       max-width: 100%;
@@ -850,11 +815,6 @@
     }
 
     /* Context-specific small mobile styles */
-    .hero-radar-chart {
-      padding: 1rem;
-      border-radius: 12px;
-    }
-
     .scenario-radar-chart {
       padding: 0.75rem;
       border-radius: 8px;

@@ -4603,17 +4603,13 @@ class MainGrid {
     const scenariosContainer = this.scenarioContainer;
     if (!scenariosContainer) return;
 
-    // Clear existing scenario cards (but keep the toolbar) - Use batched removal
+    // Clear existing scenario cards (but keep the toolbar) - Use immediate removal for count elements
     const existingCards = scenariosContainer.querySelectorAll(
       ".scenario-card-wrapper, .scenario-card, .no-scenarios-message, .scenario-count",
     );
 
-    // Batch element removal for better performance
-    if (existingCards.length > 0) {
-      this.scheduleDOMUpdate(() => {
-        existingCards.forEach((card) => card.remove());
-      });
-    }
+    // Remove elements immediately to prevent duplicates
+    existingCards.forEach((card) => card.remove());
 
     if (this.filteredScenarios.length === 0) {
       // Create no results message using batched element creation
@@ -4633,19 +4629,15 @@ class MainGrid {
       return;
     }
 
-    // Create scenario count display using batched element creation
-    const countData = [
-      {
-        tagName: "div",
-        className: "scenario-count",
-        innerHTML: `
-        <p class="count-text">Showing <span class="count-number">${this.filteredScenarios.length}</span> of ${this.allScenarios.length} scenarios</p>
-      `,
-      },
-    ];
+    // Create scenario count display immediately to prevent duplicates
+    const countElement = document.createElement("div");
+    countElement.className = "scenario-count";
+    countElement.innerHTML = `
+      <p class="count-text">Showing <span class="count-number">${this.filteredScenarios.length}</span> of ${this.allScenarios.length} scenarios</p>
+    `;
 
-    // First add the count element
-    this.batchCreateElements(countData, scenariosContainer);
+    // Add the count element immediately
+    scenariosContainer.appendChild(countElement);
 
     // Render scenarios using batched creation
     const scenarioElements = await Promise.all(
