@@ -31,11 +31,6 @@
     border-bottom: 1px solid var(--color-gray-200);
   }
 
-  [data-theme="dark"] .category-header {
-    background: var(--color-gray-900);
-    border-bottom-color: var(--color-gray-700);
-  }
-
   /* ===== CATEGORY HEADER LAYOUT ===== */
   .category-title-group {
     display: flex;
@@ -69,19 +64,11 @@
     line-height: var(--line-height-tight);
   }
 
-  [data-theme="dark"] .category-title {
-    color: var(--color-gray-100);
-  }
-
   .category-description {
     font-size: var(--font-size-base);
     color: var(--color-gray-600);
     line-height: var(--line-height-relaxed);
     margin: 0 0 var(--spacing-2) 0;
-  }
-
-  [data-theme="dark"] .category-description {
-    color: var(--color-gray-300);
   }
 
   /* ===== CATEGORY METADATA ===== */
@@ -123,19 +110,22 @@
     color: var(--color-white);
   }
 
-  [data-theme="dark"] .category-difficulty.difficulty-beginner {
+  body.theme-dark .category-difficulty.difficulty-beginner,
+  body.dark-mode .category-difficulty.difficulty-beginner {
     background: var(--color-success);
     color: var(--color-white);
     opacity: 0.8;
   }
 
-  [data-theme="dark"] .category-difficulty.difficulty-intermediate {
+  body.theme-dark .category-difficulty.difficulty-intermediate,
+  body.dark-mode .category-difficulty.difficulty-intermediate {
     background: var(--color-warning);
     color: var(--color-white);
     opacity: 0.8;
   }
 
-  [data-theme="dark"] .category-difficulty.difficulty-advanced {
+  body.theme-dark .category-difficulty.difficulty-advanced,
+  body.dark-mode .category-difficulty.difficulty-advanced {
     background: var(--color-error);
     color: var(--color-white);
     opacity: 0.8;
@@ -148,8 +138,10 @@
     font-weight: var(--font-weight-medium);
   }
 
-  [data-theme="dark"] .category-time,
-  [data-theme="dark"] .category-progress-text {
+  body.theme-dark .category-time,
+  body.dark-mode .category-time,
+  body.theme-dark .category-progress-text,
+  body.dark-mode .category-progress-text {
     color: var(--color-gray-400);
   }
 
@@ -215,7 +207,8 @@
     transition: all var(--transition-base);
   }
 
-  [data-theme="dark"] .progress-percentage {
+  body.theme-dark .progress-percentage,
+  body.dark-mode .progress-percentage {
     color: var(--color-gray-300);
   }
 
@@ -241,9 +234,8 @@
     }
   }
 
-  [data-theme="dark"]
-    .category-progress-ring.pulse-for-badge
-    .progress-percentage {
+  body.theme-dark .category-progress-ring.pulse-for-badge .progress-percentage,
+  body.dark-mode .category-progress-ring.pulse-for-badge .progress-percentage {
     color: var(--progress-pulse-color, var(--color-accent-400));
     text-shadow: 0 0 6px var(--progress-pulse-color, var(--color-accent-400));
     animation: text-glow-dark-fluid 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -404,7 +396,8 @@
     will-change: transform, opacity;
   }
 
-  [data-theme="dark"] .scenario-hover-category-header {
+  body.theme-dark .scenario-hover-category-header,
+  body.dark-mode .scenario-hover-category-header {
     background: rgb(31 41 55 / 98%);
     border-color: var(--color-gray-600);
   }
@@ -490,12 +483,14 @@
     }
   }
 
-  [data-theme="dark"] .progress-ring-tooltip {
+  body.theme-dark .progress-ring-tooltip,
+  body.dark-mode .progress-ring-tooltip {
     background: var(--color-gray-800);
     border-color: var(--color-gray-600);
   }
 
-  [data-theme="dark"] .progress-ring-tooltip::before {
+  body.theme-dark .progress-ring-tooltip::before,
+  body.dark-mode .progress-ring-tooltip::before {
     border-bottom-color: var(--color-gray-800);
   }
 
@@ -663,7 +658,8 @@
       color: #fff;
     }
 
-    [data-theme="dark"] .progress-ring-tooltip {
+    body.theme-dark .progress-ring-tooltip,
+    body.dark-mode .progress-ring-tooltip {
       background: #fff;
       color: #000;
     }
@@ -687,7 +683,7 @@
    ✅ Badge alert pulse animations (.pulse-for-badge, .badge-alert)
    ✅ Progress ring tooltips (.progress-ring-tooltip)
    ✅ Scenario hover category headers (.scenario-hover-category-header)
-   ✅ Dark theme support ([data-theme="dark"])
+   ✅ Dark theme support (body.theme-dark, body.dark-mode)
    ✅ Responsive design (mobile/tablet breakpoints)
    ✅ Touch device support (hover: none)
    ✅ Accessibility features (reduced motion, high contrast)

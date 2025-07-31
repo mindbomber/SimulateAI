@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Navigation Theme Test</title>
+
+    <!-- Early theme initialization -->
+    <script src="./src/js/utils/early-theme-init.js"></script>
+
+    <!-- Design tokens and styles -->
+    <link rel="stylesheet" href="./src/styles/design-tokens.css" />
+    <link rel="stylesheet" href="./src/styles/shared-navigation.css" />
+
+    <style>
+      body {
+        background: var(--theme-bg-primary);
+        color: var(--theme-text-primary);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        transition:
+          background-color 0.3s ease,
+          color 0.3s ease;
+      }
+
+      .test-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: var(--theme-bg-secondary);
+        border-radius: 12px;
+        border: 1px solid var(--theme-border-primary);
+      }
+
+      .theme-controls {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        padding: 15px;
+        background: var(--theme-bg-tertiary);
+        border-radius: 8px;
+      }
+
+      .theme-btn {
+        padding: 8px 16px;
+        border: 1px solid var(--theme-border-primary);
+        background: var(--theme-bg-interactive);
+        color: var(--theme-text-primary);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .theme-btn:hover {
+        background: var(--theme-accent-primary);
+        color: var(--theme-text-inverse);
+      }
+
+      .theme-btn.active {
+        background: var(--theme-accent-primary);
+        color: var(--theme-text-inverse);
+        font-weight: 600;
+      }
+
+      .navigation-test {
+        margin: 20px 0;
+        padding: 15px;
+        background: var(--theme-bg-tertiary);
+        border-radius: 8px;
+        border-left: 4px solid var(--theme-accent-primary);
+      }
+
+      .main-nav {
+        background: var(--nav-bg-primary, rgba(255, 255, 255, 0.85));
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid var(--theme-border-primary);
+        margin: 10px 0;
+        transition: background-color 0.3s ease;
+      }
+
+      .nav-link {
+        color: var(--nav-text-color, #6366f1);
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+        display: inline-block;
+        margin: 0 0.5rem;
+      }
+
+      .nav-link:hover {
+        background: var(--nav-bg-hover, rgba(248, 250, 252, 0.8));
+        color: var(--nav-text-hover, #4f46e5);
+      }
+
+      .debug-info {
+        margin-top: 20px;
+        padding: 15px;
+        background: var(--theme-bg-tertiary);
+        border-radius: 8px;
+        font-family: monospace;
+        font-size: 14px;
+      }
+
+      .debug-info h4 {
+        margin-top: 0;
+        color: var(--theme-text-primary);
+      }
+
+      .debug-info p {
+        margin: 5px 0;
+        color: var(--theme-text-secondary);
+      }
+
+      .style-indicator {
+        padding: 5px 10px;
+        border-radius: 4px;
+        margin: 5px 0;
+        font-weight: bold;
+      }
+
+      .inline-styles {
+        background: #ff6b6b;
+        color: white;
+      }
+
+      .css-styles {
+        background: #51cf66;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🧪 Navigation Theme Test</h1>
+
+      <div class="theme-controls">
+        <button
+          class="theme-btn"
+          onclick="setTheme('light')"
+          data-theme="light"
+        >
+          ☀️ Light
+        </button>
+        <button class="theme-btn" onclick="setTheme('dark')" data-theme="dark">
+          🌙 Dark
+        </button>
+        <button
+          class="theme-btn"
+          onclick="setTheme('system')"
+          data-theme="system"
+        >
+          🖥️ System
+        </button>
+      </div>
+
+      <div class="navigation-test">
+        <h3>Navigation Test Area</h3>
+        <p>
+          This simulates the .main-nav element. It should change colors properly
+          with the theme without unwanted inline styles.
+        </p>
+
+        <nav class="main-nav">
+          <a href="#" class="nav-link">Home</a>
+          <a href="#" class="nav-link">About</a>
+          <a href="#" class="nav-link">Services</a>
+          <a href="#" class="nav-link">Contact</a>
+        </nav>
+      </div>
+
+      <div class="navigation-test ethics-demo-section">
+        <h3>Ethics Demo Section Test</h3>
+        <p>
+          This simulates the .ethics-demo-section element. It should also change
+          properly without unwanted inline styles.
+        </p>
+
+        <div class="demo-section-title">Ethics Demo Title</div>
+        <div class="demo-section-description">
+          This is a demo description that should adapt to the theme.
+        </div>
+        <div class="demo-controls-panel">Demo Controls Panel</div>
+        <div class="radar-chart-panel">Radar Chart Panel</div>
+
+        <div class="accordion-item">
+          <div class="accordion-header">Accordion Header</div>
+          <div class="accordion-content-inner">Accordion Content</div>
+        </div>
+      </div>
+
+      <div class="debug-info">
+        <h4>Debug Information:</h4>
+        <p><strong>Current Theme:</strong> <span id="current-theme">-</span></p>
+        <p><strong>Body Classes:</strong> <span id="body-classes">-</span></p>
+        <p>
+          <strong>System Preference:</strong> <span id="system-pref">-</span>
+        </p>
+        <p>
+          <strong>Nav Background Source:</strong>
+          <span id="nav-bg-source">-</span>
+        </p>
+
+        <div id="style-indicators"></div>
+      </div>
+
+      <h2>Test Instructions:</h2>
+      <ol>
+        <li>Switch between Light, Dark, and System themes</li>
+        <li>Check that the navigation background changes appropriately</li>
+        <li>
+          Verify that NO inline styles (element.style) are applied in light mode
+        </li>
+        <li>Confirm that dark mode styles are only applied when appropriate</li>
+      </ol>
+    </div>
+
+    <script>
+      function setTheme(theme) {
+        console.log(`🎨 Setting theme to: ${theme}`);
+
+        // Store preference
+        localStorage.setItem("simulateai_theme_preference", theme);
+
+        // Apply theme using same logic as settings manager
+        applyThemeChoice(theme);
+
+        // Update debug info
+        updateDebugInfo();
+        updateActiveButton(theme);
+      }
+
+      function applyThemeChoice(themeChoice) {
+        const body = document.body;
+        const systemPrefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)",
+        ).matches;
+
+        // Remove all theme classes
+        body.classList.remove(
+          "theme-light",
+          "theme-dark",
+          "theme-system",
+          "dark-mode",
+        );
+
+        // Add theme class for user's choice
+        body.classList.add(`theme-${themeChoice}`);
+
+        if (themeChoice === "dark") {
+          body.classList.add("dark-mode");
+        } else if (themeChoice === "light") {
+          // Light mode - no dark-mode class needed
+          // Also clear any inline styles that might be lingering
+          clearDarkModeInlineStyles();
+        } else if (themeChoice === "system") {
+          // Follow system preference
+          const shouldBeDark = systemPrefersDark;
+          body.classList.toggle("dark-mode", shouldBeDark);
+          if (!shouldBeDark) {
+            clearDarkModeInlineStyles();
+          }
+        }
+
+        console.log(
+          `🎨 Theme applied: ${themeChoice}${themeChoice === "system" ? ` (system: ${systemPrefersDark ? "dark" : "light"})` : ""}`,
+        );
+      }
+
+      function clearDarkModeInlineStyles() {
+        // Clear the main navigation inline styles
+        const mainNav = document.querySelector(".main-nav");
+        if (mainNav) {
+          mainNav.style.removeProperty("background-color");
+          mainNav.style.removeProperty("backgroundColor");
+          console.log("🧹 Cleared main-nav inline styles");
+        }
+
+        // Clear ethics demo section inline styles
+        const ethicsDemo = document.querySelector(".ethics-demo-section");
+        if (ethicsDemo) {
+          ethicsDemo.style.removeProperty("background");
+          ethicsDemo.style.removeProperty("border-color");
+          ethicsDemo.style.removeProperty("color");
+
+          // Clear nested elements
+          const nestedElements = ethicsDemo.querySelectorAll("*");
+          nestedElements.forEach((el) => {
+            el.style.removeProperty("background");
+            el.style.removeProperty("background-color");
+            el.style.removeProperty("color");
+            el.style.removeProperty("border-color");
+          });
+          console.log("🧹 Cleared ethics-demo-section inline styles");
+        }
+      }
+
+      function updateDebugInfo() {
+        const currentTheme =
+          localStorage.getItem("simulateai_theme_preference") || "system";
+        const bodyClasses = document.body.className || "none";
+        const systemPref = window.matchMedia("(prefers-color-scheme: dark)")
+          .matches
+          ? "dark"
+          : "light";
+
+        const mainNav = document.querySelector(".main-nav");
+        const computedStyle = window.getComputedStyle(mainNav);
+        const inlineStyle = mainNav.style.backgroundColor;
+
+        document.getElementById("current-theme").textContent = currentTheme;
+        document.getElementById("body-classes").textContent = bodyClasses;
+        document.getElementById("system-pref").textContent = systemPref;
+
+        // Check source of background color
+        let bgSource = "CSS";
+        if (inlineStyle) {
+          bgSource = `INLINE STYLE: ${inlineStyle}`;
+        }
+        document.getElementById("nav-bg-source").textContent = bgSource;
+
+        // Update style indicators
+        const indicators = document.getElementById("style-indicators");
+        indicators.innerHTML = "";
+
+        // Check main nav styles
+        if (inlineStyle) {
+          const indicator = document.createElement("div");
+          indicator.className = "style-indicator inline-styles";
+          indicator.textContent = `⚠️ NAV INLINE STYLE: ${inlineStyle}`;
+          indicators.appendChild(indicator);
+        } else {
+          const indicator = document.createElement("div");
+          indicator.className = "style-indicator css-styles";
+          indicator.textContent = `✅ Nav using CSS styles (computed: ${computedStyle.backgroundColor})`;
+          indicators.appendChild(indicator);
+        }
+
+        // Check ethics demo styles
+        const ethicsDemo = document.querySelector(".ethics-demo-section");
+        if (ethicsDemo) {
+          const ethicsInlineStyle =
+            ethicsDemo.style.background || ethicsDemo.style.backgroundColor;
+          if (ethicsInlineStyle) {
+            const indicator = document.createElement("div");
+            indicator.className = "style-indicator inline-styles";
+            indicator.textContent = `⚠️ ETHICS DEMO INLINE STYLE: ${ethicsInlineStyle}`;
+            indicators.appendChild(indicator);
+          } else {
+            const indicator = document.createElement("div");
+            indicator.className = "style-indicator css-styles";
+            indicator.textContent = `✅ Ethics demo using CSS styles`;
+            indicators.appendChild(indicator);
+          }
+        }
+      }
+
+      function updateActiveButton(activeTheme) {
+        document.querySelectorAll(".theme-btn").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+
+        const activeBtn = document.querySelector(
+          `[data-theme="${activeTheme}"]`,
+        );
+        if (activeBtn) {
+          activeBtn.classList.add("active");
+        }
+      }
+
+      // Initialize on page load
+      document.addEventListener("DOMContentLoaded", () => {
+        updateDebugInfo();
+
+        const currentTheme =
+          localStorage.getItem("simulateai_theme_preference") || "system";
+        updateActiveButton(currentTheme);
+
+        // Listen for system preference changes
+        window
+          .matchMedia("(prefers-color-scheme: dark)")
+          .addEventListener("change", () => {
+            updateDebugInfo();
+          });
+      });
+
+      // Update debug info every second to catch any changes
+      setInterval(updateDebugInfo, 1000);
+    </script>
+  </body>
+</html>

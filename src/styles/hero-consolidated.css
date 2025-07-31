@@ -2012,6 +2012,29 @@
     box-shadow: -4px 4px 8px rgba(255, 255, 255, 0.08);
   }
 
+  /* Dark mode support for hero radar chart canvas */
+  body.dark-mode .hero-radar-chart canvas {
+    background: #333;
+    backdrop-filter: blur(10px);
+  }
+
+  /* Theme-dark support for hero radar chart */
+  body.theme-dark .hero-radar-chart {
+    background: transparent;
+    border-color: none;
+    color: var(--radar-theme-dark-text, #ffffff);
+  }
+
+  body.theme-dark .hero-radar-chart:hover {
+    box-shadow: -4px 4px 8px rgba(255, 255, 255, 0.08);
+  }
+
+  /* Theme-dark support for hero radar chart canvas */
+  body.theme-dark .hero-radar-chart canvas {
+    background: #333;
+    backdrop-filter: blur(10px);
+  }
+
   /* Accessibility overrides */
   @media (prefers-reduced-motion: reduce) {
     .hero-radar-demo,

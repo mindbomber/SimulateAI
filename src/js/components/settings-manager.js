@@ -60,6 +60,10 @@ class SettingsManager {
     this.mutationObserver = null;
     this.styleUpdatePending = false;
 
+    // Theme system: Track system preference and user choice
+    this.systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+    this.themeMediaQuery = null;
+
     this.init();
   }
 
@@ -67,6 +71,9 @@ class SettingsManager {
     if (this.isInitialized) return;
 
     try {
+      // Initialize theme system early to prevent flash of unstyled content
+      this.initializeThemeSystem();
+
       // Load configurations in order
       await this.loadConfigurations();
 
@@ -109,10 +116,140 @@ class SettingsManager {
       );
     } catch (error) {
       console.error("Settings Manager initialization failed:", error);
+
+      // Ensure basic theme functionality even if settings fail
+      this.applyFallbackTheme();
+
       // Fallback to hardcoded defaults
       this.settings = this.getFallbackSettings();
       this.isInitialized = true;
     }
+  }
+
+  /**
+   * Initialize theme system early to prevent FOUC (Flash of Unstyled Content)
+   * This method should run before settings are loaded to apply system preference
+   */
+  initializeThemeSystem() {
+    // Check for stored user preference first
+    const storedTheme = localStorage.getItem("simulateai_theme_preference");
+
+    if (storedTheme && ["light", "dark", "system"].includes(storedTheme)) {
+      // User has made an explicit choice - apply it immediately
+      this.applyThemeChoice(storedTheme);
+    } else {
+      // No explicit choice - respect system preference
+      this.applySystemTheme();
+    }
+
+    // Listen for system preference changes
+    this.setupSystemThemeListener();
+  }
+
+  /**
+   * Apply user's explicit theme choice
+   */
+  applyThemeChoice(themeChoice) {
+    const body = document.body;
+
+    // Remove all theme classes
+    body.classList.remove(
+      "theme-light",
+      "theme-dark",
+      "theme-system",
+      "dark-mode",
+    );
+
+    // Add theme class for user's choice
+    body.classList.add(`theme-${themeChoice}`);
+
+    if (themeChoice === "dark") {
+      body.classList.add("dark-mode");
+    } else if (themeChoice === "light") {
+      // Light mode - no dark-mode class needed
+    } else if (themeChoice === "system") {
+      // Follow system preference
+      const prefersDark = this.systemPrefersDark.matches;
+      body.classList.toggle("dark-mode", prefersDark);
+    }
+
+    // Store the preference
+    localStorage.setItem("simulateai_theme_preference", themeChoice);
+
+    console.log(
+      `🎨 Theme applied: ${themeChoice}${themeChoice === "system" ? ` (system: ${this.systemPrefersDark.matches ? "dark" : "light"})` : ""}`,
+    );
+  }
+
+  /**
+   * Apply system theme preference (no user choice stored)
+   */
+  applySystemTheme() {
+    const body = document.body;
+    const prefersDark = this.systemPrefersDark.matches;
+
+    // Remove explicit theme classes, keep system as default
+    body.classList.remove("theme-light", "theme-dark");
+    body.classList.add("theme-system");
+
+    // Apply dark mode based on system preference
+    body.classList.toggle("dark-mode", prefersDark);
+
+    console.log(`🎨 System theme applied: ${prefersDark ? "dark" : "light"}`);
+  }
+
+  /**
+   * Setup listener for system theme preference changes
+   */
+  setupSystemThemeListener() {
+    this.systemPrefersDark.addEventListener("change", (e) => {
+      // Only respond to system changes if user hasn't made an explicit choice
+      // or if user chose 'system' mode
+      const storedTheme = localStorage.getItem("simulateai_theme_preference");
+
+      if (!storedTheme || storedTheme === "system") {
+        const body = document.body;
+        body.classList.toggle("dark-mode", e.matches);
+        console.log(`🎨 System theme changed: ${e.matches ? "dark" : "light"}`);
+
+        // Trigger any theme-dependent updates
+        this.onThemeChange(e.matches ? "dark" : "light");
+      }
+    });
+  }
+
+  /**
+   * Apply fallback theme in case of errors
+   */
+  applyFallbackTheme() {
+    // Just apply system preference as fallback
+    this.applySystemTheme();
+  }
+
+  /**
+   * Handle theme changes - update dependent components
+   */
+  onThemeChange(themeName) {
+    // Update dark mode dependent components based on current theme
+    if (this.isInitialized) {
+      setTimeout(() => {
+        if (document.body.classList.contains("dark-mode")) {
+          // Apply dark mode styles
+          this.forceDarkModeComponents();
+        } else {
+          // Clear any dark mode inline styles for light theme
+          this.clearDarkModeInlineStyles();
+        }
+        this.updateAppearanceCustomization();
+      }, 100);
+    }
+
+    // Dispatch theme change event for other components
+    window.dispatchEvent(
+      new CustomEvent("themeChanged", {
+        detail: { theme: themeName, isDark: themeName === "dark" },
+      }),
+    );
   }
 
   /**
@@ -246,6 +383,143 @@ class SettingsManager {
     elements.forEach((element) => {
       element.style.cssText += `; ${cssText}`;
     });
+  }
+
+  /**
+   * Clear dark mode inline styles when switching to light mode
+   * This removes any element.style properties that were applied by forceDarkModeComponents()
+   */
+  clearDarkModeInlineStyles() {
+    // Clear navigation styles
+    const mainNav = this.getCachedElement(".main-nav");
+    if (mainNav) {
+      mainNav.style.removeProperty("background-color");
+      mainNav.style.removeProperty("backgroundColor");
+    }
+
+    // Clear radar chart styles
+    const radarCharts = this.getCachedElements(".radar-chart-container");
+    radarCharts.forEach((chart) => {
+      chart.style.removeProperty("background");
+      chart.style.removeProperty("border-color");
+      chart.style.removeProperty("color");
+      chart.style.removeProperty("box-shadow");
+    });
+
+    // Clear hero demo styles
+    const heroRadarDemos = this.getCachedElements(".hero-radar-demo");
+    heroRadarDemos.forEach((demo) => {
+      demo.style.removeProperty("background");
+      demo.style.removeProperty("border-color");
+      demo.style.removeProperty("color");
+
+      // Clear nested elements
+      const h3 = demo.querySelector("h3");
+      const p = demo.querySelector("p");
+      if (h3) {
+        h3.style.removeProperty("color");
+        h3.style.removeProperty("background");
+        h3.style.removeProperty("-webkit-background-clip");
+        h3.style.removeProperty("-webkit-text-fill-color");
+        h3.style.removeProperty("background-clip");
+      }
+      if (p) {
+        p.style.removeProperty("color");
+      }
+    });
+
+    // Clear ethics demo section styles
+    const ethicsDemoSections = this.getCachedElements(".ethics-demo-section");
+    ethicsDemoSections.forEach((section) => {
+      section.style.removeProperty("background");
+      section.style.removeProperty("border-color");
+      section.style.removeProperty("color");
+
+      // Clear nested elements
+      const title = section.querySelector(".demo-section-title");
+      const description = section.querySelector(".demo-section-description");
+      const controlsPanel = section.querySelector(".demo-controls-panel");
+      const radarPanel = section.querySelector(".radar-chart-panel");
+      const accordions = section.querySelectorAll(".accordion-item");
+
+      if (title) {
+        title.style.removeProperty("color");
+        title.style.removeProperty("background");
+        title.style.removeProperty("-webkit-background-clip");
+        title.style.removeProperty("-webkit-text-fill-color");
+        title.style.removeProperty("background-clip");
+      }
+      if (description) {
+        description.style.removeProperty("color");
+      }
+      if (controlsPanel) {
+        controlsPanel.style.removeProperty("background");
+        controlsPanel.style.removeProperty("border-color");
+        controlsPanel.style.removeProperty("color");
+      }
+      if (radarPanel) {
+        radarPanel.style.removeProperty("background");
+        radarPanel.style.removeProperty("border-color");
+      }
+
+      // Clear accordion items
+      accordions.forEach((accordion) => {
+        accordion.style.removeProperty("background");
+        accordion.style.removeProperty("border-color");
+        const header = accordion.querySelector(".accordion-header");
+        const content = accordion.querySelector(".accordion-content-inner");
+        if (header) {
+          header.style.removeProperty("background");
+          header.style.removeProperty("color");
+        }
+        if (content) {
+          content.style.removeProperty("color");
+        }
+      });
+    });
+
+    // Clear scenario card styles
+    const scenarioCards = this.getCachedElements(".scenario-card");
+    scenarioCards.forEach((card) => {
+      card.style.removeProperty("background");
+      card.style.removeProperty("border-color");
+      card.style.removeProperty("color");
+      card.style.removeProperty("box-shadow");
+
+      // Clear nested elements
+      const nestedElements = card.querySelectorAll("*");
+      nestedElements.forEach((el) => {
+        el.style.removeProperty("background");
+        el.style.removeProperty("background-color");
+        el.style.removeProperty("color");
+        el.style.removeProperty("border");
+        el.style.removeProperty("border-color");
+      });
+    });
+
+    // Clear other component styles
+    const elementsToReset = [
+      ".view-toggle-btn",
+      "kbd",
+      ".nav-link",
+      ".nav-group",
+      ".dropdown-menu",
+      ".dropdown-item",
+    ];
+
+    elementsToReset.forEach((selector) => {
+      const elements = this.getCachedElements(selector);
+      elements.forEach((el) => {
+        el.style.removeProperty("background");
+        el.style.removeProperty("background-color");
+        el.style.removeProperty("color");
+        el.style.removeProperty("border");
+        el.style.removeProperty("border-color");
+        el.style.removeProperty("box-shadow");
+      });
+    });
+
+    console.log("🧹 Cleared dark mode inline styles for light theme");
   }
 
   forceDarkModeComponents() {
@@ -430,10 +704,13 @@ class SettingsManager {
       // 2. Load user preferences from storage (DataHandler-first)
       const storedSettings = await this.loadStoredSettings();
 
-      // 3. Merge and validate
-      const mergedSettings = { ...integratedDefaults, ...storedSettings };
+      // 3. Migrate legacy settings
+      const migratedSettings = this.migrateSettingsFormat(storedSettings);
 
-      // 4. Validate constraints and apply overrides
+      // 4. Merge and validate
+      const mergedSettings = { ...integratedDefaults, ...migratedSettings };
+
+      // 5. Validate constraints and apply overrides
       const validatedSettings =
         this.validateAndApplyConstraints(mergedSettings);
 
@@ -442,6 +719,28 @@ class SettingsManager {
       console.error("Settings loading failed:", error);
       return this.getFallbackSettings();
     }
+  }
+
+  /**
+   * Migrate legacy settings format
+   */
+  migrateSettingsFormat(storedSettings) {
+    if (!storedSettings) return storedSettings;
+
+    const migrated = { ...storedSettings };
+
+    // Migrate "auto" to "system" for theme setting
+    if (migrated.theme === "auto" || migrated.appearance_theme === "auto") {
+      if (migrated.theme === "auto") {
+        migrated.theme = "system";
+      }
+      if (migrated.appearance_theme === "auto") {
+        migrated.appearance_theme = "system";
+      }
+      console.log("🔄 Migrated theme setting from 'auto' to 'system'");
+    }
+
+    return migrated;
   }
 
   /**
@@ -673,7 +972,7 @@ class SettingsManager {
         accessibility: { enabled: true },
       },
       ui: {
-        theme: { default: "auto" },
+        theme: { default: "system" },
         fontSize: { default: "medium", options: ["small", "medium", "large"] },
       },
     };
@@ -688,8 +987,8 @@ class SettingsManager {
         appearance: {
           theme: {
             type: "string",
-            default: "auto",
-            options: ["light", "dark", "auto"],
+            default: "system",
+            options: ["light", "dark", "system"],
           },
           fontSize: {
             type: "string",
@@ -918,13 +1217,17 @@ class SettingsManager {
     if (eventElements.themeSelect) {
       eventElements.themeSelect.addEventListener("change", (e) => {
         const oldValue = this.settings.theme;
-        this.settings.theme = e.target.value;
+        const newTheme = e.target.value;
+        this.settings.theme = newTheme;
+
+        // Apply theme immediately using new theme system
+        this.applyThemeChoice(newTheme);
 
         // Track the theme change
         googleAnalytics.trackEvent("settings_change", {
           settingName: "theme",
           oldValue,
-          newValue: e.target.value,
+          newValue: newTheme,
           settingType: "select",
           category: "appearance",
           context: "settings_panel",
@@ -1238,23 +1541,8 @@ class SettingsManager {
     const { body } = document;
     const { documentElement: html } = document;
 
-    // Apply theme
-    body.classList.remove("theme-light", "theme-dark", "theme-auto");
-    body.classList.add(
-      `theme-${this.settings.theme || this.settings.appearance_theme || "auto"}`,
-    );
-
-    // Apply actual theme based on system preference for auto mode
-    const themeValue =
-      this.settings.theme || this.settings.appearance_theme || "auto";
-    if (themeValue === "auto") {
-      const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)",
-      ).matches;
-      body.classList.toggle("dark-mode", prefersDark);
-    } else {
-      body.classList.toggle("dark-mode", themeValue === "dark");
-    }
+    // Apply theme using the new theme system
+    this.applyTheme();
 
     // Apply high contrast mode
     const highContrast =
@@ -1288,13 +1576,39 @@ class SettingsManager {
       html.classList.add(`font-size-${fontSize}`);
     }
 
-    // Force apply dark mode styles if in dark mode
+    // Apply or clear dark mode styles based on current theme
     if (body.classList.contains("dark-mode")) {
       this.forceDarkModeComponents();
+    } else {
+      this.clearDarkModeInlineStyles();
     }
 
     // Update theme-color meta tag
     this.updateMetaTags();
+  }
+
+  /**
+   * Apply theme from settings using the new theme system
+   * This integrates with the early theme initialization
+   */
+  applyTheme() {
+    const themeValue =
+      this.settings.theme || this.settings.appearance_theme || "system";
+
+    // Update stored preference to match settings
+    // Use 'system' instead of 'auto' for consistency
+    const normalizedTheme = themeValue === "auto" ? "system" : themeValue;
+
+    this.applyThemeChoice(normalizedTheme);
+
+    // Trigger theme change events
+    this.onThemeChange(
+      normalizedTheme === "system"
+        ? this.systemPrefersDark.matches
+          ? "dark"
+          : "light"
+        : normalizedTheme,
+    );
   }
 
   /**

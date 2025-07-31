@@ -239,6 +239,9 @@ limitations under the License.
     <!-- 1. Design tokens foundation - MUST LOAD FIRST -->
     <link rel="stylesheet" href="src/styles/design-tokens.css" />
 
+    <!-- 1.1. Early theme initialization - Apply theme immediately to prevent FOUC -->
+    <script src="src/js/utils/early-theme-init.js"></script>
+
     <!-- 2. Media queries foundation -->
     <link rel="stylesheet" href="src/styles/media.css" />
 

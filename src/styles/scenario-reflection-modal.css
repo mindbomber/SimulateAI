@@ -69,16 +69,26 @@
   }
 
   /* Override dark mode styles for reflection modal to maintain laboratory theme */
-  .dark-mode .scenario-reflection-modal .modal-body,
-  .dark-mode .scenario-reflection-modal .modal-dialog,
-  .dark-mode .scenario-reflection-modal .modal-content {
-    background: var(--lab-white) !important;
-    color: var(--lab-charcoal) !important;
-    border-color: var(--lab-gray) !important;
+  body.dark-mode .scenario-reflection-modal .modal-body,
+  body.dark-mode .scenario-reflection-modal .modal-dialog,
+  body.dark-mode .scenario-reflection-modal .modal-content {
+    background: var(--lab-white);
+    color: var(--lab-charcoal);
+    border-color: var(--lab-gray);
+  }
+
+  /* Theme-dark support */
+  body.theme-dark .scenario-reflection-modal .modal-body,
+  body.theme-dark .scenario-reflection-modal .modal-dialog,
+  body.theme-dark .scenario-reflection-modal .modal-content {
+    background: var(--lab-white);
+    color: var(--lab-charcoal);
+    border-color: var(--lab-gray);
   }
 
   /* Ensure laboratory color palette is maintained in dark mode */
-  .dark-mode .scenario-reflection-modal {
+  body.dark-mode .scenario-reflection-modal,
+  body.theme-dark .scenario-reflection-modal {
     --lab-white: #fefefe;
     --lab-light-gray: #f8f9fa;
     --lab-gray: #e2e8f0;
@@ -2567,102 +2577,138 @@
     }
   }
 
-  /* Dark Mode - Manual Toggle Only */
-  .dark-mode .scenario-reflection-content {
-    background: #0f172a !important;
-    color: #f1f5f9 !important;
+  /* Dark Mode - Manual Toggle and System Preference Support */
+  body.dark-mode .scenario-reflection-content,
+  body.theme-dark .scenario-reflection-content {
+    background: var(--theme-bg-primary);
+    color: var(--theme-text-primary);
   }
 
-  .dark-mode .reflection-step-content {
-    background: linear-gradient(135deg, #0f172a, #1e293b) !important;
-    color: #f1f5f9 !important;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+  body.dark-mode .reflection-step-content,
+  body.theme-dark .reflection-step-content {
+    background: var(--theme-bg-secondary);
+    color: var(--theme-text-primary);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
   }
 
-  .dark-mode .reflection-step-content h3,
-  .dark-mode .step-content h3 {
-    color: #f1f5f9 !important;
+  body.dark-mode .reflection-step-content h3,
+  body.dark-mode .step-content h3,
+  body.theme-dark .reflection-step-content h3,
+  body.theme-dark .step-content h3 {
+    color: var(--theme-text-primary);
   }
 
-  .dark-mode .step-description {
-    color: #cbd5e1 !important;
+  body.dark-mode .step-description,
+  body.theme-dark .step-description {
+    color: var(--theme-text-secondary);
   }
 
-  .dark-mode .reflection-progress {
-    background: linear-gradient(135deg, #0f172a, #1e293b, #334155) !important;
-    border-bottom-color: #475569 !important;
+  body.dark-mode .reflection-progress,
+  body.theme-dark .reflection-progress {
+    background: var(--theme-bg-secondary);
+    border-bottom-color: var(--theme-border);
     box-shadow:
       0 1px 2px rgba(0, 0, 0, 0.4),
-      inset 0 1px 0 rgba(96, 165, 250, 0.1) !important;
+      inset 0 1px 0 rgba(96, 165, 250, 0.1);
   }
 
-  .dark-mode .progress-bar {
-    background: #475569 !important;
+  body.dark-mode .progress-bar,
+  body.theme-dark .progress-bar {
+    background: var(--theme-border);
   }
 
-  .dark-mode .progress-fill {
-    background: linear-gradient(90deg, #60a5fa, #3b82f6) !important;
+  body.dark-mode .progress-fill,
+  body.theme-dark .progress-fill {
+    background: linear-gradient(90deg, var(--color-primary), #3b82f6);
   }
 
-  .dark-mode .progress-label {
-    color: #f1f5f9 !important;
+  body.dark-mode .progress-label,
+  body.theme-dark .progress-label {
+    color: var(--theme-text-primary);
   }
 
-  .dark-mode .progress-text {
-    color: #cbd5e1 !important;
+  body.dark-mode .progress-text,
+  body.theme-dark .progress-text {
+    color: var(--theme-text-secondary);
   }
 
-  .dark-mode .step-indicator {
-    background: #334155 !important;
-    border-color: #475569 !important;
-    color: #cbd5e1 !important;
+  body.dark-mode .step-indicator,
+  body.theme-dark .step-indicator {
+    background: var(--theme-bg-secondary);
+    border-color: var(--theme-border);
+    color: var(--theme-text-secondary);
   }
 
-  .dark-mode .step-indicator.active {
-    background: #60a5fa !important;
-    border-color: #60a5fa !important;
-    color: #0f172a !important;
+  body.dark-mode .step-indicator.active,
+  body.theme-dark .step-indicator.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
   }
 
-  .dark-mode .step-indicator.completed {
-    background: #10b981 !important;
-    border-color: #10b981 !important;
-    color: #064e3b !important;
+  body.dark-mode .step-indicator.completed,
+  body.theme-dark .step-indicator.completed {
+    background: #10b981;
+    border-color: #10b981;
+    color: #064e3b;
   }
 
-  .dark-mode .step-title {
-    color: #f1f5f9 !important;
+  body.dark-mode .step-title,
+  body.theme-dark .step-title {
+    color: var(--theme-text-primary);
   }
 
-  .dark-mode .choice-summary {
-    background: linear-gradient(135deg, #1e293b, #334155) !important;
-    border-left-color: #60a5fa !important;
+  body.dark-mode .choice-summary,
+  body.theme-dark .choice-summary {
+    background: var(--theme-bg-secondary);
+    border-left-color: var(--color-primary);
   }
 
-  .dark-mode .option-display {
-    background: linear-gradient(135deg, #1e293b, #334155) !important;
-    border-color: #475569 !important;
+  body.dark-mode .option-display,
+  body.theme-dark .option-display {
+    background: var(--theme-bg-secondary);
+    border-color: var(--theme-border);
   }
 
-  .dark-mode .scenario-reflection-modal .option-text,
-  .dark-mode .option-reasoning {
-    color: #f1f5f9 !important;
+  body.dark-mode .scenario-reflection-modal .option-text,
+  body.dark-mode .option-reasoning,
+  body.theme-dark .scenario-reflection-modal .option-text,
+  body.theme-dark .option-reasoning {
+    color: var(--theme-text-primary);
   }
 
-  .dark-mode .btn-primary {
-    background: #60a5fa !important;
-    border-color: #60a5fa !important;
-    color: #0f172a !important;
+  body.dark-mode .btn-primary,
+  body.theme-dark .btn-primary {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
   }
 
-  .dark-mode .btn-secondary {
-    background: #334155 !important;
-    border-color: #475569 !important;
-    color: #f1f5f9 !important;
+  body.dark-mode .btn-secondary,
+  body.theme-dark .btn-secondary {
+    background: var(--theme-bg-secondary);
+    border-color: var(--theme-border);
+    color: var(--theme-text-primary);
   }
 
-  .dark-mode .modal-footer-content {
-    background: linear-gradient(135deg, #0f172a, #1e293b) !important;
-    border-top-color: #475569 !important;
+  body.dark-mode .impact-radar,
+  body.theme-dark .impact-radar {
+    background: var(--theme-bg-secondary);
+    border-color: var(--theme-border);
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.2),
+      0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  body.dark-mode .impact-radar::before,
+  body.theme-dark .impact-radar::before {
+    background: linear-gradient(90deg, var(--color-primary), #3b82f6);
+    opacity: 0.6;
+  }
+
+  body.dark-mode .modal-footer-content,
+  body.theme-dark .modal-footer-content {
+    background: var(--theme-bg-primary);
+    border-top-color: var(--theme-border);
   }
 } /* End @layer overrides */

@@ -576,11 +576,6 @@
     box-shadow: var(--shadow-md);
   }
 
-  [data-theme="dark"] .category-section {
-    background: var(--color-gray-800);
-    border-color: var(--color-gray-700);
-  }
-
   .category-section::after {
     content: "";
     position: absolute;
@@ -905,6 +900,130 @@
   body.dark-mode .category-section {
     background: var(--theme-bg-secondary);
     border: 1px solid var(--theme-border);
+  }
+
+  /* Category controls toolbar dark mode */
+  body.dark-mode .category-controls-toolbar {
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+  }
+
+  body.dark-mode .category-controls-toolbar .search-input {
+    background: var(--theme-bg-primary) !important;
+    border: 1px solid var(--theme-border) !important;
+    color: var(--theme-text-primary) !important;
+  }
+
+  body.dark-mode .category-controls-toolbar .search-input:focus {
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 0 3px var(--color-primary-light) !important;
+  }
+
+  body.dark-mode .category-controls-toolbar .search-input::placeholder {
+    color: var(--theme-text-secondary) !important;
+  }
+
+  body.dark-mode .category-controls-toolbar .sort-btn,
+  body.dark-mode .category-controls-toolbar .clear-all-btn {
+    background: var(--theme-bg-primary);
+    border: 1px solid var(--theme-border);
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .category-controls-toolbar .sort-btn:hover,
+  body.dark-mode .category-controls-toolbar .clear-all-btn:hover {
+    background: var(--theme-bg-secondary);
+    border-color: var(--theme-border-hover);
+  }
+
+  body.dark-mode .category-controls-toolbar .sort-btn:focus,
+  body.dark-mode .category-controls-toolbar .clear-all-btn:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+  }
+
+  body.dark-mode .category-controls-toolbar .sort-dropdown {
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+    box-shadow: 0 8px 32px var(--theme-shadow-lg);
+  }
+
+  body.dark-mode .category-controls-toolbar .sort-option {
+    color: var(--theme-text-primary);
+    background: transparent;
+  }
+
+  body.dark-mode .category-controls-toolbar .sort-option:hover {
+    background: var(--theme-bg-primary);
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .category-controls-toolbar .sort-option.active {
+    background: var(--color-primary);
+    color: white;
+    border-left-color: var(--color-primary-light);
+  }
+
+  /* Category controls toolbar theme-dark support */
+  body.theme-dark .category-controls-toolbar {
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+  }
+
+  body.theme-dark .category-controls-toolbar .search-input {
+    background: var(--theme-bg-primary) !important;
+    border: 1px solid var(--theme-border) !important;
+    color: var(--theme-text-primary) !important;
+  }
+
+  body.theme-dark .category-controls-toolbar .search-input:focus {
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 0 3px var(--color-primary-light) !important;
+  }
+
+  body.theme-dark .category-controls-toolbar .search-input::placeholder {
+    color: var(--theme-text-secondary) !important;
+  }
+
+  body.theme-dark .category-controls-toolbar .sort-btn,
+  body.theme-dark .category-controls-toolbar .clear-all-btn {
+    background: var(--theme-bg-primary);
+    border: 1px solid var(--theme-border);
+    color: var(--theme-text-primary);
+  }
+
+  body.theme-dark .category-controls-toolbar .sort-btn:hover,
+  body.theme-dark .category-controls-toolbar .clear-all-btn:hover {
+    background: var(--theme-bg-secondary);
+    border-color: var(--theme-border-hover);
+  }
+
+  body.theme-dark .category-controls-toolbar .sort-btn:focus,
+  body.theme-dark .category-controls-toolbar .clear-all-btn:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+  }
+
+  body.theme-dark .category-controls-toolbar .sort-dropdown {
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+    box-shadow: 0 8px 32px var(--theme-shadow-lg);
+  }
+
+  body.theme-dark .category-controls-toolbar .sort-option {
+    color: var(--theme-text-primary);
+    background: transparent;
+  }
+
+  body.theme-dark .category-controls-toolbar .sort-option:hover {
+    background: var(--theme-bg-primary);
+    color: var(--theme-text-primary);
+  }
+
+  body.theme-dark .category-controls-toolbar .sort-option.active {
+    background: var(--color-primary);
+    color: white;
+    border-left-color: var(--color-primary-light);
   }
 
   /* Dark mode category header styles moved to category-header.css */
