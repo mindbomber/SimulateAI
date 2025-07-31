@@ -22,8 +22,6 @@
 /* Import additional stylesheets - moved outside @layer for proper loading */
 @import url("./category-grid.css");
 @import url("./category-header.css");
-@import url("./scenario-card.css");
-@import url("./card-component.css");
 @import url("./scenario-browser.css");
 @import url("./scenario-modal.css");
 @import url("./onboarding-tour.css");
@@ -31,7 +29,6 @@
 @import url("./enhanced-simulation-modal.css");
 @import url("./floating-action-tab.css");
 @import url("./radar-chart.css");
-@import url("./ethics-demo-section.css");
 
 @layer base {
   /* CSS Custom Properties - Core design tokens now in design-tokens.css */
@@ -1721,12 +1718,40 @@
   }
 
   /* ===== HERO ENTRANCE ANIMATIONS ===== */
-  /* MOVED TO HERO-CONSOLIDATED.CSS - All hero animations consolidated */
-  /* This prevents keyframe conflicts and animation jumping */
+  /* Elegant, professional entrance animations for hero section */
 
-  /* @keyframes heroContentEnter - MOVED TO hero-consolidated.css */
-  /* @keyframes heroElementEnter - MOVED TO hero-consolidated.css */
-  /* @keyframes heroSimulationEnter - MOVED TO hero-consolidated.css */
+  @keyframes heroContentEnter {
+    0% {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes heroElementEnter {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes heroSimulationEnter {
+    0% {
+      opacity: 0;
+      transform: translateY(40px) scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
 
   /* Hero reduced motion styles moved to hero-consolidated.css for semantic ownership */
 

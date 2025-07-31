@@ -205,27 +205,6 @@
     background-color: var(--color-primary);
     color: var(--color-white, #ffffff);
   }
-
-  /* Icon button component - migrated from main.css */
-  .btn-icon {
-    background: none;
-    border: 1px solid var(--color-gray-300);
-    border-radius: var(--radius-base);
-    padding: var(--spacing-2);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-  }
-
-  .btn-icon:hover,
-  .btn-icon:focus {
-    background-color: var(--color-gray-50);
-    border-color: var(--color-primary);
-  }
 }
 
 /* Utilities Layer - Helper classes */

@@ -17,8 +17,51 @@
     --page-loaded: 1;
   }
 
-  /* NOTE: All hero-specific loaded animations moved to hero-consolidated.css */
-  /* This file handles only generic state management */
+  /* Hero content loaded animations - replaces main.css and radar-chart.css */
+  html.loaded .hero .hero-content,
+  html.loaded .hero .hero-content h1,
+  html.loaded .hero .hero-content p,
+  html.loaded .hero .hero-simulation,
+  html.loaded .hero-title,
+  html.loaded .hero-description,
+  html.loaded .hero-actions {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity var(--transition-duration, 0.6s) ease-out,
+      transform var(--transition-duration, 0.6s) ease-out;
+  }
+
+  /* Hero radar demo loaded animations - consolidates radar-chart.css */
+  html.loaded .hero-radar-demo {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity var(--transition-duration, 0.8s) ease-out
+        var(--transition-delay, 0.2s),
+      transform var(--transition-duration, 0.8s) ease-out
+        var(--transition-delay, 0.2s);
+  }
+
+  html.loaded .hero-radar-demo h3 {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity var(--transition-duration, 0.6s) ease-out
+        var(--transition-delay, 0.4s),
+      transform var(--transition-duration, 0.6s) ease-out
+        var(--transition-delay, 0.4s);
+  }
+
+  html.loaded .hero-radar-demo p {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity var(--transition-duration, 0.6s) ease-out
+        var(--transition-delay, 0.6s),
+      transform var(--transition-duration, 0.6s) ease-out
+        var(--transition-delay, 0.6s);
+  }
 
   /* Additional loaded state elements */
   html.loaded .categories-section,
@@ -56,6 +99,7 @@
   html.font-size-small body,
   html.font-size-small .btn,
   html.font-size-small .form-input,
+  html.font-size-small .hero-description,
   html.font-size-small .section-description {
     font-size: calc(var(--font-size-base, 1rem) * var(--user-font-scale));
   }
@@ -73,6 +117,7 @@
   html.font-size-medium body,
   html.font-size-medium .btn,
   html.font-size-medium .form-input,
+  html.font-size-medium .hero-description,
   html.font-size-medium .section-description {
     font-size: calc(var(--font-size-base, 1rem) * var(--user-font-scale));
   }
@@ -90,6 +135,7 @@
   html.font-size-large body,
   html.font-size-large .btn,
   html.font-size-large .form-input,
+  html.font-size-large .hero-description,
   html.font-size-large .section-description {
     font-size: calc(var(--font-size-base, 1rem) * var(--user-font-scale));
   }
@@ -107,6 +153,7 @@
   html.font-size-extra-large body,
   html.font-size-extra-large .btn,
   html.font-size-extra-large .form-input,
+  html.font-size-extra-large .hero-description,
   html.font-size-extra-large .section-description {
     font-size: calc(var(--font-size-base, 1rem) * var(--user-font-scale));
   }
@@ -135,14 +182,31 @@
      ================================ */
 
   /* Manual dark mode only - no system preference detection */
-  /* NOTE: Hero-specific dark mode styles moved to hero-consolidated.css */
+  html.dark-mode.loaded .hero-radar-demo {
+    opacity: 0.95; /* Slightly reduced opacity for dark theme */
+  }
 
   /* High contrast mode adjustments */
-  /* NOTE: Hero-specific high contrast styles moved to hero-consolidated.css */
+  @media (prefers-contrast: high) {
+    html.loaded .hero .hero-content,
+    html.loaded .hero-title,
+    html.loaded .hero-description {
+      transition-duration: 0.3s; /* Faster transitions for high contrast */
+    }
+  }
 
   /* Reduced motion preferences */
-  /* NOTE: Hero-specific reduced motion styles moved to hero-consolidated.css */
   @media (prefers-reduced-motion: reduce) {
+    html.loaded .hero .hero-content,
+    html.loaded .hero .hero-content h1,
+    html.loaded .hero .hero-content p,
+    html.loaded .hero .hero-simulation,
+    html.loaded .hero-title,
+    html.loaded .hero-description,
+    html.loaded .hero-actions,
+    html.loaded .hero-radar-demo,
+    html.loaded .hero-radar-demo h3,
+    html.loaded .hero-radar-demo p,
     html.loaded .categories-section,
     html.loaded .donor-appreciation-section {
       transition: none;
