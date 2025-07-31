@@ -395,6 +395,40 @@
     border-color: var(--color-primary);
   }
 
+  /* Blue glow animation effect for scenario radar chart interactions */
+  .scenario-radar-chart.animating {
+    transition: all 0.3s ease;
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(0, 123, 255, 0.5);
+  }
+
+  /* Dark mode blue glow for scenario radar chart */
+  body.dark-mode .scenario-radar-chart.animating,
+  body.theme-dark .scenario-radar-chart.animating {
+    box-shadow: 0 0 20px rgba(100, 180, 255, 0.4);
+  }
+
+  /* High specificity animation overrides for scenario modal context */
+  .scenario-modal .radar-chart-container.animating,
+  .scenario-modal #scenario-radar-chart.animating,
+  .scenario-modal .scenario-radar-chart.animating {
+    transition: all 0.3s ease !important;
+    transform: scale(1.02) !important;
+    box-shadow: 0 0 20px rgba(0, 123, 255, 0.5) !important;
+    background: rgba(0, 123, 255, 0.05) !important;
+  }
+
+  /* High specificity dark mode animation overrides for scenario modal */
+  body.dark-mode .scenario-modal .radar-chart-container.animating,
+  body.dark-mode .scenario-modal #scenario-radar-chart.animating,
+  body.dark-mode .scenario-modal .scenario-radar-chart.animating,
+  body.theme-dark .scenario-modal .radar-chart-container.animating,
+  body.theme-dark .scenario-modal #scenario-radar-chart.animating,
+  body.theme-dark .scenario-modal .scenario-radar-chart.animating {
+    box-shadow: 0 0 20px rgba(100, 180, 255, 0.4) !important;
+    background: rgba(100, 180, 255, 0.05) !important;
+  }
+
   .scenario-radar-chart canvas {
     border-radius: 8px;
     background: #fff;
@@ -454,7 +488,7 @@
     display: block;
     margin: 0 auto;
     border-radius: 12px;
-    background: transparent;
+    background: #ffffff;
     box-shadow: 4px 4px 8px rgb(0 0 0 / 12%); /* Subtle bottom-right shadow similar to demo */
 
     /* Removed overflow: hidden to allow Chart.js tooltips to show */
@@ -1077,7 +1111,7 @@
   }
 
   body.dark-mode .radar-chart-container canvas {
-    background: transparent;
+    background: #333;
     box-shadow: 4px 4px 8px var(--theme-shadow);
   }
 
@@ -1280,21 +1314,26 @@
   .scenario-modal #scenario-radar-chart {
     text-align: center;
     position: relative !important;
-    width: 100% !important;
-    max-width: 420px !important;
+    width: 400px !important;
+    max-width: 400px !important;
+    height: 400px !important;
+    max-height: 400px !important;
     margin: 1rem auto !important;
-    padding: 0.5rem !important;
+    padding: 0 !important;
     background: none !important;
     border-radius: 0 !important;
     box-shadow: none !important;
     border: none !important;
-    min-height: 450px;
+    min-height: 400px;
     overflow: visible !important;
     display: flex !important;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
     visibility: visible !important;
     z-index: auto !important;
+    box-sizing: border-box !important;
+    aspect-ratio: 1 / 1 !important;
   }
 
   /* ===== CONSOLIDATED SCENARIO MODAL RADAR CHART STYLING ===== */

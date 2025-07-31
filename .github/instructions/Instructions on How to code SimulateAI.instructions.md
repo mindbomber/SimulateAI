@@ -6,6 +6,41 @@ applyTo: "**"
 
 Provide project context and coding guidelines that AI should follow when generating code, answering questions, or reviewing changes.
 
+## 📋 **IMPORTANT: Living Document Notice**
+
+**These guidelines are a living document that should evolve with SimulateAI.**
+
+### **Expected Changes:**
+
+- **New architectural patterns** as the platform scales and adds features
+- **Updated service integrations** when new tools or frameworks are adopted
+- **Revised best practices** based on performance data and user feedback
+- **Enhanced security standards** as educational data protection requirements evolve
+- **Additional toolsets** for new development workflows and specialized tasks
+
+### **When to Update These Instructions:**
+
+- ✅ **After major architectural changes** (new core services, significant refactoring)
+- ✅ **When introducing new development tools** (VS Code extensions, build tools, testing frameworks)
+- ✅ **Following security audits or compliance reviews** (GDPR, FERPA, accessibility standards)
+- ✅ **After performance optimization initiatives** (new caching strategies, optimization patterns)
+- ✅ **When educational requirements change** (new ISTE standards, research methodologies)
+
+### **Maintenance Responsibility:**
+
+- **Development Team**: Keep technical patterns current with codebase changes
+- **Architecture Team**: Update service integration patterns and core principles
+- **Product Team**: Ensure educational and research requirements are reflected
+- **Security Team**: Maintain current security and privacy standards
+
+### **Version Information:**
+
+- **Current Version**: SimulateAI v1.70 (July 2025)
+- **Last Updated**: July 31, 2025
+- **Next Review**: Quarterly or after major releases
+
+---
+
 ## CSS Architecture Standards
 
 ### CSS Layers Implementation
@@ -1668,21 +1703,171 @@ const eventData = {
 
 #### Directory Structure Standards:
 
+**CRITICAL**: Follow the established folder organization for consistent codebase structure and easy maintenance.
+
 ```
 src/
 ├── js/
-│   ├── core/           # Core system components (DataHandler, UIBinder, etc.)
-│   ├── services/       # External service integrations (Firebase, Analytics)
-│   ├── components/     # Reusable UI components
-│   ├── utils/          # Utility functions and helpers
+│   ├── core/           # Core system components (DataHandler, UIBinder, GlobalEventManager)
+│   ├── services/       # External service integrations (Firebase, Analytics, API clients)
+│   ├── components/     # Reusable UI components (modals, forms, widgets)
+│   ├── utils/          # Utility functions and helpers (logger, constants, validators)
 │   ├── constants/      # Application constants and configurations
 │   ├── data/           # Data schemas and models
-│   ├── config/         # Configuration files
+│   ├── config/         # Configuration files and loaders
+│   ├── objects/        # Complex UI object managers (enhanced objects, layouts)
+│   ├── admin/          # Administrative functionality (dashboard, blog admin)
 │   └── debug/          # Development and debugging tools
 ├── styles/             # CSS files following layers architecture
-├── components/         # HTML component templates
+├── components/         # HTML component templates and partials
 ├── config/             # JSON configuration files
-└── assets/             # Static assets (images, fonts, etc.)
+├── assets/             # Static assets (images, fonts, icons)
+├── docs/               # Documentation and guides
+└── .github/            # GitHub-specific files (workflows, templates, instructions)
+```
+
+#### Folder Purpose and Usage Guidelines:
+
+**`src/js/core/`** - Core System Components:
+
+- Use for: Central application systems that other components depend on
+- Examples: `data-handler.js`, `ui-binder.js`, `global-event-manager.js`
+- Pattern: Single responsibility, high-level abstractions
+- Dependencies: Should be minimal and well-defined
+
+**`src/js/services/`** - External Service Integration:
+
+- Use for: Third-party API integrations and external service wrappers
+- Examples: `firebase-service.js`, `google-analytics.js`, `auth-service.js`
+- Pattern: Service layer pattern, async operations, error handling
+- Dependencies: May depend on core components, but not other services
+
+**`src/js/components/`** - Reusable UI Components:
+
+- Use for: Self-contained UI components that can be reused across pages
+- Examples: `modal-manager.js`, `badge-manager.js`, `category-header.js`
+- Pattern: Component pattern with lifecycle methods (init, render, destroy)
+- Dependencies: May use core services and utilities
+
+**`src/js/utils/`** - Utility Functions and Helpers:
+
+- Use for: Pure functions, helper utilities, shared constants
+- Examples: `logger.js`, `constants.js`, `validation-utils.js`, `helpers.js`
+- Pattern: Pure functions when possible, no side effects
+- Dependencies: Should be minimal, avoid circular dependencies
+
+**`src/js/constants/`** - Application Constants:
+
+- Use for: Configuration constants, enum-like objects, application settings
+- Examples: `timing.js`, `api-endpoints.js`, `ui-constants.js`
+- Pattern: Immutable objects, clear naming conventions
+- Dependencies: None - should be pure constants
+
+**`src/js/data/`** - Data Schemas and Models:
+
+- Use for: Data validation schemas, model definitions, type definitions
+- Examples: `user-schema.js`, `simulation-model.js`, `badge-definitions.js`
+- Pattern: Schema definitions, validation functions
+- Dependencies: May use validation utilities
+
+**`src/js/config/`** - Configuration Files and Loaders:
+
+- Use for: Configuration loaders, environment-specific settings
+- Examples: Configuration loaders ending in `-config-loader.js`
+- Pattern: Async loading, caching, validation
+- Dependencies: May use core utilities for caching and validation
+
+**`src/js/objects/`** - Complex UI Object Managers:
+
+- Use for: Advanced UI components and layout managers
+- Examples: `enhanced-objects.js`, `layout-components.js`, `interactive-objects.js`
+- Pattern: Complex component management, multiple UI elements
+- Dependencies: May use core components and services
+
+**`src/js/admin/`** - Administrative Functionality:
+
+- Use for: Admin-only features, management dashboards, administrative tools
+- Examples: `blog-admin-dashboard.js`, `user-management.js`
+- Pattern: Admin-specific features with proper authentication checks
+- Dependencies: Should verify admin permissions before functionality
+
+**`src/styles/`** - CSS Architecture:
+
+- Use for: All CSS files following the layers architecture
+- Organization: Component-specific CSS files, layer-based architecture
+- Pattern: CSS layers (@layer tokens, base, components, utilities, overrides)
+- Dependencies: Follow CSS layers hierarchy
+
+**`components/`** - HTML Templates:
+
+- Use for: Reusable HTML component templates and partials
+- Examples: Modal templates, form templates, widget templates
+- Pattern: Pure HTML with data attributes for JavaScript binding
+- Dependencies: Should work with corresponding JavaScript components
+
+**`config/`** - JSON Configuration:
+
+- Use for: Application configuration, feature flags, environment settings
+- Examples: `app-config.json`, `feature-flags.json`, category configurations
+- Pattern: JSON schema validation, environment-specific overrides
+- Dependencies: Loaded by configuration managers
+
+**`assets/`** - Static Assets:
+
+- Use for: Images, fonts, icons, and other static resources
+- Organization: Organized by type (images/, fonts/, icons/)
+- Pattern: Optimized for web delivery, proper naming conventions
+- Dependencies: Referenced by CSS and HTML
+
+#### File Placement Rules:
+
+```javascript
+// ✅ CORRECT - Core system placement
+src / js / core / data - handler.js; // Central data management
+src / js / core / ui - binder.js; // UI management system
+src / js / core / global - event - manager.js; // Event coordination
+
+// ✅ CORRECT - Service integration placement
+src / js / services / firebase - service.js; // Firebase integration
+src / js / services / google - analytics.js; // Analytics service
+src / js / services / auth - service.js; // Authentication service
+
+// ✅ CORRECT - Component placement
+src / js / components / modal - manager.js; // Modal management component
+src / js / components / badge - manager.js; // Badge system component
+src / js / components / category - header.js; // Category display component
+
+// ✅ CORRECT - Utility placement
+src / js / utils / logger.js; // Logging utility
+src / js / utils / constants.js; // Application constants
+src / js / utils / validation - utils.js; // Validation helpers
+
+// ✅ CORRECT - Configuration placement
+src / js / config / category - header - config - loader.js; // Component config loader
+src / js / config / badge - modal - config - loader.js; // Modal config loader
+
+// ❌ WRONG - Misplaced files
+src / js / components / firebase - service.js; // Should be in services/
+src / js / utils / modal - manager.js; // Should be in components/
+src / js / core / config - loader.js; // Should be in config/
+```
+
+#### Cross-Folder Dependencies:
+
+**Allowed Dependency Flow:**
+
+```
+components/ → core/, services/, utils/, constants/
+services/ → core/, utils/, constants/
+core/ → utils/, constants/
+utils/ → constants/
+```
+
+**Forbidden Dependencies:**
+
+```
+core/ → components/, services/    # Core should not depend on higher-level modules
+constants/ → any other folder     # Constants should be pure
 ```
 
 #### Class Naming Patterns:
@@ -2409,13 +2594,35 @@ describe("DataHandler Integration", () => {
 
 ## File Structure:
 
-- Follow established patterns in `src/styles/` directory
-- Use meaningful, descriptive filenames
-- Keep component styles focused and avoid cross-component dependencies
+- **Follow established directory organization** as detailed in the "Directory Structure Standards" section
+- **Use meaningful, descriptive filenames** following kebab-case convention for files
+- **Place files in appropriate folders** based on their purpose and dependency requirements
+- **Keep component styles focused** and avoid cross-component dependencies
+- **Use proper import paths** based on the established folder hierarchy
+
+### Core System Files:
+
 - Use `src/js/core/data-handler.js` for ALL data operations
 - Use `src/js/core/global-event-manager.js` for ALL event handling
 - Use `src/js/core/ui-binder.js` for ALL UI operations
+
+### Service Integration Files:
+
 - Use `src/js/services/firebase-service.js` and `src/js/services/firestore-service-clean.js` for ALL backend operations
+- Use `src/js/services/google-analytics.js` for analytics tracking
+- Use `src/js/services/auth-service.js` for authentication
+
+### CSS Architecture Files:
+
+- Follow established patterns in `src/styles/` directory using CSS layers architecture
+- Use `src/styles/css-layers.css` as the master architecture file (load FIRST)
+- Component-specific CSS should only contain base styles, no theme overrides
+
+### Configuration Files:
+
+- Use `src/js/config/` for configuration loaders ending in `-config-loader.js`
+- Use `config/` for JSON configuration files
+- Use `src/js/constants/` for application constants and settings
 
 ---
 

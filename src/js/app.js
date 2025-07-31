@@ -6544,9 +6544,17 @@ function highlightChartChange(pattern) {
   // Reset after animation with proper cleanup
   highlightChartChange.animationTimeout = setTimeout(() => {
     // OPTIMIZED: Batch reset style operations
+    // Restore theme-appropriate box-shadow instead of removing it
+    const isDarkMode =
+      document.body.classList.contains("dark-mode") ||
+      document.body.classList.contains("theme-dark");
+    const defaultBoxShadow = isDarkMode
+      ? "-4px 4px 8px rgba(255, 255, 255, 0.05)"
+      : "-4px 4px 8px rgba(0, 0, 0, 0.12)";
+
     Object.assign(chartContainer.style, {
       transform: "scale(1)",
-      boxShadow: "none",
+      boxShadow: defaultBoxShadow,
     });
     if (label) {
       label.style.opacity = "0";
@@ -6567,6 +6575,119 @@ highlightChartChange.cleanup = function () {
     highlightChartChange.labelElement.remove();
     highlightChartChange.labelElement = null;
   }
+};
+
+// Visual feedback function for scenario radar chart interactions
+function highlightScenarioRadarChart(
+  chartSelector = ".scenario-radar-chart",
+  duration = 1000,
+) {
+  // Try multiple selectors to handle different contexts (modal, page, etc.)
+  const selectors = [
+    chartSelector,
+    ".scenario-modal .radar-chart-container",
+    ".scenario-modal #scenario-radar-chart",
+    ".scenario-modal .scenario-radar-chart",
+  ];
+
+  let chartContainer = null;
+  for (const selector of selectors) {
+    chartContainer = document.querySelector(selector);
+    if (chartContainer) break;
+  }
+
+  if (!chartContainer) {
+    console.log("🎯 No radar chart container found with any selector");
+    return;
+  }
+
+  console.log(
+    "🎯 Found radar chart container:",
+    chartContainer.className || chartContainer.id,
+  );
+
+  // Clear any existing animation timeout to prevent conflicts
+  if (highlightScenarioRadarChart.animationTimeout) {
+    clearTimeout(highlightScenarioRadarChart.animationTimeout);
+  }
+
+  // Add animation class for blue glow effect
+  chartContainer.classList.add("animating");
+  console.log(
+    "✨ Added 'animating' class to:",
+    chartContainer.className || chartContainer.id,
+  );
+
+  // Reset after animation with proper cleanup
+  highlightScenarioRadarChart.animationTimeout = setTimeout(() => {
+    chartContainer.classList.remove("animating");
+    console.log("🧹 Removed 'animating' class after", duration + "ms");
+  }, duration);
+}
+
+// Cleanup function for scenario radar chart highlight
+highlightScenarioRadarChart.cleanup = function () {
+  if (highlightScenarioRadarChart.animationTimeout) {
+    clearTimeout(highlightScenarioRadarChart.animationTimeout);
+    highlightScenarioRadarChart.animationTimeout = null;
+  }
+
+  // Remove animation class from all possible radar chart selectors
+  const selectors = [
+    ".scenario-radar-chart.animating",
+    ".scenario-modal .radar-chart-container.animating",
+    ".scenario-modal #scenario-radar-chart.animating",
+    ".scenario-modal .scenario-radar-chart.animating",
+  ];
+
+  selectors.forEach((selector) => {
+    const charts = document.querySelectorAll(selector);
+    charts.forEach((chart) => {
+      chart.classList.remove("animating");
+      console.log(
+        "🧹 Cleaned up animation class from:",
+        chart.className || chart.id,
+      );
+    });
+  });
+};
+
+// Make the function globally available for scenario modals and other components
+window.highlightScenarioRadarChart = highlightScenarioRadarChart;
+
+// Example usage function for testing - can be called from console
+window.testScenarioRadarAnimation = function () {
+  console.log("🎯 Testing scenario radar chart animation...");
+
+  // Debug: Show what radar chart elements exist on the page
+  const possibleSelectors = [
+    ".scenario-radar-chart",
+    ".scenario-modal .radar-chart-container",
+    ".scenario-modal #scenario-radar-chart",
+    ".scenario-modal .scenario-radar-chart",
+    "#scenario-radar-chart",
+    ".radar-chart-container",
+  ];
+
+  console.log("🔍 Debugging available radar chart elements:");
+  possibleSelectors.forEach((selector) => {
+    const elements = document.querySelectorAll(selector);
+    if (elements.length > 0) {
+      console.log(
+        `✅ Found ${elements.length} element(s) with selector: ${selector}`,
+      );
+      elements.forEach((el, index) => {
+        console.log(`   [${index}] Classes:`, el.className, "ID:", el.id);
+      });
+    } else {
+      console.log(`❌ No elements found with selector: ${selector}`);
+    }
+  });
+
+  highlightScenarioRadarChart();
+  console.log(
+    "✨ Animation triggered! Look for blue glow effect on scenario radar charts.",
+  );
 };
 
 window.resetEthicsDemo = function () {

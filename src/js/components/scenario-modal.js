@@ -1347,6 +1347,26 @@ class ScenarioModal {
           "Radar chart initialized successfully with neutral scores",
         );
 
+        // Trigger blue glow animation to indicate radar chart is ready
+        if (window.highlightScenarioRadarChart) {
+          try {
+            // Small delay to ensure chart is fully rendered
+            setTimeout(() => {
+              window.highlightScenarioRadarChart();
+              logger.info(
+                "RadarChart",
+                "Initial blue glow animation triggered",
+              );
+            }, 250);
+          } catch (animationError) {
+            logger.warn(
+              "RadarChart",
+              "Failed to trigger initial animation:",
+              animationError,
+            );
+          }
+        }
+
         // Verify chart is visible in DOM and has correct dimensions
         const chartCanvas = chartContainer.querySelector("canvas");
         if (chartCanvas) {
@@ -1553,6 +1573,23 @@ class ScenarioModal {
         if (this.radarChart && this.radarChart.isInitialized) {
           this.radarChart.resetScores();
           logger.info("RadarChart", "Radar chart reset to neutral state");
+
+          // Trigger blue glow animation after radar chart reset
+          if (window.highlightScenarioRadarChart) {
+            try {
+              window.highlightScenarioRadarChart();
+              logger.info(
+                "RadarChart",
+                "Blue glow animation triggered on reset",
+              );
+            } catch (animationError) {
+              logger.warn(
+                "RadarChart",
+                "Failed to trigger reset animation:",
+                animationError,
+              );
+            }
+          }
         }
 
         // Disable confirm button
@@ -1693,6 +1730,28 @@ class ScenarioModal {
       );
       this.radarChart.setScores(impactScores);
       logger.info("RadarChart", "Radar chart updated successfully");
+
+      // Trigger blue glow animation after radar chart update
+      if (window.highlightScenarioRadarChart) {
+        try {
+          window.highlightScenarioRadarChart();
+          logger.info(
+            "RadarChart",
+            "Blue glow animation triggered successfully",
+          );
+        } catch (animationError) {
+          logger.warn(
+            "RadarChart",
+            "Failed to trigger animation:",
+            animationError,
+          );
+        }
+      } else {
+        logger.warn(
+          "RadarChart",
+          "highlightScenarioRadarChart function not available",
+        );
+      }
     } catch (error) {
       logger.error("Failed to update radar chart:", error);
     }
