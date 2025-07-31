@@ -57,8 +57,8 @@
     /* Ensure proper positioning above modal content */
     isolation: isolate;
     opacity: 0;
-    transform: scale(0.9) translateY(-10px);
-    animation: onboarding-coach-mark-in 0.3s ease-out 0.1s forwards;
+    transform: scale(0.95) translateY(-5px);
+    animation: onboarding-coach-mark-in 0.4s ease-out 0.2s forwards;
     pointer-events: auto;
   }
 
@@ -304,7 +304,7 @@
   @keyframes onboarding-coach-mark-in {
     from {
       opacity: 0;
-      transform: scale(0.9) translateY(-10px);
+      transform: scale(0.95) translateY(-5px);
     }
 
     to {

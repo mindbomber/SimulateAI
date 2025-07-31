@@ -13,67 +13,69 @@
 /* Import media.css for responsive variables */
 @import url("./media.css");
 
-/* ================================
-   HERO ANIMATIONS
-   ================================ */
+@layer components {
+  /* ================================
+     HERO ANIMATIONS
+     ================================ */
 
-/* Subtle gradient shift animation - enhanced smoothness */
-@keyframes gradientShift {
-  0% {
-    background-position: 0% 50%;
+  /* Subtle gradient shift animation - enhanced smoothness */
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 50%;
+    }
+    25% {
+      background-position: 50% 25%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    75% {
+      background-position: 50% 75%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
   }
-  25% {
-    background-position: 50% 25%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  75% {
-    background-position: 50% 75%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
 
-/* Enhanced hero entrance animations with smooth easing */
-@keyframes heroContentEnter {
-  0% {
-    opacity: 0;
-    transform: translateY(40px) scale(0.96);
+  /* Enhanced hero entrance animations with smooth easing */
+  @keyframes heroContentEnter {
+    0% {
+      opacity: 0;
+      transform: translateY(40px) scale(0.96);
+    }
+    60% {
+      opacity: 0.8;
+      transform: translateY(-2px) scale(1.01);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
   }
-  60% {
-    opacity: 0.8;
-    transform: translateY(-2px) scale(1.01);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
 
-@keyframes heroElementEnter {
-  0% {
-    opacity: 0;
-    transform: translateY(30px) scale(0.95);
+  @keyframes heroElementEnter {
+    0% {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+    }
+    40% {
+      opacity: 0.6;
+      transform: translateY(-3px) scale(1.02);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
   }
-  40% {
-    opacity: 0.6;
-    transform: translateY(-3px) scale(1.02);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
 
-/* ================================
+  /* ================================
    HERO BASE STYLES
    ================================ */
 
-/* ================================
+  /* ================================
    CSS LAYERS FOUNDATION
    ================================ */
+} /* End @layer components - animations */
 
 /* NOTE: All loaded state animations now consolidated within @layer utilities */
 
@@ -186,11 +188,8 @@
 
   .hero .hero-content h1 {
     font-size: calc(2.5rem * var(--font-scale, 1));
-    /* Individual animation for title */
-    opacity: 0;
-    transform: translateY(30px) scale(0.95);
-    animation: heroElementEnter 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-    animation-delay: 0.5s;
+    /* Animation handled by state-management-consolidated.css in @layer utilities */
+    /* Removed conflicting keyframe animation to prevent mid-animation override */
   }
 
   .hero .hero-content p {
@@ -774,6 +773,11 @@
     text-align: left; /* Left-align for maximum desktop experience */
   }
 
+  /* Ensure hero-title stays centered regardless of parent alignment */
+  .hero-title {
+    text-align: center;
+  }
+
   .hero .hero-simulation {
     padding: calc(var(--container-padding, 48px) * 2);
     min-height: calc(500px + (var(--container-padding, 48px) * 2.5));
@@ -1348,13 +1352,18 @@
 
   .radar-instructions-accordion .accordion-content {
     background: white;
-    max-height: 500px;
+    max-height: 0; /* Start collapsed by default to prevent layout shift */
     overflow: hidden;
     transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .radar-instructions-accordion .accordion-content.collapsed {
     max-height: 0;
+  }
+
+  /* Only when explicitly opened should it show content */
+  .radar-instructions-accordion.open .accordion-content:not(.collapsed) {
+    max-height: 500px;
   }
 
   .radar-instructions-accordion .accordion-content-inner {
@@ -1605,8 +1614,10 @@
   }
 }
 
-@layer utilities {
-  /* ===== ANIMATION & STATE UTILITIES ===== */
+@layer overrides {
+  /* ================================
+     HERO STATE MANAGEMENT - HIGHEST SPECIFICITY
+     ================================ */
 
   /* Hero content loaded animations - consolidated from state-management-consolidated.css */
   html.loaded .hero .hero-content,
@@ -1616,11 +1627,9 @@
   html.loaded .hero-title,
   html.loaded .hero-description,
   html.loaded .hero-actions {
+    /* Let keyframe animations handle positioning - don't override with transform */
     opacity: 1;
-    transform: translateY(0);
-    transition:
-      opacity var(--transition-duration, 0.6s) ease-out,
-      transform var(--transition-duration, 0.6s) ease-out;
+    transition: opacity var(--transition-duration, 0.6s) ease-out;
     animation-play-state: running;
   }
 
@@ -1633,7 +1642,6 @@
         var(--transition-delay, 0.2s),
       transform var(--transition-duration, 0.8s) ease-out
         var(--transition-delay, 0.2s);
-    animation-play-state: running;
   }
 
   html.loaded .hero-radar-demo h3 {
@@ -1654,6 +1662,63 @@
         var(--transition-delay, 0.6s),
       transform var(--transition-duration, 0.6s) ease-out
         var(--transition-delay, 0.6s);
+  }
+
+  /* ================================
+     HERO THEME MANAGEMENT
+     ================================ */
+
+  /* Manual dark mode only - no system preference detection */
+  html.dark-mode.loaded .hero-radar-demo {
+    opacity: 0.95; /* Slightly reduced opacity for dark theme */
+  }
+
+  /* High contrast mode adjustments */
+  @media (prefers-contrast: high) {
+    html.loaded .hero .hero-content,
+    html.loaded .hero-title,
+    html.loaded .hero-description {
+      transition-duration: 0.3s; /* Faster transitions for high contrast */
+    }
+  }
+
+  /* Reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    html.loaded .hero .hero-content,
+    html.loaded .hero .hero-content h1,
+    html.loaded .hero .hero-content p,
+    html.loaded .hero .hero-simulation,
+    html.loaded .hero-title,
+    html.loaded .hero-description,
+    html.loaded .hero-actions,
+    html.loaded .hero-radar-demo,
+    html.loaded .hero-radar-demo h3,
+    html.loaded .hero-radar-demo p {
+      transition: none;
+      transform: none;
+      opacity: 1;
+    }
+  }
+
+  /* ================================
+     HERO FONT SIZE MANAGEMENT
+     ================================ */
+
+  /* Hero-specific font scaling */
+  html.font-size-small .hero-description {
+    font-size: calc(var(--font-size-base, 1rem) * 0.875);
+  }
+
+  html.font-size-medium .hero-description {
+    font-size: calc(var(--font-size-base, 1rem) * 1);
+  }
+
+  html.font-size-large .hero-description {
+    font-size: calc(var(--font-size-base, 1rem) * 1.125);
+  }
+
+  html.font-size-extra-large .hero-description {
+    font-size: calc(var(--font-size-base, 1rem) * 1.25);
   }
 
   /* Animation utilities */

@@ -349,14 +349,19 @@
     color: var(--color-gray-900, #1f2937);
   }
 
-  .accordion-content {
-    /* Default accordion behavior for compatibility */
+  /* Temporarily disable accordions to test blinking issue */
+  .demo-help-sections {
+    display: none !important;
+  }
+
+  .ethics-demo-section .accordion-content {
+    /* Default accordion behavior for compatibility - only within ethics demo section */
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease;
   }
 
-  .accordion-content:not(.collapsed) {
+  .ethics-demo-section .accordion-content:not(.collapsed) {
     max-height: 1000px;
   }
 

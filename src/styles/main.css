@@ -22,6 +22,8 @@
 /* Import additional stylesheets - moved outside @layer for proper loading */
 @import url("./category-grid.css");
 @import url("./category-header.css");
+@import url("./scenario-card.css");
+@import url("./card-component.css");
 @import url("./scenario-browser.css");
 @import url("./scenario-modal.css");
 @import url("./onboarding-tour.css");
@@ -29,6 +31,7 @@
 @import url("./enhanced-simulation-modal.css");
 @import url("./floating-action-tab.css");
 @import url("./radar-chart.css");
+@import url("./ethics-demo-section.css");
 
 @layer base {
   /* CSS Custom Properties - Core design tokens now in design-tokens.css */
@@ -148,18 +151,14 @@
   }
 
   html {
-    scroll-behavior: auto; /* Initially auto for page load positioning */
+    /* Use browser default scroll behavior - much more reliable */
+    scroll-behavior: smooth;
 
     /* Explicitly prevent scroll snap on the page level */
     scroll-snap-type: none;
 
     /* Prevent horizontal overflow */
     overflow-x: hidden;
-  }
-
-  /* Page loaded state for triggering animations */
-  html.loaded {
-    scroll-behavior: smooth; /* Re-enable smooth scrolling after page loads */
   }
 
   body {
@@ -182,11 +181,6 @@
 
     /* Prevent scroll anchoring that might restore position */
     overflow-anchor: none;
-  }
-
-  /* Force scroll position reset on page load */
-  html.loaded {
-    scroll-behavior: smooth; /* Re-enable smooth scrolling after page loads */
   }
 
   /* Ensure page always starts at top */
@@ -1727,40 +1721,12 @@
   }
 
   /* ===== HERO ENTRANCE ANIMATIONS ===== */
-  /* Elegant, professional entrance animations for hero section */
+  /* MOVED TO HERO-CONSOLIDATED.CSS - All hero animations consolidated */
+  /* This prevents keyframe conflicts and animation jumping */
 
-  @keyframes heroContentEnter {
-    0% {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes heroElementEnter {
-    0% {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes heroSimulationEnter {
-    0% {
-      opacity: 0;
-      transform: translateY(40px) scale(0.95);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
+  /* @keyframes heroContentEnter - MOVED TO hero-consolidated.css */
+  /* @keyframes heroElementEnter - MOVED TO hero-consolidated.css */
+  /* @keyframes heroSimulationEnter - MOVED TO hero-consolidated.css */
 
   /* Hero reduced motion styles moved to hero-consolidated.css for semantic ownership */
 
