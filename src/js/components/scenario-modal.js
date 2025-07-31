@@ -672,6 +672,8 @@ class ScenarioModal {
       this.wasCompleted = false; // Reset completion flag for new scenario
       this.isTestMode = isTestMode; // Set test mode for this session
 
+      console.log("🧪 ScenarioModal opened with test mode:", this.isTestMode);
+
       this._logTelemetry("modal_opening_started", {
         scenarioId,
         categoryId,
@@ -986,6 +988,12 @@ class ScenarioModal {
                 </div>
             </div>
         `;
+
+    console.log(
+      "🧪 Test mode UI rendered:",
+      this.isTestMode,
+      this.isTestMode ? "Test elements should be visible" : "Normal mode",
+    );
 
     logger.info(
       "ScenarioModal",
@@ -1766,17 +1774,52 @@ class ScenarioModal {
       return;
     }
 
-    // If this is a test scenario, just close the modal without tracking
+    // If this is a test scenario, still show reflection modal but skip progress tracking
     if (this.isTestMode) {
-      logger.info("Test scenario completed, closing modal without tracking:", {
+      logger.info(
+        "🧪 Test scenario completed, showing reflection modal without progress tracking:",
+        {
+          categoryId: this.currentCategoryId,
+          scenarioId: this.currentScenarioId,
+          selectedOption: this.selectedOption?.id || "unknown",
+          testMode: true,
+        },
+      );
+
+      // Create completion data for reflection modal but mark as test mode
+      const testCompletionData = {
         categoryId: this.currentCategoryId,
         scenarioId: this.currentScenarioId,
-        selectedOption: this.selectedOption?.id || "unknown",
-        testMode: true,
-      });
+        selectedOption: this.selectedOption,
+        option: this.selectedOption, // Legacy compatibility
+        completed: true,
+        isTestMode: true, // Mark as test mode to prevent progress tracking
+        scenarioData: this.scenarioData,
+        timestamp: new Date().toISOString(),
+        sessionId: this._generateSessionId(),
+      };
 
-      // Simply close the modal without any tracking or events
-      this.close();
+      // Dispatch scenario completion event for reflection modal (but not progress tracking)
+      const testEvent = new CustomEvent("scenario-completed", {
+        detail: testCompletionData,
+      });
+      document.dispatchEvent(testEvent);
+
+      logger.info("🧪 Test scenario event dispatched for reflection modal");
+
+      // Close modal with delay to show completion, then dispatch final event
+      setTimeout(async () => {
+        await this.closeAndWait();
+
+        // Dispatch test scenario modal closed event
+        const testClosedEvent = new CustomEvent("scenario-modal-closed", {
+          detail: testCompletionData,
+        });
+        document.dispatchEvent(testClosedEvent);
+
+        logger.info("🧪 Test scenario modal fully closed");
+      }, 1000);
+
       return;
     }
 

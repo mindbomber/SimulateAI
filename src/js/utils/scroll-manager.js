@@ -32,46 +32,60 @@ class ScrollManager {
   }
 
   /**
-   * Setup scroll restoration behavior
+   * Setup scroll restoration behavior - use browser defaults
    */
   setupScrollRestoration() {
+    // Let browser handle scroll restoration naturally - don't override
     if ("scrollRestoration" in history) {
-      history.scrollRestoration = "manual";
+      // Keep browser default behavior for better UX
+      history.scrollRestoration = "auto";
     }
   }
 
   /**
-   * Setup global scroll behavior and reset
+   * Setup global scroll behavior - minimal intervention
    */
   setupGlobalScrollBehavior() {
-    // Single method to reset scroll position
-    this.resetScrollPosition();
-
-    // Setup event listeners for scroll reset
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", () =>
-        this.resetScrollPosition(),
-      );
+    // Only reset scroll position for fresh page loads (not hash navigation)
+    if (
+      !window.location.hash &&
+      window.location.pathname.includes("app.html")
+    ) {
+      this.resetScrollPosition();
     }
 
-    window.addEventListener("pageshow", () => this.resetScrollPosition());
+    // Setup event listeners for scroll reset only when needed
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => {
+        // Only reset if no hash in URL
+        if (!window.location.hash) {
+          this.resetScrollPosition();
+        }
+      });
+    }
+
+    // Only reset on fresh page loads, respect browser back/forward behavior
+    window.addEventListener("pageshow", (event) => {
+      // Don't reset if this is a back/forward navigation or hash change
+      if (!event.persisted && !window.location.hash && !document.referrer) {
+        this.resetScrollPosition();
+      }
+    });
   }
 
   /**
-   * Unified scroll position reset
+   * Unified scroll position reset - minimal intervention
    */
   resetScrollPosition() {
     // Use the most reliable method for all browsers
     window.scrollTo(0, 0);
 
-    // Ensure smooth scrolling is enabled after reset using DOM class manager
-    setTimeout(() => {
-      if (window.DOMClassManager) {
-        window.DOMClassManager.setLoadedState(true);
-      } else {
-        document.documentElement.classList.add("loaded");
-      }
-    }, 100);
+    // Set loaded state immediately - no delay needed
+    if (window.DOMClassManager) {
+      window.DOMClassManager.setLoadedState(true);
+    } else {
+      document.documentElement.classList.add("loaded");
+    }
   }
 
   /**

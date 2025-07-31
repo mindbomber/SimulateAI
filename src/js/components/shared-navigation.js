@@ -4,7 +4,6 @@
  */
 
 import { UI } from "../utils/constants.js";
-import scrollManager from "../utils/scroll-manager.js";
 import DataHandler from "../core/data-handler.js";
 
 class SharedNavigation {
@@ -173,8 +172,11 @@ class SharedNavigation {
         this.addModerationLink();
       }, 1000);
 
-      // Handle hash navigation on page load
-      this.handleHashNavigation();
+      // Set active page state for hash navigation without scrolling
+      // Let browser handle initial scroll to hash naturally
+      if (window.location.hash === "#categories") {
+        this.setActivePage("simulation-hub");
+      }
 
       // Calculate performance metrics
       this.metrics.initTime = performance.now() - startTime;
@@ -622,8 +624,9 @@ class SharedNavigation {
   /**
    * Set the active page state in navigation with optimized DOM operations
    * @param {string} pageId - Page identifier
+   * @param {boolean} immediate - Whether to apply changes immediately (for user interactions)
    */
-  setActivePage(pageId) {
+  setActivePage(pageId, immediate = false) {
     // Skip if already the current page to prevent unnecessary work
     if (this.currentPage === pageId) {
       return;
@@ -632,8 +635,7 @@ class SharedNavigation {
     // Use cached elements for better performance
     const navLinks = this.getCachedElements("navLinks", ".nav-link");
 
-    // Batch DOM operations for better performance
-    requestAnimationFrame(() => {
+    const updateActiveState = () => {
       // Remove existing active states efficiently
       navLinks.forEach((link) => {
         if (link.classList.contains("active")) {
@@ -650,7 +652,15 @@ class SharedNavigation {
       }
 
       this.currentPage = pageId;
-    });
+    };
+
+    if (immediate) {
+      // Apply changes immediately for smooth user interactions
+      updateActiveState();
+    } else {
+      // Batch DOM operations for better performance
+      requestAnimationFrame(updateActiveState);
+    }
   }
 
   /**
@@ -715,7 +725,8 @@ class SharedNavigation {
   }
 
   /**
-   * Handle hash navigation on page load (e.g., app.html#categories)
+   * Handle hash navigation for user-initiated navigation only
+   * Simplified - main scrolling now handled by navigateToSimulationHub
    */
   handleHashNavigation() {
     const { hash } = window.location;
@@ -723,11 +734,7 @@ class SharedNavigation {
     if (hash === "#categories") {
       // Set the active state for simulation-hub
       this.setActivePage("simulation-hub");
-
-      // Small delay to ensure page is fully loaded
-      setTimeout(() => {
-        this.scrollToElement("#categories > div.main-section-header");
-      }, 1000);
+      // Note: Scrolling is now handled by navigateToSimulationHub to prevent competition
     }
   }
 
@@ -751,7 +758,13 @@ class SharedNavigation {
 
     const clickHandler = (e) => {
       e.preventDefault();
+      // Set flag to prevent hash navigation delay
+      this.isUserNavigation = true;
       this.navigateToSimulationHub();
+      // Clear flag after a short delay
+      setTimeout(() => {
+        this.isUserNavigation = false;
+      }, 200);
     };
 
     simulationHubLink.addEventListener("click", clickHandler);
@@ -767,24 +780,28 @@ class SharedNavigation {
       window.location.pathname.split("/").pop() || "index.html";
     const targetSelector = "#categories > div.main-section-header";
 
-    // Update active state to simulation-hub
-    this.setActivePage("simulation-hub");
-
     // If we're already on app.html, just scroll to the target
     if (currentPage === "app.html") {
-      this.scrollToElement(targetSelector);
+      // Update active state immediately for smooth scrolling
+      this.setActivePage("simulation-hub", true);
+
+      // Update hash FIRST to prevent competition, then scroll immediately
+      history.replaceState(null, null, "#categories");
+
+      // Use native browser scrolling - much faster than scroll manager
+      const targetElement = document.querySelector(targetSelector);
+      if (targetElement) {
+        targetElement.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
     } else {
+      // Update active state to simulation-hub
+      this.setActivePage("simulation-hub");
       // Navigate to app.html and then scroll to the target
       window.location.href = `app.html#categories`;
     }
-  }
-
-  /**
-   * Scroll to a specific element smoothly
-   * @param {string} selector - CSS selector for the target element
-   */
-  scrollToElement(selector) {
-    scrollManager.scrollToElement(selector);
   }
 
   /**
@@ -1596,29 +1613,14 @@ class SharedNavigation {
   }
 
   /**
-   * Navigate to category (fallback method)
+   * Navigate to category (fallback method) - consolidated to prevent scroll competition
    */
   navigateToCategory(category) {
-    // If on home page, scroll to specific category or categories section
+    // If on home page, delegate to main navigation to avoid competing scroll operations
     if (this.currentPage === "home") {
-      // First try to scroll to the specific category section
-      const specificCategorySection = document.getElementById(
-        `category-${category}`,
-      );
-      if (specificCategorySection) {
-        specificCategorySection.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-        return;
-      }
-
-      // Fallback to general categories section
-      const categoriesSection = document.getElementById("categories");
-      if (categoriesSection) {
-        categoriesSection.scrollIntoView({ behavior: "smooth" });
-        return;
-      }
+      // Delegate to the main navigation method to avoid duplication
+      this.navigateToSimulationHub();
+      return;
     }
 
     // Otherwise navigate to scenarios page with category filter

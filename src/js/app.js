@@ -2255,6 +2255,7 @@ class SimulateAIApp {
       "modal.tab-trap": this.handleModalTabTrap.bind(this),
       // "demo.pattern": this.handleDemoPattern.bind(this), // DISABLED: Conflicts with inline onclick handlers
       "scenario.launch": this.handleScenarioLaunch.bind(this),
+      "scenario.test": this.handleTestScenario.bind(this),
       "system.escape": this.handleEscapeKey.bind(this),
       "system.scroll": this.handleScrollEvent.bind(this),
       "accessibility.theme_change": this.handleThemeChange.bind(this),
@@ -2266,12 +2267,12 @@ class SimulateAIApp {
 
   /**
    * Handle start learning event from Global Event Manager
+   * Note: Scrolling is now handled by SharedNavigation.navigateToSimulationHub()
    */
   handleStartLearning() {
-    const categoriesSection = document.getElementById("categories");
-    if (categoriesSection) {
-      categoriesSection.scrollIntoView({ behavior: "smooth" });
-    }
+    // Legacy scroll operation removed to prevent competition with navigation
+    // Navigation component handles scrolling to categories section
+    console.log("Start learning triggered - navigation handles scrolling");
   }
 
   /**
@@ -2380,6 +2381,22 @@ class SimulateAIApp {
         "warning",
       );
     }
+  }
+
+  /**
+   * Handle test scenario launch events from Global Event Manager
+   */
+  handleTestScenario(data) {
+    const { categoryId, scenarioId, isTestMode } = data;
+
+    AppDebug.log("Launching test scenario:", {
+      categoryId,
+      scenarioId,
+      isTestMode,
+    });
+
+    // Call the existing testScenarioModal method for proper test mode handling
+    this.testScenarioModal();
   }
 
   /**
@@ -4283,8 +4300,14 @@ class SimulateAIApp {
    * Handle scenario completion and show reflection modal
    */
   handleScenarioCompleted(event) {
-    const { categoryId, scenarioId, selectedOption, option, scenarioData } =
-      event.detail;
+    const {
+      categoryId,
+      scenarioId,
+      selectedOption,
+      option,
+      scenarioData,
+      isTestMode,
+    } = event.detail;
 
     AppDebug.log("Scenario completed in app.js:", {
       categoryId,
@@ -4292,36 +4315,49 @@ class SimulateAIApp {
       selectedOption: selectedOption?.id || option?.id,
       hasScenarioData: !!scenarioData,
       optionsCount: scenarioData?.options?.length || 0,
+      isTestMode: !!isTestMode,
     });
 
-    // Show the scenario reflection modal FIRST
+    // Show the scenario reflection modal FIRST (works for both normal and test scenarios)
     this.showScenarioReflectionModal({
       categoryId,
       scenarioId,
       selectedOption: selectedOption || option,
       scenarioData: scenarioData || {},
+      isTestMode: !!isTestMode, // Pass test mode flag to reflection modal
     });
 
-    // AFTER reflection modal is shown, trigger progress update for main-grid
-    // This prevents conflicts between modal state management
-    setTimeout(() => {
-      const progressUpdateEvent = new CustomEvent("scenario-progress-update", {
-        detail: {
+    // ONLY trigger progress update for non-test scenarios
+    if (!isTestMode) {
+      // AFTER reflection modal is shown, trigger progress update for main-grid
+      // This prevents conflicts between modal state management
+      setTimeout(() => {
+        const progressUpdateEvent = new CustomEvent(
+          "scenario-progress-update",
+          {
+            detail: {
+              scenarioId,
+              categoryId,
+              selectedOption,
+              option: selectedOption || option,
+              completionTime: event.detail.completionTime || null,
+              timestamp: new Date().toISOString(),
+            },
+          },
+        );
+        document.dispatchEvent(progressUpdateEvent);
+
+        AppDebug.log("Dispatched scenario-progress-update event to main-grid", {
           scenarioId,
           categoryId,
-          selectedOption,
-          option: selectedOption || option,
-          completionTime: event.detail.completionTime || null,
-          timestamp: new Date().toISOString(),
-        },
-      });
-      document.dispatchEvent(progressUpdateEvent);
-
-      AppDebug.log("Dispatched scenario-progress-update event to main-grid", {
+        });
+      }, 100); // Small delay to ensure reflection modal is properly initialized
+    } else {
+      AppDebug.log("🧪 Test mode: Skipping progress update for test scenario", {
         scenarioId,
         categoryId,
       });
-    }, 100); // Small delay to ensure reflection modal is properly initialized
+    }
   }
 
   /**
@@ -4348,7 +4384,7 @@ class SimulateAIApp {
    * Show the scenario-specific reflection modal
    */
   showScenarioReflectionModal(data) {
-    const { categoryId, scenarioId, selectedOption } = data;
+    const { categoryId, scenarioId, selectedOption, isTestMode } = data;
 
     try {
       // Get scenario reflection modal configuration (fallback to empty object if not found)
@@ -4361,28 +4397,44 @@ class SimulateAIApp {
         scenarioId: scenarioId,
         selectedOption: selectedOption,
         scenarioData: data.scenarioData || {},
+        isTestMode: !!isTestMode, // Pass test mode flag to reflection modal
         ...reflectionConfig,
         onComplete: (reflectionData) => {
-          // User finished reflection - show success message
-          this.showNotification(
-            "Thank you for your thoughtful reflection! Your insights contribute to our research.",
-            "success",
-          );
+          // User finished reflection - show appropriate message based on mode
+          if (isTestMode) {
+            this.showNotification(
+              "🧪 Test scenario reflection completed! This was part of the tour/demo.",
+              "success",
+            );
+          } else {
+            this.showNotification(
+              "Thank you for your thoughtful reflection! Your insights contribute to our research.",
+              "success",
+            );
+          }
 
-          // Track completion
+          // Track completion (but note test mode in analytics)
           simpleAnalytics.trackEvent("scenario_reflection", "completed", {
             category_id: categoryId,
             scenario_id: scenarioId,
             selected_option: selectedOption?.id,
             research_data_points: Object.keys(reflectionData).length,
+            is_test_mode: !!isTestMode,
           });
         },
         onSkip: () => {
-          // User skipped reflection - show gentle reminder
-          this.showNotification(
-            "Reflection skipped. You can always revisit scenarios to explore different perspectives.",
-            "info",
-          );
+          // User skipped reflection - show appropriate message based on mode
+          if (isTestMode) {
+            this.showNotification(
+              "🧪 Test scenario reflection skipped. This was part of the tour/demo.",
+              "info",
+            );
+          } else {
+            this.showNotification(
+              "Reflection skipped. You can always revisit scenarios to explore different perspectives.",
+              "info",
+            );
+          }
         },
       });
     } catch (error) {
@@ -4397,27 +4449,43 @@ class SimulateAIApp {
         scenarioId: scenarioId,
         selectedOption: selectedOption,
         scenarioData: data.scenarioData || {},
+        isTestMode: !!isTestMode, // Pass test mode flag to reflection modal
         onComplete: (reflectionData) => {
-          // User finished reflection - show success message
-          this.showNotification(
-            "Thank you for your thoughtful reflection! Your insights contribute to our research.",
-            "success",
-          );
+          // User finished reflection - show appropriate message based on mode
+          if (isTestMode) {
+            this.showNotification(
+              "🧪 Test scenario reflection completed! This was part of the tour/demo.",
+              "success",
+            );
+          } else {
+            this.showNotification(
+              "Thank you for your thoughtful reflection! Your insights contribute to our research.",
+              "success",
+            );
+          }
 
-          // Track completion
+          // Track completion (but note test mode in analytics)
           simpleAnalytics.trackEvent("scenario_reflection", "completed", {
             category_id: categoryId,
             scenario_id: scenarioId,
             selected_option: selectedOption?.id,
             research_data_points: Object.keys(reflectionData).length,
+            is_test_mode: !!isTestMode,
           });
         },
         onSkip: () => {
-          // User skipped reflection - show gentle reminder
-          this.showNotification(
-            "Reflection skipped. You can always revisit scenarios to explore different perspectives.",
-            "info",
-          );
+          // User skipped reflection - show appropriate message based on mode
+          if (isTestMode) {
+            this.showNotification(
+              "🧪 Test scenario reflection skipped. This was part of the tour/demo.",
+              "info",
+            );
+          } else {
+            this.showNotification(
+              "Reflection skipped. You can always revisit scenarios to explore different perspectives.",
+              "info",
+            );
+          }
         },
       });
     }
@@ -5017,7 +5085,7 @@ class SimulateAIApp {
    * Scroll to the simulations section
    */
   /**
-   * Scroll to Ethics Categories section using unified scroll manager
+   * Scroll to Ethics Categories section - delegated to navigation component
    */
   async scrollToSimulations() {
     try {
@@ -5028,30 +5096,31 @@ class SimulateAIApp {
         return;
       }
 
-      // Start scrolling immediately (don't wait for navigation state)
-      const scrollPromise = scrollManager.scrollToElement("#categories", {
-        behavior: "smooth",
-        offset: 80,
-        respectReducedMotion: true,
-      });
-
-      // Set navigation active state with a small delay to ensure DOM is ready
-      setTimeout(() => {
-        if (window.sharedNav) {
-          window.sharedNav.setActivePage("simulation-hub");
-        }
-      }, 100);
-
-      // Wait for scroll to complete
-      await scrollPromise;
-
-      logger.info("Scrolled to Ethics Categories section");
+      // Use SharedNavigation to handle scrolling consistently
+      if (
+        window.sharedNav &&
+        typeof window.sharedNav.navigateToSimulationHub === "function"
+      ) {
+        window.sharedNav.navigateToSimulationHub();
+        logger.info(
+          "Delegated scroll to SharedNavigation.navigateToSimulationHub",
+        );
+      } else {
+        // Fallback: use scroll manager directly (without competing with navigation)
+        logger.warn("SharedNavigation not available, using fallback scroll");
+        const scrollPromise = scrollManager.scrollToElement("#categories", {
+          behavior: "smooth",
+          offset: 80,
+          respectReducedMotion: true,
+        });
+        await scrollPromise;
+      }
 
       // Track the navigation
       simpleAnalytics.trackEvent("navigation_to_categories", {
-        source: "start_learning_button",
+        source: "scroll_to_simulations_method",
         target: "ethics_categories",
-        method: "smooth_scroll",
+        method: "delegated_to_navigation",
       });
 
       // Announce to screen readers for accessibility

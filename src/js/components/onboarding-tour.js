@@ -271,7 +271,7 @@ class OnboardingTour {
     // Keyboard navigation tracking
     this.wasKeyboardNavigation = false;
 
-    // Tutorial steps configuration
+    // Tutorial steps configuration - Enhanced with robust positioning and element waiting
     this.tutorials = {
       1: {
         // Test Scenario Tutorial
@@ -290,6 +290,23 @@ class OnboardingTour {
             target: null,
             position: "center",
             autoScroll: false,
+            // Enhanced configuration
+            waitForElement: false,
+            elementTimeout: 5000,
+            retryPositioning: true,
+            maxRetries: 3,
+            fallbackPosition: "center",
+            dimensionHandling: {
+              minWidth: 320,
+              minHeight: 200,
+              maxWidth: 500,
+              maxHeight: 400,
+            },
+            responsiveConfig: {
+              mobile: { position: "bottom", padding: 20 },
+              tablet: { position: "center", padding: 30 },
+              desktop: { position: "center", padding: 40 },
+            },
           },
           {
             id: "launch-test",
@@ -301,6 +318,33 @@ class OnboardingTour {
             action: "wait-for-click",
             autoScroll: true,
             highlightClick: true,
+            // Enhanced configuration
+            waitForElement: true,
+            elementTimeout: 8000,
+            retryPositioning: true,
+            maxRetries: 5,
+            fallbackPosition: "center",
+            fallbackSelectors: [
+              "#test-scenario-modal",
+              ".test-scenario-button",
+              'button[data-target="test-scenario"]',
+              ".scenario-launcher",
+            ],
+            dimensionHandling: {
+              minWidth: 280,
+              minHeight: 180,
+              preferredSpacing: 20,
+            },
+            responsiveConfig: {
+              mobile: { position: "top", spacing: 15 },
+              tablet: { position: "bottom", spacing: 25 },
+              desktop: { position: "bottom", spacing: 30 },
+            },
+            accessibility: {
+              focusOnShow: true,
+              announceContent: true,
+              keyboardNavigation: true,
+            },
           },
           {
             id: "dilemma-section",
@@ -311,6 +355,39 @@ class OnboardingTour {
             position: "right",
             waitFor: "scenario-modal",
             autoScroll: true,
+            // Enhanced configuration
+            waitForElement: true,
+            elementTimeout: 10000,
+            retryPositioning: true,
+            maxRetries: 5,
+            fallbackPosition: "center",
+            fallbackSelectors: [
+              ".dilemma-text",
+              ".scenario-content",
+              ".modal-body",
+              ".scenario-description",
+            ],
+            dimensionHandling: {
+              minWidth: 300,
+              minHeight: 200,
+              preferredSpacing: 25,
+              targetPadding: 10,
+            },
+            responsiveConfig: {
+              mobile: { position: "bottom", maxWidth: "90%" },
+              tablet: { position: "right", maxWidth: "60%" },
+              desktop: { position: "right", maxWidth: "50%" },
+            },
+            accessibility: {
+              focusOnShow: false,
+              announceContent: true,
+              keyboardNavigation: true,
+            },
+            modalSpecific: {
+              waitForModalContent: true,
+              modalSelector: ".modal-dialog",
+              contentSelector: ".dilemma-text",
+            },
           },
           {
             id: "ethical-question",
@@ -320,6 +397,38 @@ class OnboardingTour {
             target: ".ethical-question",
             position: "right",
             autoScroll: true,
+            // Enhanced configuration
+            waitForElement: true,
+            elementTimeout: 8000,
+            retryPositioning: true,
+            maxRetries: 4,
+            fallbackPosition: "center",
+            fallbackSelectors: [
+              ".ethical-question",
+              ".question-section",
+              ".scenario-question",
+              ".ethics-prompt",
+            ],
+            dimensionHandling: {
+              minWidth: 320,
+              minHeight: 180,
+              preferredSpacing: 20,
+              targetPadding: 15,
+            },
+            responsiveConfig: {
+              mobile: { position: "bottom", maxWidth: "95%" },
+              tablet: { position: "right", maxWidth: "65%" },
+              desktop: { position: "right", maxWidth: "55%" },
+            },
+            accessibility: {
+              focusOnShow: false,
+              announceContent: true,
+              keyboardNavigation: true,
+            },
+            modalSpecific: {
+              waitForModalContent: true,
+              scrollIntoView: true,
+            },
           },
           {
             id: "choose-approach",
@@ -331,6 +440,40 @@ class OnboardingTour {
             action: "wait-for-click",
             highlightClick: true,
             autoScroll: true,
+            // Enhanced configuration
+            waitForElement: true,
+            elementTimeout: 10000,
+            retryPositioning: true,
+            maxRetries: 5,
+            fallbackPosition: "center",
+            fallbackSelectors: [
+              ".options-container",
+              ".choice-options",
+              ".decision-options",
+              ".response-options",
+            ],
+            dimensionHandling: {
+              minWidth: 350,
+              minHeight: 220,
+              preferredSpacing: 25,
+              targetPadding: 20,
+            },
+            responsiveConfig: {
+              mobile: { position: "top", maxWidth: "90%" },
+              tablet: { position: "right", maxWidth: "60%" },
+              desktop: { position: "right", maxWidth: "50%" },
+            },
+            accessibility: {
+              focusOnShow: false,
+              announceContent: true,
+              keyboardNavigation: true,
+              highlightTarget: true,
+            },
+            modalSpecific: {
+              waitForModalContent: true,
+              scrollIntoView: true,
+              ensureVisibility: true,
+            },
           },
           {
             id: "pros-cons",
@@ -341,6 +484,37 @@ class OnboardingTour {
             position: "right",
             autoScroll: true,
             waitForElement: true,
+            // Enhanced configuration
+            elementTimeout: 8000,
+            retryPositioning: true,
+            maxRetries: 4,
+            fallbackPosition: "center",
+            fallbackSelectors: [
+              ".option-details",
+              ".choice-analysis",
+              ".expanded-details",
+              ".pros-cons-section",
+            ],
+            dimensionHandling: {
+              minWidth: 340,
+              minHeight: 200,
+              preferredSpacing: 20,
+              targetPadding: 15,
+            },
+            responsiveConfig: {
+              mobile: { position: "bottom", maxWidth: "95%" },
+              tablet: { position: "right", maxWidth: "65%" },
+              desktop: { position: "right", maxWidth: "55%" },
+            },
+            accessibility: {
+              focusOnShow: false,
+              announceContent: true,
+              keyboardNavigation: true,
+            },
+            modalSpecific: {
+              waitForExpansion: true,
+              expansionDelay: 500,
+            },
           },
           {
             id: "radar-chart-preview",
@@ -351,6 +525,38 @@ class OnboardingTour {
             position: "left",
             autoScroll: true,
             waitFor: "option-selected",
+            // Enhanced configuration
+            waitForElement: true,
+            elementTimeout: 10000,
+            retryPositioning: true,
+            maxRetries: 5,
+            fallbackPosition: "center",
+            fallbackSelectors: [
+              "#scenario-radar-chart",
+              ".radar-chart",
+              ".ethics-chart",
+              ".visualization-container",
+            ],
+            dimensionHandling: {
+              minWidth: 320,
+              minHeight: 240,
+              preferredSpacing: 30,
+              targetPadding: 20,
+            },
+            responsiveConfig: {
+              mobile: { position: "bottom", maxWidth: "90%" },
+              tablet: { position: "left", maxWidth: "60%" },
+              desktop: { position: "left", maxWidth: "50%" },
+            },
+            accessibility: {
+              focusOnShow: false,
+              announceContent: true,
+              keyboardNavigation: true,
+            },
+            chartSpecific: {
+              waitForChartRender: true,
+              chartRenderTimeout: 3000,
+            },
           },
           {
             id: "confirm-choice",
@@ -362,6 +568,35 @@ class OnboardingTour {
             action: "wait-for-click",
             highlightClick: true,
             autoScroll: true,
+            // Enhanced configuration
+            waitForElement: true,
+            elementTimeout: 8000,
+            retryPositioning: true,
+            maxRetries: 5,
+            fallbackPosition: "center",
+            fallbackSelectors: [
+              "#confirm-choice",
+              ".confirm-button",
+              ".submit-choice",
+              ".decision-confirm",
+            ],
+            dimensionHandling: {
+              minWidth: 300,
+              minHeight: 180,
+              preferredSpacing: 20,
+              targetPadding: 15,
+            },
+            responsiveConfig: {
+              mobile: { position: "top", maxWidth: "90%" },
+              tablet: { position: "right", maxWidth: "60%" },
+              desktop: { position: "right", maxWidth: "50%" },
+            },
+            accessibility: {
+              focusOnShow: true,
+              announceContent: true,
+              keyboardNavigation: true,
+              highlightTarget: true,
+            },
           },
           {
             id: "reflection-intro",
@@ -372,6 +607,39 @@ class OnboardingTour {
             position: "center",
             waitFor: "reflection-modal",
             autoScroll: false,
+            // Enhanced configuration
+            waitForElement: true,
+            elementTimeout: 12000,
+            retryPositioning: true,
+            maxRetries: 6,
+            fallbackPosition: "center",
+            fallbackSelectors: [
+              ".reflection-modal",
+              ".reusable-modal",
+              ".modal-dialog",
+              ".reflection-container",
+            ],
+            dimensionHandling: {
+              minWidth: 400,
+              minHeight: 300,
+              preferredSpacing: 40,
+              targetPadding: 30,
+            },
+            responsiveConfig: {
+              mobile: { position: "center", maxWidth: "95%" },
+              tablet: { position: "center", maxWidth: "80%" },
+              desktop: { position: "center", maxWidth: "70%" },
+            },
+            accessibility: {
+              focusOnShow: true,
+              announceContent: true,
+              keyboardNavigation: true,
+            },
+            modalSpecific: {
+              waitForModalOpen: true,
+              modalOpenDelay: 1000,
+              ensureModalContent: true,
+            },
           },
           {
             id: "choice-analysis",
@@ -383,6 +651,40 @@ class OnboardingTour {
             action: "wait-for-click",
             highlightClick: true,
             autoScroll: true,
+            waitForElement: true,
+            // Enhanced configuration
+            elementTimeout: 10000,
+            retryPositioning: true,
+            maxRetries: 6,
+            fallbackPosition: "bottom",
+            fallbackSelectors: [
+              'button[data-action="next"]',
+              ".next-button",
+              ".continue-button",
+              ".modal-footer button:last-child",
+            ],
+            dimensionHandling: {
+              minWidth: 320,
+              minHeight: 200,
+              preferredSpacing: 25,
+              targetPadding: 20,
+            },
+            responsiveConfig: {
+              mobile: { position: "top", maxWidth: "90%" },
+              tablet: { position: "left", maxWidth: "65%" },
+              desktop: { position: "left", maxWidth: "55%" },
+            },
+            accessibility: {
+              focusOnShow: false,
+              announceContent: true,
+              keyboardNavigation: true,
+              highlightTarget: true,
+            },
+            modalSpecific: {
+              waitForModalContent: true,
+              buttonSelector: 'button[data-action="next"]',
+              ensureButtonEnabled: true,
+            },
           },
           {
             id: "global-comparison",
@@ -394,6 +696,40 @@ class OnboardingTour {
             action: "wait-for-click",
             highlightClick: true,
             autoScroll: true,
+            waitForElement: true,
+            // Enhanced configuration
+            elementTimeout: 10000,
+            retryPositioning: true,
+            maxRetries: 6,
+            fallbackPosition: "bottom",
+            fallbackSelectors: [
+              'button[data-action="next"]',
+              ".next-button",
+              ".continue-button",
+              ".modal-footer button:last-child",
+            ],
+            dimensionHandling: {
+              minWidth: 350,
+              minHeight: 220,
+              preferredSpacing: 25,
+              targetPadding: 20,
+            },
+            responsiveConfig: {
+              mobile: { position: "top", maxWidth: "90%" },
+              tablet: { position: "left", maxWidth: "65%" },
+              desktop: { position: "left", maxWidth: "55%" },
+            },
+            accessibility: {
+              focusOnShow: false,
+              announceContent: true,
+              keyboardNavigation: true,
+              highlightTarget: true,
+            },
+            modalSpecific: {
+              waitForModalContent: true,
+              waitForDataLoad: true,
+              dataLoadTimeout: 5000,
+            },
           },
           {
             id: "deeper-reflection",
@@ -405,6 +741,39 @@ class OnboardingTour {
             action: "wait-for-click",
             highlightClick: true,
             autoScroll: true,
+            waitForElement: true,
+            // Enhanced configuration
+            elementTimeout: 10000,
+            retryPositioning: true,
+            maxRetries: 6,
+            fallbackPosition: "bottom",
+            fallbackSelectors: [
+              'button[data-action="next"]',
+              ".next-button",
+              ".continue-button",
+              ".modal-footer button:last-child",
+            ],
+            dimensionHandling: {
+              minWidth: 340,
+              minHeight: 220,
+              preferredSpacing: 25,
+              targetPadding: 20,
+            },
+            responsiveConfig: {
+              mobile: { position: "top", maxWidth: "90%" },
+              tablet: { position: "left", maxWidth: "65%" },
+              desktop: { position: "left", maxWidth: "55%" },
+            },
+            accessibility: {
+              focusOnShow: false,
+              announceContent: true,
+              keyboardNavigation: true,
+              highlightTarget: true,
+            },
+            modalSpecific: {
+              waitForModalContent: true,
+              contentSelector: ".reflection-content",
+            },
           },
           {
             id: "key-insights",
@@ -416,6 +785,39 @@ class OnboardingTour {
             action: "wait-for-click",
             highlightClick: true,
             autoScroll: true,
+            waitForElement: true,
+            // Enhanced configuration
+            elementTimeout: 10000,
+            retryPositioning: true,
+            maxRetries: 6,
+            fallbackPosition: "bottom",
+            fallbackSelectors: [
+              'button[data-action="next"]',
+              ".complete-button",
+              ".finish-button",
+              ".modal-footer button:last-child",
+            ],
+            dimensionHandling: {
+              minWidth: 350,
+              minHeight: 240,
+              preferredSpacing: 25,
+              targetPadding: 20,
+            },
+            responsiveConfig: {
+              mobile: { position: "top", maxWidth: "90%" },
+              tablet: { position: "left", maxWidth: "65%" },
+              desktop: { position: "left", maxWidth: "55%" },
+            },
+            accessibility: {
+              focusOnShow: false,
+              announceContent: true,
+              keyboardNavigation: true,
+              highlightTarget: true,
+            },
+            modalSpecific: {
+              waitForModalContent: true,
+              finalStep: true,
+            },
           },
           {
             id: "tutorial-complete",
@@ -434,11 +836,33 @@ class OnboardingTour {
             position: "center",
             autoScroll: false,
             skipUntil: "choice-confirmed",
+            // Enhanced configuration
+            waitForElement: false,
+            elementTimeout: 3000,
+            retryPositioning: false,
+            maxRetries: 1,
+            fallbackPosition: "center",
+            dimensionHandling: {
+              minWidth: 400,
+              minHeight: 300,
+              maxWidth: 600,
+              maxHeight: 500,
+            },
+            responsiveConfig: {
+              mobile: { position: "center", padding: 20 },
+              tablet: { position: "center", padding: 30 },
+              desktop: { position: "center", padding: 40 },
+            },
+            accessibility: {
+              focusOnShow: true,
+              announceContent: true,
+              keyboardNavigation: true,
+            },
           },
         ],
       },
       2: {
-        // Hero Demo Tutorial
+        // Hero Demo Tutorial - Enhanced with robust positioning and element waiting
         name: "hero-demo",
         title: "Hero Demo Tutorial",
         steps: [
@@ -450,6 +874,39 @@ class OnboardingTour {
             target: "#hero-ethics-chart",
             position: "bottom",
             autoScroll: true,
+            // Enhanced configuration
+            waitForElement: true,
+            elementTimeout: 10000,
+            retryPositioning: true,
+            maxRetries: 5,
+            fallbackPosition: "center",
+            fallbackSelectors: [
+              "#hero-ethics-chart",
+              ".hero-chart",
+              ".ethics-visualization",
+              ".demo-chart-container",
+            ],
+            dimensionHandling: {
+              minWidth: 350,
+              minHeight: 240,
+              preferredSpacing: 30,
+              targetPadding: 25,
+            },
+            responsiveConfig: {
+              mobile: { position: "top", maxWidth: "90%" },
+              tablet: { position: "bottom", maxWidth: "70%" },
+              desktop: { position: "bottom", maxWidth: "60%" },
+            },
+            accessibility: {
+              focusOnShow: false,
+              announceContent: true,
+              keyboardNavigation: true,
+            },
+            chartSpecific: {
+              waitForChartRender: true,
+              chartRenderTimeout: 5000,
+              verifyChartData: true,
+            },
           },
           {
             id: "ethical-dimensions",
@@ -459,6 +916,38 @@ class OnboardingTour {
             target: "#hero-ethics-chart",
             position: "left",
             autoScroll: false,
+            // Enhanced configuration
+            waitForElement: true,
+            elementTimeout: 8000,
+            retryPositioning: true,
+            maxRetries: 4,
+            fallbackPosition: "center",
+            fallbackSelectors: [
+              "#hero-ethics-chart",
+              ".chart-dimensions",
+              ".ethics-axes",
+              ".hero-chart",
+            ],
+            dimensionHandling: {
+              minWidth: 360,
+              minHeight: 260,
+              preferredSpacing: 35,
+              targetPadding: 30,
+            },
+            responsiveConfig: {
+              mobile: { position: "bottom", maxWidth: "95%" },
+              tablet: { position: "left", maxWidth: "65%" },
+              desktop: { position: "left", maxWidth: "55%" },
+            },
+            accessibility: {
+              focusOnShow: false,
+              announceContent: true,
+              keyboardNavigation: true,
+            },
+            chartSpecific: {
+              waitForChartComplete: true,
+              highlightDimensions: true,
+            },
           },
           {
             id: "interactive-controls",
@@ -469,6 +958,39 @@ class OnboardingTour {
             position: "left",
             autoScroll: true,
             highlightClick: true,
+            // Enhanced configuration
+            waitForElement: true,
+            elementTimeout: 8000,
+            retryPositioning: true,
+            maxRetries: 5,
+            fallbackPosition: "bottom",
+            fallbackSelectors: [
+              ".demo-controls-grid",
+              ".control-buttons",
+              ".demo-controls",
+              ".interaction-controls",
+            ],
+            dimensionHandling: {
+              minWidth: 320,
+              minHeight: 200,
+              preferredSpacing: 25,
+              targetPadding: 20,
+            },
+            responsiveConfig: {
+              mobile: { position: "top", maxWidth: "90%" },
+              tablet: { position: "left", maxWidth: "65%" },
+              desktop: { position: "left", maxWidth: "55%" },
+            },
+            accessibility: {
+              focusOnShow: false,
+              announceContent: true,
+              keyboardNavigation: true,
+              highlightTarget: true,
+            },
+            interactionSpecific: {
+              waitForControls: true,
+              enableInteraction: true,
+            },
           },
           {
             id: "how-to-read",
@@ -479,6 +1001,38 @@ class OnboardingTour {
             position: "bottom",
             autoScroll: true,
             highlightClick: true,
+            // Enhanced configuration
+            waitForElement: true,
+            elementTimeout: 8000,
+            retryPositioning: true,
+            maxRetries: 4,
+            fallbackPosition: "center",
+            fallbackSelectors: [
+              ".radar-instructions-accordion",
+              ".instructions-section",
+              ".chart-guide",
+              ".reading-instructions",
+            ],
+            dimensionHandling: {
+              minWidth: 340,
+              minHeight: 220,
+              preferredSpacing: 25,
+              targetPadding: 20,
+            },
+            responsiveConfig: {
+              mobile: { position: "top", maxWidth: "90%" },
+              tablet: { position: "bottom", maxWidth: "70%" },
+              desktop: { position: "bottom", maxWidth: "60%" },
+            },
+            accessibility: {
+              focusOnShow: false,
+              announceContent: true,
+              keyboardNavigation: true,
+            },
+            accordionSpecific: {
+              waitForAccordion: true,
+              expandAccordion: false,
+            },
           },
           {
             id: "glossary",
@@ -489,6 +1043,38 @@ class OnboardingTour {
             position: "bottom",
             autoScroll: true,
             highlightClick: true,
+            // Enhanced configuration
+            waitForElement: true,
+            elementTimeout: 8000,
+            retryPositioning: true,
+            maxRetries: 4,
+            fallbackPosition: "center",
+            fallbackSelectors: [
+              ".ethics-glossary-accordion",
+              ".glossary-section",
+              ".definitions-accordion",
+              ".ethics-definitions",
+            ],
+            dimensionHandling: {
+              minWidth: 350,
+              minHeight: 240,
+              preferredSpacing: 25,
+              targetPadding: 20,
+            },
+            responsiveConfig: {
+              mobile: { position: "top", maxWidth: "90%" },
+              tablet: { position: "bottom", maxWidth: "70%" },
+              desktop: { position: "bottom", maxWidth: "60%" },
+            },
+            accessibility: {
+              focusOnShow: false,
+              announceContent: true,
+              keyboardNavigation: true,
+            },
+            accordionSpecific: {
+              waitForAccordion: true,
+              glossaryType: "ethics",
+            },
           },
           {
             id: "radar-tutorial-complete",
@@ -506,11 +1092,33 @@ class OnboardingTour {
             target: null,
             position: "center",
             autoScroll: false,
+            // Enhanced configuration
+            waitForElement: false,
+            elementTimeout: 3000,
+            retryPositioning: false,
+            maxRetries: 1,
+            fallbackPosition: "center",
+            dimensionHandling: {
+              minWidth: 400,
+              minHeight: 280,
+              maxWidth: 600,
+              maxHeight: 450,
+            },
+            responsiveConfig: {
+              mobile: { position: "center", padding: 20 },
+              tablet: { position: "center", padding: 30 },
+              desktop: { position: "center", padding: 40 },
+            },
+            accessibility: {
+              focusOnShow: true,
+              announceContent: true,
+              keyboardNavigation: true,
+            },
           },
         ],
       },
       3: {
-        // Learning Lab Pre-Launch Modal Tutorial
+        // Learning Lab Pre-Launch Modal Tutorial - Enhanced with robust positioning and element waiting
         name: "learning-lab",
         title: "Learning Lab Tutorial",
         steps: [
@@ -523,6 +1131,39 @@ class OnboardingTour {
               "#category-trolley-problem > div.scenarios-grid > article:nth-child(1)",
             position: "bottom",
             autoScroll: true,
+            // Enhanced configuration
+            waitForElement: true,
+            elementTimeout: 12000,
+            retryPositioning: true,
+            maxRetries: 6,
+            fallbackPosition: "center",
+            fallbackSelectors: [
+              "#category-trolley-problem > div.scenarios-grid > article:nth-child(1)",
+              ".scenario-card:first-child",
+              ".trolley-problem-card",
+              ".scenarios-grid article:first-child",
+            ],
+            dimensionHandling: {
+              minWidth: 350,
+              minHeight: 220,
+              preferredSpacing: 25,
+              targetPadding: 20,
+            },
+            responsiveConfig: {
+              mobile: { position: "top", maxWidth: "95%" },
+              tablet: { position: "bottom", maxWidth: "70%" },
+              desktop: { position: "bottom", maxWidth: "60%" },
+            },
+            accessibility: {
+              focusOnShow: false,
+              announceContent: true,
+              keyboardNavigation: true,
+            },
+            categorySpecific: {
+              waitForCategoryLoad: true,
+              categoryId: "trolley-problem",
+              verifyScenarioCards: true,
+            },
           },
           {
             id: "click-learning-lab",
@@ -537,6 +1178,39 @@ class OnboardingTour {
             highlightClick: true,
             waitFor:
               "#category-trolley-problem > div.scenarios-grid > article:nth-child(1)",
+            // Enhanced configuration
+            waitForElement: true,
+            elementTimeout: 10000,
+            retryPositioning: true,
+            maxRetries: 6,
+            fallbackPosition: "center",
+            fallbackSelectors: [
+              "#category-trolley-problem > div.scenarios-grid > article:nth-child(1) > div.scenario-footer > button.scenario-start-btn",
+              ".scenario-start-btn",
+              ".learning-lab-btn",
+              ".launch-scenario-btn",
+            ],
+            dimensionHandling: {
+              minWidth: 320,
+              minHeight: 180,
+              preferredSpacing: 20,
+              targetPadding: 15,
+            },
+            responsiveConfig: {
+              mobile: { position: "top", maxWidth: "90%" },
+              tablet: { position: "bottom", maxWidth: "65%" },
+              desktop: { position: "bottom", maxWidth: "55%" },
+            },
+            accessibility: {
+              focusOnShow: true,
+              announceContent: true,
+              keyboardNavigation: true,
+              highlightTarget: true,
+            },
+            buttonSpecific: {
+              waitForButtonEnabled: true,
+              verifyButtonFunction: true,
+            },
           },
           {
             id: "overview-tab",
@@ -548,6 +1222,40 @@ class OnboardingTour {
             position: "right",
             waitFor: "pre-launch-modal",
             autoScroll: true,
+            // Enhanced configuration
+            waitForElement: true,
+            elementTimeout: 12000,
+            retryPositioning: true,
+            maxRetries: 6,
+            fallbackPosition: "bottom",
+            fallbackSelectors: [
+              '.tab-buttons-container [data-tab="overview"]',
+              '.tab-button[data-tab="overview"]',
+              ".overview-tab",
+              ".tab-buttons-container .tab-button:first-child",
+            ],
+            dimensionHandling: {
+              minWidth: 340,
+              minHeight: 200,
+              preferredSpacing: 25,
+              targetPadding: 20,
+            },
+            responsiveConfig: {
+              mobile: { position: "bottom", maxWidth: "90%" },
+              tablet: { position: "right", maxWidth: "65%" },
+              desktop: { position: "right", maxWidth: "55%" },
+            },
+            accessibility: {
+              focusOnShow: false,
+              announceContent: true,
+              keyboardNavigation: true,
+            },
+            modalSpecific: {
+              waitForModalOpen: true,
+              modalType: "pre-launch",
+              waitForTabsLoad: true,
+              tabsLoadTimeout: 5000,
+            },
           },
           {
             id: "learning-goals-tab",
@@ -559,6 +1267,38 @@ class OnboardingTour {
             position: "right",
             highlightClick: true,
             autoScroll: true,
+            // Enhanced configuration
+            waitForElement: true,
+            elementTimeout: 8000,
+            retryPositioning: true,
+            maxRetries: 5,
+            fallbackPosition: "bottom",
+            fallbackSelectors: [
+              '.tab-buttons-container [data-tab="objectives"]',
+              '.tab-button[data-tab="objectives"]',
+              ".objectives-tab",
+              ".learning-goals-tab",
+            ],
+            dimensionHandling: {
+              minWidth: 340,
+              minHeight: 200,
+              preferredSpacing: 25,
+              targetPadding: 20,
+            },
+            responsiveConfig: {
+              mobile: { position: "bottom", maxWidth: "90%" },
+              tablet: { position: "right", maxWidth: "65%" },
+              desktop: { position: "right", maxWidth: "55%" },
+            },
+            accessibility: {
+              focusOnShow: false,
+              announceContent: true,
+              keyboardNavigation: true,
+            },
+            tabSpecific: {
+              tabName: "objectives",
+              waitForTabContent: true,
+            },
           },
           {
             id: "ethics-guide-tab",
@@ -570,6 +1310,38 @@ class OnboardingTour {
             position: "right",
             highlightClick: true,
             autoScroll: true,
+            // Enhanced configuration
+            waitForElement: true,
+            elementTimeout: 8000,
+            retryPositioning: true,
+            maxRetries: 5,
+            fallbackPosition: "bottom",
+            fallbackSelectors: [
+              '.tab-buttons-container [data-tab="ethics"]',
+              '.tab-button[data-tab="ethics"]',
+              ".ethics-tab",
+              ".ethics-guide-tab",
+            ],
+            dimensionHandling: {
+              minWidth: 340,
+              minHeight: 200,
+              preferredSpacing: 25,
+              targetPadding: 20,
+            },
+            responsiveConfig: {
+              mobile: { position: "bottom", maxWidth: "90%" },
+              tablet: { position: "right", maxWidth: "65%" },
+              desktop: { position: "right", maxWidth: "55%" },
+            },
+            accessibility: {
+              focusOnShow: false,
+              announceContent: true,
+              keyboardNavigation: true,
+            },
+            tabSpecific: {
+              tabName: "ethics",
+              waitForTabContent: true,
+            },
           },
           {
             id: "get-ready-tab",
@@ -581,6 +1353,38 @@ class OnboardingTour {
             position: "right",
             highlightClick: true,
             autoScroll: true,
+            // Enhanced configuration
+            waitForElement: true,
+            elementTimeout: 8000,
+            retryPositioning: true,
+            maxRetries: 5,
+            fallbackPosition: "bottom",
+            fallbackSelectors: [
+              '.tab-buttons-container [data-tab="preparation"]',
+              '.tab-button[data-tab="preparation"]',
+              ".preparation-tab",
+              ".get-ready-tab",
+            ],
+            dimensionHandling: {
+              minWidth: 340,
+              minHeight: 200,
+              preferredSpacing: 25,
+              targetPadding: 20,
+            },
+            responsiveConfig: {
+              mobile: { position: "bottom", maxWidth: "90%" },
+              tablet: { position: "right", maxWidth: "65%" },
+              desktop: { position: "right", maxWidth: "55%" },
+            },
+            accessibility: {
+              focusOnShow: false,
+              announceContent: true,
+              keyboardNavigation: true,
+            },
+            tabSpecific: {
+              tabName: "preparation",
+              waitForTabContent: true,
+            },
           },
           {
             id: "resources-tab",
@@ -592,6 +1396,38 @@ class OnboardingTour {
             position: "right",
             highlightClick: true,
             autoScroll: true,
+            // Enhanced configuration
+            waitForElement: true,
+            elementTimeout: 8000,
+            retryPositioning: true,
+            maxRetries: 5,
+            fallbackPosition: "bottom",
+            fallbackSelectors: [
+              '.tab-buttons-container [data-tab="resources"]',
+              '.tab-button[data-tab="resources"]',
+              ".resources-tab",
+              ".materials-tab",
+            ],
+            dimensionHandling: {
+              minWidth: 340,
+              minHeight: 200,
+              preferredSpacing: 25,
+              targetPadding: 20,
+            },
+            responsiveConfig: {
+              mobile: { position: "bottom", maxWidth: "90%" },
+              tablet: { position: "right", maxWidth: "65%" },
+              desktop: { position: "right", maxWidth: "55%" },
+            },
+            accessibility: {
+              focusOnShow: false,
+              announceContent: true,
+              keyboardNavigation: true,
+            },
+            tabSpecific: {
+              tabName: "resources",
+              waitForTabContent: true,
+            },
           },
           {
             id: "for-educators-tab",
@@ -605,6 +1441,39 @@ class OnboardingTour {
             autoScroll: true,
             hasNextButton: true,
             action: "next",
+            // Enhanced configuration
+            waitForElement: true,
+            elementTimeout: 8000,
+            retryPositioning: true,
+            maxRetries: 5,
+            fallbackPosition: "bottom",
+            fallbackSelectors: [
+              '.tab-buttons-container [data-tab="educator"]',
+              '.tab-button[data-tab="educator"]',
+              ".educator-tab",
+              ".for-educators-tab",
+            ],
+            dimensionHandling: {
+              minWidth: 340,
+              minHeight: 220,
+              preferredSpacing: 25,
+              targetPadding: 20,
+            },
+            responsiveConfig: {
+              mobile: { position: "bottom", maxWidth: "90%" },
+              tablet: { position: "right", maxWidth: "65%" },
+              desktop: { position: "right", maxWidth: "55%" },
+            },
+            accessibility: {
+              focusOnShow: false,
+              announceContent: true,
+              keyboardNavigation: true,
+            },
+            tabSpecific: {
+              tabName: "educator",
+              waitForTabContent: true,
+              finalTab: true,
+            },
             onShow() {
               // OPTIMIZED: Enhanced auto-scroll with visibility check to avoid unnecessary scrolling
               const educatorTab =
@@ -695,6 +1564,28 @@ class OnboardingTour {
             target: null,
             position: "center",
             autoScroll: false,
+            // Enhanced configuration
+            waitForElement: false,
+            elementTimeout: 3000,
+            retryPositioning: false,
+            maxRetries: 1,
+            fallbackPosition: "center",
+            dimensionHandling: {
+              minWidth: 400,
+              minHeight: 280,
+              maxWidth: 600,
+              maxHeight: 450,
+            },
+            responsiveConfig: {
+              mobile: { position: "center", padding: 20 },
+              tablet: { position: "center", padding: 30 },
+              desktop: { position: "center", padding: 40 },
+            },
+            accessibility: {
+              focusOnShow: true,
+              announceContent: true,
+              keyboardNavigation: true,
+            },
           },
         ],
       },
@@ -1114,22 +2005,49 @@ class OnboardingTour {
   }
 
   _performPositioning(targetElement, position, step, retryCount) {
-    // Prevent infinite recursion - max 3 retries
-    const MAX_POSITION_RETRIES = 3;
-    if (retryCount > MAX_POSITION_RETRIES) {
+    // Enhanced retry logic with step configuration
+    const maxRetries = step?.maxRetries || 3;
+    if (retryCount > maxRetries) {
       logger.warn(
         "OnboardingTour",
         `⚠️ Max positioning retries reached for step ${step?.id || "unknown"}`,
+        {
+          stepId: step?.id,
+          maxRetries,
+          retryCount,
+          willUseFallback: !!step?.fallbackPosition,
+        },
       );
+
+      // Use enhanced fallback positioning if available
+      if (step?.fallbackPosition) {
+        return this.applyFallbackPositioning(step);
+      }
       return;
     }
 
-    // MOBILE-AWARE POSITIONING LOGIC
-    const isMobile = window.innerWidth <= this.MOBILE_BREAKPOINT; // Mobile breakpoint
+    // Enhanced mobile-aware positioning with responsive configuration
+    const isMobile = window.innerWidth <= this.MOBILE_BREAKPOINT;
+    const responsiveConfig = step?.responsiveConfig || {};
+    const currentConfig = isMobile
+      ? responsiveConfig.mobile
+      : window.innerWidth <= 1024
+        ? responsiveConfig.tablet
+        : responsiveConfig.desktop;
 
-    // OPTIMIZED: Batch initial style setup to reduce DOM mutations
+    // Use enhanced dimension handling
+    const dimensionConfig = step?.dimensionHandling || {};
+    const spacing =
+      currentConfig?.spacing ||
+      (isMobile ? this.MOBILE_SPACING : this.DESKTOP_SPACING);
+
+    // Get viewport dimensions early for responsive calculations
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+
+    // OPTIMIZED: Batch initial style setup with enhanced configuration
     const initialStyles = {
-      visibility: "hidden",
+      opacity: "0", // Use opacity instead of visibility for smoother transitions
       display: "block",
       position: "fixed",
       zIndex: "10014",
@@ -1138,16 +2056,82 @@ class OnboardingTour {
       overflow: "", // Reset overflow
     };
 
+    // Apply responsive width constraints if configured, but respect CSS max-width limits
+    if (currentConfig?.maxWidth) {
+      // Convert percentage to pixels and compare with CSS max-width constraint (400px)
+      const cssMaxWidthPx = 400; // From CSS: .onboarding-coach-mark { max-width: 400px; }
+
+      if (currentConfig.maxWidth.includes("%")) {
+        const percentageValue = parseFloat(currentConfig.maxWidth) / 100;
+        const calculatedWidthPx = viewportWidth * percentageValue;
+
+        // Use the smaller of calculated percentage width or CSS max-width
+        const effectiveMaxWidth = Math.min(calculatedWidthPx, cssMaxWidthPx);
+        initialStyles.maxWidth = `${effectiveMaxWidth}px`;
+
+        logger.debug(
+          "OnboardingTour",
+          "Responsive width constraint applied with CSS limit",
+          {
+            stepId: step?.id,
+            originalPercentage: currentConfig.maxWidth,
+            calculatedPx: calculatedWidthPx,
+            cssMaxPx: cssMaxWidthPx,
+            effectiveMaxPx: effectiveMaxWidth,
+            viewportWidth,
+          },
+        );
+      } else {
+        // Non-percentage value, apply directly but still respect CSS limits
+        const configuredWidthPx = parseFloat(currentConfig.maxWidth);
+        const effectiveMaxWidth = Math.min(configuredWidthPx, cssMaxWidthPx);
+        initialStyles.maxWidth = `${effectiveMaxWidth}px`;
+      }
+    }
+
     // Apply all initial styles at once
     Object.assign(this.coachMark.style, initialStyles);
 
     // Reset mobile overlay class in case it was previously set
     this.coachMark.classList.remove("mobile-overlay");
 
+    // Force layout recalculation to ensure getBoundingClientRect reflects the new maxWidth
+    this.coachMark.offsetHeight; // Trigger layout reflow
+
     const coachMarkRect = this.coachMark.getBoundingClientRect();
-    const viewportHeight = window.innerHeight;
-    const viewportWidth = window.innerWidth;
-    const spacing = isMobile ? this.MOBILE_SPACING : this.DESKTOP_SPACING;
+
+    logger.debug(
+      "OnboardingTour",
+      "Coach mark dimensions after style application",
+      {
+        stepId: step?.id,
+        appliedMaxWidth: initialStyles.maxWidth,
+        actualWidth: coachMarkRect.width,
+        actualHeight: coachMarkRect.height,
+        viewportWidth,
+      },
+    );
+
+    // Enhanced dimension safeguards with step configuration
+    const safeCoachMarkWidth =
+      coachMarkRect.width > 0
+        ? coachMarkRect.width
+        : dimensionConfig.minWidth || 320;
+    const safeCoachMarkHeight =
+      coachMarkRect.height > 0
+        ? coachMarkRect.height
+        : dimensionConfig.minHeight || 200;
+
+    logger.debug("OnboardingTour", "Enhanced coach mark positioning", {
+      originalRect: {
+        width: coachMarkRect.width,
+        height: coachMarkRect.height,
+      },
+      safeRect: { width: safeCoachMarkWidth, height: safeCoachMarkHeight },
+      stepId: step?.id,
+      appliedMaxWidth: initialStyles.maxWidth || "none",
+      responsiveConfig: currentConfig,
+    });
 
     let left, top;
 
@@ -1163,10 +2147,10 @@ class OnboardingTour {
         targetRect.left > viewportWidth
       ) {
         // Target is outside viewport, scroll it into view (only if we haven't exceeded retries)
-        if (retryCount < MAX_POSITION_RETRIES) {
+        if (retryCount < maxRetries) {
           logger.debug(
             "OnboardingTour",
-            `Target outside viewport, scrolling into view (retry ${retryCount + 1}/${MAX_POSITION_RETRIES})`,
+            `Target outside viewport, scrolling into view (retry ${retryCount + 1}/${maxRetries})`,
           );
           targetElement.scrollIntoView({
             behavior: "smooth",
@@ -1187,7 +2171,7 @@ class OnboardingTour {
           // Exceeded retries, position anyway (might be partially visible)
           logger.warn(
             "OnboardingTour",
-            `Target still outside viewport after ${MAX_POSITION_RETRIES} retries, positioning anyway`,
+            `Target still outside viewport after ${maxRetries} retries, positioning anyway`,
           );
         }
       }
@@ -1196,7 +2180,7 @@ class OnboardingTour {
       if (isMobile) {
         // On mobile, use a more intelligent positioning strategy that avoids covering the target
         const mobileCoachMarkHeight = Math.min(
-          coachMarkRect.height,
+          safeCoachMarkHeight,
           viewportHeight * this.MOBILE_COACH_MARK_HEIGHT_RATIO,
         ); // Max 40% of screen
 
@@ -1213,7 +2197,7 @@ class OnboardingTour {
           },
           spaceAbove,
           spaceBelow,
-          coachMarkHeight: coachMarkRect.height,
+          coachMarkHeight: safeCoachMarkHeight,
           mobileCoachMarkHeight,
         });
 
@@ -1224,8 +2208,8 @@ class OnboardingTour {
           left = Math.max(
             spacing,
             Math.min(
-              targetRect.left + targetRect.width / 2 - coachMarkRect.width / 2,
-              viewportWidth - coachMarkRect.width - spacing,
+              targetRect.left + targetRect.width / 2 - safeCoachMarkWidth / 2,
+              viewportWidth - safeCoachMarkWidth - spacing,
             ),
           );
           top = targetRect.bottom + spacing;
@@ -1236,11 +2220,11 @@ class OnboardingTour {
           left = Math.max(
             spacing,
             Math.min(
-              targetRect.left + targetRect.width / 2 - coachMarkRect.width / 2,
-              viewportWidth - coachMarkRect.width - spacing,
+              targetRect.left + targetRect.width / 2 - safeCoachMarkWidth / 2,
+              viewportWidth - safeCoachMarkWidth - spacing,
             ),
           );
-          top = targetRect.top - coachMarkRect.height - spacing;
+          top = targetRect.top - safeCoachMarkHeight - spacing;
           logger.debug("OnboardingTour", "Mobile: Positioning above target");
         } else {
           // Not enough space above or below - use full-width overlay at bottom
@@ -1248,7 +2232,7 @@ class OnboardingTour {
           left = spacing;
           top =
             viewportHeight -
-            coachMarkRect.height -
+            safeCoachMarkHeight -
             spacing -
             this.MOBILE_NAVIGATION_SPACE; // Leave space for navigation
 
@@ -1284,35 +2268,35 @@ class OnboardingTour {
         switch (position) {
           case "top":
             left =
-              targetRect.left + targetRect.width / 2 - coachMarkRect.width / 2;
-            top = targetRect.top - coachMarkRect.height - spacing;
+              targetRect.left + targetRect.width / 2 - safeCoachMarkWidth / 2;
+            top = targetRect.top - safeCoachMarkHeight - spacing;
             break;
           case "bottom":
             left =
-              targetRect.left + targetRect.width / 2 - coachMarkRect.width / 2;
+              targetRect.left + targetRect.width / 2 - safeCoachMarkWidth / 2;
             top = targetRect.bottom + spacing;
             break;
           case "left":
-            left = targetRect.left - coachMarkRect.width - spacing;
+            left = targetRect.left - safeCoachMarkWidth - spacing;
             top =
-              targetRect.top + targetRect.height / 2 - coachMarkRect.height / 2;
+              targetRect.top + targetRect.height / 2 - safeCoachMarkHeight / 2;
             break;
           case "right":
             left = targetRect.right + spacing;
             top =
-              targetRect.top + targetRect.height / 2 - coachMarkRect.height / 2;
+              targetRect.top + targetRect.height / 2 - safeCoachMarkHeight / 2;
             break;
           default: // Default to bottom
             left =
-              targetRect.left + targetRect.width / 2 - coachMarkRect.width / 2;
+              targetRect.left + targetRect.width / 2 - safeCoachMarkWidth / 2;
             top = targetRect.bottom + spacing;
         }
 
         // VIEWPORT BOUNDS CHECKING - Always keep within viewport
         const minLeft = spacing;
-        const maxLeft = viewportWidth - coachMarkRect.width - spacing;
+        const maxLeft = viewportWidth - safeCoachMarkWidth - spacing;
         const minTop = spacing;
-        const maxTop = viewportHeight - coachMarkRect.height - spacing;
+        const maxTop = viewportHeight - safeCoachMarkHeight - spacing;
 
         // Clamp to viewport bounds
         left = Math.max(minLeft, Math.min(left, maxLeft));
@@ -1328,9 +2312,9 @@ class OnboardingTour {
         // If positioned over target, try alternative positions
         if (
           left < targetRect.right &&
-          left + coachMarkRect.width > targetRect.left &&
+          left + safeCoachMarkWidth > targetRect.left &&
           top < targetRect.bottom &&
-          top + coachMarkRect.height > targetRect.top
+          top + safeCoachMarkHeight > targetRect.top
         ) {
           if (isMobile) {
             // On mobile, prefer overlay mode when covering target
@@ -1351,7 +2335,7 @@ class OnboardingTour {
             // Desktop fallback positioning
             // Try positioning to the right
             if (
-              targetRect.right + coachMarkRect.width + spacing <=
+              targetRect.right + safeCoachMarkWidth + spacing <=
               viewportWidth
             ) {
               left = targetRect.right + spacing;
@@ -1359,45 +2343,45 @@ class OnboardingTour {
                 spacing,
                 Math.min(
                   targetRect.top,
-                  viewportHeight - coachMarkRect.height - spacing,
+                  viewportHeight - safeCoachMarkHeight - spacing,
                 ),
               );
             }
             // Try positioning to the left
-            else if (targetRect.left - coachMarkRect.width - spacing >= 0) {
-              left = targetRect.left - coachMarkRect.width - spacing;
+            else if (targetRect.left - safeCoachMarkWidth - spacing >= 0) {
+              left = targetRect.left - safeCoachMarkWidth - spacing;
               top = Math.max(
                 spacing,
                 Math.min(
                   targetRect.top,
-                  viewportHeight - coachMarkRect.height - spacing,
+                  viewportHeight - safeCoachMarkHeight - spacing,
                 ),
               );
             }
             // Try positioning below
             else if (
-              targetRect.bottom + coachMarkRect.height + spacing <=
+              targetRect.bottom + safeCoachMarkHeight + spacing <=
               viewportHeight
             ) {
               left = Math.max(
                 spacing,
                 Math.min(
                   targetRect.left,
-                  viewportWidth - coachMarkRect.width - spacing,
+                  viewportWidth - safeCoachMarkWidth - spacing,
                 ),
               );
               top = targetRect.bottom + spacing;
             }
             // Try positioning above
-            else if (targetRect.top - coachMarkRect.height - spacing >= 0) {
+            else if (targetRect.top - safeCoachMarkHeight - spacing >= 0) {
               left = Math.max(
                 spacing,
                 Math.min(
                   targetRect.left,
-                  viewportWidth - coachMarkRect.width - spacing,
+                  viewportWidth - safeCoachMarkWidth - spacing,
                 ),
               );
-              top = targetRect.top - coachMarkRect.height - spacing;
+              top = targetRect.top - safeCoachMarkHeight - spacing;
             }
           }
         }
@@ -1422,13 +2406,22 @@ class OnboardingTour {
       );
     } else {
       // Center on viewport for steps without targets
+      logger.warn(
+        "OnboardingTour",
+        `Target element not found for step ${step?.id}, using fallback positioning`,
+        {
+          stepId: step?.id,
+          targetSelector: step?.target,
+        },
+      );
+
       if (isMobile) {
         // On mobile, position towards bottom to avoid header overlap
         left = spacing;
         top = Math.max(
           viewportHeight * this.MOBILE_POSITION_RATIO,
           viewportHeight -
-            coachMarkRect.height -
+            safeCoachMarkHeight -
             spacing -
             this.MOBILE_NAVIGATION_SPACE,
         );
@@ -1439,27 +2432,42 @@ class OnboardingTour {
         };
         Object.assign(this.coachMark.style, mobileCenterStyles);
       } else {
-        left = viewportWidth / 2 - coachMarkRect.width / 2;
-        top = viewportHeight / 2 - coachMarkRect.height / 2;
+        left = Math.max(20, viewportWidth / 2 - safeCoachMarkWidth / 2);
+        top = Math.max(20, viewportHeight / 2 - safeCoachMarkHeight / 2);
       }
 
-      logger.debug("OnboardingTour", "Coach mark centered in viewport", {
-        stepId: step?.id,
-        coachMarkPos: { left, top },
-        isMobile,
-      });
+      logger.info(
+        "OnboardingTour",
+        "Coach mark centered in viewport (fallback)",
+        {
+          stepId: step?.id,
+          targetSelector: step?.target,
+          coachMarkPos: { left, top },
+          isMobile,
+          viewportSize: { width: viewportWidth, height: viewportHeight },
+          coachMarkSize: {
+            width: safeCoachMarkWidth,
+            height: safeCoachMarkHeight,
+          },
+        },
+      );
     }
 
     // OPTIMIZED: Apply final position and visibility in batch to reduce DOM mutations
+    // Allow CSS animations to handle the opacity transition smoothly
     const finalPositionStyles = {
       left: `${left}px`,
       top: `${top}px`,
-      visibility: "visible",
-      opacity: "1",
       pointerEvents: "auto",
       display: "block",
+      // Remove opacity and visibility - let CSS animations handle them
     };
     Object.assign(this.coachMark.style, finalPositionStyles);
+
+    // Trigger CSS animation by removing the initial opacity override after positioning
+    requestAnimationFrame(() => {
+      this.coachMark.style.opacity = "";
+    });
 
     // Final verification that coach mark is visible
     const finalRect = this.coachMark.getBoundingClientRect();
@@ -1489,8 +2497,8 @@ class OnboardingTour {
 
       // OPTIMIZED: Emergency fallback with batched style update
       const fallbackStyles = {
-        left: `${viewportWidth / 2 - coachMarkRect.width / 2}px`,
-        top: `${viewportHeight / 2 - coachMarkRect.height / 2}px`,
+        left: `${viewportWidth / 2 - safeCoachMarkWidth / 2}px`,
+        top: `${viewportHeight / 2 - safeCoachMarkHeight / 2}px`,
       };
       Object.assign(this.coachMark.style, fallbackStyles);
     }
@@ -1532,68 +2540,41 @@ class OnboardingTour {
         currentStep: this.currentStep,
         stepId: step.id,
         totalSteps: tutorial.steps.length,
+        enhancedConfig: {
+          waitForElement: step.waitForElement,
+          elementTimeout: step.elementTimeout,
+          fallbackSelectors: step.fallbackSelectors?.length || 0,
+          retryPositioning: step.retryPositioning,
+          maxRetries: step.maxRetries,
+        },
       },
     );
 
-    // SIMPLIFIED STEP RENDERING - Removed complex conditions that could cause skipping
+    // Enhanced element finding with robust fallback handling
+    let targetElement = await this.findTargetElementWithFallbacks(step);
 
-    // Find target element if specified
-    let targetElement = step.target
-      ? document.querySelector(step.target)
-      : null;
-
-    // If step requires waiting for element to appear, wait for it
+    // Enhanced element waiting with configurable timeout
     if (step.waitForElement && step.target && !targetElement) {
-      logger.info(
-        "OnboardingTour",
-        `Waiting for element to appear: ${step.target}`,
-        {
-          stepId: step.id,
-          selector: step.target,
-        },
-      );
-
-      // Wait for element to appear with a timeout
-      let attempts = 0;
-      const maxAttempts = 30; // 3 seconds with 100ms intervals
-
-      while (!targetElement && attempts < maxAttempts) {
-        await new Promise((resolve) => setTimeout(resolve, this.CHECK_DELAY));
-        targetElement = document.querySelector(step.target);
-        attempts++;
-      }
-
-      if (!targetElement) {
-        logger.warn(
-          "OnboardingTour",
-          `Target element still not found after waiting: ${step.target}`,
-          {
-            stepId: step.id,
-            selector: step.target,
-            attemptsUsed: attempts,
-          },
-        );
-      } else {
-        logger.info(
-          "OnboardingTour",
-          `Target element found after ${attempts * 100}ms`,
-          {
-            stepId: step.id,
-            selector: step.target,
-          },
-        );
-      }
+      targetElement = await this.waitForElementWithTimeout(step);
     }
 
+    // Verify target element or use fallback positioning
     if (step.target && !targetElement) {
       logger.warn(
         "OnboardingTour",
-        `Target element not found: ${step.target}`,
+        `Target element not found after all attempts: ${step.target}`,
         {
           stepId: step.id,
           selector: step.target,
+          fallbackSelectors: step.fallbackSelectors,
+          willUseFallbackPosition: !!step.fallbackPosition,
         },
       );
+    }
+
+    // Enhanced auto-scroll with responsive awareness
+    if (step.autoScroll && targetElement) {
+      await this.performEnhancedAutoScroll(targetElement, step);
     }
 
     // Auto-scroll to target if needed and element exists
@@ -1704,15 +2685,14 @@ class OnboardingTour {
     // Position coach mark
     this.positionCoachMark(targetElement, step.position, step);
 
-    // OPTIMIZED: Batch final coach mark visibility styles to reduce DOM mutations
-    const finalVisibilityStyles = {
+    // OPTIMIZED: Final coach mark setup - let CSS animations handle visibility smoothly
+    const finalSetupStyles = {
       display: "block",
-      visibility: "visible",
-      opacity: "1",
       pointerEvents: "auto",
       zIndex: "10014",
+      // Don't override opacity/visibility - let CSS animations handle the entrance
     };
-    Object.assign(this.coachMark.style, finalVisibilityStyles);
+    Object.assign(this.coachMark.style, finalSetupStyles);
 
     // Set up event listeners for buttons
     this.setupEventListeners(step);
@@ -4109,6 +5089,327 @@ class OnboardingTour {
       lastHealthCheck: this.lastHealthCheck,
       lastTelemetryFlush: this.lastTelemetryFlush,
     };
+  }
+
+  // === ENHANCED ELEMENT FINDING AND POSITIONING METHODS ===
+
+  /**
+   * Find target element with robust fallback handling
+   * @param {Object} step - Step configuration with fallback selectors
+   * @returns {Element|null} Found element or null
+   */
+  async findTargetElementWithFallbacks(step) {
+    if (!step.target) return null;
+
+    // Try primary selector first
+    let targetElement = document.querySelector(step.target);
+    if (targetElement) {
+      logger.debug("OnboardingTour", `Primary selector found: ${step.target}`, {
+        stepId: step.id,
+      });
+      return targetElement;
+    }
+
+    // Try fallback selectors if available
+    if (step.fallbackSelectors && step.fallbackSelectors.length > 0) {
+      logger.info(
+        "OnboardingTour",
+        `Primary selector failed, trying ${step.fallbackSelectors.length} fallback selectors`,
+        {
+          stepId: step.id,
+          primarySelector: step.target,
+          fallbackSelectors: step.fallbackSelectors,
+        },
+      );
+
+      for (const selector of step.fallbackSelectors) {
+        targetElement = document.querySelector(selector);
+        if (targetElement) {
+          logger.info(
+            "OnboardingTour",
+            `Fallback selector found: ${selector}`,
+            {
+              stepId: step.id,
+              fallbackSelector: selector,
+            },
+          );
+          return targetElement;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Wait for element with configurable timeout and enhanced retry logic
+   * @param {Object} step - Step configuration
+   * @returns {Element|null} Found element or null
+   */
+  async waitForElementWithTimeout(step) {
+    const timeout = step.elementTimeout || 8000; // Default 8 seconds
+    const checkInterval = 100; // Check every 100ms
+    const maxAttempts = Math.floor(timeout / checkInterval);
+
+    logger.info(
+      "OnboardingTour",
+      `Enhanced element waiting started for: ${step.target}`,
+      {
+        stepId: step.id,
+        timeout,
+        maxAttempts,
+        hasFallbacks: !!step.fallbackSelectors?.length,
+      },
+    );
+
+    for (let attempts = 0; attempts < maxAttempts; attempts++) {
+      // Try primary selector
+      let targetElement = document.querySelector(step.target);
+      if (targetElement) {
+        logger.info(
+          "OnboardingTour",
+          `Element found after ${attempts * checkInterval}ms`,
+          {
+            stepId: step.id,
+            selector: step.target,
+            elapsedTime: attempts * checkInterval,
+          },
+        );
+        return targetElement;
+      }
+
+      // Try fallback selectors on every 5th attempt
+      if (attempts % 5 === 0 && step.fallbackSelectors) {
+        for (const selector of step.fallbackSelectors) {
+          targetElement = document.querySelector(selector);
+          if (targetElement) {
+            logger.info(
+              "OnboardingTour",
+              `Fallback element found after ${attempts * checkInterval}ms`,
+              {
+                stepId: step.id,
+                fallbackSelector: selector,
+                elapsedTime: attempts * checkInterval,
+              },
+            );
+            return targetElement;
+          }
+        }
+      }
+
+      // Wait before next attempt
+      await new Promise((resolve) => setTimeout(resolve, checkInterval));
+    }
+
+    logger.warn(
+      "OnboardingTour",
+      `Element waiting timeout after ${timeout}ms`,
+      {
+        stepId: step.id,
+        selector: step.target,
+        fallbackSelectors: step.fallbackSelectors,
+        timeout,
+      },
+    );
+
+    return null;
+  }
+
+  /**
+   * Perform enhanced auto-scroll with responsive awareness
+   * @param {Element} targetElement - Element to scroll to
+   * @param {Object} step - Step configuration
+   */
+  async performEnhancedAutoScroll(targetElement, step) {
+    if (!targetElement) return;
+
+    const rect = targetElement.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    const isMobile = viewportWidth <= this.MOBILE_BREAKPOINT;
+
+    // Get responsive configuration
+    const responsiveConfig = step.responsiveConfig || {};
+    const currentConfig = isMobile
+      ? responsiveConfig.mobile
+      : viewportWidth <= 1024
+        ? responsiveConfig.tablet
+        : responsiveConfig.desktop;
+
+    const scrollPadding = currentConfig?.spacing || 20;
+
+    // Check if element is already optimally positioned
+    const isOptimallyPositioned =
+      rect.top >= scrollPadding &&
+      rect.bottom <= viewportHeight - scrollPadding &&
+      rect.left >= 0 &&
+      rect.right <= viewportWidth;
+
+    if (isOptimallyPositioned) {
+      logger.debug(
+        "OnboardingTour",
+        "Element already optimally positioned, skipping scroll",
+        {
+          stepId: step.id,
+          elementRect: { top: rect.top, bottom: rect.bottom },
+          viewport: { width: viewportWidth, height: viewportHeight },
+        },
+      );
+      return;
+    }
+
+    logger.info("OnboardingTour", `Enhanced auto-scroll for step ${step.id}`, {
+      stepId: step.id,
+      isMobile,
+      scrollPadding,
+      currentConfig,
+      elementRect: {
+        top: rect.top,
+        bottom: rect.bottom,
+        left: rect.left,
+        right: rect.right,
+      },
+    });
+
+    // Special handling for modal content
+    if (step.modalSpecific?.waitForModalContent) {
+      const modalScrolled = this.scrollToElementInModal(targetElement, step);
+      if (modalScrolled) {
+        await new Promise((resolve) =>
+          setTimeout(resolve, this.SCROLL_DURATION),
+        );
+        return;
+      }
+    }
+
+    // Standard enhanced scrolling
+    const scrollOptions = {
+      behavior: "smooth",
+      block: isMobile ? "start" : "center",
+      inline: "center",
+    };
+
+    targetElement.scrollIntoView(scrollOptions);
+
+    // Wait for scroll animation
+    await new Promise((resolve) => setTimeout(resolve, this.SCROLL_DURATION));
+
+    logger.debug("OnboardingTour", "Enhanced auto-scroll completed", {
+      stepId: step.id,
+      scrollOptions,
+    });
+  }
+
+  /**
+   * Enhanced positioning with responsive dimension handling
+   * @param {Element} targetElement - Target element
+   * @param {Object} step - Step configuration
+   * @param {string} position - Position preference
+   * @param {number} retryCount - Current retry count
+   */
+  async performEnhancedPositioning(
+    targetElement,
+    step,
+    position,
+    retryCount = 0,
+  ) {
+    const maxRetries = step.maxRetries || 3;
+
+    if (retryCount > maxRetries) {
+      logger.warn(
+        "OnboardingTour",
+        `Max positioning retries reached for step ${step.id}`,
+        {
+          stepId: step.id,
+          maxRetries,
+          retryCount,
+        },
+      );
+      return this.applyFallbackPositioning(step);
+    }
+
+    const isMobile = window.innerWidth <= this.MOBILE_BREAKPOINT;
+    const responsiveConfig = step.responsiveConfig || {};
+    const currentConfig = isMobile
+      ? responsiveConfig.mobile
+      : window.innerWidth <= 1024
+        ? responsiveConfig.tablet
+        : responsiveConfig.desktop;
+
+    // Use responsive position override if available
+    const effectivePosition =
+      currentConfig?.position || position || step.fallbackPosition || "center";
+
+    logger.debug(
+      "OnboardingTour",
+      `Enhanced positioning attempt ${retryCount + 1}/${maxRetries + 1}`,
+      {
+        stepId: step.id,
+        targetSelector: step.target,
+        effectivePosition,
+        isMobile,
+        currentConfig,
+        retryCount,
+      },
+    );
+
+    // Delegate to existing positioning logic with enhancements
+    this.positionCoachMark(targetElement, effectivePosition, step, retryCount);
+  }
+
+  /**
+   * Apply fallback positioning when primary positioning fails
+   * @param {Object} step - Step configuration
+   */
+  applyFallbackPositioning(step) {
+    const fallbackPosition = step.fallbackPosition || "center";
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const isMobile = viewportWidth <= this.MOBILE_BREAKPOINT;
+
+    const dimensionConfig = step.dimensionHandling || {};
+    const width = dimensionConfig.minWidth || 320;
+    const height = dimensionConfig.minHeight || 200;
+
+    const left = Math.max(20, (viewportWidth - width) / 2);
+    const top = Math.max(20, (viewportHeight - height) / 2);
+
+    logger.info(
+      "OnboardingTour",
+      `Applying fallback positioning for step ${step.id}`,
+      {
+        stepId: step.id,
+        fallbackPosition,
+        calculatedPosition: { left, top },
+        dimensions: { width, height },
+        isMobile,
+      },
+    );
+
+    if (this.coachMark) {
+      const fallbackStyles = {
+        left: `${left}px`,
+        top: `${top}px`,
+        position: "fixed",
+        zIndex: "10014",
+        pointerEvents: "auto",
+        display: "block",
+      };
+
+      // Apply responsive width if configured
+      if (isMobile && step.responsiveConfig?.mobile?.maxWidth) {
+        fallbackStyles.maxWidth = step.responsiveConfig.mobile.maxWidth;
+      }
+
+      Object.assign(this.coachMark.style, fallbackStyles);
+
+      // Remove opacity override to let CSS animations handle visibility
+      requestAnimationFrame(() => {
+        if (this.coachMark) {
+          this.coachMark.style.opacity = "";
+        }
+      });
+    }
   }
 }
 

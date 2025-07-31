@@ -115,8 +115,15 @@ export class ScenarioReflectionModal {
       enableAnalytics: options.enableAnalytics !== false,
       enableAnimations: options.enableAnimations !== false,
       enterpriseMonitoring: options.enterpriseMonitoring !== false,
+      isTestMode: !!options.isTestMode, // Store test mode flag
       ...options,
     };
+
+    // Log test mode status for debugging
+    console.log(
+      "🧪 ScenarioReflectionModal constructor - test mode:",
+      this.options.isTestMode,
+    );
 
     // Enterprise monitoring initialization
     this.instanceId = `reflection_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -785,7 +792,14 @@ export class ScenarioReflectionModal {
    * Generate modal title
    */
   generateModalTitle() {
-    return `🎯 Your Choice: ${this.scenarioInfo.title}`;
+    const baseTitle = `🎯 Your Choice: ${this.scenarioInfo.title}`;
+
+    // Add test mode indicator if in test mode
+    if (this.options.isTestMode) {
+      return `🧪 ${baseTitle} (Demo/Tour)`;
+    }
+
+    return baseTitle;
   }
 
   /**

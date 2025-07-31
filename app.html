@@ -245,8 +245,7 @@ limitations under the License.
     <!-- 2. Media queries foundation -->
     <link rel="stylesheet" href="src/styles/media.css" />
 
-    <!-- 3. Base styles -->
-    <link rel="stylesheet" href="src/styles/main.css" />
+    <!-- 3. Core styles - main.css removed (consolidated into layers architecture) -->
     <link rel="stylesheet" href="src/styles/accessibility.css" />
     <link rel="stylesheet" href="src/styles/navigation-highlight-fix.css" />
 
@@ -338,7 +337,6 @@ limitations under the License.
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="SimulateAI" />
     <!-- Preload critical resources -->
-    <link rel="preload" href="src/styles/main.css" as="style" />
     <link rel="preload" href="src/styles/accessibility.css" as="style" />
     <link rel="preload" href="src/js/app.js" as="script" crossorigin />
 
@@ -366,8 +364,10 @@ limitations under the License.
         }
         pageInitialized = true;
 
-        // Reset scroll position
-        window.scrollTo(0, 0);
+        // Only reset scroll position if there's no hash (don't interfere with navigation)
+        if (!window.location.hash) {
+          window.scrollTo(0, 0);
+        }
 
         // Set loaded state for animations
         if (window.DOMClassManager) {
@@ -469,20 +469,22 @@ limitations under the License.
         class="ethics-demo-section layout-container-responsive"
         id="ethics-demo"
       >
-        <div class="demo-section-header">
-          <h2 class="demo-section-title">Interactive Ethics Radar Chart</h2>
-          <p class="demo-section-description">
+        <div class="ethics-demo-header">
+          <h2 class="ethics-demo-title">Interactive Ethics Radar Chart</h2>
+          <p class="ethics-demo-description">
             Experience how ethical decisions affect multiple dimensions
             simultaneously. Click the buttons to see different decision patterns
             and understand the complex relationships between ethical principles.
           </p>
         </div>
 
-        <div class="demo-horizontal-layout">
+        <div class="ethics-horizontal-layout">
           <!-- Demo Controls Panel -->
-          <div class="demo-controls-panel">
-            <h3 class="controls-title">Try Different Ethical Approaches</h3>
-            <p class="controls-description">
+          <div class="ethics-controls-panel">
+            <h3 class="ethics-controls-title">
+              Try Different Ethical Approaches
+            </h3>
+            <p class="ethics-controls-description">
               Each button represents a different ethical framework. Watch how
               the radar chart changes to show their unique priorities:
             </p>
@@ -552,8 +554,8 @@ limitations under the License.
           </div>
 
           <!-- Radar Chart Panel -->
-          <div class="radar-chart-panel">
-            <div id="hero-ethics-chart" class="radar-chart-wrapper"></div>
+          <div class="ethics-radar-panel">
+            <div id="hero-ethics-chart" class="ethics-radar-wrapper"></div>
           </div>
         </div>
 

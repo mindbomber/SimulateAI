@@ -240,7 +240,6 @@ class SettingsManager {
           // Clear any dark mode inline styles for light theme
           this.clearDarkModeInlineStyles();
         }
-        this.updateAppearanceCustomization();
       }, 100);
     }
 
