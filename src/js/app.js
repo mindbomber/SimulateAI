@@ -2267,12 +2267,27 @@ class SimulateAIApp {
 
   /**
    * Handle start learning event from Global Event Manager
-   * Note: Scrolling is now handled by SharedNavigation.navigateToSimulationHub()
+   * Delegates to SharedNavigation for consistent scrolling behavior
    */
   handleStartLearning() {
-    // Legacy scroll operation removed to prevent competition with navigation
-    // Navigation component handles scrolling to categories section
-    console.log("Start learning triggered - navigation handles scrolling");
+    const currentPage =
+      window.location.pathname.split("/").pop() || "index.html";
+
+    if (currentPage === "app.html") {
+      // If we're on app.html, scroll directly to categories
+      const categoriesSection = document.getElementById("categories");
+      if (categoriesSection) {
+        categoriesSection.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+        console.log("Start learning: scrolled to categories on app.html");
+      }
+    } else {
+      // If we're on another page, navigate to app.html#categories
+      window.location.href = "app.html#categories";
+      console.log("Start learning: navigated to app.html#categories");
+    }
   }
 
   /**
