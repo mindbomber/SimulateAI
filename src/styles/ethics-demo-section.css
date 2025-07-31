@@ -93,6 +93,7 @@
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-2xl, 4rem);
     align-items: start;
+    justify-items: center; /* Center grid items horizontally */
     max-width: 100%; /* Use full container width */
     margin: 0 auto;
     width: 100%;
@@ -125,6 +126,8 @@
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     border: 1px solid var(--color-gray-200, #e5e7eb);
     height: fit-content;
+    width: 100%;
+    max-width: 500px; /* Consistent max-width for alignment */
   }
 
   .controls-title {
@@ -150,6 +153,22 @@
     grid-template-columns: 1fr;
     gap: var(--spacing-md, 1.5rem);
     position: relative;
+  }
+
+  /* Desktop layout - horizontal buttons */
+  @media (min-width: 768px) {
+    .demo-controls-grid.horizontal {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-sm, 0.75rem);
+    }
+  }
+
+  /* Large desktop - more spacing */
+  @media (min-width: 1024px) {
+    .demo-controls-grid.horizontal {
+      gap: var(--spacing-md, 1.5rem);
+    }
   }
 
   .demo-controls-grid.horizontal .demo-btn {
@@ -195,6 +214,37 @@
     line-height: 1.4;
   }
 
+  /* Responsive demo button adjustments */
+  @media (max-width: 768px) {
+    .demo-controls-grid.horizontal .demo-btn {
+      padding: var(--spacing-md, 1.5rem);
+      text-align: center;
+      align-items: center;
+    }
+
+    .demo-btn .btn-label {
+      font-size: 1rem;
+    }
+
+    .demo-btn .btn-description {
+      font-size: 0.8125rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .demo-controls-grid.horizontal .demo-btn {
+      padding: var(--spacing-sm, 0.75rem) var(--spacing-md, 1.5rem);
+    }
+
+    .demo-btn .btn-label {
+      font-size: 0.9375rem;
+    }
+
+    .demo-btn .btn-description {
+      font-size: 0.75rem;
+    }
+  }
+
   /* ================================
      RADAR CHART PANEL
      ================================ */
@@ -209,6 +259,8 @@
     align-items: center;
     justify-content: center;
     min-height: 500px;
+    width: 100%;
+    max-width: 500px; /* Consistent max-width for alignment */
   }
 
   .radar-chart-wrapper {
@@ -253,7 +305,17 @@
     background: var(--color-white, #ffffff);
     border-radius: var(--radius-md, 8px);
     border: 1px solid var(--color-gray-200, #e5e7eb);
-    overflow: hidden;
+    overflow: visible; /* Allow floating content to extend outside */
+    position: relative; /* For absolute positioning of content */
+  }
+
+  .accordion-item {
+    position: relative; /* Enable absolute positioning for content */
+  }
+
+  /* Ensure demo help section accordion items are properly positioned for floating content */
+  .demo-help-sections .accordion-item {
+    position: relative;
   }
 
   .accordion-header {
@@ -288,6 +350,7 @@
   }
 
   .accordion-content {
+    /* Default accordion behavior for compatibility */
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease;
@@ -295,6 +358,40 @@
 
   .accordion-content:not(.collapsed) {
     max-height: 1000px;
+  }
+
+  /* Floating accordion content - only for demo help sections */
+  .demo-help-sections .accordion-content {
+    /* Floating accordion content - doesn't expand parent */
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+
+    /* Visual styling for floating effect */
+    background: var(--color-white, #ffffff);
+    border: 1px solid var(--color-gray-200, #e5e7eb);
+    border-radius: 0 0 var(--radius-md, 8px) var(--radius-md, 8px);
+    box-shadow:
+      0 10px 25px rgba(0, 0, 0, 0.15),
+      0 4px 10px rgba(0, 0, 0, 0.1);
+
+    /* Visibility and animation */
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition:
+      max-height 0.3s ease,
+      opacity 0.3s ease,
+      transform 0.3s ease;
+  }
+
+  .demo-help-sections .accordion-content:not(.collapsed) {
+    max-height: 1000px;
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .accordion-content-inner {
@@ -374,10 +471,6 @@
     .demo-help-sections {
       grid-template-columns: 1fr;
     }
-
-    .radar-chart-panel {
-      order: -1;
-    }
   }
 
   /* Mobile */
@@ -414,6 +507,14 @@
     .accordion-content-inner {
       padding: var(--spacing-md, 1.5rem);
     }
+
+    /* Adjust floating accordion for mobile */
+    .accordion-content {
+      /* Ensure floating accordions don't go off-screen on mobile */
+      left: -1rem;
+      right: -1rem;
+      max-width: calc(100vw - 2rem);
+    }
   }
 
   /* Small Mobile */
@@ -439,36 +540,108 @@
 @layer utilities {
   .demo-feedback-popover {
     position: absolute;
-    top: -60px;
+    bottom: calc(100% + 12px); /* Position directly above the button */
     left: 50%;
     transform: translateX(-50%);
-    background: var(--color-gray-900, #1f2937);
-    color: white;
-    padding: var(--spacing-sm, 0.75rem) var(--spacing-md, 1.5rem);
-    border-radius: var(--radius-md, 8px);
+    background: var(--color-white, #ffffff);
+    color: var(--color-gray-800, #1f2937);
+    padding: var(--spacing-md, 1.5rem);
+    border-radius: var(--radius-lg, 12px);
     font-size: 0.875rem;
+    line-height: 1.4;
     z-index: 1000;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s ease;
-    white-space: nowrap;
+    transition: all 0.3s ease;
+
+    /* Professional styling */
+    box-shadow:
+      0 10px 25px rgba(0, 0, 0, 0.15),
+      0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--color-gray-200, #e5e7eb);
+
+    /* Text containment and wrapping */
+    min-width: 280px;
+    max-width: 400px;
+    white-space: normal; /* Allow text wrapping */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   .demo-feedback-popover.visible {
     opacity: 1;
     pointer-events: auto;
-    animation: fadeInOut 2s ease-in-out;
+    transform: translateX(-50%) translateY(-4px); /* Slight lift effect */
+    animation: fadeInOut 3s ease-in-out;
   }
 
+  /* Enhanced content styling */
+  .demo-feedback-popover .popover-content {
+    display: block;
+  }
+
+  .demo-feedback-popover h5,
+  .demo-feedback-popover .popover-title {
+    margin: 0 0 var(--spacing-sm, 0.75rem);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-primary, #1a73e8);
+    line-height: 1.3;
+  }
+
+  .demo-feedback-popover p,
+  .demo-feedback-popover .popover-description {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--color-gray-700, #374151);
+  }
+
+  /* Footer text styling for dark text */
+  .demo-feedback-popover .pattern-emphasis,
+  .demo-feedback-popover .popover-footer {
+    font-size: 0.75rem;
+    color: var(--color-gray-600, #6b7280);
+    border-top: 1px solid var(--color-gray-100, #f3f4f6);
+    padding-top: var(--spacing-sm, 0.75rem);
+    margin-top: var(--spacing-sm, 0.75rem);
+    font-style: italic;
+  }
+
+  /* Professional arrow pointing down */
   .popover-arrow {
     position: absolute;
-    bottom: -6px;
+    top: 100%;
     left: 50%;
     transform: translateX(-50%);
     width: 0;
     height: 0;
-    border-left: 6px solid transparent;
-    border-right: 6px solid transparent;
-    border-top: 6px solid var(--color-gray-900, #1f2937);
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid var(--color-white, #ffffff);
+  }
+
+  /* Arrow border for professional look */
+  .popover-arrow::before {
+    content: "";
+    position: absolute;
+    top: -9px;
+    left: -9px;
+    width: 0;
+    height: 0;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-top: 9px solid var(--color-gray-200, #e5e7eb);
+    z-index: -1;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .demo-feedback-popover {
+      min-width: 240px;
+      max-width: 320px;
+      padding: var(--spacing-sm, 0.75rem) var(--spacing-md, 1.5rem);
+      font-size: 0.8125rem;
+    }
   }
 }

@@ -21,14 +21,6 @@ separation of concerns and improve maintainability.
     margin-top: var(--spacing-20);
   }
 
-  .footer-content {
-    /* Footer styles managed by professional-footer.js component */
-    /* See below for all footer styling */
-    max-width: var(--container-xl);
-    margin: 0 auto;
-    padding: var(--spacing-16) var(--spacing-6);
-  }
-
   /* Footer sections grid - consolidated from main.css */
   .footer-sections {
     display: grid;
@@ -207,10 +199,6 @@ separation of concerns and improve maintainability.
     display: block;
     clear: both;
     height: auto; /* Allow natural sizing to content */
-
-    /* Ensure full viewport coverage when positioned outside containers */
-    left: 0;
-    right: 0;
   }
 
   .footer-wave {
@@ -224,12 +212,12 @@ separation of concerns and improve maintainability.
     background-size: cover;
   }
 
-  .footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 60px var(--container-padding, 20px) 0;
-    width: 100%;
-    box-sizing: border-box;
+  .professional-footer .footer-content {
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 60px 20px 0 !important; /* Match page sections with consistent 20px padding */
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .footer-main {
@@ -240,7 +228,6 @@ separation of concerns and improve maintainability.
     width: 100%;
     box-sizing: border-box;
     align-items: start; /* Align grid items to top */
-    justify-content: center; /* Center the entire grid */
     overflow-x: hidden; /* Prevent horizontal overflow */
   }
 
@@ -604,7 +591,7 @@ separation of concerns and improve maintainability.
     }
 
     /* Content sizing handled naturally by flexbox */
-    .footer-content {
+    .professional-footer .footer-content {
       min-height: 500px; /* Keep content min-height for layout stability */
     }
 
@@ -615,8 +602,8 @@ separation of concerns and improve maintainability.
 
   /* Small mobile devices - using media.css device detection */
   @media only screen and (width <= 479px) {
-    .footer-content {
-      padding: 40px var(--container-padding, 1rem) 0;
+    .professional-footer .footer-content {
+      padding: 40px 20px 0; /* Use consistent 20px padding instead of variable */
       min-height: 600px; /* Keep content min-height for very small screens */
     }
 
@@ -702,8 +689,8 @@ separation of concerns and improve maintainability.
 
   /* Tablet responsive adjustments */
   @media only screen and (width >= 768px) and (width <= 1279px) {
-    .footer-content {
-      padding: 50px var(--container-padding, 24px) 0;
+    .professional-footer .footer-content {
+      padding: 50px 20px 0; /* Use consistent 20px padding */
       min-height: 350px; /* Keep content min-height for tablet layout */
     }
 
@@ -721,8 +708,8 @@ separation of concerns and improve maintainability.
 
   /* Desktop responsive adjustments */
   @media only screen and (width >= 1280px) {
-    .footer-content {
-      padding: 60px var(--container-padding, 40px) 0;
+    .professional-footer .footer-content {
+      padding: 60px 20px 0; /* Use consistent 20px padding */
       min-height: 400px; /* Keep content min-height for desktop layout */
     }
 

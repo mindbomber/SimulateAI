@@ -246,7 +246,6 @@ limitations under the License.
     <link rel="stylesheet" href="src/styles/main.css" />
     <link rel="stylesheet" href="src/styles/accessibility.css" />
     <link rel="stylesheet" href="src/styles/navigation-highlight-fix.css" />
-    <link rel="stylesheet" href="src/styles/footer.css" />
 
     <!-- 4. Base component styles -->
     <link rel="stylesheet" href="src/styles/simulations.css" />
@@ -350,17 +349,6 @@ limitations under the License.
 
     <!-- Scroll restoration configuration -->
     <script>
-      // Debug tracker for initialization - helps identify multiple DOM loads
-      window.debugInitTracker = window.debugInitTracker || {
-        initCount: 0,
-        events: [],
-      };
-
-      // Immediate debug output to confirm tracker is working
-      console.log("🐛 Debug tracker initialized:", window.debugInitTracker);
-      console.log("🐛 Tracker accessible at: window.debugInitTracker");
-      console.log("🐛 Use getDebugInfo() function for detailed status");
-
       // Configure scroll restoration (safe to do in head)
       if ("scrollRestoration" in history) {
         history.scrollRestoration = "manual";
@@ -371,26 +359,9 @@ limitations under the License.
 
       function initializePage() {
         if (pageInitialized) {
-          console.warn(
-            "⚠️ initializePage() called again - preventing duplicate execution",
-          );
           return; // Prevent duplicate initialization
         }
         pageInitialized = true;
-
-        // Debug logging
-        window.debugInitTracker.initCount++;
-        window.debugInitTracker.events.push({
-          time: Date.now(),
-          event: "initializePage",
-          readyState: document.readyState,
-        });
-
-        console.log(
-          "✅ Page initialization started (count:",
-          window.debugInitTracker.initCount,
-          ")",
-        );
 
         // Reset scroll position
         window.scrollTo(0, 0);
@@ -401,38 +372,15 @@ limitations under the License.
         } else {
           document.documentElement.classList.add("loaded");
         }
-
-        console.log("✅ Page initialization completed");
       }
-
-      // Helper function to inspect debug tracker - accessible from console
-      window.getDebugInfo = function () {
-        console.log("🔍 Debug Tracker Status:");
-        console.log(
-          "- Init Count:",
-          window.debugInitTracker?.initCount || "undefined",
-        );
-        console.log(
-          "- Events Count:",
-          window.debugInitTracker?.events?.length || "undefined",
-        );
-        console.log("- Page Initialized:", pageInitialized);
-        console.log(
-          "- Events Timeline:",
-          window.debugInitTracker?.events || "undefined",
-        );
-        return window.debugInitTracker;
-      };
 
       // Single event listener setup
       if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", initializePage, {
           once: true,
         });
-        console.log("📝 DOMContentLoaded listener added");
       } else {
         // DOM already loaded
-        console.log("📝 DOM already loaded, initializing immediately");
         initializePage();
       }
     </script>
@@ -445,9 +393,6 @@ limitations under the License.
         import("https://unpkg.com/wicg-inert@3.1.2/dist/inert.min.js").catch(
           () => {
             // Fallback: add script tag conditionally if dynamic import fails
-            console.warn(
-              "Inert polyfill failed to load via import, trying fallback",
-            );
           },
         );
       }
@@ -490,8 +435,7 @@ limitations under the License.
           <h2 class="hero-title">Welcome to SimulateAI</h2>
           <p class="hero-description">
             Explore ethical decision-making in AI through interactive
-            simulations. Experience real-world scenarios and discover how
-            ethical frameworks apply to emerging technologies.
+            simulations.
           </p>
           <div class="hero-actions">
             <button
@@ -1410,7 +1354,6 @@ limitations under the License.
             readyState: document.readyState,
           });
         }
-        console.log("🎁 Initializing donation components...");
 
         if (window.EnhancedDonationWidget) {
           window.EnhancedDonationWidget.init("homepage-donation-button", {
@@ -1420,7 +1363,6 @@ limitations under the License.
             style: "accordion",
             showBenefits: true,
           });
-          console.log("✅ Enhanced donation widget initialized");
         }
 
         // Initialize donor appreciation section
@@ -1460,7 +1402,6 @@ limitations under the License.
             "#donor-appreciation-container",
             sampleDonors,
           );
-          console.log("✅ Donor flair display initialized");
         }
       }
 
@@ -1471,12 +1412,8 @@ limitations under the License.
           initializeDonationComponents,
           { once: true },
         );
-        console.log("📝 Donation component DOMContentLoaded listener added");
       } else {
         // DOM already loaded, initialize immediately
-        console.log(
-          "📝 DOM already loaded, initializing donation components immediately",
-        );
         initializeDonationComponents();
       }
     </script>

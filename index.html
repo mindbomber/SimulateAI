@@ -1118,10 +1118,8 @@
 
     <!-- Preload critical resources -->
     <link rel="preload" href="./src/js/app.js" as="script" crossorigin />
-    <link rel="preload" href="./src/styles/footer.css" as="style" />
 
     <!-- Load CSS Files -->
-    <link rel="stylesheet" href="./src/styles/footer.css" />
     <link rel="stylesheet" href="./src/styles/shared-navigation.css" />
     <link rel="stylesheet" href="./src/styles/settings-menu.css" />
     <link rel="stylesheet" href="./src/styles/badge-modal.css" />
@@ -1928,63 +1926,21 @@
                     newWorker.state === "installed" &&
                     navigator.serviceWorker.controller
                   ) {
-                    // New content is available, show update notification
-                    showUpdateNotification();
+                    // New content is available - just log it instead of showing notification
+                    console.log("🚀 New content is available - refresh to update");
                   }
                 });
               }
             });
 
-            // Check for waiting service worker
+            // Check for waiting service worker - just log instead of showing notification
             if (registration.waiting) {
-              showUpdateNotification();
+              console.log("🚀 Service worker update is waiting - refresh to activate");
             }
           } catch (error) {
             console.warn("🚨 Service Worker registration failed:", error);
           }
         });
-
-        // Show update notification
-        function showUpdateNotification() {
-          const updateBanner = document.createElement("div");
-          updateBanner.innerHTML = `
-            <div style="
-              position: fixed;
-              top: 0;
-              left: 0;
-              right: 0;
-              background: linear-gradient(45deg, #667eea, #764ba2);
-              color: white;
-              padding: 15px;
-              text-align: center;
-              z-index: 10000;
-              box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            ">
-              🚀 New version available! 
-              <button onclick="location.reload()" style="
-                background: white;
-                color: #667eea;
-                border: none;
-                padding: 8px 16px;
-                border-radius: 20px;
-                margin-left: 10px;
-                cursor: pointer;
-                font-weight: bold;
-              ">Update Now</button>
-              <button onclick="this.parentElement.parentElement.remove()" style="
-                background: transparent;
-                color: white;
-                border: 1px solid white;
-                padding: 8px 16px;
-                border-radius: 20px;
-                margin-left: 10px;
-                cursor: pointer;
-              ">Later</button>
-            </div>
-          `;
-          document.body.appendChild(updateBanner);
-        }
-      }
 
       // PWA Install Prompt
       let deferredPrompt;

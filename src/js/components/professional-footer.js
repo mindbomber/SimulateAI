@@ -54,20 +54,15 @@ class FooterBatchManager {
     if (elements.length === 0) return;
 
     requestAnimationFrame(() => {
-      const startTime = performance.now();
       elements.forEach((element) => {
         try {
           element.remove();
         } catch (error) {
-          console.warn("[Footer] Failed to remove element:", error);
+          // Element removal failed
         }
       });
 
       this.performanceMetrics.batchedOperations++;
-      const endTime = performance.now();
-      console.debug(
-        `[Footer] Batched removal of ${elements.length} elements took ${endTime - startTime}ms`,
-      );
     });
   }
 
@@ -75,8 +70,6 @@ class FooterBatchManager {
    * Batch DOM queries to reduce DOM traversal overhead
    */
   batchDOMQueries() {
-    const startTime = performance.now();
-
     const elements = {
       existing: document.querySelector(".professional-footer"),
       placeholder: document.getElementById("footer-placeholder"),
@@ -86,9 +79,7 @@ class FooterBatchManager {
       ),
     };
 
-    const endTime = performance.now();
     this.performanceMetrics.domQueriesReduced += 3; // Reduced from 4 separate queries to 1 batch
-    console.debug(`[Footer] Batched DOM queries took ${endTime - startTime}ms`);
 
     return elements;
   }
@@ -125,14 +116,9 @@ class FooterBatchManager {
           initEndTime - initStartTime;
         this.performanceMetrics.layoutRecalculations++;
 
-        console.debug(
-          `[Footer] Batched initialization completed in ${this.performanceMetrics.initializationTime}ms`,
-        );
-
         // Send metrics to monitoring if available
         this.reportMetrics();
       } catch (error) {
-        console.error("[Footer] Failed to update footer:", error);
         // Fallback: still mark as initialized to prevent infinite loops
         FOOTER_CONSTANTS.INITIALIZED = true;
       }
@@ -255,8 +241,6 @@ const FOOTER_CONFIG = {
  * Optimized template data preprocessing to reduce repeated calculations
  */
 function preprocessFooterData(config) {
-  const startTime = performance.now();
-
   // Pre-process all data that requires computation
   const optimizedConfig = {
     ...config,
@@ -278,11 +262,6 @@ function preprocessFooterData(config) {
       })),
     },
   };
-
-  const endTime = performance.now();
-  console.debug(
-    `[Footer] Template preprocessing took ${endTime - startTime}ms`,
-  );
 
   return optimizedConfig;
 }
@@ -417,17 +396,11 @@ function initializeFooter() {
   const existingFooter = document.querySelector(".professional-footer");
 
   if (FOOTER_CONSTANTS.INITIALIZED && existingFooter) {
-    console.debug(
-      "Footer already initialized (module + DOM check), skipping duplicate execution",
-    );
     return;
   }
 
   // If footer exists in DOM but module state was reset, just mark as initialized
   if (existingFooter && !FOOTER_CONSTANTS.INITIALIZED) {
-    console.debug(
-      "Footer found in DOM, updating module state without re-rendering",
-    );
     FOOTER_CONSTANTS.INITIALIZED = true;
     return;
   }
