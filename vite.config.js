@@ -33,10 +33,10 @@ export default defineConfig({
         format: "es",
         // Global variables for production
         globals: {
-          'firebase/app': 'firebase',
-          'firebase/auth': 'firebase',
-          'firebase/firestore': 'firebase',
-          'firebase/analytics': 'firebase'
+          "firebase/app": "firebase",
+          "firebase/auth": "firebase",
+          "firebase/firestore": "firebase",
+          "firebase/analytics": "firebase",
         },
         manualChunks: {
           firebase: [
@@ -48,7 +48,7 @@ export default defineConfig({
             "firebase/app-check",
             "firebase/messaging",
             "firebase/storage",
-            "firebase/functions"
+            "firebase/functions",
           ],
           core: ["./src/js/core/engine.js", "./src/js/core/simulation.js"],
           ui: ["./src/js/core/ui.js", "./src/js/core/accessibility.js"],
