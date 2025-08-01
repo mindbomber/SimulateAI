@@ -1718,40 +1718,8 @@
   }
 
   /* ===== HERO ENTRANCE ANIMATIONS ===== */
-  /* Elegant, professional entrance animations for hero section */
-
-  @keyframes heroContentEnter {
-    0% {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes heroElementEnter {
-    0% {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes heroSimulationEnter {
-    0% {
-      opacity: 0;
-      transform: translateY(40px) scale(0.95);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
+  /* Hero animations moved to hero-consolidated.css for semantic ownership and to prevent keyframe conflicts */
+  /* This ensures hero-consolidated.css keyframes (with advanced easing and scaling) take precedence */
 
   /* Hero reduced motion styles moved to hero-consolidated.css for semantic ownership */
 

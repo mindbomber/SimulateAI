@@ -413,10 +413,22 @@
   padding: 0;
   background: white;
   overflow: hidden;
+  /* Start collapsed by default to prevent page load animation */
+  max-height: 0;
+  transition: none;
+}
+
+/* Apply transitions only after page is fully loaded AND user interaction */
+.loaded .donation-accordion .accordion-content:not(.no-transition) {
   transition:
     max-height 0.4s ease,
     padding 0.4s ease;
+}
+
+/* Expanded state */
+.donation-accordion .accordion-content:not(.collapsed) {
   max-height: 1000px; /* Large enough for content */
+  padding: 0;
 }
 
 .donation-accordion .accordion-content.collapsed {
@@ -485,39 +497,6 @@
   .donation-accordion .accordion-content-inner {
     padding: 16px;
   }
-}
-
-/* Animation for opening/closing */
-@keyframes accordionExpand {
-  from {
-    max-height: 0;
-    opacity: 0;
-  }
-
-  to {
-    max-height: 1000px;
-    opacity: 1;
-  }
-}
-
-@keyframes accordionCollapse {
-  from {
-    max-height: 1000px;
-    opacity: 1;
-  }
-
-  to {
-    max-height: 0;
-    opacity: 0;
-  }
-}
-
-.donation-accordion .accordion-content:not(.collapsed) {
-  animation: accordionExpand 0.4s ease-out;
-}
-
-.donation-accordion .accordion-content.collapsed {
-  animation: accordionCollapse 0.4s ease-out;
 }
 
 /* ===== DARK MODE SUPPORT ===== */

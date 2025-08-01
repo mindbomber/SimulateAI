@@ -67,6 +67,21 @@
   }
 }
 
+@keyframes heroSimulationEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  60% {
+    opacity: 0.7;
+    transform: translateY(-2px) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 /* ================================
    HERO BASE STYLES
    ================================ */
@@ -113,6 +128,10 @@
     /* Add subtle texture overlay with smooth animation */
     background-size: 400% 400%;
     animation: gradientShift 20s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+
+    /* Performance optimizations for smooth 3D transforms and animations */
+    transform-style: preserve-3d;
+    will-change: transform, opacity;
   }
 
   .hero::before {
@@ -179,9 +198,11 @@
     /* Initial state for entrance animation */
     opacity: 0;
     transform: translateY(40px) scale(0.96);
-    animation: heroContentEnter 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+    animation: heroContentEnter 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)
       forwards;
-    animation-delay: 0.3s;
+    animation-delay: 0.2s;
+    /* Performance optimization for smooth animations */
+    will-change: transform, opacity;
   }
 
   .hero .hero-content h1 {
@@ -189,8 +210,11 @@
     /* Individual animation for title */
     opacity: 0;
     transform: translateY(30px) scale(0.95);
-    animation: heroElementEnter 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-    animation-delay: 0.5s;
+    animation: heroElementEnter 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+      forwards;
+    animation-delay: 0.3s;
+    /* Performance optimization */
+    will-change: transform, opacity;
   }
 
   .hero .hero-content p {
@@ -198,8 +222,11 @@
     /* Individual animation for description */
     opacity: 0;
     transform: translateY(25px) scale(0.96);
-    animation: heroElementEnter 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-    animation-delay: 0.7s;
+    animation: heroElementEnter 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+      forwards;
+    animation-delay: 0.4s;
+    /* Performance optimization */
+    will-change: transform, opacity;
   }
 
   /* ===== HERO SIMULATION COMPONENTS ===== */
@@ -219,8 +246,10 @@
     /* Initial state for entrance animation */
     opacity: 0;
     transform: translateY(40px) scale(0.95);
-    animation: heroSimulationEnter 0.8s ease-out forwards;
+    animation: heroSimulationEnter 0.6s ease-out forwards;
     animation-delay: 0.5s;
+    /* Performance optimization */
+    will-change: transform, opacity;
   }
 
   /* Demo container with improved integration */
@@ -321,6 +350,7 @@
     /* Smooth animation */
     opacity: 0;
     transform: translateY(20px) scale(0.97);
+    will-change: transform, opacity;
     animation: heroElementEnter 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
     animation-delay: 0.9s;
   }
@@ -1608,21 +1638,9 @@
 @layer utilities {
   /* ===== ANIMATION & STATE UTILITIES ===== */
 
-  /* Hero content loaded animations - consolidated from state-management-consolidated.css */
-  html.loaded .hero .hero-content,
-  html.loaded .hero .hero-content h1,
-  html.loaded .hero .hero-content p,
-  html.loaded .hero .hero-simulation,
-  html.loaded .hero-title,
-  html.loaded .hero-description,
-  html.loaded .hero-actions {
-    opacity: 1;
-    transform: translateY(0);
-    transition:
-      opacity var(--transition-duration, 0.6s) ease-out,
-      transform var(--transition-duration, 0.6s) ease-out;
-    animation-play-state: running;
-  }
+  /* Note: Individual CSS animations handle hero entrance effects */
+  /* Each element has its own animation: heroContentEnter, heroElementEnter, heroSimulationEnter */
+  /* No html.loaded overrides needed - animations work automatically on page load */
 
   /* Hero radar demo loaded animations - consolidated */
   html.loaded .hero-radar-demo {
@@ -2079,6 +2097,41 @@
   @media print {
     .hero-radar-demo {
       display: none;
+    }
+  }
+
+  /* ================================
+     ACCESSIBILITY SUPPORT
+     ================================ */
+
+  /* High contrast mode adjustments for hero */
+  @media (prefers-contrast: high) {
+    /* Target the actual elements for faster transitions */
+    .hero .hero-content,
+    .hero .hero-content h1,
+    .hero .hero-content p,
+    .hero .hero-simulation,
+    .hero-title,
+    .hero-description,
+    .hero-actions {
+      animation-duration: 0.3s !important; /* Faster animations for high contrast */
+    }
+  }
+
+  /* Reduced motion preferences for hero */
+  @media (prefers-reduced-motion: reduce) {
+    /* Disable all hero keyframe animations for motion sensitivity */
+    .hero,
+    .hero-content,
+    .hero-content h1,
+    .hero-content p,
+    .hero-simulation,
+    .hero-title,
+    .hero-description,
+    .hero-actions {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
     }
   }
 }

@@ -168,7 +168,7 @@ class EnhancedDonationWidget {
             <span class="accordion-title">${config.title}</span>
             <span class="accordion-subtitle">${config.subtitle}</span>
           </div>
-          <div class="accordion-content collapsed">
+          <div class="accordion-content collapsed no-transition">
             <div class="accordion-content-inner">
               <div class="enhanced-donation-widget card">
                 <!-- Authentication Status Banner -->
@@ -822,6 +822,11 @@ class EnhancedDonationWidget {
     );
 
     if (!accordionHeader || !accordionContent || !accordionIcon) return;
+
+    // Enable transitions after first user interaction
+    if (accordionContent.classList.contains("no-transition")) {
+      accordionContent.classList.remove("no-transition");
+    }
 
     const isExpanded = accordionHeader.getAttribute("aria-expanded") === "true";
 
