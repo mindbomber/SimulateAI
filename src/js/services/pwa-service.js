@@ -261,8 +261,8 @@ export class PWAService {
     if ("serviceWorker" in navigator) {
       try {
         // Determine the correct base path for service worker
-        const basePath = "/SimulateAI/";
-        const swPath = "/SimulateAI/sw.js";
+        const basePath = "/";
+        const swPath = "/sw.js";
 
         console.log("🔧 PWA Service Worker Registration:", {
           isDevelopment,

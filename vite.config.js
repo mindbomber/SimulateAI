@@ -16,8 +16,9 @@
 
 import { defineConfig } from "vite";
 
-export default defineConfig(({ command }) => {
-  const base = command === "serve" ? "/" : "/SimulateAI/";
+export default defineConfig(() => {
+  // For custom domain (simulateai.io), always use root path
+  const base = "/";
 
   return {
     root: ".",
@@ -30,6 +31,19 @@ export default defineConfig(({ command }) => {
       rollupOptions: {
         input: {
           main: "app.html",
+          index: "index.html",
+          about: "about.html",
+          blog: "blog.html",
+          dataDelete: "data-deletion.html",
+          educator: "educator-tools.html",
+          ethics: "ethics-guide.html",
+          help: "help-faq.html",
+          moderation: "moderation.html",
+          privacy: "privacy-notice.html",
+          profile: "profile.html",
+          research: "research-consent.html",
+          terms: "terms-of-use.html",
+          welcome: "welcome.html",
           sw: "sw.js", // Include service worker
         },
         external: [], // Don't externalize any modules - bundle everything

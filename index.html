@@ -9,6 +9,9 @@
     <meta name="theme-color" content="#667eea" />
     <meta name="color-scheme" content="light" />
 
+    <!-- Base URL for custom domain - will be removed for localhost -->
+    <base href="/" id="custom-domain-base" />
+
     <!-- PWA Meta Tags -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -55,13 +58,10 @@
       property="og:description"
       content="Experience the future of ethical AI education through immersive, consequence-driven simulations."
     />
-    <meta
-      property="og:url"
-      content="https://mindbomber.github.io/SimulateAI/"
-    />
+    <meta property="og:url" content="https://simulateai.io/" />
     <meta
       property="og:image"
-      content="https://mindbomber.github.io/SimulateAI/src/assets/images/og-image.jpg"
+      content="https://simulateai.io/src/assets/images/og-image.jpg"
     />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -82,7 +82,7 @@
     />
     <meta
       name="twitter:image"
-      content="https://mindbomber.github.io/SimulateAI/src/assets/images/twitter-card.jpg"
+      content="https://simulateai.io/src/assets/images/twitter-card.jpg"
     />
 
     <!-- Additional SEO Meta Tags -->
@@ -91,7 +91,7 @@
       content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
     />
     <meta name="googlebot" content="index, follow" />
-    <link rel="canonical" href="https://mindbomber.github.io/SimulateAI/" />
+    <link rel="canonical" href="https://simulateai.io/" />
 
     <!-- Preconnect for Performance -->
     <link rel="preconnect" href="https://www.googletagmanager.com" />
@@ -107,8 +107,8 @@
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": "SimulateAI",
-        "url": "https://mindbomber.github.io/SimulateAI/",
-        "logo": "https://mindbomber.github.io/SimulateAI/src/assets/icons/favicon.svg",
+        "url": "https://simulateai.io/",
+        "logo": "https://simulateai.io/src/assets/icons/favicon.svg",
         "description": "Educational platform providing AI ethics education through interactive simulations",
         "foundingDate": "2024",
         "sameAs": ["https://github.com/mindbomber/SimulateAI"],
@@ -126,11 +126,11 @@
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "SimulateAI",
-        "url": "https://mindbomber.github.io/SimulateAI/",
+        "url": "https://simulateai.io/",
         "description": "AI Ethics Education Through Interactive Simulations",
         "potentialAction": {
           "@type": "SearchAction",
-          "target": "https://mindbomber.github.io/SimulateAI/blog.html?search={search_term_string}",
+          "target": "https://simulateai.io/blog.html?search={search_term_string}",
           "query-input": "required name=search_term_string"
         }
       }
@@ -142,7 +142,7 @@
         "@context": "https://schema.org",
         "@type": "EducationalOrganization",
         "name": "SimulateAI",
-        "url": "https://mindbomber.github.io/SimulateAI/",
+        "url": "https://simulateai.io/",
         "description": "Platform for AI ethics education through interactive simulations and research",
         "educationalCredentialAwarded": "Digital Citizenship and AI Ethics Certification",
         "hasCredential": {
@@ -1670,7 +1670,7 @@
 
             // Navigate to main application
             const isDevelopment = window.location.hostname === "localhost";
-            const appPath = isDevelopment ? "app.html" : "/SimulateAI/app.html";
+            const appPath = isDevelopment ? "app.html" : "/app.html";
             window.location.href = appPath;
           });
         });
@@ -1693,7 +1693,7 @@
 
             // Navigate to main application
             const isDevelopment = window.location.hostname === "localhost";
-            const appPath = isDevelopment ? "app.html" : "/SimulateAI/app.html";
+            const appPath = isDevelopment ? "app.html" : "/app.html";
             window.location.href = appPath;
           });
         });
@@ -1916,11 +1916,12 @@
 
     <!-- PWA Service Worker Registration -->
     <script>
-      // Set base URL dynamically for proper ES module resolution
-      if (window.location.hostname !== "localhost") {
-        const baseTag = document.createElement("base");
-        baseTag.href = "/SimulateAI/";
-        document.head.insertBefore(baseTag, document.head.firstChild);
+      // Remove base URL for localhost development
+      if (window.location.hostname === "localhost") {
+        const baseTag = document.getElementById("custom-domain-base");
+        if (baseTag) {
+          baseTag.remove();
+        }
       }
 
       if ("serviceWorker" in navigator) {
@@ -1928,8 +1929,8 @@
           try {
             // Determine the correct base path for service worker
             const isDevelopment = window.location.hostname === "localhost";
-            const basePath = isDevelopment ? "/" : "/SimulateAI/";
-            const swPath = isDevelopment ? "/sw.js" : "/SimulateAI/sw.js";
+            const basePath = isDevelopment ? "/" : "/";
+            const swPath = isDevelopment ? "/sw.js" : "/sw.js";
 
             const registration = await navigator.serviceWorker.register(
               swPath,

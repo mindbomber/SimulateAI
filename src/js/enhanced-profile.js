@@ -318,7 +318,7 @@ class EnhancedProfile {
     // Redirect to main page or show limited functionality
     setTimeout(() => {
       const isDevelopment = window.location.hostname === "localhost";
-      const appPath = isDevelopment ? "app.html" : "/SimulateAI/app.html";
+      const appPath = isDevelopment ? "app.html" : "/app.html";
       window.location.href = appPath;
     }, this.constants.TIMEOUT_GUEST);
   }

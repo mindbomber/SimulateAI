@@ -40,6 +40,9 @@ limitations under the License.
     <meta name="color-scheme" content="light dark" />
     <meta name="page-id" content="home" />
 
+    <!-- Base URL for custom domain - will be removed for localhost -->
+    <base href="/" id="custom-domain-base" />
+
     <!-- Import map for Firebase ES modules -->
     <script type="importmap">
       {
@@ -70,10 +73,7 @@ limitations under the License.
 
     <!-- SEO Enhancement -->
     <meta name="robots" content="index, follow" />
-    <link
-      rel="canonical"
-      href="https://mindbomber.github.io/SimulateAI/app.html"
-    />
+    <link rel="canonical" href="https://simulateai.io/app.html" />
 
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="website" />
@@ -85,13 +85,10 @@ limitations under the License.
       property="og:description"
       content="Experience hands-on AI ethics education through interactive simulations designed for educators and students"
     />
-    <meta
-      property="og:url"
-      content="https://mindbomber.github.io/SimulateAI/app.html"
-    />
+    <meta property="og:url" content="https://simulateai.io/app.html" />
     <meta
       property="og:image"
-      content="https://mindbomber.github.io/SimulateAI/src/assets/images/app-preview.jpg"
+      content="https://simulateai.io/src/assets/images/app-preview.jpg"
     />
     <meta property="og:site_name" content="SimulateAI" />
 
@@ -120,7 +117,7 @@ limitations under the License.
         "@type": "WebApplication",
         "name": "SimulateAI App",
         "description": "Interactive AI ethics education platform with simulation-based learning",
-        "url": "https://mindbomber.github.io/SimulateAI/app.html",
+        "url": "https://simulateai.io/app.html",
         "applicationCategory": "EducationalApplication",
         "operatingSystem": "Web Browser",
         "offers": {
@@ -424,6 +421,16 @@ limitations under the License.
             // Fallback: add script tag conditionally if dynamic import fails
           },
         );
+      }
+    </script>
+
+    <!-- Remove base URL for localhost development -->
+    <script>
+      if (window.location.hostname === "localhost") {
+        const baseTag = document.getElementById("custom-domain-base");
+        if (baseTag) {
+          baseTag.remove();
+        }
       }
     </script>
   </head>

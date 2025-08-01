@@ -6,8 +6,8 @@
   "main": "app.html",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && npm run post-build",
-    "build-only": "vite build",
+    "build": "vite build",
+    "build-with-copy": "vite build && npm run post-build",
     "post-build": "node -e \"const fs = require('fs'); fs.copyFileSync('dist/app.html', 'dist/index.html'); console.log('✓ Copied app.html to index.html for GitHub Pages');\"",
     "preview": "vite preview",
     "test": "echo \"Tests will be added\" && exit 0",

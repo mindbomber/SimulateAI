@@ -277,7 +277,7 @@
           if (!this.canModerate()) {
             alert("Access denied: Moderation privileges required");
             const isDevelopment = window.location.hostname === "localhost";
-            const appPath = isDevelopment ? "app.html" : "/SimulateAI/app.html";
+            const appPath = isDevelopment ? "app.html" : "/app.html";
             window.location.href = appPath;
             return;
           }
