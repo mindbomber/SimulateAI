@@ -113,7 +113,18 @@ Open browser dev tools and verify:
 
 ### If you get 404 errors for JS modules:
 
-1. Verify files exist in your upload:
+**🚨 GITIGNORE ISSUE**: Your `.gitignore` file ignores `dist/` folder and `firebase-config.js`!
+
+**SOLUTION**: Upload files manually (bypass Git for deployment):
+
+1. **Build locally**: `npm run build`
+
+2. **Upload entire `dist/` folder** to your web hosting provider:
+   - Use FTP, hosting panel, or hosting CLI
+   - Upload ALL contents of `dist/` to simulateai.io web root
+   - Don't rely on Git - upload everything manually
+
+3. **Verify files exist** on your server:
 
    ```
    https://simulateai.io/src/js/config/firebase-config.js
@@ -121,8 +132,10 @@ Open browser dev tools and verify:
    https://simulateai.io/src/js/data/scenario-creation-dates.js
    ```
 
-2. Check file permissions on your server
-3. Ensure directory structure matches exactly
+4. **Check file permissions** on your server
+5. **Ensure directory structure** matches exactly
+
+**Note**: `.gitignore` prevents these critical files from being tracked by Git, so manual upload is required for deployment.
 
 ### If Service Worker fails:
 

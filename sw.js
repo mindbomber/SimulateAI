@@ -7,68 +7,64 @@ const RUNTIME_CACHE = "simulateai-runtime-v1.0";
 
 // Core files to cache immediately
 const CORE_FILES = [
-  "/SimulateAI/",
-  "/SimulateAI/index.html",
-  "/SimulateAI/app.html",
-  "/SimulateAI/manifest.json",
+  "/",
+  "/index.html",
+  "/app.html",
+  "/manifest.json",
 
   // Core JavaScript
-  "/SimulateAI/src/js/app.js",
-  "/SimulateAI/src/js/config/firebase-config.js",
-  "/SimulateAI/src/js/services/firebase-service.js",
-  "/SimulateAI/src/js/services/firebase-analytics-service.js",
-  "/SimulateAI/src/js/services/hybrid-data-service.js",
+  "/src/js/app.js",
+  "/src/js/config/firebase-config.js",
+  "/src/js/services/firebase-service.js",
+  "/src/js/services/firebase-analytics-service.js",
+  "/src/js/services/hybrid-data-service.js",
 
   // Core CSS
-  "/SimulateAI/src/styles/main.css",
-  "/SimulateAI/src/styles/priority-components.css",
-  "/SimulateAI/src/styles/consolidated-components.css",
+  "/src/styles/main.css",
+  "/src/styles/priority-components.css",
+  "/src/styles/consolidated-components.css",
 
   // Essential assets
-  "/SimulateAI/src/assets/icons/Square Icon_192_x_192.png",
-  "/SimulateAI/src/assets/icons/Square Icon_512_x_512.png",
-  "/SimulateAI/src/assets/icons/favicon.svg",
-  "/SimulateAI/src/assets/icons/logo-square.svg",
+  "/src/assets/icons/Square Icon_192_x_192.png",
+  "/src/assets/icons/Square Icon_512_x_512.png",
+  "/src/assets/icons/favicon.svg",
+  "/src/assets/icons/logo-square.svg",
 
   // Data files
-  "/SimulateAI/src/data/categories.js",
+  "/src/data/categories.js",
 ];
 
 // Files to cache on first visit
 const EXTENDED_FILES = [
   // Additional pages
-  "/SimulateAI/firebase-analytics-dashboard.html",
-  "/SimulateAI/firebase-integration-demo.html",
+  "/firebase-analytics-dashboard.html",
+  "/firebase-integration-demo.html",
 
   // Component files
-  "/SimulateAI/src/js/components/badge-modal.js",
-  "/SimulateAI/src/js/components/card-component.js",
-  "/SimulateAI/src/js/components/main-grid.js",
-  "/SimulateAI/src/js/components/enhanced-simulation-modal.js",
-  "/SimulateAI/src/js/components/ethics-explorer.js",
-  "/SimulateAI/src/js/components/onboarding-tour.js",
+  "/src/js/components/badge-modal.js",
+  "/src/js/components/card-component.js",
+  "/src/js/components/main-grid.js",
+  "/src/js/components/enhanced-simulation-modal.js",
+  "/src/js/components/ethics-explorer.js",
+  "/src/js/components/onboarding-tour.js",
 
   // Additional styles
-  "/SimulateAI/src/styles/badge-modal.css",
-  "/SimulateAI/src/styles/card-component.css",
-  "/SimulateAI/src/styles/ethics-explorer.css",
-  "/SimulateAI/src/styles/onboarding-tour.css",
-  "/SimulateAI/src/styles/enhanced-simulation-modal.css",
+  "/src/styles/badge-modal.css",
+  "/src/styles/card-component.css",
+  "/src/styles/ethics-explorer.css",
+  "/src/styles/onboarding-tour.css",
+  "/src/styles/enhanced-simulation-modal.css",
 ];
 
 // Network-first resources (always try network first)
 const NETWORK_FIRST = [
-  "/SimulateAI/src/js/services/",
-  "/SimulateAI/firebase-analytics-dashboard.html",
-  "/SimulateAI/firebase-integration-demo.html",
+  "/src/js/services/",
+  "/firebase-analytics-dashboard.html",
+  "/firebase-integration-demo.html",
 ];
 
 // Cache-first resources (static assets)
-const CACHE_FIRST = [
-  "/SimulateAI/src/assets/",
-  "/SimulateAI/src/styles/",
-  "/SimulateAI/manifest.json",
-];
+const CACHE_FIRST = ["/src/assets/", "/src/styles/", "/manifest.json"];
 
 // Runtime cache patterns
 const RUNTIME_PATTERNS = [
@@ -114,8 +110,8 @@ self.addEventListener("install", (event) => {
       caches.open(OFFLINE_CACHE).then((cache) => {
         console.log("📦 Caching offline fallbacks...");
         return cache.addAll([
-          "/SimulateAI/offline.html",
-          "/SimulateAI/src/assets/icons/Square Icon_192_x_192.png",
+          "/offline.html",
+          "/src/assets/icons/Square Icon_192_x_192.png",
         ]);
       }),
     ])
@@ -368,8 +364,8 @@ async function staleWhileRevalidate(request, cache) {
 function isAppShellRequest(request) {
   const url = new URL(request.url);
   return (
-    url.pathname === "/SimulateAI/" ||
-    url.pathname === "/SimulateAI/index.html" ||
+    url.pathname === "/" ||
+    url.pathname === "/index.html" ||
     url.pathname.endsWith(".html")
   );
 }
@@ -404,7 +400,7 @@ async function handleOfflineFallback(request) {
   // For HTML pages, return offline page
   if (request.headers.get("accept")?.includes("text/html")) {
     const offlineCache = await caches.open(OFFLINE_CACHE);
-    const offlinePage = await offlineCache.match("/SimulateAI/offline.html");
+    const offlinePage = await offlineCache.match("/offline.html");
     if (offlinePage) {
       return offlinePage;
     }
@@ -414,7 +410,7 @@ async function handleOfflineFallback(request) {
   if (request.headers.get("accept")?.includes("image/")) {
     const offlineCache = await caches.open(OFFLINE_CACHE);
     const fallbackImage = await offlineCache.match(
-      "/SimulateAI/src/assets/icons/Square Icon_192_x_192.png",
+      "/src/assets/icons/Square Icon_192_x_192.png",
     );
     if (fallbackImage) {
       return fallbackImage;
@@ -465,8 +461,8 @@ self.addEventListener("push", (event) => {
 
   const options = {
     body: data.body || "New update from SimulateAI",
-    icon: "/SimulateAI/src/assets/icons/Square Icon_192_x_192.png",
-    badge: "/SimulateAI/src/assets/icons/Square Icon_192_x_192.png",
+    icon: "/src/assets/icons/Square Icon_192_x_192.png",
+    badge: "/src/assets/icons/Square Icon_192_x_192.png",
     tag: data.tag || "simulateai-notification",
     requireInteraction: data.requireInteraction || false,
     actions: data.actions || [],
@@ -492,19 +488,19 @@ self.addEventListener("notificationclick", (event) => {
 
   // Open or focus the app
   event.waitUntil(
-    clients
+    self.clients
       .matchAll({ includeUncontrolled: true, type: "window" })
       .then((clientList) => {
         // Check if app is already open
         for (const client of clientList) {
-          if (client.url.includes("/SimulateAI/") && "focus" in client) {
+          if (client.url.includes(self.location.origin) && "focus" in client) {
             return client.focus();
           }
         }
 
         // Open new window
-        if (clients.openWindow) {
-          return clients.openWindow("/SimulateAI/");
+        if (self.clients.openWindow) {
+          return self.clients.openWindow("/");
         }
       }),
   );
