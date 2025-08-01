@@ -46,6 +46,8 @@ export default defineConfig(() => {
           welcome: "welcome.html",
           sw: "sw.js", // Include service worker
         },
+        // Ensure all JS modules are included in build
+        plugins: [],
         external: [], // Don't externalize any modules - bundle everything
         output: {
           format: "es",
