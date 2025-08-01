@@ -212,13 +212,56 @@
       }
     </script>
 
-    <!-- Anonymous Donation Component -->
-    <script src="src/js/components/anonymous-donation.js"></script>
+    <!-- Basic back to top functionality -->
+    <script>
+      // Simple back to top button
+      document.addEventListener("DOMContentLoaded", function () {
+        // Create back to top button
+        const backToTopBtn = document.createElement("button");
+        backToTopBtn.textContent = "↑ Top";
+        backToTopBtn.style.cssText = `
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          background: #667eea;
+          color: white;
+          border: none;
+          border-radius: 50px;
+          padding: 12px 20px;
+          cursor: pointer;
+          display: none;
+          z-index: 1000;
+          font-family: inherit;
+          font-size: 14px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+          transition: all 0.3s ease;
+        `;
 
-    <!-- Back to Top Component -->
-    <script type="module" src="src/js/components/back-to-top.js"></script>
+        backToTopBtn.onmouseover = () => {
+          backToTopBtn.style.background = "#5a67d8";
+          backToTopBtn.style.transform = "translateY(-2px)";
+        };
 
-    <!-- Shared Navigation Component -->
-    <script src="src/js/components/shared-navigation.js"></script>
+        backToTopBtn.onmouseout = () => {
+          backToTopBtn.style.background = "#667eea";
+          backToTopBtn.style.transform = "translateY(0)";
+        };
+
+        backToTopBtn.onclick = () => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        };
+
+        document.body.appendChild(backToTopBtn);
+
+        // Show/hide on scroll
+        window.addEventListener("scroll", () => {
+          if (window.pageYOffset > 300) {
+            backToTopBtn.style.display = "block";
+          } else {
+            backToTopBtn.style.display = "none";
+          }
+        });
+      });
+    </script>
   </body>
 </html>

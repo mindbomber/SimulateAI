@@ -35,6 +35,7 @@ export default defineConfig(() => {
           about: "about.html",
           blog: "blog.html",
           dataDelete: "data-deletion.html",
+          donate: "donate.html",
           educator: "educator-tools.html",
           ethics: "ethics-guide.html",
           help: "help-faq.html",
