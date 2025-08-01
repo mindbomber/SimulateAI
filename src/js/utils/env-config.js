@@ -35,14 +35,14 @@ class EnvironmentConfig {
         measurementId: metaEnv.VITE_FIREBASE_MEASUREMENT_ID || "G-ABCDEF1234",
       },
 
-      // Stripe Configuration
+      // Stripe Configuration (with fallback)
       stripe: {
-        publishableKey: import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY,
+        publishableKey: metaEnv.VITE_STRIPE_PUBLISHABLE_KEY || "pk_demo_key",
       },
 
       // Environment Settings
       environment:
-        import.meta.env.VITE_ENVIRONMENT ||
+        metaEnv.VITE_ENVIRONMENT ||
         (isProduction ? "production" : "development"),
       isDevelopment,
       isProduction,

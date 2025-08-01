@@ -18,11 +18,11 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   root: ".",
-  base: "./",
+  base: "/SimulateAI/", // Update this to match your GitHub repository name
   build: {
     outDir: "dist",
     assetsDir: "assets",
-    sourcemap: true,
+    sourcemap: false, // Disable sourcemaps for production
     target: "es2020",
     rollupOptions: {
       input: {
@@ -30,6 +30,7 @@ export default defineConfig({
       },
       output: {
         manualChunks: {
+          firebase: ["firebase/app", "firebase/auth", "firebase/firestore", "firebase/analytics"],
           core: ["./src/js/core/engine.js", "./src/js/core/simulation.js"],
           ui: ["./src/js/core/ui.js", "./src/js/core/accessibility.js"],
           utils: [
