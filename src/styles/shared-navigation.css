@@ -1423,6 +1423,30 @@
     transform: translateY(0) scale(1);
   }
 
+  /* Hover functionality for nav-group-about dropdown */
+  .nav-group-about .nav-item-dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    z-index: var(--z-dropdown-hover, 1051);
+  }
+
+  /* Keep dropdown open when hovering over the dropdown itself */
+  .nav-group-about .dropdown-menu:hover {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+  }
+
+  /* Ensure smooth transition when moving between trigger and dropdown */
+  .nav-group-about .nav-item-dropdown {
+    position: relative;
+  }
+
+  .nav-group-about .nav-item-dropdown:hover {
+    z-index: var(--z-dropdown-hover, 1051);
+  }
+
   .dropdown-item {
     padding: calc(0.75rem * var(--font-scale, 1))
       calc(1rem * var(--font-scale, 1));

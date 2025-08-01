@@ -1,445 +1,447 @@
 /* Donor Flair Display Styles */
 
-/* Flair Badge Styles */
-.donor-flair-badge {
-  display: inline-block;
-  font-size: 1em;
-  line-height: 1;
-  margin: 0 2px;
-  vertical-align: middle;
-  transition: all 0.3s ease;
-}
-
-.donor-flair-badge.small {
-  font-size: 0.8em;
-}
-
-.donor-flair-badge.large {
-  font-size: 1.3em;
-}
-
-.donor-flair-badge.floating {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  font-size: 0.7em;
-  background: white;
-  border-radius: 50%;
-  padding: 2px;
-  box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
-}
-
-.donor-flair-badge[data-tier="3"] {
-  filter: drop-shadow(0 0 2px rgb(255 215 0 / 50%));
-}
-
-.donor-flair-badge[data-tier="2"] {
-  filter: drop-shadow(0 0 2px rgb(192 192 192 / 50%));
-}
-
-.donor-flair-badge[data-tier="1"] {
-  filter: drop-shadow(0 0 2px rgb(205 127 50 / 50%));
-}
-
-/* Enhanced Username Styles */
-.has-donor-flair {
-  font-weight: 500;
-  position: relative;
-}
-
-.has-donor-flair::after {
-  content: "";
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--flair-color, #007bff),
-    transparent
-  );
-  opacity: 0.3;
-}
-
-/* Donor Appreciation Section - Basic fallback styles only */
-/* Main styles are defined in donor-wall.css with CSS layers */
-
-.appreciation-title {
-  color: #2c3e50;
-  margin: 0 0 20px;
-  font-size: 1.3rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.appreciation-icon {
-  font-size: 1.4em;
-  animation: gentle-bounce 2s ease-in-out infinite;
-}
-
-@keyframes gentle-bounce {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-2px);
-  }
-}
-
-/* Donor Showcase */
-.donor-showcase {
-  margin-bottom: 24px;
-}
-
-.donor-placeholder {
-  padding: 20px;
-  color: #6c757d;
-  font-style: italic;
-}
-
-.donor-tier-group {
-  margin-bottom: 24px;
-  background: white;
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: 0 2px 8px rgb(0 0 0 / 5%);
-}
-
-.tier-title {
-  color: #2c3e50;
-  margin: 0 0 12px;
-  font-size: 1.1rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.tier-flair {
-  font-size: 1.3em;
-}
-
-.donor-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 12px;
-}
-
-/* Donor Card */
-.donor-card {
-  background: #f8f9fa;
-  border-radius: 6px;
-  padding: 12px;
-  border-left: 3px solid var(--flair-color, #007bff);
-}
-
-.donor-info {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 4px;
-}
-
-.donor-name {
-  font-weight: 500;
-  color: #2c3e50;
-}
-
-.donor-flair {
-  font-size: 1.1em;
-}
-
-.donor-date {
-  font-size: 0.8rem;
-  color: #6c757d;
-}
-
-/* Become Supporter Section */
-.become-supporter {
-  background: white;
-  border-radius: 8px;
-  padding: 16px;
-  margin-top: 16px;
-}
-
-.become-supporter p {
-  margin: 0 0 12px;
-  color: #495057;
-}
-
-.become-supporter-btn {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 10px 20px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.become-supporter-btn:hover {
-  background: linear-gradient(135deg, #0056b3, #004085);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgb(0 123 255 / 30%);
-}
-
-/* Navigation Flair Enhancement */
-.nav-link.has-donor-flair {
-  position: relative;
-}
-
-.nav-link.has-donor-flair::before {
-  content: "";
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  width: 8px;
-  height: 8px;
-  background: var(--flair-color, #007bff);
-  border-radius: 50%;
-  border: 2px solid white;
-  animation: pulse-flair 2s ease-in-out infinite;
-}
-
-@keyframes pulse-flair {
-  0%,
-  100% {
-    opacity: 0.7;
-    transform: scale(1);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scale(1.2);
-  }
-}
-
-/* Profile Page Flair Enhancement */
-.profile-header .has-donor-flair {
-  font-size: 1.2em;
-  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-  padding: 8px 16px;
-  border-radius: 20px;
-  display: inline-block;
-  margin: 8px 0;
-}
-
-/* Comment/Forum Flair */
-.comment-author.has-donor-flair,
-.forum-post-author.has-donor-flair {
-  background: linear-gradient(
-    135deg,
-    rgb(0 123 255 / 10%),
-    rgb(0 86 179 / 10%)
-  );
-  border-radius: 4px;
-  padding: 2px 6px;
-}
-
-/* Tier-specific colors */
-.donor-card[data-tier="3"],
-.donor-tier-group[data-tier="3"] {
-  --flair-color: #ffd700;
-}
-
-.donor-card[data-tier="2"],
-.donor-tier-group[data-tier="2"] {
-  --flair-color: #c0c0c0;
-}
-
-.donor-card[data-tier="1"],
-.donor-tier-group[data-tier="1"] {
-  --flair-color: #cd7f32;
-}
-
-/* Mobile Responsiveness */
-@media (width <= 768px) {
-  .donor-appreciation-section {
-    padding: 12px;
-    margin: 16px auto; /* Reduced from 20px to 16px */
-    max-width: 100%; /* Ensure it doesn't exceed container on mobile */
-  }
-
-  .appreciation-title {
-    font-size: 1.1rem;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .donor-list {
-    grid-template-columns: 1fr;
-  }
-
-  .donor-card {
-    padding: 10px;
-  }
-
-  .donor-info {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-  }
-
-  .profile-header .has-donor-flair {
-    font-size: 1em;
-    padding: 6px 12px;
-  }
-}
-
-/* Accessibility */
-.donor-flair-badge:focus {
-  outline: 2px solid #007bff;
-  outline-offset: 2px;
-}
-
-.has-donor-flair:focus-within {
-  outline: 2px solid var(--flair-color, #007bff);
-  outline-offset: 2px;
-  border-radius: 2px;
-}
-
-/* High Contrast Mode */
-@media (prefers-contrast: high) {
+@layer components {
+  /* Flair Badge Styles */
   .donor-flair-badge {
+    display: inline-block;
+    font-size: 1em;
+    line-height: 1;
+    margin: 0 2px;
+    vertical-align: middle;
+    transition: all 0.3s ease;
+  }
+
+  .donor-flair-badge.small {
+    font-size: 0.8em;
+  }
+
+  .donor-flair-badge.large {
+    font-size: 1.3em;
+  }
+
+  .donor-flair-badge.floating {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    font-size: 0.7em;
     background: white;
-    border: 1px solid currentcolor;
     border-radius: 50%;
     padding: 2px;
+    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+  }
+
+  .donor-flair-badge[data-tier="3"] {
+    filter: drop-shadow(0 0 2px rgb(255 215 0 / 50%));
+  }
+
+  .donor-flair-badge[data-tier="2"] {
+    filter: drop-shadow(0 0 2px rgb(192 192 192 / 50%));
+  }
+
+  .donor-flair-badge[data-tier="1"] {
+    filter: drop-shadow(0 0 2px rgb(205 127 50 / 50%));
+  }
+
+  /* Enhanced Username Styles */
+  .has-donor-flair {
+    font-weight: 500;
+    position: relative;
   }
 
   .has-donor-flair::after {
-    opacity: 1;
-    height: 2px;
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--flair-color, #007bff),
+      transparent
+    );
+    opacity: 0.3;
   }
 
-  .donor-card {
-    border: 2px solid var(--flair-color, #007bff);
+  /* Donor Appreciation Section - Basic fallback styles only */
+  /* Main styles are defined in donor-wall.css with CSS layers */
+
+  .appreciation-title {
+    color: #2c3e50;
+    margin: 0 0 20px;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
   }
-}
 
-/* Dark Mode Support */
-body.dark-mode .donor-flair-badge.floating {
-  background: var(--theme-bg-secondary, #2d3748);
-  box-shadow: 0 2px 4px var(--theme-shadow, rgb(0 0 0 / 30%));
-}
-
-body.dark-mode .has-donor-flair::after {
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--flair-color, var(--theme-accent, #007bff)),
-    transparent
-  );
-}
-
-body.dark-mode .donor-appreciation-section {
-  background: linear-gradient(
-    135deg,
-    var(--theme-bg-primary, #1a202c),
-    var(--theme-bg-secondary, #2d3748)
-  );
-  color: var(--theme-text-primary, #f7fafc);
-}
-
-body.dark-mode .appreciation-title {
-  color: var(--theme-text-primary, #f7fafc);
-}
-
-body.dark-mode .donor-placeholder {
-  color: var(--theme-text-secondary, #a0aec0);
-}
-
-body.dark-mode .donor-tier-group {
-  background: var(--theme-bg-secondary, #2d3748);
-  box-shadow: 0 2px 8px var(--theme-shadow, rgb(0 0 0 / 20%));
-}
-
-body.dark-mode .tier-title {
-  color: var(--theme-text-primary, #f7fafc);
-}
-
-body.dark-mode .donor-card {
-  background: var(--theme-bg-secondary, #2d3748);
-  border-left-color: var(--flair-color, var(--theme-accent, #007bff));
-}
-
-body.dark-mode .donor-name {
-  color: var(--theme-text-primary, #f7fafc);
-}
-
-body.dark-mode .donor-date {
-  color: var(--theme-text-secondary, #a0aec0);
-}
-
-body.dark-mode .become-supporter {
-  background: var(--theme-bg-secondary, #2d3748);
-}
-
-body.dark-mode .become-supporter p {
-  color: var(--theme-text-secondary, #a0aec0);
-}
-
-body.dark-mode .become-supporter-btn {
-  background: linear-gradient(
-    135deg,
-    var(--theme-accent, #007bff),
-    var(--theme-accent-dark, #0056b3)
-  );
-}
-
-body.dark-mode .become-supporter-btn:hover {
-  background: linear-gradient(
-    135deg,
-    var(--theme-accent-dark, #0056b3),
-    var(--theme-accent-darker, #004085)
-  );
-  box-shadow: 0 4px 12px var(--theme-shadow-accent, rgb(0 123 255 / 40%));
-}
-
-body.dark-mode .nav-link.has-donor-flair::before {
-  border-color: var(--theme-bg-secondary, #2d3748);
-}
-
-body.dark-mode .profile-header .has-donor-flair {
-  background: linear-gradient(
-    135deg,
-    var(--theme-bg-secondary, #2d3748),
-    var(--theme-bg-tertiary, #4a5568)
-  );
-  color: var(--theme-text-primary, #f7fafc);
-}
-
-body.dark-mode .comment-author.has-donor-flair,
-body.dark-mode .forum-post-author.has-donor-flair {
-  background: linear-gradient(
-    135deg,
-    rgb(var(--theme-accent-rgb, 0 123 255) / 15%),
-    rgb(var(--theme-accent-dark-rgb, 0 86 179) / 15%)
-  );
-  color: var(--theme-text-primary, #f7fafc);
-}
-
-/* Print Styles */
-@media print {
-  .donor-flair-badge,
   .appreciation-icon {
-    color: black !important;
-    text-shadow: none !important;
-    filter: none !important;
+    font-size: 1.4em;
+    animation: gentle-bounce 2s ease-in-out infinite;
   }
 
-  .donor-appreciation-section {
-    background: white !important;
-    border: 1px solid #000 !important;
+  @keyframes gentle-bounce {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-2px);
+    }
   }
 
+  /* Donor Showcase */
+  .donor-showcase {
+    margin-bottom: 24px;
+  }
+
+  .donor-placeholder {
+    padding: 20px;
+    color: #6c757d;
+    font-style: italic;
+  }
+
+  .donor-tier-group {
+    margin-bottom: 24px;
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 5%);
+  }
+
+  .tier-title {
+    color: #2c3e50;
+    margin: 0 0 12px;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tier-flair {
+    font-size: 1.3em;
+  }
+
+  .donor-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+
+  /* Donor Card */
+  .donor-card {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 12px;
+    border-left: 3px solid var(--flair-color, #007bff);
+  }
+
+  .donor-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .donor-name {
+    font-weight: 500;
+    color: #2c3e50;
+  }
+
+  .donor-flair {
+    font-size: 1.1em;
+  }
+
+  .donor-date {
+    font-size: 0.8rem;
+    color: #6c757d;
+  }
+
+  /* Become Supporter Section */
   .become-supporter {
-    display: none;
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+  }
+
+  .become-supporter p {
+    margin: 0 0 12px;
+    color: #495057;
+  }
+
+  .become-supporter-btn {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .become-supporter-btn:hover {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgb(0 123 255 / 30%);
+  }
+
+  /* Navigation Flair Enhancement */
+  .nav-link.has-donor-flair {
+    position: relative;
+  }
+
+  .nav-link.has-donor-flair::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    background: var(--flair-color, #007bff);
+    border-radius: 50%;
+    border: 2px solid white;
+    animation: pulse-flair 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-flair {
+    0%,
+    100% {
+      opacity: 0.7;
+      transform: scale(1);
+    }
+
+    50% {
+      opacity: 1;
+      transform: scale(1.2);
+    }
+  }
+
+  /* Profile Page Flair Enhancement */
+  .profile-header .has-donor-flair {
+    font-size: 1.2em;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    padding: 8px 16px;
+    border-radius: 20px;
+    display: inline-block;
+    margin: 8px 0;
+  }
+
+  /* Comment/Forum Flair */
+  .comment-author.has-donor-flair,
+  .forum-post-author.has-donor-flair {
+    background: linear-gradient(
+      135deg,
+      rgb(0 123 255 / 10%),
+      rgb(0 86 179 / 10%)
+    );
+    border-radius: 4px;
+    padding: 2px 6px;
+  }
+
+  /* Tier-specific colors */
+  .donor-card[data-tier="3"],
+  .donor-tier-group[data-tier="3"] {
+    --flair-color: #ffd700;
+  }
+
+  .donor-card[data-tier="2"],
+  .donor-tier-group[data-tier="2"] {
+    --flair-color: #c0c0c0;
+  }
+
+  .donor-card[data-tier="1"],
+  .donor-tier-group[data-tier="1"] {
+    --flair-color: #cd7f32;
+  }
+
+  /* Mobile Responsiveness */
+  @media (width <= 768px) {
+    .donor-appreciation-section {
+      padding: 12px;
+      margin: 16px auto; /* Reduced from 20px to 16px */
+      max-width: 100%; /* Ensure it doesn't exceed container on mobile */
+    }
+
+    .appreciation-title {
+      font-size: 1.1rem;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .donor-list {
+      grid-template-columns: 1fr;
+    }
+
+    .donor-card {
+      padding: 10px;
+    }
+
+    .donor-info {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .profile-header .has-donor-flair {
+      font-size: 1em;
+      padding: 6px 12px;
+    }
+  }
+
+  /* Accessibility */
+  .donor-flair-badge:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+  }
+
+  .has-donor-flair:focus-within {
+    outline: 2px solid var(--flair-color, #007bff);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* High Contrast Mode */
+  @media (prefers-contrast: high) {
+    .donor-flair-badge {
+      background: white;
+      border: 1px solid currentcolor;
+      border-radius: 50%;
+      padding: 2px;
+    }
+
+    .has-donor-flair::after {
+      opacity: 1;
+      height: 2px;
+    }
+
+    .donor-card {
+      border: 2px solid var(--flair-color, #007bff);
+    }
+  }
+
+  /* Dark Mode Support */
+  body.dark-mode .donor-flair-badge.floating {
+    background: var(--theme-bg-secondary, #2d3748);
+    box-shadow: 0 2px 4px var(--theme-shadow, rgb(0 0 0 / 30%));
+  }
+
+  body.dark-mode .has-donor-flair::after {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--flair-color, var(--theme-accent, #007bff)),
+      transparent
+    );
+  }
+
+  body.dark-mode .donor-appreciation-section {
+    background: linear-gradient(
+      135deg,
+      var(--theme-bg-primary, #1a202c),
+      var(--theme-bg-secondary, #2d3748)
+    );
+    color: var(--theme-text-primary, #f7fafc);
+  }
+
+  body.dark-mode .appreciation-title {
+    color: var(--theme-text-primary, #f7fafc);
+  }
+
+  body.dark-mode .donor-placeholder {
+    color: var(--theme-text-secondary, #a0aec0);
+  }
+
+  body.dark-mode .donor-tier-group {
+    background: var(--theme-bg-secondary, #2d3748);
+    box-shadow: 0 2px 8px var(--theme-shadow, rgb(0 0 0 / 20%));
+  }
+
+  body.dark-mode .tier-title {
+    color: var(--theme-text-primary, #f7fafc);
+  }
+
+  body.dark-mode .donor-card {
+    background: var(--theme-bg-secondary, #2d3748);
+    border-left-color: var(--flair-color, var(--theme-accent, #007bff));
+  }
+
+  body.dark-mode .donor-name {
+    color: var(--theme-text-primary, #f7fafc);
+  }
+
+  body.dark-mode .donor-date {
+    color: var(--theme-text-secondary, #a0aec0);
+  }
+
+  body.dark-mode .become-supporter {
+    background: var(--theme-bg-secondary, #2d3748);
+  }
+
+  body.dark-mode .become-supporter p {
+    color: var(--theme-text-secondary, #a0aec0);
+  }
+
+  body.dark-mode .become-supporter-btn {
+    background: linear-gradient(
+      135deg,
+      var(--theme-accent, #007bff),
+      var(--theme-accent-dark, #0056b3)
+    );
+  }
+
+  body.dark-mode .become-supporter-btn:hover {
+    background: linear-gradient(
+      135deg,
+      var(--theme-accent-dark, #0056b3),
+      var(--theme-accent-darker, #004085)
+    );
+    box-shadow: 0 4px 12px var(--theme-shadow-accent, rgb(0 123 255 / 40%));
+  }
+
+  body.dark-mode .nav-link.has-donor-flair::before {
+    border-color: var(--theme-bg-secondary, #2d3748);
+  }
+
+  body.dark-mode .profile-header .has-donor-flair {
+    background: linear-gradient(
+      135deg,
+      var(--theme-bg-secondary, #2d3748),
+      var(--theme-bg-tertiary, #4a5568)
+    );
+    color: var(--theme-text-primary, #f7fafc);
+  }
+
+  body.dark-mode .comment-author.has-donor-flair,
+  body.dark-mode .forum-post-author.has-donor-flair {
+    background: linear-gradient(
+      135deg,
+      rgb(var(--theme-accent-rgb, 0 123 255) / 15%),
+      rgb(var(--theme-accent-dark-rgb, 0 86 179) / 15%)
+    );
+    color: var(--theme-text-primary, #f7fafc);
+  }
+
+  /* Print Styles */
+  @media print {
+    .donor-flair-badge,
+    .appreciation-icon {
+      color: black !important;
+      text-shadow: none !important;
+      filter: none !important;
+    }
+
+    .donor-appreciation-section {
+      background: white !important;
+      border: 1px solid #000 !important;
+    }
+
+    .become-supporter {
+      display: none;
+    }
   }
 }
