@@ -30,7 +30,12 @@ export default defineConfig({
       },
       output: {
         manualChunks: {
-          firebase: ["firebase/app", "firebase/auth", "firebase/firestore", "firebase/analytics"],
+          firebase: [
+            "firebase/app",
+            "firebase/auth",
+            "firebase/firestore",
+            "firebase/analytics",
+          ],
           core: ["./src/js/core/engine.js", "./src/js/core/simulation.js"],
           ui: ["./src/js/core/ui.js", "./src/js/core/accessibility.js"],
           utils: [

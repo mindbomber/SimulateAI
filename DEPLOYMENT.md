@@ -25,6 +25,7 @@ The following issues have been resolved for successful GitHub Pages deployment:
 ### 🛠 **Configuration Changes**
 
 #### **1. vite.config.js**
+
 ```javascript
 export default defineConfig({
   base: "/SimulateAI/", // Match your GitHub repository name
@@ -33,7 +34,12 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          firebase: ["firebase/app", "firebase/auth", "firebase/firestore", "firebase/analytics"],
+          firebase: [
+            "firebase/app",
+            "firebase/auth",
+            "firebase/firestore",
+            "firebase/analytics",
+          ],
           // ... other chunks
         },
       },
@@ -43,11 +49,13 @@ export default defineConfig({
 ```
 
 #### **2. Environment Variables**
+
 - Added `.env.production` with public Firebase keys
 - Updated GitHub Actions workflow with environment variables
 - Added fallbacks in `env-config.js`
 
 #### **3. GitHub Actions Workflow**
+
 - Updated `.github/workflows/deploy.yml` with proper environment variables
 - Firebase keys are public (safe to expose)
 - Stripe publishable key is public (safe to expose)
@@ -57,6 +65,7 @@ export default defineConfig({
 ### **Option 1: Automatic Deployment (Recommended)**
 
 1. **Push to main branch:**
+
    ```bash
    git push origin main
    ```
@@ -69,6 +78,7 @@ export default defineConfig({
 ### **Option 2: Manual Deployment**
 
 1. **Build locally:**
+
    ```bash
    npm run build
    ```
