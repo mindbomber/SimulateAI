@@ -106,11 +106,17 @@ if (import.meta.env && import.meta.env.VITE_FIREBASE_CONFIG) {
   console.log("🔒 Using Firebase config from window.envConfig");
 } else {
   // Fallback to development config for localhost only
-  if (typeof window !== 'undefined' && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+  if (
+    typeof window !== "undefined" &&
+    (window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1")
+  ) {
     firebaseConfig = devFirebaseConfig;
     console.log("🔧 Using development Firebase config for localhost");
   } else {
-    throw new Error("Firebase configuration not available in environment variables for production deployment");
+    throw new Error(
+      "Firebase configuration not available in environment variables for production deployment",
+    );
   }
 }
 
