@@ -1,3 +1,4 @@
+/* global module */
 /**
  * Anonymous Donation Component
  * Allows users to donate without authentication

@@ -1,3 +1,4 @@
+/* global module */
 /**
  * Donor Appreciation Module
  * Handles displaying donor recognition and appreciation content
