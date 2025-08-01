@@ -1912,6 +1912,13 @@
 
     <!-- PWA Service Worker Registration -->
     <script>
+      // Set base URL dynamically for proper ES module resolution
+      if (window.location.hostname !== "localhost") {
+        const baseTag = document.createElement("base");
+        baseTag.href = "/SimulateAI/";
+        document.head.insertBefore(baseTag, document.head.firstChild);
+      }
+
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", async () => {
           try {

@@ -30,10 +30,25 @@ export default defineConfig(({ command }) => {
       rollupOptions: {
         input: {
           main: "app.html",
+          sw: "sw.js", // Include service worker
         },
         external: [], // Don't externalize any modules - bundle everything
         output: {
           format: "es",
+          // Don't hash the service worker filename
+          assetFileNames: (assetInfo) => {
+            if (assetInfo.name && assetInfo.name.endsWith("sw.js")) {
+              return "[name].[ext]";
+            }
+            return "assets/[name]-[hash].[ext]";
+          },
+          entryFileNames: (chunkInfo) => {
+            if (chunkInfo.name === "sw") {
+              return "sw.js";
+            }
+            return "assets/[name]-[hash].js";
+          },
+          chunkFileNames: "assets/[name]-[hash].js",
           // Global variables for production
           globals: {
             "firebase/app": "firebase",
@@ -86,5 +101,6 @@ export default defineConfig(({ command }) => {
       "**/*.gif",
       "**/*.webp",
     ],
+    publicDir: "public",
   };
 });
