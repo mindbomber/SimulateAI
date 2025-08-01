@@ -1,0 +1,279 @@
+{
+  "//": "Copyright 2025 SimulateAI Platform",
+  "//license": "Licensed under the Apache License, Version 2.0 (the 'License')",
+  "//license-url": "http://www.apache.org/licenses/LICENSE-2.0",
+  "//notice": "See LICENSE file in the root directory for full license terms",
+  "badgeModal": {
+    "animations": {
+      "durations": {
+        "confetti": 3000,
+        "confettiSecondDelay": 500,
+        "confettiThirdDelay": 1000,
+        "confettiFourthDelay": 1500,
+        "confettiFifthDelay": 2000,
+        "confettiSimultaneous": 10,
+        "confettiNearSimultaneous": 50,
+        "confettiOverlapShort": 100,
+        "confettiOverlapMedium": 150,
+        "confettiOverlapLong": 200,
+        "modalEnter": 600,
+        "modalExit": 400,
+        "badgeScale": 800,
+        "sidekickEntrance": 1200,
+        "entranceDelay": 100,
+        "shieldDelay": 200,
+        "sidekickDelay": 400,
+        "textStartDelay": 400,
+        "textStaggerDelay": 100,
+        "typewriterStartDelay": 1000
+      },
+      "easings": {
+        "modalEntrance": "cubic-bezier(0.68, -0.55, 0.265, 1.55)",
+        "modalExit": "ease-in",
+        "textElements": "ease-out"
+      }
+    },
+    "effects": {
+      "confetti": {
+        "waves": [
+          {
+            "id": "wave1",
+            "delay": 0,
+            "emojiSize": 60,
+            "baseCount": 8,
+            "description": "Large confetti (immediate)"
+          },
+          {
+            "id": "wave2",
+            "delay": "confettiSimultaneous",
+            "emojiSize": 40,
+            "baseCount": 10,
+            "description": "Medium confetti (virtually simultaneous)"
+          },
+          {
+            "id": "wave3",
+            "delay": "confettiSecondDelay",
+            "emojiSize": 25,
+            "baseCount": 6,
+            "description": "Small confetti (with modal appearance)"
+          }
+        ],
+        "tierEffects": {
+          "large": {
+            "threshold": 3,
+            "delay": "confettiThirdDelay",
+            "emojiSize": 70,
+            "count": 12,
+            "description": "Tier 3+: Large finale"
+          },
+          "epic": {
+            "threshold": 6,
+            "delay": 200,
+            "emojiSize": 80,
+            "count": 15,
+            "description": "Tier 6+: Epic finale with multiple waves"
+          },
+          "legendary": {
+            "threshold": 9,
+            "delay": 400,
+            "emojiSize": 90,
+            "count": 20,
+            "extraEmojis": ["✨", "🌟"],
+            "description": "Tier 9+: Legendary finale"
+          }
+        }
+      },
+      "particles": {
+        "count": 8,
+        "minSize": 2,
+        "sizeRange": 3,
+        "maxDelay": 8,
+        "minDuration": 15,
+        "durationRange": 10,
+        "driftMultiplier": 100,
+        "driftOffset": 0.5,
+        "className": "floating-particle"
+      },
+      "bubbles": {
+        "category": {
+          "count": 4,
+          "className": "bubbling-emoji category"
+        },
+        "sidekick": {
+          "count": 3,
+          "className": "bubbling-emoji sidekick"
+        },
+        "shared": {
+          "maxDelay": 12,
+          "minDuration": 8,
+          "durationRange": 4,
+          "driftRange": 60
+        }
+      }
+    },
+    "typography": {
+      "typewriter": {
+        "charSpeed": 20,
+        "cursorDelay": 600,
+        "startDelay": 50,
+        "cursorStyle": "2px solid rgba(255, 255, 255, 0.8)",
+        "animation": "typewriter 1.5s steps(30) forwards"
+      }
+    },
+    "structure": {
+      "modal": {
+        "backdrop": {
+          "className": "badge-modal-backdrop"
+        },
+        "container": {
+          "className": "badge-modal"
+        },
+        "content": {
+          "className": "badge-modal-content"
+        }
+      },
+      "visual": {
+        "container": {
+          "className": "badge-visual-container"
+        },
+        "shield": {
+          "className": "badge-shield",
+          "emoji": "🛡️",
+          "emojiClassName": "badge-shield-emoji"
+        },
+        "categoryEmoji": {
+          "className": "badge-category-emoji"
+        },
+        "sidekickEmoji": {
+          "className": "badge-sidekick-emoji"
+        }
+      },
+      "text": {
+        "container": {
+          "className": "badge-text-content"
+        },
+        "title": {
+          "element": "h2",
+          "className": "badge-title"
+        },
+        "quote": {
+          "element": "p",
+          "className": "badge-quote"
+        },
+        "details": {
+          "container": {
+            "className": "badge-details"
+          },
+          "reason": {
+            "element": "p",
+            "className": "badge-reason"
+          },
+          "timestamp": {
+            "element": "p",
+            "className": "badge-timestamp"
+          }
+        }
+      },
+      "footer": {
+        "container": {
+          "className": "badge-modal-footer"
+        },
+        "closeButton": {
+          "element": "button",
+          "className": "badge-close-btn btn-primary"
+        }
+      },
+      "containers": {
+        "particles": {
+          "className": "particles-container"
+        },
+        "bubbles": {
+          "className": "emoji-bubbles-container"
+        }
+      }
+    },
+    "tiers": {
+      "thresholds": {
+        "large": 3,
+        "epic": 6,
+        "legendary": 9
+      },
+      "descriptions": {
+        "1": "your first scenario",
+        "2": "three scenarios",
+        "3": "all six scenarios"
+      }
+    },
+    "templates": {
+      "reasonText": "You've earned this badge for completing {tierText} in the {categoryName} category.",
+      "buttonText": {
+        "category": "Back to Category",
+        "main": "Back to Scenarios"
+      },
+      "timestampFormat": {
+        "locale": "en-US",
+        "options": {
+          "month": "short",
+          "day": "numeric",
+          "year": "numeric",
+          "hour": "numeric",
+          "minute": "2-digit",
+          "hour12": true
+        }
+      }
+    },
+    "accessibility": {
+      "keyboard": {
+        "escapeToClose": true
+      },
+      "focus": {
+        "trapFocus": true,
+        "returnFocus": true
+      },
+      "announcements": {
+        "badgeEarned": "Badge earned: {title}",
+        "modalOpened": "Badge achievement modal opened",
+        "modalClosed": "Badge achievement modal closed"
+      },
+      "reducedMotion": {
+        "animationScale": 0.5,
+        "particleReduction": 0.3,
+        "confettiReduction": 0.5
+      }
+    },
+    "performance": {
+      "optimizations": {
+        "particleLimit": 8,
+        "bubbleLimit": 7,
+        "confettiReduction": true,
+        "deferNonCritical": true
+      },
+      "thresholds": {
+        "lowEnd": {
+          "particleCount": 4,
+          "bubbleCount": 3,
+          "confettiMultiplier": 0.5
+        }
+      }
+    },
+    "fallbacks": {
+      "confetti": {
+        "disabled": false,
+        "fallbackMessage": "Confetti disabled - library not available"
+      },
+      "animations": {
+        "reducedMotion": {
+          "modalEnter": 200,
+          "modalExit": 150,
+          "disableParticles": true,
+          "disableTypewriter": true
+        }
+      },
+      "defaults": {
+        "glowClass": "badge-glow-low",
+        "tierText": "scenarios",
+        "categoryName": "Unknown Category"
+      }
+    }
+  }
+}

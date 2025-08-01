@@ -343,8 +343,4 @@ if (!document.querySelector("#rate-limit-status-styles")) {
 }
 
 // Export for use in other modules
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = RateLimitStatus;
-} else {
-  window.RateLimitStatus = RateLimitStatus;
-}
+export default RateLimitStatus;

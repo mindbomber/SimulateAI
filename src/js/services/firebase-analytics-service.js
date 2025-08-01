@@ -694,24 +694,65 @@ export class FirebaseAnalyticsService {
    */
 
   async storeEvent(event) {
-    // Skip Firestore writes in development mode
-    if (this.isDevelopmentMode) {
+    // FIREBASE 400 FIX: Enhanced error handling and retry logic
+    // Skip if in development or if too many recent errors
+    if (
+      this.isDevelopmentMode ||
+      (this.recentErrors && this.recentErrors > 5)
+    ) {
       return;
     }
 
     try {
-      await addDoc(collection(this.db, "analytics_events"), {
-        ...event,
-        timestamp: serverTimestamp(),
-      });
+      // FIREBASE 400 FIX: Add retry logic
+      const maxRetries = 3;
+      let attempt = 0;
+
+      while (attempt < maxRetries) {
+        try {
+          await addDoc(collection(this.db, "analytics_events"), {
+            ...event,
+            timestamp: serverTimestamp(),
+          });
+
+          // Reset error count on success
+          if (this.recentErrors > 0) {
+            this.recentErrors = Math.max(0, this.recentErrors - 1);
+          }
+          return;
+        } catch (error) {
+          attempt++;
+          if (attempt >= maxRetries) throw error;
+          await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
+        }
+      }
     } catch (error) {
-      // Failed to store event - handled silently to prevent infinite loops
+      this.recentErrors = (this.recentErrors || 0) + 1;
+      console.warn(
+        `Firebase event storage failed (${this.recentErrors} recent errors):`,
+        error,
+      );
+
+      // If too many errors, temporarily disable
+      if (this.recentErrors > 10) {
+        console.error(
+          "🚨 Too many Firebase errors, temporarily disabling event storage",
+        );
+        setTimeout(() => {
+          this.recentErrors = 0;
+          console.log("✅ Re-enabling Firebase event storage");
+        }, 300000); // 5 minutes
+      }
     }
   }
 
   async storePerformanceMetric(metric) {
-    // Skip Firestore writes in development mode
-    if (this.isDevelopmentMode) {
+    // FIREBASE 400 FIX: Enhanced error handling
+    // Skip if in development or if too many recent errors
+    if (
+      this.isDevelopmentMode ||
+      (this.recentErrors && this.recentErrors > 5)
+    ) {
       return;
     }
 
@@ -720,8 +761,17 @@ export class FirebaseAnalyticsService {
         ...metric,
         timestamp: serverTimestamp(),
       });
+
+      // Reset error count on success
+      if (this.recentErrors > 0) {
+        this.recentErrors = Math.max(0, this.recentErrors - 1);
+      }
     } catch (error) {
-      // Failed to store performance metric - handled silently
+      this.recentErrors = (this.recentErrors || 0) + 1;
+      console.warn(
+        `Firebase performance metric storage failed (${this.recentErrors} recent errors):`,
+        error,
+      );
     }
   }
 

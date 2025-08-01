@@ -1,0 +1,341 @@
+{
+  "//": "Copyright 2025 SimulateAI Platform",
+  "//license": "Licensed under the Apache License, Version 2.0 (the 'License')",
+  "//license-url": "http://www.apache.org/licenses/LICENSE-2.0",
+  "//notice": "See LICENSE file in the root directory for full license terms",
+  "scenarioModal": {
+    "animations": {
+      "durations": {
+        "modalAnimation": 300,
+        "modalEnterTransition": 400,
+        "modalExitTransition": 300,
+        "optionSelectTransition": 200,
+        "radarChartAnimation": 800,
+        "typewriterCharacterDelay": 50,
+        "domSettleDelay": 250
+      },
+      "easings": {
+        "modalEntrance": "cubic-bezier(0.25, 0.8, 0.25, 1)",
+        "modalExit": "cubic-bezier(0.4, 0, 0.6, 1)",
+        "optionSelect": "ease-out",
+        "radarChart": "cubic-bezier(0.68, -0.55, 0.265, 1.55)"
+      }
+    },
+    "radarChart": {
+      "scoring": {
+        "maxScore": 5,
+        "neutralScore": 3,
+        "minScore": 1
+      },
+      "initialization": {
+        "maxInitAttempts": 15,
+        "initRetryDelay": 200,
+        "domSettleDelay": 250,
+        "containerSelector": "#scenario-radar-chart",
+        "timeoutThreshold": 5000
+      },
+      "visualization": {
+        "minHeight": 380,
+        "defaultColors": {
+          "primary": "#667eea",
+          "secondary": "#764ba2",
+          "accent": "#f093fb",
+          "neutral": "#c5c5c5"
+        },
+        "animationDuration": 800,
+        "responsive": true
+      }
+    },
+    "enterprise": {
+      "performance": {
+        "thresholds": {
+          "maxModalOpenTime": 3000,
+          "maxRadarInitTime": 2000,
+          "maxTypewriterTime": 5000,
+          "maxOptionSelectTime": 500,
+          "warningModalOpenTime": 1500,
+          "warningRadarInitTime": 1000,
+          "memoryWarningThreshold": 75,
+          "memoryCriticalThreshold": 150
+        },
+        "optimization": {
+          "enablePerformanceTracking": true,
+          "trackMemoryUsage": true,
+          "batchTelemetry": true,
+          "enableMetrics": true
+        }
+      },
+      "health": {
+        "monitoring": {
+          "checkInterval": 20000,
+          "failureThreshold": 3,
+          "recoveryTimeout": 45000,
+          "heartbeatInterval": 15000
+        },
+        "diagnostics": {
+          "enableHealthChecks": true,
+          "trackErrorRate": true,
+          "monitorCircuitBreaker": true,
+          "enableRecovery": true
+        }
+      },
+      "circuitBreaker": {
+        "faultTolerance": {
+          "failureThreshold": 4,
+          "recoveryTimeout": 30000,
+          "successThreshold": 2,
+          "states": ["closed", "open", "half-open"]
+        },
+        "behavior": {
+          "enableCircuitBreaker": true,
+          "trackFailures": true,
+          "autoRecovery": true
+        }
+      },
+      "telemetry": {
+        "batching": {
+          "batchSize": 8,
+          "flushInterval": 12000,
+          "maxEventsMemory": 50
+        },
+        "events": {
+          "trackModalOperations": true,
+          "trackPerformanceMetrics": true,
+          "trackUserInteractions": true,
+          "trackErrors": true
+        },
+        "analytics": {
+          "enableRealTimeReporting": true,
+          "enableBatchReporting": true,
+          "enableErrorTracking": true
+        }
+      },
+      "errorRecovery": {
+        "retry": {
+          "maxRetryAttempts": 3,
+          "retryDelay": 800,
+          "backoffMultiplier": 1.5,
+          "enableExponentialBackoff": true
+        },
+        "strategies": {
+          "autoRetry": true,
+          "gracefulDegradation": true,
+          "errorLogging": true,
+          "userNotification": true
+        }
+      }
+    },
+    "modal": {
+      "structure": {
+        "backdrop": {
+          "className": "scenario-modal-backdrop",
+          "closeOnClick": true
+        },
+        "container": {
+          "className": "scenario-modal",
+          "role": "dialog",
+          "ariaModal": true
+        },
+        "dialog": {
+          "className": "scenario-modal-dialog"
+        },
+        "header": {
+          "className": "scenario-modal-header",
+          "showCloseButton": true
+        },
+        "content": {
+          "className": "scenario-content",
+          "enableTypewriter": true
+        },
+        "footer": {
+          "className": "scenario-modal-footer",
+          "showCancelButton": true,
+          "showConfirmButton": true
+        }
+      },
+      "components": {
+        "title": {
+          "element": "h1",
+          "className": "scenario-title"
+        },
+        "category": {
+          "element": "span",
+          "className": "scenario-category"
+        },
+        "description": {
+          "className": "scenario-description"
+        },
+        "dilemma": {
+          "className": "dilemma-section",
+          "title": "The Dilemma"
+        },
+        "ethicalQuestion": {
+          "className": "ethical-question-section",
+          "title": "Ethical Question"
+        },
+        "options": {
+          "className": "options-section",
+          "title": "Choose Your Approach",
+          "containerClassName": "options-container"
+        },
+        "sidebar": {
+          "className": "scenario-sidebar"
+        }
+      },
+      "interactions": {
+        "keyboardNavigation": {
+          "enableEscapeToClose": true,
+          "trapFocus": true,
+          "returnFocus": true
+        },
+        "optionSelection": {
+          "allowMultipleSelection": false,
+          "highlightSelected": true,
+          "showImpactPreview": true
+        }
+      }
+    },
+    "typewriter": {
+      "effects": {
+        "characterSpeed": 50,
+        "startDelay": 300,
+        "betweenElementDelay": 500,
+        "cursorBlink": true,
+        "soundEffects": false
+      },
+      "targets": {
+        "dilemma": {
+          "selector": ".dilemma-text",
+          "priority": 1,
+          "enableEffect": true
+        },
+        "ethicalQuestion": {
+          "selector": ".ethical-question",
+          "priority": 2,
+          "enableEffect": true
+        }
+      },
+      "customization": {
+        "enableTypewriter": true,
+        "respectReducedMotion": true,
+        "allowSkip": true
+      }
+    },
+    "options": {
+      "rendering": {
+        "cardClassName": "option-card",
+        "headerClassName": "option-header",
+        "titleClassName": "option-title",
+        "descriptionClassName": "option-description",
+        "detailsClassName": "option-details"
+      },
+      "interactions": {
+        "expandOnHover": true,
+        "showDetailsOnSelect": true,
+        "enableProsCons": true,
+        "highlightImpact": true
+      },
+      "animations": {
+        "selectTransition": 200,
+        "hoverTransition": 150,
+        "expandTransition": 300
+      }
+    },
+    "testMode": {
+      "indicators": {
+        "showTestBadge": true,
+        "testBadgeText": "🧪 Test Mode - Choices not tracked",
+        "testBadgeClassName": "test-mode-indicator"
+      },
+      "behavior": {
+        "trackChoices": false,
+        "showTestWarnings": true,
+        "enableAllFeatures": true
+      }
+    },
+    "accessibility": {
+      "keyboard": {
+        "escapeToClose": true,
+        "tabNavigation": true,
+        "enterToSelect": true,
+        "spaceToSelect": true
+      },
+      "focus": {
+        "trapFocus": true,
+        "returnFocus": true,
+        "visibleFocusRing": true
+      },
+      "screenReader": {
+        "announceModalOpen": true,
+        "announceOptionSelection": true,
+        "announceCompletions": true,
+        "provideLiveRegions": true
+      },
+      "reducedMotion": {
+        "respectUserPreference": true,
+        "disableAnimations": true,
+        "reduceTypewriterSpeed": true,
+        "simplifyTransitions": true
+      }
+    },
+    "templates": {
+      "buttons": {
+        "cancel": "Cancel",
+        "confirm": "Confirm Choice",
+        "confirmTest": "Close Test",
+        "close": "×"
+      },
+      "messages": {
+        "loadingScenario": "Loading scenario...",
+        "errorLoadingScenario": "Failed to load scenario. Please try again.",
+        "circuitBreakerOpen": "Service temporarily unavailable. Please try again later.",
+        "duplicateRequest": "Modal is already opening. Please wait.",
+        "noScenarioData": "Scenario data not available."
+      },
+      "aria": {
+        "closeButton": "Close modal",
+        "modalDialog": "Scenario selection dialog",
+        "optionButton": "Option {index}: {title}",
+        "radarChart": "Ethical impact visualization chart"
+      }
+    },
+    "performance": {
+      "optimization": {
+        "lazyLoadRadarChart": true,
+        "deferNonCriticalOperations": true,
+        "enableVirtualization": false,
+        "batchDOMUpdates": true
+      },
+      "monitoring": {
+        "enablePerformanceObserver": true,
+        "trackLargestContentfulPaint": true,
+        "trackFirstInputDelay": true,
+        "trackCumulativeLayoutShift": true
+      },
+      "thresholds": {
+        "lowEndDevice": {
+          "reduceAnimations": true,
+          "simplifyEffects": true,
+          "disableParticles": true
+        }
+      }
+    },
+    "fallbacks": {
+      "radarChart": {
+        "fallbackMessage": "Chart visualization unavailable",
+        "showTextualImpact": true,
+        "enableFallbackMode": true
+      },
+      "animations": {
+        "disableOnSlowDevice": true,
+        "fallbackToInstant": true,
+        "maintainFunctionality": true
+      },
+      "enterprise": {
+        "disableMonitoringOnError": true,
+        "maintainCoreFeatures": true,
+        "gracefulDegradation": true
+      }
+    }
+  }
+}

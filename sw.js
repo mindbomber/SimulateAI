@@ -1,60 +1,15 @@
 // SimulateAI Service Worker
 // Comprehensive PWA service worker with offline support and caching strategies
 
-const CACHE_NAME = "simulateai-v1.10.0";
-const OFFLINE_CACHE = "simulateai-offline-v1.0";
-const RUNTIME_CACHE = "simulateai-runtime-v1.0";
+const CACHE_NAME = "simulateai-v1.13.0"; // FIREBASE 400 FIX: Version bump to force refresh
+const OFFLINE_CACHE = "simulateai-offline-v1.2";
+const RUNTIME_CACHE = "simulateai-runtime-v1.2";
 
-// Core files to cache immediately
-const CORE_FILES = [
-  "/",
-  "/index.html",
-  "/app.html",
-  "/manifest.json",
+// Core files to cache immediately (only guaranteed files that exist in build)
+const CORE_FILES = ["/", "/index.html", "/app.html", "/manifest.json"];
 
-  // Core JavaScript
-  "/src/js/app.js",
-  "/src/js/config/firebase-config.js",
-  "/src/js/services/firebase-service.js",
-  "/src/js/services/firebase-analytics-service.js",
-  "/src/js/services/hybrid-data-service.js",
-
-  // Core CSS
-  "/src/styles/main.css",
-  "/src/styles/priority-components.css",
-  "/src/styles/consolidated-components.css",
-
-  // Essential assets
-  "/src/assets/icons/Square Icon_192_x_192.png",
-  "/src/assets/icons/Square Icon_512_x_512.png",
-  "/src/assets/icons/favicon.svg",
-  "/src/assets/icons/logo-square.svg",
-
-  // Data files
-  "/src/data/categories.js",
-];
-
-// Files to cache on first visit
-const EXTENDED_FILES = [
-  // Additional pages
-  "/firebase-analytics-dashboard.html",
-  "/firebase-integration-demo.html",
-
-  // Component files
-  "/src/js/components/badge-modal.js",
-  "/src/js/components/card-component.js",
-  "/src/js/components/main-grid.js",
-  "/src/js/components/enhanced-simulation-modal.js",
-  "/src/js/components/ethics-explorer.js",
-  "/src/js/components/onboarding-tour.js",
-
-  // Additional styles
-  "/src/styles/badge-modal.css",
-  "/src/styles/card-component.css",
-  "/src/styles/ethics-explorer.css",
-  "/src/styles/onboarding-tour.css",
-  "/src/styles/enhanced-simulation-modal.css",
-];
+// Remove extended files that may not exist after build
+const EXTENDED_FILES = [];
 
 // Network-first resources (always try network first)
 const NETWORK_FIRST = [
@@ -90,29 +45,42 @@ const RUNTIME_PATTERNS = [
   },
 ];
 
-// Install event - cache core resources
+// Install event - cache core resources with better error handling
 self.addEventListener("install", (event) => {
   console.log("🔧 Service Worker installing...");
 
   event.waitUntil(
     Promise.all([
-      caches.open(CACHE_NAME).then((cache) => {
+      caches.open(CACHE_NAME).then(async (cache) => {
         console.log("📦 Caching core files...");
-        return cache.addAll(
-          CORE_FILES.map(
-            (url) =>
-              new Request(url, {
-                cache: "reload",
-              }),
-          ),
-        );
+        // Cache files individually to avoid complete failure if one file fails
+        const cachePromises = CORE_FILES.map(async (url) => {
+          try {
+            await cache.add(new Request(url, { cache: "reload" }));
+            console.log(`✅ Cached: ${url}`);
+          } catch (error) {
+            console.warn(`⚠️ Failed to cache: ${url}`, error);
+            // Don't fail the entire installation for individual file failures
+          }
+        });
+        await Promise.all(cachePromises);
       }),
-      caches.open(OFFLINE_CACHE).then((cache) => {
+      caches.open(OFFLINE_CACHE).then(async (cache) => {
         console.log("📦 Caching offline fallbacks...");
-        return cache.addAll([
+        // Try to cache offline files, but don't fail if they don't exist
+        const offlineFiles = [
           "/offline.html",
-          "/src/assets/icons/Square Icon_192_x_192.png",
-        ]);
+          "/src/assets/icons/favicon.svg", // Use a file we know exists
+        ];
+
+        for (const file of offlineFiles) {
+          try {
+            await cache.add(new Request(file, { cache: "reload" }));
+            console.log(`✅ Cached offline file: ${file}`);
+          } catch (error) {
+            console.warn(`⚠️ Failed to cache offline file: ${file}`, error);
+          }
+        }
       }),
     ])
       .then(() => {
@@ -437,15 +405,97 @@ self.addEventListener("sync", (event) => {
 });
 
 async function doBackgroundSync() {
+  const startTime = Date.now();
+
   try {
-    // Handle any queued offline actions
     console.log("📤 Processing offline queue...");
 
-    // This would integrate with your Firebase offline queue
-    // For now, just log that sync is available
-    console.log("✅ Background sync completed");
+    // FIREBASE 400 FIX: Batch Firebase operations instead of individual calls
+    const queuedEvents = await getQueuedEvents();
+    let processedCount = 0;
+
+    if (queuedEvents.length > 0) {
+      processedCount = await batchProcessEvents(queuedEvents);
+    }
+
+    console.log(
+      `✅ Background sync completed: ${processedCount} events processed`,
+    );
+
+    // FIREBASE 400 FIX: Notify main thread with minimal data
+    const clients = await self.clients.matchAll();
+    clients.forEach((client) => {
+      client.postMessage({
+        type: "SYNC_COMPLETE",
+        payload: {
+          success: true,
+          count: processedCount,
+          duration: Date.now() - startTime,
+        },
+      });
+    });
   } catch (error) {
     console.error("❌ Background sync failed:", error);
+
+    // Notify main thread of failure
+    const clients = await self.clients.matchAll();
+    clients.forEach((client) => {
+      client.postMessage({
+        type: "SYNC_COMPLETE",
+        payload: {
+          success: false,
+          error: error.message,
+          duration: Date.now() - startTime,
+        },
+      });
+    });
+  }
+}
+
+// FIREBASE 400 FIX: Helper functions for batch processing
+async function getQueuedEvents() {
+  // FIREBASE 400 FIX: Return empty array to prevent Firebase spam during fix period
+  // TODO: Implement proper IndexedDB/Cache queuing when Firebase issues are resolved
+  return [];
+}
+
+async function batchProcessEvents(events) {
+  if (events.length === 0) return 0;
+
+  try {
+    // FIREBASE 400 FIX: Process in small batches to avoid overwhelming Firebase
+    const batchSize = 5;
+    let processed = 0;
+
+    for (let i = 0; i < events.length; i += batchSize) {
+      const batch = events.slice(i, i + batchSize);
+
+      // Process batch with delay to prevent rate limiting
+      await processBatch(batch);
+      processed += batch.length;
+
+      // Add delay between batches
+      if (i + batchSize < events.length) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+    }
+
+    return processed;
+  } catch (error) {
+    console.error("Batch processing failed:", error);
+    return 0;
+  }
+}
+
+async function processBatch(events) {
+  // FIREBASE 400 FIX: Minimal processing to avoid Firebase errors
+  for (const event of events) {
+    try {
+      // Log instead of sending to Firebase during fix period
+      console.log("Processing queued event:", event.type);
+    } catch (error) {
+      console.warn("Failed to process event:", error);
+    }
   }
 }
 

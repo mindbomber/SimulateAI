@@ -1,0 +1,146 @@
+{
+  "//": "Copyright 2025 SimulateAI Platform",
+  "//license": "Licensed under the Apache License, Version 2.0 (the 'License')",
+  "//license-url": "http://www.apache.org/licenses/LICENSE-2.0",
+  "//notice": "See LICENSE file in the root directory for full license terms",
+  "progressRing": {
+    "dimensions": {
+      "width": 60,
+      "height": 60,
+      "viewBox": "0 0 60 60",
+      "radius": 26,
+      "circumference": 163,
+      "strokeWidth": 4
+    },
+    "animation": {
+      "pulseEnabled": true,
+      "transitionDuration": "0.3s",
+      "transformOrigin": "30px 30px"
+    },
+    "colors": {
+      "background": "#e5e7eb",
+      "strokeLinecap": "round"
+    },
+    "positioning": {
+      "centerX": 30,
+      "centerY": 30,
+      "rotationOffset": -90
+    }
+  },
+  "tooltip": {
+    "offset": 8,
+    "zIndex": 1300,
+    "positioning": {
+      "transform": "translateX(-50%)",
+      "position": "fixed"
+    },
+    "mobile": {
+      "duration": 3000,
+      "autoHide": true
+    },
+    "desktop": {
+      "autoHide": false,
+      "hoverDelay": 0
+    },
+    "accessibility": {
+      "role": "tooltip",
+      "ariaLabel": true
+    }
+  },
+  "htmlTemplates": {
+    "categoryHeader": {
+      "containerClass": "category-header",
+      "titleGroupClass": "category-title-group",
+      "iconClass": "category-icon-large",
+      "infoClass": "category-info",
+      "titleClass": "category-title",
+      "descriptionClass": "category-description",
+      "metaClass": "category-meta",
+      "metaItemsClass": "category-meta-items"
+    },
+    "progressRing": {
+      "containerClass": "category-progress-ring",
+      "badgeAlertClass": "badge-alert",
+      "tooltipClass": "progress-ring-tooltip",
+      "percentageClass": "progress-percentage",
+      "visibleClass": "visible"
+    },
+    "categoryMeta": {
+      "difficultyPrefix": "difficulty-",
+      "progressTextClass": "category-progress-text",
+      "timeClass": "category-time",
+      "difficultyClass": "category-difficulty"
+    }
+  },
+  "styling": {
+    "iconBackground": {
+      "opacityHex": "20",
+      "colorProperty": "background-color",
+      "textColorProperty": "color"
+    },
+    "progressRing": {
+      "strokeDasharray": true,
+      "strokeDashoffset": true,
+      "transform": "rotate(-90deg)"
+    }
+  },
+  "events": {
+    "desktop": {
+      "mouseenter": "showTooltip",
+      "mouseleave": "hideTooltip"
+    },
+    "mobile": {
+      "touchstart": "handleProgressRingTouch",
+      "click": "handleProgressRingClick"
+    },
+    "accessibility": {
+      "keydown": "handleProgressRingKeydown",
+      "supportedKeys": ["Enter", " ", "Escape"]
+    },
+    "cleanup": {
+      "trackBoundEvents": true,
+      "autoCleanup": true
+    }
+  },
+  "badge": {
+    "alertThreshold": 1,
+    "progressTracking": {
+      "refreshOnUpdate": true,
+      "trackNextBadge": true
+    },
+    "messages": {
+      "oneScenarioAway": "1 more to unlock next badge",
+      "multipleScenarios": "{remaining} more to unlock next badge",
+      "completedFormat": "{completed} of {total} scenarios completed",
+      "percentageFormat": "({percentage}%)"
+    }
+  },
+  "selectors": {
+    "progressRing": ".category-progress-ring[data-tooltip]",
+    "progressRingByCategory": ".category-progress-ring[data-category-id=\"{categoryId}\"]",
+    "progressCircle": "circle[stroke-dasharray]",
+    "percentageSpan": ".progress-percentage",
+    "existingTooltips": ".progress-ring-tooltip",
+    "allProgressRings": ".category-progress-ring",
+    "categoryProgressText": ".category-meta .category-progress-text",
+    "categoryHeader": ".category-header",
+    "categoryTitle": ".category-title"
+  },
+  "attributes": {
+    "dataTooltip": "data-tooltip",
+    "dataCategoryId": "data-category-id",
+    "role": "role",
+    "tabindex": "tabindex",
+    "ariaLabel": "aria-label"
+  },
+  "performance": {
+    "useRequestAnimationFrame": true,
+    "debounceUpdates": false,
+    "batchDOMUpdates": true
+  },
+  "debugging": {
+    "enableLogging": true,
+    "logLevel": "debug",
+    "trackMetrics": true
+  }
+}

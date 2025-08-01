@@ -51,6 +51,12 @@ export class PWAService {
       syncQueueHealth: "healthy",
     };
 
+    // FIREBASE 400 FIX: Add rate limiting and initialization tracking
+    this.eventThrottle = new Map();
+    this.maxEventsPerMinute = 10;
+    this.isInitializing = true;
+    this.recentErrors = 0;
+
     // Don't auto-initialize to prevent service duplication
     // Call init() manually after construction
   }
@@ -234,8 +240,12 @@ export class PWAService {
         has_service_worker: !!this.registration,
         has_data_handler: !!this.dataHandler,
       });
+
+      // FIREBASE 400 FIX: Mark initialization complete
+      this.isInitializing = false;
     } catch (error) {
       console.error("❌ PWA Service initialization failed:", error);
+      this.isInitializing = false; // FIREBASE 400 FIX: Clear initialization flag on error
 
       // Phase 3.5: Track initialization failure
       this.trackPWAEvent("pwa_service_init_failed", {
@@ -821,26 +831,77 @@ export class PWAService {
 
   /**
    * Track PWA-related events
+   * FIREBASE 400 FIX: Added rate limiting and error handling
    */
   trackPWAEvent(eventName, data = {}) {
+    // FIREBASE 400 FIX: Rate limiting check
+    const now = Date.now();
+    const key = `pwa_${eventName}`;
+    const lastEvent = this.eventThrottle.get(key) || 0;
+
+    if (now - lastEvent < 6000) {
+      // 6 seconds between same events
+      console.log(`⚠️ Throttling PWA event: ${eventName}`);
+      return;
+    }
+
+    this.eventThrottle.set(key, now);
+
+    // FIREBASE 400 FIX: Only track critical events during initialization
+    const criticalEvents = [
+      "pwa_service_initialized",
+      "background_sync_supported",
+      "pwa_service_init_failed",
+    ];
+    if (!criticalEvents.includes(eventName) && this.isInitializing) {
+      console.log(
+        `⏳ Skipping non-critical PWA event during initialization: ${eventName}`,
+      );
+      return;
+    }
+
     if (this.firebaseService && this.firebaseService.trackStorageEvent) {
-      this.firebaseService.trackStorageEvent(`pwa_${eventName}`, {
-        ...data,
-        timestamp: Date.now(),
-        user_agent: navigator.userAgent,
-        is_standalone: this.isInstalled,
-        is_online: this.isOnline,
-      });
+      // FIREBASE 400 FIX: Add try-catch to prevent cascade failures
+      try {
+        this.firebaseService.trackStorageEvent(`pwa_${eventName}`, {
+          ...data,
+          timestamp: Date.now(),
+          user_agent: navigator.userAgent,
+          is_standalone: this.isInstalled,
+          is_online: this.isOnline,
+        });
+      } catch (error) {
+        this.recentErrors++;
+        console.warn(
+          `Failed to track PWA event ${eventName} (${this.recentErrors} recent errors):`,
+          error,
+        );
+
+        // If too many errors, temporarily disable PWA tracking
+        if (this.recentErrors > 5) {
+          console.error(
+            "🚨 Too many PWA tracking errors, temporarily disabling Firebase tracking",
+          );
+          setTimeout(() => {
+            this.recentErrors = 0;
+            console.log("✅ Re-enabling PWA Firebase tracking");
+          }, 60000); // 1 minute
+        }
+      }
     }
 
     // Also track with Google Analytics if available
     if (typeof window !== "undefined" && typeof window.gtag !== "undefined") {
-      window.gtag("event", eventName, {
-        event_category: "PWA",
-        event_label: data.label || eventName,
-        custom_parameter_1: this.isInstalled ? "installed" : "browser",
-        custom_parameter_2: this.isOnline ? "online" : "offline",
-      });
+      try {
+        window.gtag("event", eventName, {
+          event_category: "PWA",
+          event_label: data.label || eventName,
+          custom_parameter_1: this.isInstalled ? "installed" : "browser",
+          custom_parameter_2: this.isOnline ? "online" : "offline",
+        });
+      } catch (error) {
+        console.warn("Google Analytics tracking failed:", error);
+      }
     }
   }
 

@@ -537,8 +537,4 @@ if (!document.querySelector("#network-status-styles")) {
 }
 
 // Export for use in other modules
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = NetworkStatusMonitor;
-} else {
-  window.NetworkStatusMonitor = NetworkStatusMonitor;
-}
+export default NetworkStatusMonitor;

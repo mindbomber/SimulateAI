@@ -45,9 +45,18 @@ export default defineConfig(() => {
           terms: "terms-of-use.html",
           welcome: "welcome.html",
           sw: "sw.js", // Include service worker
+          earlyThemeInit: "src/js/utils/early-theme-init.js", // Critical for FOUC prevention
         },
         // Ensure all JS modules are included in build
-        plugins: [],
+        plugins: [
+          // Custom plugin to copy config files
+          {
+            name: "copy-config-files",
+            generateBundle() {
+              // Config files will be handled by copyPublicDir
+            },
+          },
+        ],
         external: [], // Don't externalize any modules - bundle everything
         output: {
           format: "es",
@@ -61,6 +70,9 @@ export default defineConfig(() => {
           entryFileNames: (chunkInfo) => {
             if (chunkInfo.name === "sw") {
               return "sw.js";
+            }
+            if (chunkInfo.name === "earlyThemeInit") {
+              return "src/js/utils/early-theme-init.js";
             }
             return "assets/[name]-[hash].js";
           },
@@ -116,6 +128,7 @@ export default defineConfig(() => {
       "**/*.jpeg",
       "**/*.gif",
       "**/*.webp",
+      "**/*.json",
     ],
     publicDir: "public",
   };

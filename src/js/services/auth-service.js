@@ -64,18 +64,13 @@ export class AuthService {
    */
   async loadNetworkStatusMonitor() {
     try {
-      // Import the component script if not already loaded
-      if (!document.querySelector('script[src*="network-status-monitor"]')) {
-        const script = document.createElement("script");
-        script.src = "/src/js/components/network-status-monitor.js";
-        script.onload = () => {
-          if (window.NetworkStatusMonitor) {
-            window.networkStatusMonitor = new window.NetworkStatusMonitor();
-          }
-        };
-        document.head.appendChild(script);
-      }
+      // Use dynamic import instead of script tag
+      const { default: NetworkStatusMonitor } = await import(
+        "/src/js/components/network-status-monitor.js"
+      );
+      window.networkStatusMonitor = new NetworkStatusMonitor();
     } catch (error) {
+      console.warn("Failed to load network status monitor:", error);
       // Network status monitor is optional, continue without it
     }
   }
@@ -98,18 +93,13 @@ export class AuthService {
    */
   async loadRateLimitStatusComponent() {
     try {
-      // Import the component script if not already loaded
-      if (!document.querySelector('script[src*="rate-limit-status"]')) {
-        const script = document.createElement("script");
-        script.src = "/src/js/components/rate-limit-status.js";
-        script.onload = () => {
-          if (window.RateLimitStatus) {
-            this.rateLimitStatus = new window.RateLimitStatus();
-          }
-        };
-        document.head.appendChild(script);
-      }
+      // Use dynamic import instead of script tag
+      const { default: RateLimitStatus } = await import(
+        "/src/js/components/rate-limit-status.js"
+      );
+      this.rateLimitStatus = new RateLimitStatus();
     } catch (error) {
+      console.warn("Failed to load rate limit status component:", error);
       // Rate limit status is optional, continue without it
     }
   }
@@ -2060,22 +2050,14 @@ export class AuthService {
    */
   async loadIntentionalLogoutManager() {
     try {
-      // Import the component script if not already loaded
-      if (
-        !document.querySelector('script[src*="intentional-logout-manager"]')
-      ) {
-        const script = document.createElement("script");
-        script.type = "module";
-        script.src = "/src/js/components/intentional-logout-manager.js";
-        script.onload = () => {
-          if (window.IntentionalLogoutManager) {
-            this.logoutManager = new window.IntentionalLogoutManager(this);
-            this.setupLogoutEventListeners();
-          }
-        };
-        document.head.appendChild(script);
-      }
+      // Use dynamic import instead of script tag
+      const { default: IntentionalLogoutManager } = await import(
+        "/src/js/components/intentional-logout-manager.js"
+      );
+      this.logoutManager = new IntentionalLogoutManager(this);
+      this.setupLogoutEventListeners();
     } catch (error) {
+      console.warn("Failed to load intentional logout manager:", error);
       // Intentional logout manager is optional, continue without it
     }
   }

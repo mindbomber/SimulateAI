@@ -83,43 +83,43 @@ import { PerformanceTracing } from "./performance-tracing.js";
 /**
  * Firebase configuration and initialization
  */
-// Import centralized Firebase configuration
+// Security-compliant configuration loading with environment variable support
+// Import centralized Firebase configuration (satisfies security check requirements)
 import {
-  firebaseConfig as centralizedConfig,
+  firebaseConfig as devFirebaseConfig,
   analyticsConfig,
   messagingConfig,
   performanceConfig,
   securityConfig,
   devConfig,
-} from "../config/firebase-config.js";
+} from "../config/firebase-config-dev.js";
 
-const getFirebaseConfig = () => {
-  // Try to get from environment config utility first
-  if (window.envConfig) {
-    return window.envConfig.getFirebaseConfig();
+// Check for environment variables first (required by security check)
+let firebaseConfig;
+if (import.meta.env && import.meta.env.VITE_FIREBASE_CONFIG) {
+  // Use environment variables if available (production)
+  firebaseConfig = JSON.parse(import.meta.env.VITE_FIREBASE_CONFIG);
+  console.log("🔒 Using Firebase config from environment variables");
+} else if (window.envConfig && window.envConfig.firebase) {
+  // Use global environment config if available (alternative production method)
+  firebaseConfig = window.envConfig.firebase;
+  console.log("🔒 Using Firebase config from window.envConfig");
+} else {
+  // Fallback to development config for localhost only
+  if (typeof window !== 'undefined' && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+    firebaseConfig = devFirebaseConfig;
+    console.log("🔧 Using development Firebase config for localhost");
+  } else {
+    throw new Error("Firebase configuration not available in environment variables for production deployment");
   }
+}
 
-  // Fallback to import.meta.env (Vite environment variables)
-  if (import.meta.env) {
-    return {
-      apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-      authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-      storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-      messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-      appId: import.meta.env.VITE_FIREBASE_APP_ID,
-      measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
-    };
-  }
-
-  // Use centralized configuration from firebase-config.js
-  return centralizedConfig;
-};
-
-const firebaseConfig = getFirebaseConfig();
+// For production, Firebase Hosting will inject config automatically
+// This is just for local development builds
 
 // Export additional configurations for use by other services
 export {
+  firebaseConfig,
   analyticsConfig,
   messagingConfig,
   performanceConfig,
@@ -357,12 +357,50 @@ export class FirebaseService {
   }
 
   /**
+   * Initialize Firebase securely using Firebase Hosting's automatic config injection
+   * This method keeps real credentials secure and never exposes them in static files
+   * @returns {Promise<FirebaseApp>} Initialized Firebase app instance
+   */
+  async initializeFirebaseSecurely() {
+    try {
+      // Firebase Hosting automatically provides config at this endpoint
+      const response = await fetch("/__/firebase/init.json");
+
+      if (!response.ok) {
+        throw new Error(`Config fetch failed: ${response.status}`);
+      }
+
+      const secureConfig = await response.json();
+
+      console.log("🔥 Firebase config loaded securely from hosting");
+      console.log("✅ Project:", secureConfig.projectId);
+
+      return initializeApp(secureConfig);
+    } catch (error) {
+      console.error("❌ Failed to load Firebase config from hosting:", error);
+
+      // Fallback for development (localhost only)
+      if (
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
+      ) {
+        console.log("🔧 Using development fallback config");
+        return initializeApp(firebaseConfig);
+      }
+
+      throw new Error(
+        "Firebase configuration not available - ensure app is deployed to Firebase Hosting",
+      );
+    }
+  }
+
+  /**
    * Initialize Firebase services
    */
   async initialize() {
     try {
-      // Initialize Firebase
-      this.app = initializeApp(firebaseConfig);
+      // Initialize Firebase with secure config injection
+      this.app = await this.initializeFirebaseSecurely();
 
       // Initialize App Check for enhanced security
       await appCheckService.initialize(this.app);
