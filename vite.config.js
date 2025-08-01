@@ -28,13 +28,27 @@ export default defineConfig({
       input: {
         main: "app.html",
       },
+      external: [], // Don't externalize any modules - bundle everything
       output: {
+        format: "es",
+        // Global variables for production
+        globals: {
+          'firebase/app': 'firebase',
+          'firebase/auth': 'firebase',
+          'firebase/firestore': 'firebase',
+          'firebase/analytics': 'firebase'
+        },
         manualChunks: {
           firebase: [
             "firebase/app",
             "firebase/auth",
             "firebase/firestore",
             "firebase/analytics",
+            "firebase/performance",
+            "firebase/app-check",
+            "firebase/messaging",
+            "firebase/storage",
+            "firebase/functions"
           ],
           core: ["./src/js/core/engine.js", "./src/js/core/simulation.js"],
           ui: ["./src/js/core/ui.js", "./src/js/core/accessibility.js"],
