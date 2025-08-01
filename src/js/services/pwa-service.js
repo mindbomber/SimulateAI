@@ -249,10 +249,29 @@ export class PWAService {
    * Register service worker
    */
   async registerServiceWorker() {
+    // Skip Service Worker registration in development
+    const isDevelopment = window.location.hostname === 'localhost';
+    if (isDevelopment) {
+      console.log('🔧 PWA Service Worker: Skipping registration in development');
+      return null;
+    }
+    
     if ("serviceWorker" in navigator) {
       try {
-        this.registration = await navigator.serviceWorker.register("./sw.js", {
-          scope: "/SimulateAI/",
+        // Determine the correct base path for service worker
+        const basePath = '/SimulateAI/';
+        const swPath = '/SimulateAI/sw.js';
+        
+        console.log('🔧 PWA Service Worker Registration:', {
+          isDevelopment,
+          hostname: window.location.hostname,
+          basePath,
+          swPath,
+          fullUrl: window.location.origin + swPath
+        });
+        
+        this.registration = await navigator.serviceWorker.register(swPath, {
+          scope: basePath,
         });
 
         // Handle updates

@@ -16,9 +16,12 @@
 
 import { defineConfig } from "vite";
 
-export default defineConfig({
+export default defineConfig(({ command }) => {
+  const base = command === 'serve' ? '/' : '/SimulateAI/';
+  
+  return {
   root: ".",
-  base: "/SimulateAI/", // Update this to match your GitHub repository name
+  base, // Use "/" for dev, "/SimulateAI/" for production
   build: {
     outDir: "dist",
     assetsDir: "assets",
@@ -83,4 +86,5 @@ export default defineConfig({
     "**/*.gif",
     "**/*.webp",
   ],
+};
 });
