@@ -179,32 +179,35 @@ SimulateAI/
     <div id="demo-container" style="width: 800px; height: 600px;"></div>
 
     <script type="module">
-      import VisualEngine from './src/js/core/visual-engine.js';
+      import VisualEngine from "./src/js/core/visual-engine.js";
 
       // Initialize the Visual Engine
-      const engine = new VisualEngine(document.getElementById('demo-container'), {
-        renderMode: 'auto',
-        accessibility: true,
-        debug: true,
-      });
+      const engine = new VisualEngine(
+        document.getElementById("demo-container"),
+        {
+          renderMode: "auto",
+          accessibility: true,
+          debug: true,
+        },
+      );
 
       // Create components using the registry
-      const button = engine.createComponent('button', {
+      const button = engine.createComponent("button", {
         x: 50,
         y: 50,
-        text: 'Click Me!',
-        onClick: () => alert('Hello World!'),
+        text: "Click Me!",
+        onClick: () => alert("Hello World!"),
       });
 
-      const chart = engine.createComponent('chart', {
+      const chart = engine.createComponent("chart", {
         x: 50,
         y: 150,
         width: 400,
         height: 200,
-        type: 'line',
+        type: "line",
         data: [[10, 20, 15, 25, 30]],
-        labels: ['A', 'B', 'C', 'D', 'E'],
-        title: 'Sample Data',
+        labels: ["A", "B", "C", "D", "E"],
+        title: "Sample Data",
       });
 
       engine.start();
@@ -233,7 +236,7 @@ separate demo files.
 
 ```javascript
 // In browser console or test environment
-import UIComponentTestSuite from './tests/ui-components-test.js';
+import UIComponentTestSuite from "./tests/ui-components-test.js";
 
 const testSuite = new UIComponentTestSuite();
 await testSuite.runAllTests();
@@ -294,19 +297,19 @@ await testSuite.runAllTests();
 ### Creating a Modal Dialog
 
 ```javascript
-const modal = engine.createComponent('modal-dialog', {
-  title: 'Confirmation',
+const modal = engine.createComponent("modal-dialog", {
+  title: "Confirmation",
   content: `
         <p>Are you sure you want to delete this item?</p>
         <p>This action cannot be undone.</p>
     `,
   buttons: [
-    { text: 'Cancel', action: 'close', variant: 'secondary' },
-    { text: 'Delete', callback: handleDelete, variant: 'danger' },
+    { text: "Cancel", action: "close", variant: "secondary" },
+    { text: "Delete", callback: handleDelete, variant: "danger" },
   ],
   closable: true,
   backdrop: true,
-  animation: 'slide',
+  animation: "slide",
 });
 
 modal.open();
@@ -315,17 +318,17 @@ modal.open();
 ### Building a Navigation Interface
 
 ```javascript
-const navigation = engine.createComponent('navigation-menu', {
+const navigation = engine.createComponent("navigation-menu", {
   x: 20,
   y: 20,
   width: 250,
   height: 400,
-  orientation: 'vertical',
+  orientation: "vertical",
   items: [
-    { text: 'Dashboard', icon: '📊', action: () => showDashboard() },
-    { text: 'Analytics', icon: '📈', action: () => showAnalytics() },
-    { text: 'Settings', icon: '⚙️', action: () => showSettings() },
-    { text: 'Help', icon: '❓', action: () => showHelp() },
+    { text: "Dashboard", icon: "📊", action: () => showDashboard() },
+    { text: "Analytics", icon: "📈", action: () => showAnalytics() },
+    { text: "Settings", icon: "⚙️", action: () => showSettings() },
+    { text: "Help", icon: "❓", action: () => showHelp() },
   ],
 });
 ```
@@ -334,16 +337,21 @@ const navigation = engine.createComponent('navigation-menu', {
 
 ```javascript
 // DataTable with AI model results
-const dataTable = engine.createComponent('data-table', {
+const dataTable = engine.createComponent("data-table", {
   x: 20,
   y: 60,
   width: 700,
   height: 350,
   columns: [
-    { key: 'name', title: 'Model Name', sortable: true },
-    { key: 'accuracy', title: 'Accuracy', type: 'number', format: v => `${(v * 100).toFixed(1)}%` },
-    { key: 'bias_score', title: 'Bias Score', sortable: true },
-    { key: 'ethics_rating', title: 'Ethics Rating' },
+    { key: "name", title: "Model Name", sortable: true },
+    {
+      key: "accuracy",
+      title: "Accuracy",
+      type: "number",
+      format: (v) => `${(v * 100).toFixed(1)}%`,
+    },
+    { key: "bias_score", title: "Bias Score", sortable: true },
+    { key: "ethics_rating", title: "Ethics Rating" },
   ],
   data: aiModelResults,
   pagination: true,
@@ -351,22 +359,22 @@ const dataTable = engine.createComponent('data-table', {
 });
 
 // Success notification
-const successToast = engine.createComponent('notification-toast', {
-  message: 'Model training completed successfully!',
-  type: 'success',
+const successToast = engine.createComponent("notification-toast", {
+  message: "Model training completed successfully!",
+  type: "success",
   duration: 5000,
   actions: [
-    { text: 'View Results', callback: showResults },
-    { text: 'Export Data', callback: exportData },
+    { text: "View Results", callback: showResults },
+    { text: "Export Data", callback: exportData },
   ],
 });
 
 // Loading spinner with progress
-const loadingSpinner = engine.createComponent('loading-spinner', {
+const loadingSpinner = engine.createComponent("loading-spinner", {
   x: 400,
   y: 300,
-  size: 'large',
-  message: 'Training neural network...',
+  size: "large",
+  message: "Training neural network...",
   progress: 0.65,
   cancellable: true,
   onCancel: stopTraining,
@@ -377,19 +385,19 @@ const loadingSpinner = engine.createComponent('loading-spinner', {
 
 ```javascript
 // Line chart
-const lineChart = engine.createComponent('chart', {
+const lineChart = engine.createComponent("chart", {
   x: 50,
   y: 100,
   width: 500,
   height: 250,
-  type: 'line',
+  type: "line",
   data: [
     [10, 25, 18, 35, 42, 28, 55], // Series 1
     [15, 20, 30, 25, 38, 45, 40], // Series 2
   ],
-  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-  title: 'Performance Trends',
-  colors: ['#3498db', '#e74c3c'],
+  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
+  title: "Performance Trends",
+  colors: ["#3498db", "#e74c3c"],
   showLegend: true,
 });
 ```
@@ -398,64 +406,79 @@ const lineChart = engine.createComponent('chart', {
 
 ```javascript
 // Tab container for multi-view interface
-const tabContainer = engine.createComponent('tab-container', {
+const tabContainer = engine.createComponent("tab-container", {
   x: 50,
   y: 50,
   width: 700,
   height: 400,
   tabs: [
-    { id: 'overview', title: 'Overview', icon: '📊', content: 'System overview' },
-    { id: 'data', title: 'Data View', icon: '📁', content: 'Data visualization' },
-    { id: 'analysis', title: 'Analysis', icon: '🔍', content: 'Analysis results' },
+    {
+      id: "overview",
+      title: "Overview",
+      icon: "📊",
+      content: "System overview",
+    },
+    {
+      id: "data",
+      title: "Data View",
+      icon: "📁",
+      content: "Data visualization",
+    },
+    {
+      id: "analysis",
+      title: "Analysis",
+      icon: "🔍",
+      content: "Analysis results",
+    },
   ],
   closeable: true,
   reorderable: true,
 });
 
 // Progress stepper for workflows
-const workflowStepper = engine.createComponent('progress-stepper', {
+const workflowStepper = engine.createComponent("progress-stepper", {
   x: 50,
   y: 500,
   width: 700,
   height: 80,
   steps: [
-    { id: 'data', title: 'Data Collection', completed: true },
-    { id: 'processing', title: 'Processing', completed: true },
-    { id: 'analysis', title: 'Analysis', completed: false },
-    { id: 'results', title: 'Results', completed: false },
+    { id: "data", title: "Data Collection", completed: true },
+    { id: "processing", title: "Processing", completed: true },
+    { id: "analysis", title: "Analysis", completed: false },
+    { id: "results", title: "Results", completed: false },
   ],
   currentStep: 2,
   allowStepClick: true,
 });
 
 // Split pane layout
-const splitPane = engine.createComponent('split-pane', {
+const splitPane = engine.createComponent("split-pane", {
   x: 50,
   y: 50,
   width: 800,
   height: 500,
-  orientation: 'horizontal',
+  orientation: "horizontal",
   split: 0.3,
   resizable: true,
   collapsible: true,
-  leftPane: 'Navigation content',
-  rightPane: 'Main content area',
+  leftPane: "Navigation content",
+  rightPane: "Main content area",
 });
 
 // Tree view for hierarchical data
-const treeView = engine.createComponent('tree-view', {
+const treeView = engine.createComponent("tree-view", {
   x: 50,
   y: 50,
   width: 300,
   height: 400,
   data: [
     {
-      id: 'models',
-      label: 'AI Models',
-      icon: '🤖',
+      id: "models",
+      label: "AI Models",
+      icon: "🤖",
       children: [
-        { id: 'nn', label: 'Neural Networks', icon: '🧠' },
-        { id: 'ml', label: 'Machine Learning', icon: '📊' },
+        { id: "nn", label: "Neural Networks", icon: "🧠" },
+        { id: "ml", label: "Machine Learning", icon: "📊" },
       ],
     },
   ],
@@ -464,15 +487,15 @@ const treeView = engine.createComponent('tree-view', {
 });
 
 // File upload component
-const fileUpload = engine.createComponent('file-upload', {
+const fileUpload = engine.createComponent("file-upload", {
   x: 50,
   y: 50,
   width: 400,
   height: 200,
   multiple: true,
-  accept: '.csv,.json,.txt',
+  accept: ".csv,.json,.txt",
   maxFileSize: 10 * 1024 * 1024, // 10MB
-  uploadText: 'Drop training data files here',
+  uploadText: "Drop training data files here",
 });
 ```
 
@@ -480,80 +503,80 @@ const fileUpload = engine.createComponent('file-upload', {
 
 ```javascript
 // Advanced color picker
-const colorPicker = engine.createComponent('color-picker', {
+const colorPicker = engine.createComponent("color-picker", {
   x: 50,
   y: 50,
-  value: '#3498db',
+  value: "#3498db",
   showAlpha: true,
-  presets: ['#3498db', '#e74c3c', '#2ecc71', '#f39c12'],
+  presets: ["#3498db", "#e74c3c", "#2ecc71", "#f39c12"],
 });
 
-colorPicker.on('colorChanged', event => {
+colorPicker.on("colorChanged", (event) => {
   updateThemeColor(event.value);
 });
 
 // Date range picker for analytics
-const dateRange = engine.createComponent('datetime-picker', {
+const dateRange = engine.createComponent("datetime-picker", {
   x: 300,
   y: 50,
   showTime: false,
-  format: 'YYYY-MM-DD',
-  minDate: new Date('2024-01-01'),
+  format: "YYYY-MM-DD",
+  minDate: new Date("2024-01-01"),
   maxDate: new Date(),
 });
 
 // Smart search with suggestions
-const searchBox = engine.createComponent('search-box', {
+const searchBox = engine.createComponent("search-box", {
   x: 50,
   y: 150,
-  placeholder: 'Search AI models...',
+  placeholder: "Search AI models...",
   suggestions: [
-    'Neural Network',
-    'Deep Learning Model',
-    'Computer Vision',
-    'Natural Language Processing',
-    'Reinforcement Learning',
+    "Neural Network",
+    "Deep Learning Model",
+    "Computer Vision",
+    "Natural Language Processing",
+    "Reinforcement Learning",
   ],
   debounceDelay: 300,
 });
 
-searchBox.on('search', async event => {
+searchBox.on("search", async (event) => {
   const results = await searchModels(event.query);
   displaySearchResults(results);
 });
 
 // Settings accordion
-const settingsAccordion = engine.createComponent('accordion', {
+const settingsAccordion = engine.createComponent("accordion", {
   x: 400,
   y: 150,
   width: 350,
   items: [
     {
-      id: 'model-settings',
-      title: 'Model Configuration',
-      icon: '🤖',
-      content: 'Learning rate, batch size, epochs configuration...',
+      id: "model-settings",
+      title: "Model Configuration",
+      icon: "🤖",
+      content: "Learning rate, batch size, epochs configuration...",
     },
     {
-      id: 'data-settings',
-      title: 'Data Processing',
-      icon: '📊',
-      content: 'Data preprocessing, augmentation, validation split...',
+      id: "data-settings",
+      title: "Data Processing",
+      icon: "📊",
+      content: "Data preprocessing, augmentation, validation split...",
     },
     {
-      id: 'export-settings',
-      title: 'Export Options',
-      icon: '💾',
-      content: 'Model export formats, optimization settings...',
+      id: "export-settings",
+      title: "Export Options",
+      icon: "💾",
+      content: "Model export formats, optimization settings...",
     },
   ],
 });
 
 // Navigation drawer
-const navigationDrawer = engine.createComponent('drawer', {
-  position: 'left',
+const navigationDrawer = engine.createComponent("drawer", {
+  position: "left",
   width: 280,
-  title: 'AI Toolkit',
+  title: "AI Toolkit",
   content: `
         🏠 Dashboard
         🧠 Neural Networks
@@ -588,7 +611,7 @@ const navigationDrawer = engine.createComponent('drawer', {
 
 ```javascript
 // Automated testing
-import UIComponentTestSuite from './tests/ui-components-test.js';
+import UIComponentTestSuite from "./tests/ui-components-test.js";
 
 const testSuite = new UIComponentTestSuite();
 const results = await testSuite.runAllTests();

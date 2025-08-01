@@ -28,6 +28,7 @@ This project adheres to a code of conduct that promotes a welcoming and inclusiv
 ### Development Setup
 
 1. **Fork the repository**
+
    ```bash
    # Fork the repo on GitHub, then clone your fork
    git clone https://github.com/YOUR_USERNAME/SimulateAI.git
@@ -35,11 +36,13 @@ This project adheres to a code of conduct that promotes a welcoming and inclusiv
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Environment setup**
+
    ```bash
    # Copy the example environment file
    cp .env.example .env
@@ -47,6 +50,7 @@ This project adheres to a code of conduct that promotes a welcoming and inclusiv
    ```
 
 4. **Start development server**
+
    ```bash
    npm run dev
    ```

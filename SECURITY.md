@@ -76,5 +76,6 @@ We use the following tools to maintain security:
 ## Contact
 
 For security-related questions or concerns, please contact:
+
 - Email: security@simulateai.com
 - GitHub Security Advisories: Use the "Report a vulnerability" button
