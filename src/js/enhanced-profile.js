@@ -317,7 +317,9 @@ class EnhancedProfile {
     this.showNotification("Guest mode functionality coming soon!", "info");
     // Redirect to main page or show limited functionality
     setTimeout(() => {
-      window.location.href = "app.html";
+      const isDevelopment = window.location.hostname === "localhost";
+      const appPath = isDevelopment ? "app.html" : "/SimulateAI/app.html";
+      window.location.href = appPath;
     }, this.constants.TIMEOUT_GUEST);
   }
 

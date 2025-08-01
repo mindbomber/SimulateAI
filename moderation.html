@@ -276,7 +276,9 @@
           // Check if user has moderation privileges
           if (!this.canModerate()) {
             alert("Access denied: Moderation privileges required");
-            window.location.href = "app.html";
+            const isDevelopment = window.location.hostname === "localhost";
+            const appPath = isDevelopment ? "app.html" : "/SimulateAI/app.html";
+            window.location.href = appPath;
             return;
           }
 

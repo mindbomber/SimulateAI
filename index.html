@@ -1669,7 +1669,9 @@
             }
 
             // Navigate to main application
-            window.location.href = "app.html";
+            const isDevelopment = window.location.hostname === "localhost";
+            const appPath = isDevelopment ? "app.html" : "/SimulateAI/app.html";
+            window.location.href = appPath;
           });
         });
 
@@ -1690,7 +1692,9 @@
             }
 
             // Navigate to main application
-            window.location.href = "app.html";
+            const isDevelopment = window.location.hostname === "localhost";
+            const appPath = isDevelopment ? "app.html" : "/SimulateAI/app.html";
+            window.location.href = appPath;
           });
         });
 

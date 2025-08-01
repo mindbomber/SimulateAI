@@ -43,7 +43,7 @@ limitations under the License.
     />
     <meta
       property="og:url"
-      content="https://www.SimulateAI.io/data-deletion.html"
+      content="https://mindbomber.github.io/SimulateAI/data-deletion.html"
     />
 
     <!-- Accessibility -->
@@ -709,7 +709,11 @@ limitations under the License.
 
             // Redirect after 3 seconds
             setTimeout(() => {
-              window.location.href = "app.html";
+              const isDevelopment = window.location.hostname === "localhost";
+              const appPath = isDevelopment
+                ? "app.html"
+                : "/SimulateAI/app.html";
+              window.location.href = appPath;
             }, 3000);
           } else {
             throw new Error("No authenticated user found");
