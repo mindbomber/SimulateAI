@@ -2726,7 +2726,7 @@ class OnboardingTour {
           "OnboardingTour",
           `Executing onShow callback for step ${step.id}`,
         );
-        step.onShow();
+        step.onShow.call(this);
       } catch (error) {
         logger.error(
           "OnboardingTour",
@@ -3174,6 +3174,8 @@ class OnboardingTour {
           timeSinceLastAction: this.lastActionTime
             ? now - this.lastActionTime
             : "N/A",
+          currentTutorial: this.currentTutorial,
+          currentStep: this.currentStep,
         },
       );
       return;
@@ -3186,6 +3188,8 @@ class OnboardingTour {
       currentTutorial: this.currentTutorial,
       currentStep: this.currentStep,
       actionTimestamp: now,
+      isTransitioning: this.isTransitioning,
+      isTransitioningTutorial: this.isTransitioningTutorial,
     });
 
     switch (action) {
@@ -3354,10 +3358,29 @@ class OnboardingTour {
             "OnboardingTour",
             "Modal detected, closing modal before starting Tutorial 2",
           );
+
+          // Set a maximum wait time and force progression if needed
+          let tutorialStarted = false;
+          const forceStartTimeout = setTimeout(() => {
+            if (!tutorialStarted) {
+              logger.warn(
+                "OnboardingTour",
+                "Forcing Tutorial 2 start due to modal closure timeout",
+              );
+              tutorialStarted = true;
+              this.scrollToHeroDemoAndStart();
+              this.isTransitioningTutorial = false;
+            }
+          }, 3000); // 3 second maximum wait (reduced from 15 seconds)
+
           this.waitForModalClosure(() => {
-            // After modal closes, scroll to hero demo and start tutorial
-            this.scrollToHeroDemoAndStart();
-            this.isTransitioningTutorial = false;
+            if (!tutorialStarted) {
+              tutorialStarted = true;
+              clearTimeout(forceStartTimeout);
+              // After modal closes, scroll to hero demo and start tutorial
+              this.scrollToHeroDemoAndStart();
+              this.isTransitioningTutorial = false;
+            }
           });
 
           // Close the modal
@@ -3878,6 +3901,24 @@ class OnboardingTour {
           this.createOverlay();
         }
 
+        // Reset all flags to ensure clean state for Tutorial 2
+        this.isProcessingAction = false;
+        this.isTransitioning = false;
+        this.isTransitioningTutorial = false;
+
+        // Additional cleanup for Tutorial 2 - remove any stale event listeners
+        this.cleanupStaleEventListeners();
+
+        // Force recreation of overlay elements to ensure clean state
+        this.removeOverlay();
+        this.createOverlay();
+
+        logger.info("OnboardingTour", "All flags reset for Tutorial 2 start", {
+          isProcessingAction: this.isProcessingAction,
+          isTransitioning: this.isTransitioning,
+          isTransitioningTutorial: this.isTransitioningTutorial,
+        });
+
         this.showStep();
       }, this.SCROLL_DURATION);
     } else {
@@ -3898,6 +3939,28 @@ class OnboardingTour {
         );
         this.createOverlay();
       }
+
+      // Reset all flags to ensure clean state for Tutorial 2
+      this.isProcessingAction = false;
+      this.isTransitioning = false;
+      this.isTransitioningTutorial = false;
+
+      // Additional cleanup for Tutorial 2 - remove any stale event listeners
+      this.cleanupStaleEventListeners();
+
+      // Force recreation of overlay elements to ensure clean state
+      this.removeOverlay();
+      this.createOverlay();
+
+      logger.info(
+        "OnboardingTour",
+        "All flags reset for Tutorial 2 start (no hero chart)",
+        {
+          isProcessingAction: this.isProcessingAction,
+          isTransitioning: this.isTransitioning,
+          isTransitioningTutorial: this.isTransitioningTutorial,
+        },
+      );
 
       this.showStep();
     }
@@ -3922,7 +3985,25 @@ class OnboardingTour {
   waitForModalClosure(callback) {
     logger.info("OnboardingTour", "Starting to wait for modal closure");
 
+    const maxWaitTime = 3000; // 3 seconds maximum wait (reduced from 10 seconds)
+    const startTime = Date.now();
+
     const checkModalClosed = () => {
+      // Check if we've been waiting too long
+      const elapsedTime = Date.now() - startTime;
+      if (elapsedTime > maxWaitTime) {
+        logger.warn(
+          "OnboardingTour",
+          "Modal closure wait timed out, proceeding anyway",
+          {
+            elapsedTime,
+            maxWaitTime,
+          },
+        );
+        setTimeout(callback, this.ANIMATION_DURATION);
+        return;
+      }
+
       // Check for scenario modal and pre-launch modal specifically
       const scenarioModal = document.querySelector(".scenario-modal");
       const preLaunchModal = document.querySelector(".pre-launch-modal");
@@ -3948,6 +4029,7 @@ class OnboardingTour {
         hasOtherOpenModal: hasOpenModal,
         scenarioModalClass: scenarioModal?.className,
         preLaunchModalClass: preLaunchModal?.className,
+        elapsedTime,
       });
 
       if (!scenarioModal && !preLaunchModal && !hasOpenModal) {
@@ -3990,6 +4072,37 @@ class OnboardingTour {
 
     // Start checking after a brief delay to allow the click to process
     setTimeout(checkAccordionOpen, this.ACCORDION_CHECK_DELAY);
+  }
+
+  /**
+   * Clean up stale event listeners that might interfere with tutorial progression
+   */
+  cleanupStaleEventListeners() {
+    logger.info("OnboardingTour", "Cleaning up stale event listeners");
+
+    // Clear any pending timeouts that might interfere
+    if (this.contentUpdateTimeout) {
+      clearTimeout(this.contentUpdateTimeout);
+      this.contentUpdateTimeout = null;
+    }
+
+    // Remove any existing click highlights that might have old listeners
+    document.querySelectorAll(".onboarding-click-highlight").forEach((el) => {
+      el.classList.remove("onboarding-click-highlight");
+    });
+
+    // Clear any stored event handler references
+    this.currentClickHandler = null;
+    this.currentKeyHandler = null;
+
+    // Reset any user states that might be stuck
+    this.userStates = {
+      "option-selected": false,
+      "choice-confirmed": false,
+      "modal-opened": false,
+    };
+
+    logger.debug("OnboardingTour", "Stale event listeners cleanup complete");
   }
 
   /**

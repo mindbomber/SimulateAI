@@ -1,4 +1,8 @@
 {
+  "//": "Copyright 2025 SimulateAI Platform",
+  "//license": "Licensed under the Apache License, Version 2.0 (the 'License')",
+  "//license-url": "http://www.apache.org/licenses/LICENSE-2.0",
+  "//notice": "See LICENSE file in the root directory for full license terms",
   "scenarioModal": {
     "animations": {
       "durations": {

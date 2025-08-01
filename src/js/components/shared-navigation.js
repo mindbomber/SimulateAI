@@ -716,11 +716,36 @@ class SharedNavigation {
         if (pageId) {
           this.setActivePage(pageId);
         }
+
+        // Close mobile navigation when a nav link is clicked
+        this.closeMobileNav();
       };
 
       link.addEventListener("click", clickHandler);
       // Store for cleanup
       this.eventListeners.set(link, { click: clickHandler });
+    });
+
+    // Also add listeners for dropdown items to close mobile menu
+    const dropdownItems = this.getCachedElements(
+      "dropdownItems",
+      ".dropdown-item[data-page], .dropdown-item[href]",
+    );
+
+    dropdownItems.forEach((item) => {
+      const clickHandler = () => {
+        // Close mobile navigation when a dropdown item is clicked
+        this.closeMobileNav();
+
+        // Close any open dropdowns
+        this.closeAllDropdowns();
+      };
+
+      item.addEventListener("click", clickHandler);
+      // Store for cleanup
+      if (!this.eventListeners.has(item)) {
+        this.eventListeners.set(item, { click: clickHandler });
+      }
     });
   }
 
@@ -765,6 +790,9 @@ class SharedNavigation {
       setTimeout(() => {
         this.isUserNavigation = false;
       }, 200);
+
+      // Close mobile navigation when simulation hub is clicked
+      this.closeMobileNav();
     };
 
     simulationHubLink.addEventListener("click", clickHandler);
@@ -1055,7 +1083,27 @@ class SharedNavigation {
         }
       };
       document.addEventListener("keydown", keydownHandler);
-      this.eventListeners.set(document, { keydown: keydownHandler });
+
+      // Close mobile nav when clicking outside the navigation
+      const documentClickHandler = (e) => {
+        if (!mainNav.classList.contains("open")) return;
+
+        // Check if click is outside the navigation area
+        const isClickInsideNav = mainNav.contains(e.target);
+        const isClickOnToggle = navToggle.contains(e.target);
+        const isClickOnBackdrop = navBackdrop && navBackdrop.contains(e.target);
+
+        // Close mobile nav if clicked outside navigation (but not on toggle or backdrop)
+        if (!isClickInsideNav && !isClickOnToggle && !isClickOnBackdrop) {
+          this.closeMobileNav();
+        }
+      };
+      document.addEventListener("click", documentClickHandler);
+
+      this.eventListeners.set(document, {
+        keydown: keydownHandler,
+        click: documentClickHandler,
+      });
     }
   }
 
