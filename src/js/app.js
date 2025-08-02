@@ -2709,6 +2709,9 @@ class SimulateAIApp {
       await this.dataHandler.initialize(this.firebaseService);
       AppDebug.log("DataHandler initialized");
 
+      // Make DataHandler globally available for components
+      window.dataHandler = this.dataHandler;
+
       // Initialize UIBinder for unified UI management
       this.uiBinder = new UIBinder({
         enableThemeManager: true,

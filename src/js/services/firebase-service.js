@@ -98,8 +98,17 @@ import {
 let firebaseConfig;
 if (import.meta.env && import.meta.env.VITE_FIREBASE_CONFIG) {
   // Use environment variables if available (production)
-  firebaseConfig = JSON.parse(import.meta.env.VITE_FIREBASE_CONFIG);
-  console.log("🔒 Using Firebase config from environment variables");
+  try {
+    firebaseConfig = JSON.parse(import.meta.env.VITE_FIREBASE_CONFIG);
+    console.log("🔒 Using Firebase config from environment variables");
+  } catch (parseError) {
+    console.error(
+      "Failed to parse Firebase config from environment:",
+      parseError,
+    );
+    firebaseConfig = devFirebaseConfig;
+    console.log("🔧 Falling back to development Firebase config");
+  }
 } else if (window.envConfig && window.envConfig.firebase) {
   // Use global environment config if available (alternative production method)
   firebaseConfig = window.envConfig.firebase;
@@ -114,8 +123,10 @@ if (import.meta.env && import.meta.env.VITE_FIREBASE_CONFIG) {
     firebaseConfig = devFirebaseConfig;
     console.log("🔧 Using development Firebase config for localhost");
   } else {
-    throw new Error(
-      "Firebase configuration not available in environment variables for production deployment",
+    // For production, use placeholder config - real config will be loaded by initializeFirebaseSecurely()
+    firebaseConfig = devFirebaseConfig;
+    console.log(
+      "🔒 Using placeholder config - real config will be loaded from Firebase Hosting",
     );
   }
 }
@@ -166,6 +177,44 @@ export class FirebaseService {
 
     // PWA service
     this.pwaService = null;
+
+    // Firebase configuration status
+    this.isFirebaseConfigured = false;
+  }
+
+  /**
+   * Check if Firebase is properly configured and available
+   * @returns {boolean} True if Firebase services are available
+   */
+  isFirebaseAvailable() {
+    return this.isFirebaseConfigured && this.app !== null;
+  }
+
+  /**
+   * Helper method to gracefully handle Firebase operations when service is unavailable
+   * @param {Function} operation - The Firebase operation to attempt
+   * @param {*} fallbackValue - Value to return if Firebase is unavailable
+   * @param {string} operationName - Name of the operation for logging
+   * @returns {Promise<*>} Result of operation or fallback value
+   */
+  async safeFirebaseOperation(
+    operation,
+    fallbackValue = null,
+    operationName = "Firebase operation",
+  ) {
+    if (!this.isFirebaseAvailable()) {
+      console.warn(
+        `🔄 ${operationName} skipped - Firebase not available (offline mode)`,
+      );
+      return fallbackValue;
+    }
+
+    try {
+      return await operation();
+    } catch (error) {
+      console.error(`❌ ${operationName} failed:`, error);
+      return fallbackValue;
+    }
   }
 
   /**
@@ -174,54 +223,55 @@ export class FirebaseService {
    * @param {Object} options - Additional options like autoSignOut timer
    */
   async setAuthPersistence(mode = "local", options = {}) {
-    if (!this.auth) {
-      throw new Error("Firebase auth not initialized");
-    }
+    return this.safeFirebaseOperation(
+      async () => {
+        if (!this.auth) {
+          throw new Error("Firebase auth not initialized");
+        }
 
-    try {
-      let persistence;
+        let persistence;
 
-      switch (mode) {
-        case "local":
-          // Persist across browser sessions (default)
-          persistence = browserLocalPersistence;
-          this.persistenceMode = "local";
-          break;
+        switch (mode) {
+          case "local":
+            // Persist across browser sessions (default)
+            persistence = browserLocalPersistence;
+            this.persistenceMode = "local";
+            break;
 
-        case "session":
-          // Only persist during browser session
-          persistence = browserSessionPersistence;
-          this.persistenceMode = "session";
-          break;
+          case "session":
+            // Only persist during browser session
+            persistence = browserSessionPersistence;
+            this.persistenceMode = "session";
+            break;
 
-        case "memory":
-          // No persistence - user signed out when tab closes
-          persistence = inMemoryPersistence;
-          this.persistenceMode = "memory";
-          break;
+          case "memory":
+            // No persistence - user signed out when tab closes
+            persistence = inMemoryPersistence;
+            this.persistenceMode = "memory";
+            break;
 
-        default:
-          throw new Error(`Invalid persistence mode: ${mode}`);
-      }
+          default:
+            throw new Error(`Invalid persistence mode: ${mode}`);
+        }
 
-      await setPersistence(this.auth, persistence);
+        await setPersistence(this.auth, persistence);
 
-      // Set up auto-signout timer if specified
-      if (options.autoSignOutMinutes && mode !== "memory") {
-        this.setupAutoSignOut(options.autoSignOutMinutes);
-      }
+        // Set up auto-signout timer if specified
+        if (options.autoSignOutMinutes && mode !== "memory") {
+          this.setupAutoSignOut(options.autoSignOutMinutes);
+        }
 
-      // Track persistence setting for analytics
-      this.trackEvent("auth_persistence_set", {
-        mode,
-        auto_signout: options.autoSignOutMinutes || null,
-      });
+        // Track persistence setting for analytics
+        this.trackEvent("auth_persistence_set", {
+          mode,
+          auto_signout: options.autoSignOutMinutes || null,
+        });
 
-      return { success: true, mode };
-    } catch (error) {
-      console.error("❌ Failed to set auth persistence:", error);
-      return { success: false, error: error.message };
-    }
+        return { success: true, mode };
+      },
+      { success: false, error: "Firebase not available" },
+      "Set auth persistence",
+    );
   }
 
   /**
@@ -365,7 +415,7 @@ export class FirebaseService {
   /**
    * Initialize Firebase securely using Firebase Hosting's automatic config injection
    * This method keeps real credentials secure and never exposes them in static files
-   * @returns {Promise<FirebaseApp>} Initialized Firebase app instance
+   * @returns {Promise<{app: FirebaseApp|null, isConfigured: boolean}>} Firebase app and configuration status
    */
   async initializeFirebaseSecurely() {
     try {
@@ -381,7 +431,10 @@ export class FirebaseService {
       console.log("🔥 Firebase config loaded securely from hosting");
       console.log("✅ Project:", secureConfig.projectId);
 
-      return initializeApp(secureConfig);
+      return {
+        app: initializeApp(secureConfig),
+        isConfigured: true,
+      };
     } catch (error) {
       console.error("❌ Failed to load Firebase config from hosting:", error);
 
@@ -391,12 +444,20 @@ export class FirebaseService {
         window.location.hostname === "127.0.0.1"
       ) {
         console.log("🔧 Using development fallback config");
-        return initializeApp(firebaseConfig);
+        return {
+          app: initializeApp(firebaseConfig),
+          isConfigured: true,
+        };
       }
 
-      throw new Error(
-        "Firebase configuration not available - ensure app is deployed to Firebase Hosting",
+      // Return null app but don't throw - this allows the app to continue without Firebase
+      console.warn(
+        "⚠️ Firebase services will be disabled - running in offline mode",
       );
+      return {
+        app: null,
+        isConfigured: false,
+      };
     }
   }
 
@@ -406,64 +467,84 @@ export class FirebaseService {
   async initialize() {
     try {
       // Initialize Firebase with secure config injection
-      this.app = await this.initializeFirebaseSecurely();
+      const initResult = await this.initializeFirebaseSecurely();
+      this.app = initResult.app;
+      this.isFirebaseConfigured = initResult.isConfigured;
 
-      // Initialize App Check for enhanced security
-      await appCheckService.initialize(this.app);
-      this.appCheck = appCheckService;
+      // Only initialize Firebase services if we have a valid app
+      if (this.app && this.isFirebaseConfigured) {
+        // Initialize App Check for enhanced security
+        await appCheckService.initialize(this.app);
+        this.appCheck = appCheckService;
 
-      this.auth = getAuth(this.app);
-      this.db = getFirestore(this.app);
-      this.storage = getStorage(this.app);
-      this.analytics = getAnalytics(this.app);
-      this.performance = getPerformance(this.app);
+        this.auth = getAuth(this.app);
+        this.db = getFirestore(this.app);
+        this.storage = getStorage(this.app);
+        this.analytics = getAnalytics(this.app);
+        this.performance = getPerformance(this.app);
 
-      // Initialize messaging service with error handling
-      try {
-        this.messaging = new MessagingService(this.app);
-        await this.messaging.init();
-      } catch (messagingError) {
-        console.warn(
-          "Firebase Messaging initialization failed:",
-          messagingError,
-        );
-        this.messaging = null;
-      }
+        // Initialize messaging service with error handling
+        try {
+          this.messaging = new MessagingService(this.app);
+          await this.messaging.init();
+        } catch (messagingError) {
+          console.warn(
+            "Firebase Messaging initialization failed:",
+            messagingError,
+          );
+          this.messaging = null;
+        }
 
-      // Initialize hybrid data service
-      this.hybridData = new HybridDataService(this.app);
-      await this.hybridData.initializeDataConnect();
+        // Initialize hybrid data service
+        this.hybridData = new HybridDataService(this.app);
+        await this.hybridData.initializeDataConnect();
 
-      // Initialize storage service
-      this.storageService = new FirebaseStorageService(
-        this.app,
-        this.hybridData,
-      );
-
-      // Initialize analytics service with error handling
-      try {
-        this.analyticsService = new FirebaseAnalyticsService(
+        // Initialize storage service
+        this.storageService = new FirebaseStorageService(
           this.app,
           this.hybridData,
         );
-      } catch (analyticsError) {
-        console.warn(
-          "Firebase Analytics Service initialization failed:",
-          analyticsError,
-        );
+
+        // Initialize analytics service with error handling
+        try {
+          this.analyticsService = new FirebaseAnalyticsService(
+            this.app,
+            this.hybridData,
+          );
+        } catch (analyticsError) {
+          console.warn(
+            "Firebase Analytics Service initialization failed:",
+            analyticsError,
+          );
+          this.analyticsService = null;
+        }
+
+        // Initialize performance tracing service
+        this.performanceTracing = new PerformanceTracing(this);
+
+        // Initialize PWA service with error handling
+        try {
+          this.pwaService = new PWAService(this);
+          await this.pwaService.init();
+        } catch (pwaError) {
+          console.warn("PWA Service initialization failed:", pwaError);
+          this.pwaService = null;
+        }
+      } else {
+        // Firebase is not configured - set up offline mode
+        console.warn("🔄 Running in offline mode - Firebase services disabled");
+        this.auth = null;
+        this.db = null;
+        this.storage = null;
+        this.analytics = null;
+        this.performance = null;
+        this.messaging = null;
+        this.hybridData = null;
+        this.storageService = null;
         this.analyticsService = null;
-      }
-
-      // Initialize performance tracing service
-      this.performanceTracing = new PerformanceTracing(this);
-
-      // Initialize PWA service with error handling
-      try {
-        this.pwaService = new PWAService(this);
-        await this.pwaService.init();
-      } catch (pwaError) {
-        console.warn("PWA Service initialization failed:", pwaError);
+        this.performanceTracing = null;
         this.pwaService = null;
+        this.appCheck = null;
       }
 
       // Connect storage service to hybrid data service
@@ -1027,55 +1108,60 @@ export class FirebaseService {
    * Create or update user profile in Firestore
    */
   async createOrUpdateUserProfile(user) {
-    try {
-      const userRef = doc(this.db, "users", user.uid);
-      const userSnap = await getDoc(userRef);
+    return this.safeFirebaseOperation(
+      async () => {
+        if (!this.db) {
+          throw new Error("Firestore not initialized");
+        }
 
-      const now = new Date();
+        const userRef = doc(this.db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
 
-      if (!userSnap.exists()) {
-        // Create new user profile
-        await setDoc(userRef, {
-          displayName: user.displayName || "Anonymous User",
-          email: user.email,
-          photoURL: user.photoURL || null,
-          tier: 0, // 0=free, 1=research($5+), 2=supporter($25+), etc.
-          researchParticipant: false,
-          totalDonated: 0,
-          flair: {
-            color: "#666666", // Default gray
-            badge: "", // No badge for free tier
-            title: "", // Badge title flair
-            displayName: user.displayName || "Anonymous User", // Custom display name
-          },
-          badges: [], // Array of earned badges
-          customization: {
+        const now = new Date();
+
+        if (!userSnap.exists()) {
+          // Create new user profile
+          await setDoc(userRef, {
             displayName: user.displayName || "Anonymous User",
+            email: user.email,
             photoURL: user.photoURL || null,
-            selectedBadgeFlair: null, // User-selected badge for flair
-            profileTheme: "default",
-          },
-          createdAt: now,
-          updatedAt: now,
-          lastLoginAt: now,
-          scenariosCompleted: 0,
-          researchResponsesSubmitted: 0,
-        });
+            tier: 0, // 0=free, 1=research($5+), 2=supporter($25+), etc.
+            researchParticipant: false,
+            totalDonated: 0,
+            flair: {
+              color: "#666666", // Default gray
+              badge: "", // No badge for free tier
+              title: "", // Badge title flair
+              displayName: user.displayName || "Anonymous User", // Custom display name
+            },
+            badges: [], // Array of earned badges
+            customization: {
+              displayName: user.displayName || "Anonymous User",
+              photoURL: user.photoURL || null,
+              selectedBadgeFlair: null, // User-selected badge for flair
+              profileTheme: "default",
+            },
+            createdAt: now,
+            updatedAt: now,
+            lastLoginAt: now,
+            scenariosCompleted: 0,
+            researchResponsesSubmitted: 0,
+          });
 
-        this.trackEvent("user_profile_created", { user_id: user.uid });
-      } else {
-        // Update existing user's last login
-        await updateDoc(userRef, {
-          lastLoginAt: now,
-          updatedAt: now,
-        });
-      }
+          this.trackEvent("user_profile_created", { user_id: user.uid });
+        } else {
+          // Update existing user's last login
+          await updateDoc(userRef, {
+            lastLoginAt: now,
+            updatedAt: now,
+          });
+        }
 
-      return true;
-    } catch (error) {
-      console.error("❌ Failed to create/update user profile:", error);
-      return false;
-    }
+        return true;
+      },
+      false,
+      "Create/update user profile",
+    );
   }
 
   /**

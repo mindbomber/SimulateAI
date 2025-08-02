@@ -56,6 +56,14 @@ export class PWAService {
     this.maxEventsPerMinute = 10;
     this.isInitializing = true;
     this.recentErrors = 0;
+    this.initialized = false; // Prevent duplicate initialization
+
+    // PWA prompt dismissal tracking
+    this.promptDismissed = false;
+    this.promptDismissedAt = null;
+    this.promptCooldownHours = 24; // Don't show again for 24 hours
+    this.updatePromptDismissedAt = null; // Track update prompt dismissals separately
+    this.currentUpdateWorker = null; // Track current service worker to prevent duplicate updates
 
     // Don't auto-initialize to prevent service duplication
     // Call init() manually after construction
@@ -65,9 +73,10 @@ export class PWAService {
    * Phase 3.5: Initialize DataHandler integration for persistent PWA state
    */
   async initializeDataHandlerIntegration() {
-    if (this.app && this.app.dataHandler) {
-      this.dataHandler = this.app.dataHandler;
+    // Try multiple sources for DataHandler
+    this.dataHandler = this.app?.dataHandler || window.dataHandler || null;
 
+    if (this.dataHandler) {
       // Load existing PWA data
       await this.loadPWAData();
 
@@ -98,6 +107,10 @@ export class PWAService {
         ...pwaData.syncMetrics,
       };
 
+      // Load prompt dismissal state
+      this.promptDismissed = pwaData.promptDismissed || false;
+      this.promptDismissedAt = pwaData.promptDismissedAt || null;
+
       console.log("✅ PWAService: Loaded persistent PWA data");
     } catch (error) {
       console.error("❌ PWAService: Failed to load PWA data:", error);
@@ -115,6 +128,8 @@ export class PWAService {
         installationHistory: this.installationHistory,
         connectivityHistory: this.connectivityHistory,
         syncMetrics: this.syncMetrics,
+        promptDismissed: this.promptDismissed,
+        promptDismissedAt: this.promptDismissedAt,
         lastUpdated: Date.now(),
       };
 
@@ -122,6 +137,43 @@ export class PWAService {
     } catch (error) {
       console.error("❌ PWAService: Failed to save PWA data:", error);
     }
+  }
+
+  /**
+   * Check if install prompt should be shown (respects dismissal cooldown)
+   */
+  shouldShowInstallPrompt() {
+    // Don't show if already installed
+    if (this.isInstalled) return false;
+
+    // Don't show if dismissed and still in cooldown
+    if (this.promptDismissed && this.promptDismissedAt) {
+      const hoursPasssed =
+        (Date.now() - this.promptDismissedAt) / (1000 * 60 * 60);
+      if (hoursPasssed < this.promptCooldownHours) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Mark install prompt as dismissed
+   */
+  async dismissInstallPrompt() {
+    this.promptDismissed = true;
+    this.promptDismissedAt = Date.now();
+
+    // Save to persistent storage
+    await this.savePWAData();
+
+    this.trackPWAEvent("install_prompt_dismissed", {
+      dismissed_at: this.promptDismissedAt,
+      cooldown_hours: this.promptCooldownHours,
+    });
+
+    console.log("📱 PWA install prompt dismissed for 24 hours");
   }
 
   /**
@@ -210,13 +262,25 @@ export class PWAService {
   })();
 
   /**
-   * Initialize PWA service
+   * Initialize PWA service with enhanced deduplication
    * Phase 3.5: Enhanced with DataHandler integration
    */
   async init() {
+    if (this.initialized) {
+      console.warn(
+        "📱 PWAService already initialized - skipping duplicate initialization",
+      );
+      return;
+    }
+
     try {
+      console.log("🚀 Initializing PWA Service...");
+
       // Phase 3.5: Initialize DataHandler integration first
       await this.initializeDataHandlerIntegration();
+
+      // Check installation status first
+      this.checkInstallationStatus();
 
       // Register service worker
       await this.registerServiceWorker();
@@ -224,14 +288,14 @@ export class PWAService {
       // Set up event listeners
       this.setupEventListeners();
 
-      // Check installation status
-      this.checkInstallationStatus();
-
       // Initialize background sync
       this.initializeBackgroundSync();
 
       // Phase 3.5: Update PWA health status
       this.updatePWAHealth();
+
+      // Mark as initialized
+      this.initialized = true;
 
       // Track PWA initialization
       this.trackPWAEvent("pwa_service_initialized", {
@@ -240,6 +304,22 @@ export class PWAService {
         has_service_worker: !!this.registration,
         has_data_handler: !!this.dataHandler,
       });
+
+      console.log("✅ PWA Service initialized successfully", {
+        isInstalled: this.isInstalled,
+        hasServiceWorker: !!this.registration,
+        hasDataHandler: !!this.dataHandler,
+      });
+
+      // Only show install prompt if not installed and not in cooldown
+      if (!this.isInstalled) {
+        // Delay install prompt to avoid overwhelming user on page load
+        setTimeout(() => {
+          if (this.installPromptEvent && this.shouldShowInstallPrompt()) {
+            this.showInstallPrompt();
+          }
+        }, 3000); // 3 second delay
+      }
 
       // FIREBASE 400 FIX: Mark initialization complete
       this.isInitializing = false;
@@ -302,41 +382,151 @@ export class PWAService {
   }
 
   /**
-   * Handle service worker updates
+   * Handle service worker updates with deduplication
    */
   handleServiceWorkerUpdate() {
     const newWorker = this.registration.installing;
 
     if (newWorker) {
+      // Prevent multiple update notifications for the same worker
+      if (this.currentUpdateWorker === newWorker) {
+        console.log("📱 Service worker update already being handled");
+        return;
+      }
+
+      this.currentUpdateWorker = newWorker;
+
       newWorker.addEventListener("statechange", () => {
         if (
           newWorker.state === "installed" &&
           navigator.serviceWorker.controller
         ) {
-          this.showUpdateNotification();
+          // Only show update notification if app is installed
+          // For non-installed apps, this should be an install prompt instead
+          if (this.isInstalled) {
+            this.showUpdateNotification();
+          } else {
+            console.log(
+              "📱 Service worker updated but app not installed - showing install prompt instead",
+            );
+            this.showInstallPrompt();
+          }
         }
       });
     }
   }
 
   /**
-   * Show update notification to user
+   * Force service worker update and cache refresh
+   */
+  async forceUpdate() {
+    try {
+      console.log("🔄 Forcing PWA update and cache refresh...");
+
+      // Step 1: Tell the service worker to skip waiting
+      if (this.registration && this.registration.waiting) {
+        this.registration.waiting.postMessage({ type: "SKIP_WAITING" });
+      }
+
+      // Step 2: Clear all caches
+      if ("caches" in window) {
+        const cacheNames = await caches.keys();
+        console.log(`🗑️ Clearing ${cacheNames.length} cache(s)...`);
+
+        await Promise.all(
+          cacheNames.map((cacheName) => {
+            console.log(`🗑️ Deleting cache: ${cacheName}`);
+            return caches.delete(cacheName);
+          }),
+        );
+      }
+
+      // Step 3: Unregister current service worker
+      if (this.registration) {
+        console.log("🔄 Unregistering service worker...");
+        await this.registration.unregister();
+      }
+
+      // Step 4: Clear browser storage related to app
+      this.clearAppStorage();
+
+      // Step 5: Force hard reload with cache bypass
+      console.log("🔄 Performing hard reload...");
+      window.location.reload(true); // Force reload from server, not cache
+    } catch (error) {
+      console.error("❌ Force update failed:", error);
+      // Fallback to regular reload
+      window.location.reload();
+    }
+  }
+
+  /**
+   * Clear app-specific storage
+   */
+  clearAppStorage() {
+    try {
+      // Clear localStorage items that might be stale
+      const storageKeys = Object.keys(localStorage);
+      const appKeys = storageKeys.filter(
+        (key) =>
+          key.startsWith("simulateai_") ||
+          key.startsWith("pwa_") ||
+          key.includes("cache") ||
+          key.includes("version"),
+      );
+
+      appKeys.forEach((key) => {
+        console.log(`🗑️ Clearing localStorage key: ${key}`);
+        localStorage.removeItem(key);
+      });
+
+      // Clear sessionStorage
+      sessionStorage.clear();
+    } catch (error) {
+      console.warn("⚠️ Could not clear some storage:", error);
+    }
+  }
+
+  /**
+   * Show update notification to user with deduplication
    */
   showUpdateNotification() {
+    // Check for existing update notifications
+    const existingUpdateNotification = document.getElementById(
+      "pwa-update-simulateai",
+    );
+    if (existingUpdateNotification) {
+      console.log(
+        "📱 Update notification already showing - skipping duplicate",
+      );
+      return;
+    }
+
     // Custom update notification
     const notification = {
+      id: "pwa-update-simulateai",
       title: "SimulateAI Update Available",
       message:
-        "A new version of SimulateAI is ready. Refresh to get the latest features!",
+        "A new version of SimulateAI is ready. This will clear cache and reload the app with the latest features!",
       actions: [
         {
           text: "Update Now",
-          action: () => window.location.reload(),
+          action: () => {
+            console.log("📱 User chose to update PWA");
+            this.forceUpdate(); // Use the new force update method
+          },
         },
         {
           text: "Later",
           action: () => {
-            // User dismissed the update notification
+            console.log("📱 User dismissed PWA update");
+            this.trackPWAEvent("update_dismissed", {
+              version: "v1.15.0",
+              user_choice: "later",
+            });
+
+            // Dismiss for a shorter period for updates (1 hour vs 24 hours for install)
+            this.updatePromptDismissedAt = Date.now();
           },
         },
       ],
@@ -345,8 +535,9 @@ export class PWAService {
     this.showNotification(notification);
 
     this.trackPWAEvent("update_available_shown", {
-      version: "v1.10.0",
+      version: "v1.15.0",
       user_choice: "pending",
+      service_worker_state: this.registration?.waiting ? "waiting" : "unknown",
     });
   }
 
@@ -365,11 +556,24 @@ export class PWAService {
       this.handleOnlineStatusChange(false);
     });
 
-    // Install prompt
+    // Install prompt with enhanced deduplication
     window.addEventListener("beforeinstallprompt", (e) => {
       e.preventDefault();
       this.installPromptEvent = e;
-      this.showInstallPrompt();
+
+      // Don't automatically show prompt - let init() handle timing
+      console.log("📱 Install prompt event captured, will show with delay");
+
+      // Only auto-show if we're past the initialization phase
+      if (
+        this.initialized &&
+        !this.isInstalled &&
+        this.shouldShowInstallPrompt()
+      ) {
+        setTimeout(() => {
+          this.showInstallPrompt();
+        }, 2000); // 2 second delay for auto-prompt
+      }
     });
 
     // App installed
@@ -451,29 +655,87 @@ export class PWAService {
   }
 
   /**
-   * Check if app is installed as PWA
+   * Check if app is installed as PWA with enhanced detection
    */
   checkInstallationStatus() {
-    // Check if running in standalone mode
+    // Multiple methods to detect PWA installation
+    const standaloneMode = window.matchMedia(
+      "(display-mode: standalone)",
+    ).matches;
+    const iosStandalone = window.navigator.standalone === true;
+    const isAndroidPWA = window.location.search.includes(
+      "utm_source=homescreen",
+    );
+    const hasInstalledClass = document.body.classList.contains("pwa-installed");
+
+    // Check if beforeinstallprompt event is available (indicates not installed)
+    const beforeInstallPromptAvailable = "onbeforeinstallprompt" in window;
+
     this.isInstalled =
-      window.matchMedia("(display-mode: standalone)").matches ||
-      window.navigator.standalone === true;
+      standaloneMode || iosStandalone || isAndroidPWA || hasInstalledClass;
+
+    console.log("📱 PWA Installation Status Check:", {
+      standaloneMode,
+      iosStandalone,
+      isAndroidPWA,
+      hasInstalledClass,
+      beforeInstallPromptAvailable,
+      finalStatus: this.isInstalled,
+    });
 
     if (this.isInstalled) {
       document.body.classList.add("pwa-installed");
+
+      // Clear any pending install prompts since app is installed
+      this.installPromptEvent = null;
+
+      // Remove any existing install notifications
+      const installNotifications =
+        document.querySelectorAll(".pwa-notification");
+      installNotifications.forEach((notification) => {
+        if (notification.textContent.includes("Install")) {
+          notification.remove();
+        }
+      });
+    } else {
+      document.body.classList.remove("pwa-installed");
     }
 
     return this.isInstalled;
   }
 
   /**
-   * Show install prompt
+   * Show install prompt with enhanced deduplication
    */
   showInstallPrompt() {
-    // Don't show if already installed
-    if (this.isInstalled) return;
+    // Recheck installation status first
+    this.checkInstallationStatus();
+
+    // Check if prompt should be shown (respects dismissal and installation status)
+    if (!this.shouldShowInstallPrompt()) {
+      console.log("📱 PWA install prompt skipped", {
+        isInstalled: this.isInstalled,
+        promptDismissed: this.promptDismissed,
+        cooldownActive:
+          this.promptDismissed &&
+          this.promptDismissedAt &&
+          (Date.now() - this.promptDismissedAt) / (1000 * 60 * 60) <
+            this.promptCooldownHours,
+      });
+      return;
+    }
+
+    // Check for existing install prompts
+    const existingInstallPrompt = document.getElementById(
+      "pwa-install-simulateai",
+    );
+    if (existingInstallPrompt) {
+      console.log("📱 Install prompt already showing - skipping duplicate");
+      return;
+    }
 
     const prompt = {
+      id: "pwa-install-simulateai",
       title: "📱 Install SimulateAI",
       message:
         "Get the full app experience with offline access and faster loading!",
@@ -484,9 +746,7 @@ export class PWAService {
         },
         {
           text: "Not Now",
-          action: () => {
-            /* action removed */
-          },
+          action: () => this.dismissInstallPrompt(),
         },
       ],
     };
@@ -495,6 +755,7 @@ export class PWAService {
 
     this.trackPWAEvent("install_prompt_shown", {
       prompt_available: !!this.installPromptEvent,
+      installation_status: this.isInstalled,
     });
   }
 
@@ -785,11 +1046,31 @@ export class PWAService {
   }
 
   /**
-   * Generic notification display
+   * Generic notification display with deduplication
    */
   showNotification(notification) {
+    // Prevent duplicate notifications
+    const notificationId =
+      notification.id ||
+      `pwa-${notification.title.replace(/\s+/g, "-").toLowerCase()}`;
+
+    // Remove any existing notification with the same ID
+    const existingNotification = document.getElementById(notificationId);
+    if (existingNotification) {
+      console.log(`📱 Removing duplicate PWA notification: ${notificationId}`);
+      existingNotification.remove();
+    }
+
+    // Don't show install prompts if app is already installed
+    if (notification.title.includes("Install") && this.isInstalled) {
+      console.log("📱 Skipping install prompt - app already installed");
+      return;
+    }
+
     // Create notification element
     const notificationEl = document.createElement("div");
+    notificationEl.id = notificationId;
+    notificationEl.className = "pwa-notification";
     notificationEl.style.cssText = `
             position: fixed;
             top: 20px;
@@ -802,6 +1083,7 @@ export class PWAService {
             z-index: ${UI.Z_INDEX.CRITICAL_OVERLAY};
             max-width: 350px;
             border-left: 4px solid #667eea;
+            animation: slideInRight 0.3s ease-out;
         `;
 
     let content = `<div style="font-weight: bold; margin-bottom: 10px;">${notification.title}</div>`;
@@ -809,16 +1091,31 @@ export class PWAService {
 
     if (notification.actions) {
       content += "<div>";
-      notification.actions.forEach((action) => {
-        content += `<button onclick="this.parentElement.parentElement.remove(); (${action.action.toString()})()" 
+      notification.actions.forEach((action, index) => {
+        content += `<button onclick="this.parentElement.parentElement.remove(); window.pwaNotificationAction_${index}_${Date.now()}()" 
                            style="margin-right: 10px; padding: 8px 16px; border: none; border-radius: 5px; 
                            background: #667eea; color: white; cursor: pointer;">${action.text}</button>`;
+
+        // Create global function for the action
+        const functionName = `pwaNotificationAction_${index}_${Date.now()}`;
+        window[functionName] = () => {
+          try {
+            action.action();
+          } catch (error) {
+            console.error("PWA notification action error:", error);
+          }
+          // Clean up the global function
+          delete window[functionName];
+        };
       });
       content += "</div>";
     }
 
     notificationEl.innerHTML = content;
     document.body.appendChild(notificationEl);
+
+    // Track notification display
+    console.log(`📱 Showing PWA notification: ${notificationId}`);
 
     // Auto-remove after duration
     const duration = notification.duration || TIMING.NOTIFICATION_NORMAL;

@@ -58,6 +58,47 @@ class EnhancedDonationWidget {
     return key;
   }
 
+  /**
+   * Dynamically load Stripe JavaScript SDK
+   * @returns {Promise<boolean>} True if Stripe is loaded successfully
+   */
+  async loadStripe() {
+    // Check if Stripe is already loaded
+    if (window.Stripe) {
+      return true;
+    }
+
+    try {
+      // Create and load Stripe script
+      const script = document.createElement("script");
+      script.src = "https://js.stripe.com/v3/";
+      script.async = true;
+
+      // Return a promise that resolves when script is loaded
+      return new Promise((resolve, reject) => {
+        script.onload = () => {
+          if (window.Stripe) {
+            console.log("✅ Stripe SDK loaded successfully");
+            resolve(true);
+          } else {
+            console.error("❌ Stripe SDK failed to initialize");
+            reject(new Error("Stripe SDK failed to initialize"));
+          }
+        };
+
+        script.onerror = () => {
+          console.error("❌ Failed to load Stripe SDK");
+          reject(new Error("Failed to load Stripe SDK"));
+        };
+
+        document.head.appendChild(script);
+      });
+    } catch (error) {
+      console.error("❌ Error loading Stripe SDK:", error);
+      return false;
+    }
+  }
+
   async init() {
     // Check authentication status
     if (window.firebase && window.firebase.auth) {
@@ -585,6 +626,12 @@ class EnhancedDonationWidget {
 
   async processAuthenticatedDonation(tier) {
     try {
+      // Ensure Stripe SDK is loaded
+      const stripeLoaded = await this.loadStripe();
+      if (!stripeLoaded) {
+        throw new Error("Failed to load Stripe SDK");
+      }
+
       // Try Firebase Functions first
       const functions = window.firebase.functions();
       const createCheckoutSession = functions.httpsCallable(
@@ -623,6 +670,12 @@ class EnhancedDonationWidget {
     const message = this.promptForMessage();
 
     try {
+      // Ensure Stripe SDK is loaded
+      const stripeLoaded = await this.loadStripe();
+      if (!stripeLoaded) {
+        throw new Error("Failed to load Stripe SDK");
+      }
+
       const functions = window.firebase.functions();
       const createAnonymousCheckout = functions.httpsCallable(
         "createAnonymousCheckout",

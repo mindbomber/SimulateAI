@@ -1587,8 +1587,8 @@ For research articles, consider including:
 
           if (confirm(message + "\n\nWould you like to sign in now?")) {
             // Trigger authentication flow
-            if (this.authService && this.authService.signIn) {
-              this.authService.signIn();
+            if (this.authService && this.authService.showLoginModal) {
+              this.authService.showLoginModal();
             } else {
               window.location.href = "index.html#auth";
             }

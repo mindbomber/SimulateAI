@@ -815,7 +815,20 @@ class SettingsManager {
 
       // Fallback to localStorage
       const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
-      const settings = stored ? JSON.parse(stored) : {};
+      let settings = {};
+      if (stored) {
+        try {
+          settings = JSON.parse(stored);
+        } catch (parseError) {
+          console.warn(
+            "[SettingsManager] Failed to parse localStorage settings:",
+            parseError,
+          );
+          // Clear corrupted data
+          localStorage.removeItem(SETTINGS_STORAGE_KEY);
+          settings = {};
+        }
+      }
 
       // If we found settings in localStorage and have DataHandler, migrate them
       if (settings && Object.keys(settings).length > 0 && this.dataHandler) {
@@ -2265,7 +2278,28 @@ class SettingsManager {
 
   // Public API methods
   getSetting(key) {
-    return this.settings[key];
+    // Return the current setting value, or default if undefined
+    const currentValue = this.settings[key];
+    if (currentValue !== undefined) {
+      return currentValue;
+    }
+
+    // If setting is undefined, return the default value from schema
+    const settingDef = this.findSettingDefinition(key);
+    if (settingDef && settingDef.default !== undefined) {
+      return settingDef.default;
+    }
+
+    // Final fallback for critical interface settings
+    const criticalDefaults = {
+      tourTabEnabled: true,
+      surpriseTabEnabled: true,
+      donateTabEnabled: true,
+    };
+
+    return criticalDefaults[key] !== undefined
+      ? criticalDefaults[key]
+      : currentValue;
   }
 
   setSetting(key, value) {

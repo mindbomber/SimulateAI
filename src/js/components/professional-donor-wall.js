@@ -203,6 +203,49 @@ class ProfessionalDonorWall {
 
     this.init();
   }
+
+  /**
+   * Resolve asset paths for production builds
+   */
+  resolveAssetPath(path) {
+    // Handle development vs production path resolution
+    if (!path) return this.getDefaultAvatarDataURL();
+
+    // If path already starts with http or is already resolved, return as-is
+    if (path.startsWith("http") || path.startsWith("/assets/")) {
+      return path;
+    }
+
+    // For development and production builds, resolve relative to base
+    if (path.startsWith("src/assets/")) {
+      // In production, assets are moved to /assets/ directory
+      return path.replace("src/assets/", "./assets/");
+    }
+
+    return path;
+  }
+
+  /**
+   * Get default avatar as data URL for reliable fallback
+   */
+  getDefaultAvatarDataURL() {
+    const svgContent = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+        <defs>
+          <linearGradient id="avatarGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#4285f4;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#34a853;stop-opacity:1" />
+          </linearGradient>
+        </defs>
+        <circle cx="32" cy="32" r="32" fill="url(#avatarGradient)"/>
+        <circle cx="32" cy="24" r="10" fill="white" opacity="0.9"/>
+        <path d="M16 48 C16 40, 22 36, 32 36 C42 36, 48 40, 48 48" fill="white" opacity="0.9"/>
+      </svg>
+    `.trim();
+
+    return `data:image/svg+xml;base64,${btoa(svgContent)}`;
+  }
+
   async init() {
     this.cacheDOMElements(); // Cache frequently accessed elements
     await this.loadUserPreferences(); // Load user preferences via DataHandler
@@ -887,24 +930,14 @@ class ProfessionalDonorWall {
       elementsToAppend.push(anonymousAvatar);
     } else {
       const img = document.createElement("img");
-      img.src = donor.avatar;
+      // Fix avatar path for production builds
+      img.src = this.resolveAssetPath(donor.avatar);
       img.alt = `${donor.displayName} avatar`;
       img.onerror = () => {
-        // Batch fallback operations
-        this.batchManager.scheduleDOMUpdate(() => {
-          img.style.display = "none";
-          const fallbackData = {
-            tagName: "div",
-            className: "anonymous-avatar",
-            attributes: {
-              "aria-label": "Contributor avatar",
-            },
-          };
-          const fallback = this.batchManager.batchCreateElements([
-            fallbackData,
-          ]).firstChild;
-          avatarContainer.appendChild(fallback);
-        });
+        // Use data URL fallback for reliability
+        console.log("Avatar failed to load, using embedded fallback");
+        img.src = this.getDefaultAvatarDataURL();
+        img.onerror = null; // Prevent infinite loop
       };
       elementsToAppend.push(img);
     }

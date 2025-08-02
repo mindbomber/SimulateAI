@@ -1,15 +1,10 @@
-name: Deploy to GitHub Pages
+name: Deploy to GitHub Pages - DISABLED
 
-permissions:
-  contents: write
-  pages: write
-  id-token: write
+# This workflow is disabled since we've moved to Firebase Hosting
+# To re-enable, change workflow_dispatch to push/pull_request
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  workflow_dispatch: # Manual trigger only
 
 jobs:
   build-and-deploy:

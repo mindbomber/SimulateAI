@@ -1,9 +1,15 @@
 // SimulateAI Service Worker
 // Comprehensive PWA service worker with offline support and caching strategies
 
-const CACHE_NAME = "simulateai-v1.13.0"; // FIREBASE 400 FIX: Version bump to force refresh
+// Service Worker Configuration
+const CACHE_VERSION = "simulateai-v1.15.1"; // Incremented for PWA notification fixes
+const CACHE_NAME = `simulateai-main-${CACHE_VERSION}`;
 const OFFLINE_CACHE = "simulateai-offline-v1.2";
 const RUNTIME_CACHE = "simulateai-runtime-v1.2";
+
+// Update strategy configuration
+const UPDATE_CHECK_INTERVAL = 60000; // Check for updates every minute
+const SKIP_WAITING_DELAY = 3000; // Wait 3 seconds before activating new service worker
 
 // Core files to cache immediately (only guaranteed files that exist in build)
 const CORE_FILES = ["/", "/index.html", "/app.html", "/manifest.json"];
@@ -154,6 +160,40 @@ async function cacheExtendedFiles() {
     console.warn("⚠️ Background caching failed:", error);
   }
 }
+
+// Message event - handle commands from PWA service
+self.addEventListener("message", (event) => {
+  console.log("📨 Service Worker received message:", event.data);
+
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    console.log("🔄 Skipping waiting and taking control...");
+    self.skipWaiting();
+
+    // Notify all clients that update is ready
+    self.clients.matchAll().then((clients) => {
+      clients.forEach((client) => {
+        client.postMessage({
+          type: "SW_UPDATED",
+          message: "Service Worker updated and ready",
+        });
+      });
+    });
+  }
+
+  if (event.data && event.data.type === "CLEAR_CACHE") {
+    console.log("🗑️ Clearing all caches on command...");
+    event.waitUntil(
+      caches.keys().then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => {
+            console.log("🗑️ Deleting cache:", cacheName);
+            return caches.delete(cacheName);
+          }),
+        );
+      }),
+    );
+  }
+});
 
 // Fetch event - handle all network requests
 self.addEventListener("fetch", (event) => {

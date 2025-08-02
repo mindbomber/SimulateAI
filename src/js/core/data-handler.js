@@ -373,6 +373,21 @@ class DataHandler {
     });
   }
 
+  // Research data management
+  async getResearchData(userId = "default") {
+    return (await this.getData(`research_data_${userId}`)) || [];
+  }
+
+  async saveResearchData(researchData, userId = "default") {
+    const existingData = await this.getResearchData(userId);
+    existingData.push({
+      ...researchData,
+      timestamp: new Date().toISOString(),
+      id: `research_${Date.now()}`,
+    });
+    return await this.saveData(`research_data_${userId}`, existingData);
+  }
+
   // Navigation telemetry management
   async getNavigationTelemetry(userId = "default") {
     return (await this.getData(`nav_telemetry_${userId}`)) || [];

@@ -1,5 +1,8 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+
+// Load environment variables
+require("dotenv").config();
 
 // Initialize Firebase Admin SDK
 admin.initializeApp();
@@ -12,14 +15,14 @@ const verifyToken = async (req, res, next) => {
   try {
     // Extract token from Authorization header
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
-        error: 'Unauthorized: Missing or invalid authorization header',
-        code: 'auth/missing-token',
+        error: "Unauthorized: Missing or invalid authorization header",
+        code: "auth/missing-token",
       });
     }
 
-    const idToken = authHeader.split('Bearer ')[1];
+    const idToken = authHeader.split("Bearer ")[1];
 
     // Verify the ID token with Firebase Admin
     const decodedToken = await admin.auth().verifyIdToken(idToken);
@@ -38,33 +41,33 @@ const verifyToken = async (req, res, next) => {
 
     // Log successful authentication for security monitoring
     console.log(
-      `✅ Token verified for user: ${decodedToken.uid} (${decodedToken.email})`
+      `✅ Token verified for user: ${decodedToken.uid} (${decodedToken.email})`,
     );
 
     next();
   } catch (error) {
-    console.error('❌ Token verification failed:', error);
+    console.error("❌ Token verification failed:", error);
 
     // Provide specific error messages based on the error type
-    let errorMessage = 'Invalid authentication token';
-    let errorCode = 'auth/invalid-token';
+    let errorMessage = "Invalid authentication token";
+    let errorCode = "auth/invalid-token";
 
-    if (error.code === 'auth/id-token-expired') {
-      errorMessage = 'Authentication token has expired';
-      errorCode = 'auth/token-expired';
-    } else if (error.code === 'auth/id-token-revoked') {
-      errorMessage = 'Authentication token has been revoked';
-      errorCode = 'auth/token-revoked';
-    } else if (error.code === 'auth/invalid-id-token') {
-      errorMessage = 'Invalid authentication token format';
-      errorCode = 'auth/invalid-format';
+    if (error.code === "auth/id-token-expired") {
+      errorMessage = "Authentication token has expired";
+      errorCode = "auth/token-expired";
+    } else if (error.code === "auth/id-token-revoked") {
+      errorMessage = "Authentication token has been revoked";
+      errorCode = "auth/token-revoked";
+    } else if (error.code === "auth/invalid-id-token") {
+      errorMessage = "Invalid authentication token format";
+      errorCode = "auth/invalid-format";
     }
 
     return res.status(401).json({
       error: errorMessage,
       code: errorCode,
       details:
-        process.env.NODE_ENV === 'development' ? error.message : undefined,
+        process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
@@ -72,8 +75,9 @@ const verifyToken = async (req, res, next) => {
 /**
  * Secured endpoint for submitting research data
  * Only authenticated users can submit simulation responses
+ * TEMPORARILY DISABLED - NEEDS UPGRADE TO 2ND GEN
  */
-exports.submitResearchData = functions.https.onRequest(async (req, res) => {
+/* exports.submitResearchData = functions.https.onRequest(async (req, res) => {
   // Enable CORS for web client
   res.set('Access-Control-Allow-Origin', '*');
   res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -172,13 +176,14 @@ exports.submitResearchData = functions.https.onRequest(async (req, res) => {
       code: 'server/internal-error',
     });
   }
-});
+}); */
 
 /**
  * Secured endpoint for updating user profiles
  * Validates user identity and prevents privilege escalation
+ * TEMPORARILY DISABLED - NEEDS UPGRADE TO 2ND GEN
  */
-exports.updateUserProfile = functions.https.onRequest(async (req, res) => {
+/* exports.updateUserProfile = functions.https.onRequest(async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
   res.set('Access-Control-Allow-Methods', 'PUT, OPTIONS');
   res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -258,13 +263,14 @@ exports.updateUserProfile = functions.https.onRequest(async (req, res) => {
       code: 'server/internal-error',
     });
   }
-});
+}); */
 
 /**
  * Secured endpoint for awarding badges
  * Only authorized systems can award badges to prevent spoofing
+ * TEMPORARILY DISABLED - NEEDS UPGRADE TO 2ND GEN
  */
-exports.awardBadge = functions.https.onRequest(async (req, res) => {
+/* exports.awardBadge = functions.https.onRequest(async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
   res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.set(
@@ -375,7 +381,7 @@ exports.awardBadge = functions.https.onRequest(async (req, res) => {
       code: 'server/internal-error',
     });
   }
-});
+}); */
 
 /**
  * Utility function to validate URLs
@@ -392,8 +398,9 @@ function isValidURL(string) {
 /**
  * Secured endpoint for getting user analytics
  * Returns aggregated data while protecting individual privacy
+ * TEMPORARILY DISABLED - NEEDS UPGRADE TO 2ND GEN
  */
-exports.getUserAnalytics = functions.https.onRequest(async (req, res) => {
+/* exports.getUserAnalytics = functions.https.onRequest(async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
   res.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -476,11 +483,11 @@ exports.getUserAnalytics = functions.https.onRequest(async (req, res) => {
       code: 'server/internal-error',
     });
   }
-});
+}); */
 
 // ===== STRIPE INTEGRATION FUNCTIONS =====
 
-const stripe = require('stripe')(functions.config().stripe?.secret_key);
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 /**
  * Create Stripe Checkout Session
@@ -492,8 +499,8 @@ exports.createCheckoutSession = functions.https.onCall(
       // Verify user authentication
       if (!context.auth) {
         throw new functions.https.HttpsError(
-          'unauthenticated',
-          'Must be authenticated'
+          "unauthenticated",
+          "Must be authenticated",
         );
       }
 
@@ -502,18 +509,18 @@ exports.createCheckoutSession = functions.https.onCall(
       const userEmail = context.auth.token.email;
 
       // Validate tier
-      const validTiers = ['1', '2', '3'];
+      const validTiers = ["1", "2", "3"];
       if (!validTiers.includes(tier)) {
         throw new functions.https.HttpsError(
-          'invalid-argument',
-          'Invalid tier'
+          "invalid-argument",
+          "Invalid tier",
         );
       }
 
       // Get or create Stripe customer
       const userDoc = await admin
         .firestore()
-        .collection('users')
+        .collection("users")
         .doc(userId)
         .get();
       let customerId = userDoc.data()?.stripeCustomerId;
@@ -529,7 +536,7 @@ exports.createCheckoutSession = functions.https.onCall(
         customerId = customer.id;
 
         // Save customer ID to Firebase
-        await admin.firestore().collection('users').doc(userId).update({
+        await admin.firestore().collection("users").doc(userId).update({
           stripeCustomerId: customerId,
         });
       }
@@ -537,16 +544,16 @@ exports.createCheckoutSession = functions.https.onCall(
       // Create checkout session for one-time payment
       const session = await stripe.checkout.sessions.create({
         customer: customerId,
-        payment_method_types: ['card'],
+        payment_method_types: ["card"],
         line_items: [
           {
             price: priceId,
             quantity: 1,
           },
         ],
-        mode: 'payment', // Changed from 'subscription' to 'payment'
-        success_url: `${functions.config().app?.frontend_url || 'http://localhost:3003'}/profile.html?success=true&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${functions.config().app?.frontend_url || 'http://localhost:3003'}/profile.html?success=false`,
+        mode: "payment", // Changed from 'subscription' to 'payment'
+        success_url: `${process.env.APP_FRONTEND_URL || "http://localhost:3003"}/profile.html?success=true&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.APP_FRONTEND_URL || "http://localhost:3003"}/profile.html?success=false`,
         metadata: {
           tier,
           userId,
@@ -555,7 +562,7 @@ exports.createCheckoutSession = functions.https.onCall(
       });
 
       console.log(
-        `✅ Checkout session created for user ${userId}, tier ${tier}`
+        `✅ Checkout session created for user ${userId}, tier ${tier}`,
       );
 
       return {
@@ -563,10 +570,10 @@ exports.createCheckoutSession = functions.https.onCall(
         url: session.url,
       };
     } catch (error) {
-      console.error('❌ Error creating checkout session:', error);
-      throw new functions.https.HttpsError('internal', error.message);
+      console.error("❌ Error creating checkout session:", error);
+      throw new functions.https.HttpsError("internal", error.message);
     }
-  }
+  },
 );
 
 /**
@@ -578,8 +585,8 @@ exports.verifyPaymentSuccess = functions.https.onCall(async (data, context) => {
     // Verify user authentication
     if (!context.auth) {
       throw new functions.https.HttpsError(
-        'unauthenticated',
-        'Must be authenticated'
+        "unauthenticated",
+        "Must be authenticated",
       );
     }
 
@@ -592,12 +599,12 @@ exports.verifyPaymentSuccess = functions.https.onCall(async (data, context) => {
     // Verify the session belongs to this user
     if (session.metadata.userId !== userId) {
       throw new functions.https.HttpsError(
-        'permission-denied',
-        'Session does not belong to user'
+        "permission-denied",
+        "Session does not belong to user",
       );
     }
 
-    if (session.payment_status === 'paid') {
+    if (session.payment_status === "paid") {
       const tier = parseInt(session.metadata.tier);
       const tierInfo = getTierInfo(tier);
 
@@ -607,20 +614,20 @@ exports.verifyPaymentSuccess = functions.https.onCall(async (data, context) => {
       // Update user profile for one-time payment
       await admin
         .firestore()
-        .collection('users')
+        .collection("users")
         .doc(userId)
         .update({
           tier,
           flair: tierInfo.flair,
           stripeCustomerId: session.customer,
-          paymentType: 'one-time',
+          paymentType: "one-time",
           totalDonated: admin.firestore.FieldValue.increment(amountPaid),
           lastPaymentDate: admin.firestore.FieldValue.serverTimestamp(),
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
 
       console.log(
-        `✅ One-time payment verified for user ${userId}, tier ${tier}, amount: $${amountPaid}`
+        `✅ One-time payment verified for user ${userId}, tier ${tier}, amount: $${amountPaid}`,
       );
 
       return {
@@ -630,17 +637,17 @@ exports.verifyPaymentSuccess = functions.https.onCall(async (data, context) => {
         tierName: tierInfo.name,
         stripeCustomerId: session.customer,
         totalDonated: amountPaid,
-        paymentType: 'one-time',
+        paymentType: "one-time",
       };
     } else {
       throw new functions.https.HttpsError(
-        'failed-precondition',
-        'Payment not completed'
+        "failed-precondition",
+        "Payment not completed",
       );
     }
   } catch (error) {
-    console.error('❌ Error verifying payment:', error);
-    throw new functions.https.HttpsError('internal', error.message);
+    console.error("❌ Error verifying payment:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });
 
@@ -654,39 +661,39 @@ exports.createAnonymousCheckout = functions.https.onCall(
       const { priceId, tier, donorEmail } = data;
 
       // Validate tier
-      const validTiers = ['1', '2', '3'];
+      const validTiers = ["1", "2", "3"];
       if (!validTiers.includes(tier)) {
         throw new functions.https.HttpsError(
-          'invalid-argument',
-          'Invalid tier'
+          "invalid-argument",
+          "Invalid tier",
         );
       }
 
       // Validate price ID
       if (!priceId) {
         throw new functions.https.HttpsError(
-          'invalid-argument',
-          'Price ID is required'
+          "invalid-argument",
+          "Price ID is required",
         );
       }
 
       // Create checkout session for anonymous donation
       const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
+        payment_method_types: ["card"],
         line_items: [
           {
             price: priceId,
             quantity: 1,
           },
         ],
-        mode: 'payment',
-        success_url: `${functions.config().app?.frontend_url || 'http://localhost:3000'}/?donation_success=true&tier=${tier}`,
-        cancel_url: `${functions.config().app?.frontend_url || 'http://localhost:3000'}/?donation_cancelled=true`,
+        mode: "payment",
+        success_url: `${process.env.APP_FRONTEND_URL || "http://localhost:3000"}/?donation_success=true&tier=${tier}`,
+        cancel_url: `${process.env.APP_FRONTEND_URL || "http://localhost:3000"}/?donation_cancelled=true`,
         metadata: {
           tier,
           tierName: getTierName(tier),
-          donationType: 'anonymous',
-          donorEmail: donorEmail || 'anonymous',
+          donationType: "anonymous",
+          donorEmail: donorEmail || "anonymous",
         },
         customer_email: donorEmail || undefined,
       });
@@ -698,10 +705,10 @@ exports.createAnonymousCheckout = functions.https.onCall(
         url: session.url,
       };
     } catch (error) {
-      console.error('❌ Error creating anonymous checkout session:', error);
-      throw new functions.https.HttpsError('internal', error.message);
+      console.error("❌ Error creating anonymous checkout session:", error);
+      throw new functions.https.HttpsError("internal", error.message);
     }
-  }
+  },
 );
 
 /**
@@ -709,12 +716,12 @@ exports.createAnonymousCheckout = functions.https.onCall(
  * Handles all Stripe events securely
  */
 exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
-  const sig = req.headers['stripe-signature'];
-  const webhookSecret = functions.config().stripe?.webhook_secret;
+  const sig = req.headers["stripe-signature"];
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   if (!webhookSecret) {
-    console.error('❌ Webhook secret not configured');
-    return res.status(500).send('Webhook secret not configured');
+    console.error("❌ Webhook secret not configured");
+    return res.status(500).send("Webhook secret not configured");
   }
 
   let event;
@@ -723,7 +730,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
     // Verify webhook signature
     event = stripe.webhooks.constructEvent(req.rawBody, sig, webhookSecret);
   } catch (err) {
-    console.error('❌ Webhook signature verification failed:', err.message);
+    console.error("❌ Webhook signature verification failed:", err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -732,31 +739,31 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
 
     // Handle the event
     switch (event.type) {
-      case 'checkout.session.completed':
+      case "checkout.session.completed":
         await handleCheckoutSessionCompleted(event.data.object);
         break;
 
-      case 'customer.subscription.created':
+      case "customer.subscription.created":
         await handleSubscriptionCreated(event.data.object);
         break;
 
-      case 'customer.subscription.updated':
+      case "customer.subscription.updated":
         await handleSubscriptionUpdated(event.data.object);
         break;
 
-      case 'customer.subscription.deleted':
+      case "customer.subscription.deleted":
         await handleSubscriptionDeleted(event.data.object);
         break;
 
-      case 'invoice.payment_succeeded':
+      case "invoice.payment_succeeded":
         await handlePaymentSucceeded(event.data.object);
         break;
 
-      case 'invoice.payment_failed':
+      case "invoice.payment_failed":
         await handlePaymentFailed(event.data.object);
         break;
 
-      case 'customer.subscription.trial_will_end':
+      case "customer.subscription.trial_will_end":
         await handleTrialWillEnd(event.data.object);
         break;
 
@@ -766,8 +773,8 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
 
     res.json({ received: true });
   } catch (error) {
-    console.error('❌ Error handling webhook:', error);
-    res.status(500).json({ error: 'Webhook handler failed' });
+    console.error("❌ Error handling webhook:", error);
+    res.status(500).json({ error: "Webhook handler failed" });
   }
 });
 
@@ -780,8 +787,8 @@ exports.cancelSubscription = functions.https.onCall(async (data, context) => {
     // Verify user authentication
     if (!context.auth) {
       throw new functions.https.HttpsError(
-        'unauthenticated',
-        'Must be authenticated'
+        "unauthenticated",
+        "Must be authenticated",
       );
     }
 
@@ -790,15 +797,15 @@ exports.cancelSubscription = functions.https.onCall(async (data, context) => {
     // Get user's subscription ID
     const userDoc = await admin
       .firestore()
-      .collection('users')
+      .collection("users")
       .doc(userId)
       .get();
     const subscriptionId = userDoc.data()?.subscriptionId;
 
     if (!subscriptionId) {
       throw new functions.https.HttpsError(
-        'not-found',
-        'No active subscription found'
+        "not-found",
+        "No active subscription found",
       );
     }
 
@@ -808,8 +815,8 @@ exports.cancelSubscription = functions.https.onCall(async (data, context) => {
     });
 
     // Update user profile
-    await admin.firestore().collection('users').doc(userId).update({
-      subscriptionStatus: 'cancel_at_period_end',
+    await admin.firestore().collection("users").doc(userId).update({
+      subscriptionStatus: "cancel_at_period_end",
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
@@ -818,11 +825,11 @@ exports.cancelSubscription = functions.https.onCall(async (data, context) => {
     return {
       success: true,
       message:
-        'Subscription will be cancelled at the end of the current period',
+        "Subscription will be cancelled at the end of the current period",
     };
   } catch (error) {
-    console.error('❌ Error cancelling subscription:', error);
-    throw new functions.https.HttpsError('internal', error.message);
+    console.error("❌ Error cancelling subscription:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });
 
@@ -835,8 +842,8 @@ exports.createPortalSession = functions.https.onCall(async (data, context) => {
     // Verify user authentication
     if (!context.auth) {
       throw new functions.https.HttpsError(
-        'unauthenticated',
-        'Must be authenticated'
+        "unauthenticated",
+        "Must be authenticated",
       );
     }
 
@@ -845,30 +852,30 @@ exports.createPortalSession = functions.https.onCall(async (data, context) => {
     // Get user's Stripe customer ID
     const userDoc = await admin
       .firestore()
-      .collection('users')
+      .collection("users")
       .doc(userId)
       .get();
     const stripeCustomerId = userDoc.data()?.stripeCustomerId;
 
     if (!stripeCustomerId) {
       throw new functions.https.HttpsError(
-        'not-found',
-        'No Stripe customer found'
+        "not-found",
+        "No Stripe customer found",
       );
     }
 
     // Create portal session
     const session = await stripe.billingPortal.sessions.create({
       customer: stripeCustomerId,
-      return_url: `${functions.config().app?.frontend_url || 'http://localhost:3003'}/profile.html`,
+      return_url: `${process.env.APP_FRONTEND_URL || "http://localhost:3003"}/profile.html`,
     });
 
     console.log(`✅ Billing portal session created for user ${userId}`);
 
     return { url: session.url };
   } catch (error) {
-    console.error('❌ Error creating portal session:', error);
-    throw new functions.https.HttpsError('internal', error.message);
+    console.error("❌ Error creating portal session:", error);
+    throw new functions.https.HttpsError("internal", error.message);
   }
 });
 
@@ -879,17 +886,17 @@ exports.createPortalSession = functions.https.onCall(async (data, context) => {
  */
 async function handleCheckoutSessionCompleted(session) {
   try {
-    if (session.payment_status === 'paid') {
+    if (session.payment_status === "paid") {
       const tier = parseInt(session.metadata.tier);
       const tierInfo = getTierInfo(tier);
       const amountPaid = session.amount_total / 100; // Convert from cents
-      const donationType = session.metadata.donationType || 'authenticated';
+      const donationType = session.metadata.donationType || "authenticated";
 
-      if (donationType === 'anonymous') {
+      if (donationType === "anonymous") {
         // Handle anonymous donation - just log it
         await admin
           .firestore()
-          .collection('anonymousDonations')
+          .collection("anonymousDonations")
           .add({
             tier,
             tierName: tierInfo.name,
@@ -897,13 +904,13 @@ async function handleCheckoutSessionCompleted(session) {
             donorEmail:
               session.metadata.donorEmail ||
               session.customer_email ||
-              'anonymous',
+              "anonymous",
             stripeSessionId: session.id,
             timestamp: admin.firestore.FieldValue.serverTimestamp(),
           });
 
         console.log(
-          `✅ Anonymous donation processed: tier ${tier}, amount: $${amountPaid}`
+          `✅ Anonymous donation processed: tier ${tier}, amount: $${amountPaid}`,
         );
       } else {
         // Handle authenticated user donation
@@ -914,25 +921,25 @@ async function handleCheckoutSessionCompleted(session) {
           // Update user profile with one-time payment
           await admin
             .firestore()
-            .collection('users')
+            .collection("users")
             .doc(userId)
             .update({
               tier,
               flair: tierInfo.flair,
-              paymentType: 'one-time',
+              paymentType: "one-time",
               totalDonated: admin.firestore.FieldValue.increment(amountPaid),
               lastPaymentDate: admin.firestore.FieldValue.serverTimestamp(),
               updatedAt: admin.firestore.FieldValue.serverTimestamp(),
             });
 
           console.log(
-            `✅ Authenticated donation processed via webhook for user ${userId}, tier ${tier}, amount: $${amountPaid}`
+            `✅ Authenticated donation processed via webhook for user ${userId}, tier ${tier}, amount: $${amountPaid}`,
           );
         }
       }
     }
   } catch (error) {
-    console.error('❌ Error handling checkout session completed:', error);
+    console.error("❌ Error handling checkout session completed:", error);
   }
 }
 
@@ -947,13 +954,13 @@ async function handleSubscriptionCreated(subscription) {
     if (userId) {
       await admin
         .firestore()
-        .collection('users')
+        .collection("users")
         .doc(userId)
         .update({
           subscriptionId: subscription.id,
           subscriptionStatus: subscription.status,
           subscriptionStartDate: admin.firestore.Timestamp.fromDate(
-            new Date(subscription.created * 1000)
+            new Date(subscription.created * 1000),
           ),
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
@@ -961,7 +968,7 @@ async function handleSubscriptionCreated(subscription) {
       console.log(`✅ Subscription created for user ${userId}`);
     }
   } catch (error) {
-    console.error('❌ Error handling subscription created:', error);
+    console.error("❌ Error handling subscription created:", error);
   }
 }
 
@@ -980,26 +987,26 @@ async function handleSubscriptionUpdated(subscription) {
       };
 
       // If subscription is cancelled, update tier and flair
-      if (subscription.status === 'canceled') {
+      if (subscription.status === "canceled") {
         updateData.tier = 0;
         updateData.flair = null;
         updateData.subscriptionEndDate = admin.firestore.Timestamp.fromDate(
-          new Date(subscription.ended_at * 1000)
+          new Date(subscription.ended_at * 1000),
         );
       }
 
       await admin
         .firestore()
-        .collection('users')
+        .collection("users")
         .doc(userId)
         .update(updateData);
 
       console.log(
-        `✅ Subscription updated for user ${userId}: ${subscription.status}`
+        `✅ Subscription updated for user ${userId}: ${subscription.status}`,
       );
     }
   } catch (error) {
-    console.error('❌ Error handling subscription updated:', error);
+    console.error("❌ Error handling subscription updated:", error);
   }
 }
 
@@ -1014,14 +1021,14 @@ async function handleSubscriptionDeleted(subscription) {
     if (userId) {
       await admin
         .firestore()
-        .collection('users')
+        .collection("users")
         .doc(userId)
         .update({
           tier: 0,
           flair: null,
-          subscriptionStatus: 'canceled',
+          subscriptionStatus: "canceled",
           subscriptionEndDate: admin.firestore.Timestamp.fromDate(
-            new Date(subscription.ended_at * 1000)
+            new Date(subscription.ended_at * 1000),
           ),
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
@@ -1029,7 +1036,7 @@ async function handleSubscriptionDeleted(subscription) {
       console.log(`✅ Subscription deleted for user ${userId}`);
     }
   } catch (error) {
-    console.error('❌ Error handling subscription deleted:', error);
+    console.error("❌ Error handling subscription deleted:", error);
   }
 }
 
@@ -1044,24 +1051,24 @@ async function handlePaymentSucceeded(invoice) {
     if (userId) {
       await admin
         .firestore()
-        .collection('users')
+        .collection("users")
         .doc(userId)
         .update({
           lastPaymentDate: admin.firestore.Timestamp.fromDate(
-            new Date(invoice.created * 1000)
+            new Date(invoice.created * 1000),
           ),
           totalDonated: admin.firestore.FieldValue.increment(
-            invoice.amount_paid / 100
+            invoice.amount_paid / 100,
           ),
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
 
       console.log(
-        `✅ Payment succeeded for user ${userId}: $${invoice.amount_paid / 100}`
+        `✅ Payment succeeded for user ${userId}: $${invoice.amount_paid / 100}`,
       );
     }
   } catch (error) {
-    console.error('❌ Error handling payment succeeded:', error);
+    console.error("❌ Error handling payment succeeded:", error);
   }
 }
 
@@ -1077,21 +1084,21 @@ async function handlePaymentFailed(invoice) {
       // Log the failed payment
       await admin
         .firestore()
-        .collection('payment_failures')
+        .collection("payment_failures")
         .add({
           userId,
           invoiceId: invoice.id,
           amount: invoice.amount_due / 100,
-          failureReason: invoice.last_payment_error?.message || 'Unknown',
+          failureReason: invoice.last_payment_error?.message || "Unknown",
           timestamp: admin.firestore.FieldValue.serverTimestamp(),
         });
 
       console.log(
-        `❌ Payment failed for user ${userId}: ${invoice.last_payment_error?.message}`
+        `❌ Payment failed for user ${userId}: ${invoice.last_payment_error?.message}`,
       );
     }
   } catch (error) {
-    console.error('❌ Error handling payment failed:', error);
+    console.error("❌ Error handling payment failed:", error);
   }
 }
 
@@ -1108,7 +1115,7 @@ async function handleTrialWillEnd(subscription) {
       // Could implement notification logic here
     }
   } catch (error) {
-    console.error('❌ Error handling trial will end:', error);
+    console.error("❌ Error handling trial will end:", error);
   }
 }
 
@@ -1119,11 +1126,11 @@ async function handleTrialWillEnd(subscription) {
  */
 function getTierInfo(tier) {
   const tierMapping = {
-    1: { name: 'Bronze Contributor ($5)', flair: 'bronze' },
-    2: { name: 'Silver Supporter ($10)', flair: 'silver' },
-    3: { name: 'Gold Patron ($20)', flair: 'gold' },
+    1: { name: "Bronze Contributor ($5)", flair: "bronze" },
+    2: { name: "Silver Supporter ($10)", flair: "silver" },
+    3: { name: "Gold Patron ($20)", flair: "gold" },
   };
-  return tierMapping[tier] || { name: 'Free Member', flair: null };
+  return tierMapping[tier] || { name: "Free Member", flair: null };
 }
 
 /**

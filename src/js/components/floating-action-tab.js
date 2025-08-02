@@ -58,10 +58,10 @@ class FloatingActionTab {
    */
   async initializeDataHandler() {
     try {
-      // Get DataHandler from app instance
+      // Get DataHandler from multiple possible sources
       const app =
         window.simulateAIApp || window.app || window.simulateAI || null;
-      this.dataHandler = app?.dataHandler || null;
+      this.dataHandler = app?.dataHandler || window.dataHandler || null;
 
       if (this.dataHandler) {
         await this.loadAnalyticsData();

@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PWA System Test - SimulateAI</title>
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        line-height: 1.6;
+      }
+      .test-section {
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+      .status.success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .status.error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .status.warning {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      pre {
+        background-color: #f8f9fa;
+        padding: 10px;
+        border-radius: 4px;
+        overflow-x: auto;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔧 PWA System Test</h1>
+    <p>
+      This tool tests the Progressive Web App functionality and identifies any
+      issues.
+    </p>
+
+    <div class="test-section">
+      <h2>📋 Manifest Validation</h2>
+      <div id="manifest-status">Testing...</div>
+      <button onclick="testManifest()">Test Manifest</button>
+      <pre id="manifest-details"></pre>
+    </div>
+
+    <div class="test-section">
+      <h2>⚙️ Service Worker Status</h2>
+      <div id="sw-status">Testing...</div>
+      <button onclick="testServiceWorker()">Test Service Worker</button>
+      <pre id="sw-details"></pre>
+    </div>
+
+    <div class="test-section">
+      <h2>🔄 PWA Installation</h2>
+      <div id="install-status">Testing...</div>
+      <button onclick="testInstallability()">Test Installability</button>
+      <button
+        onclick="forceInstallPrompt()"
+        id="install-btn"
+        style="display: none"
+      >
+        Install PWA
+      </button>
+      <pre id="install-details"></pre>
+    </div>
+
+    <div class="test-section">
+      <h2>💾 Cache Management</h2>
+      <div id="cache-status">Testing...</div>
+      <button onclick="testCaches()">Test Caches</button>
+      <button onclick="clearAllCaches()">Clear All Caches</button>
+      <pre id="cache-details"></pre>
+    </div>
+
+    <div class="test-section">
+      <h2>🌐 Network & Offline</h2>
+      <div id="network-status">Testing...</div>
+      <button onclick="testNetworkStatus()">Test Network</button>
+      <pre id="network-details"></pre>
+    </div>
+
+    <script>
+      let installPromptEvent = null;
+
+      // Listen for install prompt
+      window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        installPromptEvent = e;
+        document.getElementById("install-btn").style.display = "inline-block";
+        updateStatus("install-status", "success", "✅ PWA is installable!");
+      });
+
+      async function testManifest() {
+        try {
+          updateStatus("manifest-status", "warning", "⏳ Testing manifest...");
+
+          const response = await fetch("/manifest.json");
+          if (!response.ok) {
+            throw new Error(`Manifest fetch failed: ${response.status}`);
+          }
+
+          const manifest = await response.json();
+
+          // Validate required fields
+          const required = ["name", "start_url", "display", "icons"];
+          const missing = required.filter((field) => !manifest[field]);
+
+          if (missing.length > 0) {
+            throw new Error(`Missing required fields: ${missing.join(", ")}`);
+          }
+
+          // Test icons
+          const iconTests = await Promise.all(
+            manifest.icons.map(async (icon) => {
+              try {
+                const iconResponse = await fetch(icon.src);
+                return {
+                  src: icon.src,
+                  status: iconResponse.ok
+                    ? "OK"
+                    : `Error: ${iconResponse.status}`,
+                };
+              } catch (error) {
+                return {
+                  src: icon.src,
+                  status: `Error: ${error.message}`,
+                };
+              }
+            }),
+          );
+
+          updateStatus("manifest-status", "success", "✅ Manifest is valid!");
+          document.getElementById("manifest-details").textContent =
+            JSON.stringify(
+              {
+                manifest: manifest,
+                iconTests: iconTests,
+              },
+              null,
+              2,
+            );
+        } catch (error) {
+          updateStatus(
+            "manifest-status",
+            "error",
+            `❌ Manifest error: ${error.message}`,
+          );
+          document.getElementById("manifest-details").textContent = error.stack;
+        }
+      }
+
+      async function testServiceWorker() {
+        try {
+          updateStatus("sw-status", "warning", "⏳ Testing service worker...");
+
+          if (!("serviceWorker" in navigator)) {
+            throw new Error("Service Workers not supported");
+          }
+
+          const registration = await navigator.serviceWorker.getRegistration();
+
+          if (!registration) {
+            throw new Error("No service worker registered");
+          }
+
+          const swInfo = {
+            scope: registration.scope,
+            active: registration.active
+              ? {
+                  state: registration.active.state,
+                  url: registration.active.scriptURL,
+                }
+              : null,
+            waiting: registration.waiting
+              ? {
+                  state: registration.waiting.state,
+                  url: registration.waiting.scriptURL,
+                }
+              : null,
+            installing: registration.installing
+              ? {
+                  state: registration.installing.state,
+                  url: registration.installing.scriptURL,
+                }
+              : null,
+          };
+
+          updateStatus(
+            "sw-status",
+            "success",
+            "✅ Service Worker is registered and active!",
+          );
+          document.getElementById("sw-details").textContent = JSON.stringify(
+            swInfo,
+            null,
+            2,
+          );
+        } catch (error) {
+          updateStatus(
+            "sw-status",
+            "error",
+            `❌ Service Worker error: ${error.message}`,
+          );
+          document.getElementById("sw-details").textContent = error.stack;
+        }
+      }
+
+      async function testInstallability() {
+        try {
+          updateStatus(
+            "install-status",
+            "warning",
+            "⏳ Testing installability...",
+          );
+
+          // Check if already installed
+          if (
+            window.matchMedia &&
+            window.matchMedia("(display-mode: standalone)").matches
+          ) {
+            updateStatus(
+              "install-status",
+              "success",
+              "✅ PWA is already installed!",
+            );
+            return;
+          }
+
+          // Check for install prompt
+          if (installPromptEvent) {
+            updateStatus("install-status", "success", "✅ PWA is installable!");
+          } else {
+            updateStatus(
+              "install-status",
+              "warning",
+              "⚠️ Install prompt not available (may already be installed or installability criteria not met)",
+            );
+          }
+
+          const installDetails = {
+            displayMode: window.matchMedia("(display-mode: standalone)").matches
+              ? "standalone"
+              : "browser",
+            installPromptAvailable: !!installPromptEvent,
+            userAgent: navigator.userAgent,
+          };
+
+          document.getElementById("install-details").textContent =
+            JSON.stringify(installDetails, null, 2);
+        } catch (error) {
+          updateStatus(
+            "install-status",
+            "error",
+            `❌ Installability error: ${error.message}`,
+          );
+          document.getElementById("install-details").textContent = error.stack;
+        }
+      }
+
+      async function forceInstallPrompt() {
+        if (installPromptEvent) {
+          const choiceResult = await installPromptEvent.prompt();
+          updateStatus(
+            "install-status",
+            "success",
+            `Install choice: ${choiceResult.outcome}`,
+          );
+          installPromptEvent = null;
+          document.getElementById("install-btn").style.display = "none";
+        }
+      }
+
+      async function testCaches() {
+        try {
+          updateStatus("cache-status", "warning", "⏳ Testing caches...");
+
+          if (!("caches" in window)) {
+            throw new Error("Cache API not supported");
+          }
+
+          const cacheNames = await caches.keys();
+          const cacheDetails = {};
+
+          for (const cacheName of cacheNames) {
+            const cache = await caches.open(cacheName);
+            const keys = await cache.keys();
+            cacheDetails[cacheName] = {
+              entries: keys.length,
+              urls: keys.slice(0, 10).map((req) => req.url), // Show first 10 URLs
+            };
+          }
+
+          updateStatus(
+            "cache-status",
+            "success",
+            `✅ Found ${cacheNames.length} cache(s)`,
+          );
+          document.getElementById("cache-details").textContent = JSON.stringify(
+            cacheDetails,
+            null,
+            2,
+          );
+        } catch (error) {
+          updateStatus(
+            "cache-status",
+            "error",
+            `❌ Cache error: ${error.message}`,
+          );
+          document.getElementById("cache-details").textContent = error.stack;
+        }
+      }
+
+      async function clearAllCaches() {
+        try {
+          const cacheNames = await caches.keys();
+          await Promise.all(cacheNames.map((name) => caches.delete(name)));
+          updateStatus(
+            "cache-status",
+            "success",
+            `✅ Cleared ${cacheNames.length} cache(s)`,
+          );
+          document.getElementById("cache-details").textContent =
+            "All caches cleared";
+        } catch (error) {
+          updateStatus(
+            "cache-status",
+            "error",
+            `❌ Cache clear error: ${error.message}`,
+          );
+        }
+      }
+
+      function testNetworkStatus() {
+        const networkInfo = {
+          online: navigator.onLine,
+          connection: navigator.connection
+            ? {
+                effectiveType: navigator.connection.effectiveType,
+                downlink: navigator.connection.downlink,
+                rtt: navigator.connection.rtt,
+              }
+            : "Connection API not supported",
+        };
+
+        updateStatus(
+          "network-status",
+          "success",
+          `✅ Network status: ${navigator.onLine ? "Online" : "Offline"}`,
+        );
+        document.getElementById("network-details").textContent = JSON.stringify(
+          networkInfo,
+          null,
+          2,
+        );
+      }
+
+      function updateStatus(elementId, type, message) {
+        const element = document.getElementById(elementId);
+        element.className = `status ${type}`;
+        element.textContent = message;
+      }
+
+      // Auto-run tests on load
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          testManifest();
+          testServiceWorker();
+          testInstallability();
+          testCaches();
+          testNetworkStatus();
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>

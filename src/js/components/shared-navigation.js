@@ -438,14 +438,23 @@ class SharedNavigation {
       // Fallback to localStorage
       const localData = localStorage.getItem("nav_telemetry");
       if (localData) {
-        const parsed = JSON.parse(localData);
-        if (Array.isArray(parsed)) {
-          // Migrate to DataHandler
-          await this.dataHandler.saveData("nav_telemetry", parsed);
-          console.log(
-            "📊 Navigation telemetry migrated from localStorage to DataHandler",
+        try {
+          const parsed = JSON.parse(localData);
+          if (Array.isArray(parsed)) {
+            // Migrate to DataHandler
+            await this.dataHandler.saveData("nav_telemetry", parsed);
+            console.log(
+              "📊 Navigation telemetry migrated from localStorage to DataHandler",
+            );
+            return parsed;
+          }
+        } catch (parseError) {
+          console.warn(
+            "Failed to parse navigation telemetry from localStorage:",
+            parseError,
           );
-          return parsed;
+          // Clear corrupted data
+          localStorage.removeItem("nav_telemetry");
         }
       }
 
@@ -1727,9 +1736,12 @@ class SharedNavigation {
 
     // Trigger sign in through app instance or fallback
     if (typeof window.app !== "undefined" && window.app.authService) {
-      window.app.authService.signIn();
+      window.app.authService.showLoginModal();
     } else {
-      // Authentication not available
+      // Authentication not available, try to show a simple alert or redirect
+      alert(
+        "Please refresh the page and try again. Authentication service is not available.",
+      );
     }
   }
 

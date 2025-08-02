@@ -15,6 +15,7 @@
  */
 
 import { defineConfig } from "vite";
+import fs from "fs";
 
 export default defineConfig(() => {
   // For custom domain (simulateai.io), always use root path
@@ -55,6 +56,77 @@ export default defineConfig(() => {
             name: "copy-config-files",
             generateBundle() {
               // Config files will be handled by copyPublicDir
+            },
+          },
+          // Copy additional required files
+          {
+            name: "copy-additional-files",
+            generateBundle() {
+              // Copy firebase-emergency-fix.js to root of dist
+              try {
+                const firebaseFixContent = fs.readFileSync(
+                  "firebase-emergency-fix.js",
+                  "utf8",
+                );
+                this.emitFile({
+                  type: "asset",
+                  fileName: "firebase-emergency-fix.js",
+                  source: firebaseFixContent,
+                });
+              } catch (e) {
+                console.warn(
+                  "Could not copy firebase-emergency-fix.js:",
+                  e.message,
+                );
+              }
+
+              // Copy media.css to src/styles/
+              try {
+                const mediaCssContent = fs.readFileSync(
+                  "src/styles/media.css",
+                  "utf8",
+                );
+                this.emitFile({
+                  type: "asset",
+                  fileName: "src/styles/media.css",
+                  source: mediaCssContent,
+                });
+              } catch (e) {
+                console.warn("Could not copy media.css:", e.message);
+              }
+
+              // Copy default-avatar.svg to src/assets/avatars/
+              try {
+                const defaultAvatarContent = fs.readFileSync(
+                  "src/assets/avatars/default-avatar.svg",
+                  "utf8",
+                );
+                this.emitFile({
+                  type: "asset",
+                  fileName: "src/assets/avatars/default-avatar.svg",
+                  source: defaultAvatarContent,
+                });
+              } catch (e) {
+                console.warn("Could not copy default-avatar.svg:", e.message);
+              }
+
+              // Copy shared-navigation.html to src/components/
+              try {
+                const sharedNavContent = fs.readFileSync(
+                  "src/components/shared-navigation.html",
+                  "utf8",
+                );
+                this.emitFile({
+                  type: "asset",
+                  fileName: "src/components/shared-navigation.html",
+                  source: sharedNavContent,
+                });
+              } catch (e) {
+                console.warn(
+                  "Could not copy shared-navigation.html:",
+                  e.message,
+                );
+              }
             },
           },
         ],
@@ -132,5 +204,6 @@ export default defineConfig(() => {
       "**/*.json",
     ],
     publicDir: "public",
+    copyPublicDir: true,
   };
 });
