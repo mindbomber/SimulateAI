@@ -10,7 +10,7 @@
 
     <style>
       body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         max-width: 1200px;
         margin: 0 auto;
         padding: 20px;
@@ -142,7 +142,7 @@
         color: #ecf0f1;
         padding: 20px;
         border-radius: 8px;
-        font-family: 'Courier New', monospace;
+        font-family: "Courier New", monospace;
         overflow-x: auto;
         margin: 15px 0;
       }
@@ -181,7 +181,7 @@
       </p>
 
       <div class="status info">
-        <strong>ℹ️ Site Key:</strong> 6LfizIQrAAAAAETdjKY14uI3ckhF-JeUujcloH53
+        <strong>ℹ️ Site Key:</strong> 6LcuUpsrAAAAAEzAeX1qx0cjShEt7Nf0f73rvLjf
         <br /><strong>🔧 Implementation:</strong> Google reCAPTCHA v3 with
         automatic button binding
       </div>
@@ -218,7 +218,7 @@
 
             <button
               class="btn g-recaptcha"
-              data-sitekey="6LfizIQrAAAAAETdjKY14uI3ckhF-JeUujcloH53"
+              data-sitekey="6LcuUpsrAAAAAEzAeX1qx0cjShEt7Nf0f73rvLjf"
               data-callback="onAutoSubmit"
               data-action="contact_form"
             >
@@ -228,7 +228,7 @@
 
           <div class="code-block">
             &lt;button class="g-recaptcha btn"
-            data-sitekey="6LfizIQrAAAAAETdjKY14uI3ckhF-JeUujcloH53"
+            data-sitekey="6LcuUpsrAAAAAEzAeX1qx0cjShEt7Nf0f73rvLjf"
             data-callback='onAutoSubmit' data-action='contact_form'&gt; Submit
             &lt;/button&gt; &lt;script&gt; function onAutoSubmit(token) {
             document.getElementById("autoForm").submit(); } &lt;/script&gt;
@@ -425,16 +425,16 @@
       // Import reCAPTCHA service
       import recaptchaService, {
         RECAPTCHA_CONFIG,
-      } from './src/js/services/recaptcha-service.js';
+      } from "./src/js/services/recaptcha-service.js";
 
       // Global callback for auto-binding method
       window.onAutoSubmit = function (token) {
-        console.log('Auto-submit token received:', token);
+        console.log("Auto-submit token received:", token);
 
         // Show success message
         showStatus(
-          '✅ Auto-submit successful! Token: ' + token.substring(0, 20) + '...',
-          'success'
+          "✅ Auto-submit successful! Token: " + token.substring(0, 20) + "...",
+          "success",
         );
 
         // In a real app, you would submit the form here
@@ -446,13 +446,13 @@
         try {
           const button = event.target;
           button.disabled = true;
-          button.textContent = '🔄 Generating token...';
+          button.textContent = "🔄 Generating token...";
 
           const token =
-            await recaptchaService.executeRecaptcha('research_consent');
+            await recaptchaService.executeRecaptcha("research_consent");
 
           // Display token (truncated for security)
-          const tokenDisplay = document.getElementById('token-display');
+          const tokenDisplay = document.getElementById("token-display");
           tokenDisplay.innerHTML = `
                     <div class="status success">
                         <strong>✅ Token Generated Successfully!</strong><br>
@@ -462,62 +462,62 @@
                 `;
 
           button.disabled = false;
-          button.textContent = '🧪 Generate Token Manually';
+          button.textContent = "🧪 Generate Token Manually";
         } catch (error) {
-          console.error('Manual reCAPTCHA failed:', error);
-          showStatus('❌ Token generation failed: ' + error.message, 'error');
+          console.error("Manual reCAPTCHA failed:", error);
+          showStatus("❌ Token generation failed: " + error.message, "error");
 
           button.disabled = false;
-          button.textContent = '🧪 Generate Token Manually';
+          button.textContent = "🧪 Generate Token Manually";
         }
       };
 
       // Protect forms with reCAPTCHA service
       function setupFormProtection() {
-        const serviceForm = document.getElementById('serviceForm');
-        const loginForm = document.getElementById('loginForm');
-        const signupForm = document.getElementById('signupForm');
+        const serviceForm = document.getElementById("serviceForm");
+        const loginForm = document.getElementById("loginForm");
+        const signupForm = document.getElementById("signupForm");
 
         if (serviceForm) {
           recaptchaService.protectForm(
             serviceForm,
-            'feedback_form',
+            "feedback_form",
             async (form, token) => {
-              console.log('Service form submitted with token:', token);
-              showStatus('✅ Service form submitted successfully!', 'success');
-            }
+              console.log("Service form submitted with token:", token);
+              showStatus("✅ Service form submitted successfully!", "success");
+            },
           );
         }
 
         if (loginForm) {
           recaptchaService.protectForm(
             loginForm,
-            'auth_login',
+            "auth_login",
             async (form, token) => {
-              console.log('Login form submitted with token:', token);
-              showStatus('🔑 Login form submitted successfully!', 'success');
-            }
+              console.log("Login form submitted with token:", token);
+              showStatus("🔑 Login form submitted successfully!", "success");
+            },
           );
         }
 
         if (signupForm) {
           recaptchaService.protectForm(
             signupForm,
-            'auth_signup',
+            "auth_signup",
             async (form, token) => {
-              console.log('Signup form submitted with token:', token);
+              console.log("Signup form submitted with token:", token);
               showStatus(
-                '👤 Registration form submitted successfully!',
-                'success'
+                "👤 Registration form submitted successfully!",
+                "success",
               );
-            }
+            },
           );
         }
       }
 
       // Status display helper
       function showStatus(message, type) {
-        const statusEl = document.getElementById('integrationStatus');
+        const statusEl = document.getElementById("integrationStatus");
         statusEl.textContent = message;
         statusEl.className = `status ${type}`;
       }
@@ -526,7 +526,7 @@
       async function checkIntegrationStatus() {
         try {
           // Wait for reCAPTCHA to load
-          await new Promise(resolve => {
+          await new Promise((resolve) => {
             if (window.grecaptcha && window.grecaptcha.ready) {
               window.grecaptcha.ready(resolve);
             } else {
@@ -536,24 +536,24 @@
 
           if (recaptchaService.isReady()) {
             showStatus(
-              '✅ reCAPTCHA integration successful! All examples are ready to use.',
-              'success'
+              "✅ reCAPTCHA integration successful! All examples are ready to use.",
+              "success",
             );
             setupFormProtection();
           } else {
-            showStatus('⏳ reCAPTCHA is loading... Please wait.', 'info');
+            showStatus("⏳ reCAPTCHA is loading... Please wait.", "info");
             setTimeout(checkIntegrationStatus, 2000);
           }
         } catch (error) {
           showStatus(
-            '❌ reCAPTCHA integration failed: ' + error.message,
-            'error'
+            "❌ reCAPTCHA integration failed: " + error.message,
+            "error",
           );
         }
       }
 
       // Initialize on page load
-      document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener("DOMContentLoaded", () => {
         checkIntegrationStatus();
       });
 

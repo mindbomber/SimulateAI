@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Google OAuth Quick Test - SimulateAI</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .test-container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .status {
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .warning {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
+      .info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      button:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+      }
+      pre {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 4px;
+        overflow-x: auto;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔐 Google OAuth Quick Test</h1>
+
+    <div class="test-container">
+      <h2>Configuration Check</h2>
+      <div id="config-status" class="status info">
+        Checking configuration...
+      </div>
+      <pre id="config-details"></pre>
+    </div>
+
+    <div class="test-container">
+      <h2>Domain Authorization</h2>
+      <div id="domain-status" class="status info">
+        Checking domain authorization...
+      </div>
+      <pre id="domain-details"></pre>
+    </div>
+
+    <div class="test-container">
+      <h2>Google Sign-In Test</h2>
+      <div id="auth-status" class="status info">Ready to test</div>
+      <button id="test-google-signin">🔍 Test Google Sign-In</button>
+      <button id="test-popup">🪟 Test Popup Blocker</button>
+      <pre id="auth-details"></pre>
+    </div>
+
+    <div class="test-container">
+      <h2>Network & Security</h2>
+      <div id="network-status" class="status info">
+        Checking network and security...
+      </div>
+      <pre id="network-details"></pre>
+    </div>
+
+    <script type="module">
+      // Import Firebase modules
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import {
+        getAuth,
+        GoogleAuthProvider,
+        signInWithPopup,
+        onAuthStateChanged,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyAwoc3L-43aXyNjNB9ncGbFm7eE-yn5bFA",
+        authDomain: "simulateai-research.firebaseapp.com",
+        projectId: "simulateai-research",
+        storageBucket: "simulateai-research.firebasestorage.app",
+        messagingSenderId: "52924445915",
+        appId: "1:52924445915:web:dadca1a93bc382403a08fe",
+        measurementId: "G-XW8H062BMV",
+      };
+
+      let app, auth;
+
+      function updateStatus(elementId, type, message) {
+        const element = document.getElementById(elementId);
+        element.className = `status ${type}`;
+        element.textContent = message;
+      }
+
+      function updateDetails(elementId, content) {
+        document.getElementById(elementId).textContent = content;
+      }
+
+      // 1. Configuration Check
+      async function checkConfiguration() {
+        try {
+          app = initializeApp(firebaseConfig);
+          auth = getAuth(app);
+
+          updateStatus(
+            "config-status",
+            "success",
+            "✅ Firebase initialized successfully",
+          );
+          updateDetails(
+            "config-details",
+            JSON.stringify(
+              {
+                projectId: firebaseConfig.projectId,
+                authDomain: firebaseConfig.authDomain,
+                currentDomain: window.location.hostname,
+                currentOrigin: window.location.origin,
+              },
+              null,
+              2,
+            ),
+          );
+
+          return true;
+        } catch (error) {
+          updateStatus(
+            "config-status",
+            "error",
+            `❌ Firebase initialization failed: ${error.message}`,
+          );
+          updateDetails("config-details", error.stack);
+          return false;
+        }
+      }
+
+      // 2. Domain Authorization Check
+      function checkDomainAuthorization() {
+        const currentDomain = window.location.hostname;
+        const currentOrigin = window.location.origin;
+        const expectedDomains = [
+          "simulateai.io",
+          "www.simulateai.io",
+          "localhost",
+          "127.0.0.1",
+        ];
+
+        const isAuthorized = expectedDomains.includes(currentDomain);
+
+        if (isAuthorized) {
+          updateStatus(
+            "domain-status",
+            "success",
+            "✅ Domain should be authorized",
+          );
+        } else {
+          updateStatus(
+            "domain-status",
+            "warning",
+            "⚠️ Domain may not be authorized",
+          );
+        }
+
+        updateDetails(
+          "domain-details",
+          JSON.stringify(
+            {
+              currentDomain,
+              currentOrigin,
+              expectedDomains,
+              isAuthorized,
+              authDomain: firebaseConfig.authDomain,
+            },
+            null,
+            2,
+          ),
+        );
+      }
+
+      // 3. Network & Security Check
+      function checkNetworkSecurity() {
+        const checks = {
+          https:
+            window.location.protocol === "https:" ||
+            window.location.hostname === "localhost",
+          cookies: navigator.cookieEnabled,
+          onLine: navigator.onLine,
+          userAgent: navigator.userAgent,
+          referrer: document.referrer || "none",
+        };
+
+        if (checks.https && checks.cookies && checks.onLine) {
+          updateStatus(
+            "network-status",
+            "success",
+            "✅ Network and security settings look good",
+          );
+        } else {
+          updateStatus(
+            "network-status",
+            "warning",
+            "⚠️ Some security settings may cause issues",
+          );
+        }
+
+        updateDetails("network-details", JSON.stringify(checks, null, 2));
+      }
+
+      // 4. Test Google Sign-In
+      async function testGoogleSignIn() {
+        if (!auth) {
+          updateStatus("auth-status", "error", "❌ Firebase not initialized");
+          return;
+        }
+
+        updateStatus("auth-status", "info", "⏳ Testing Google sign-in...");
+
+        try {
+          const provider = new GoogleAuthProvider();
+          provider.addScope("profile");
+          provider.addScope("email");
+
+          const result = await signInWithPopup(auth, provider);
+          const user = result.user;
+
+          updateStatus(
+            "auth-status",
+            "success",
+            "✅ Google sign-in successful!",
+          );
+          updateDetails(
+            "auth-details",
+            JSON.stringify(
+              {
+                success: true,
+                userEmail: user.email,
+                userName: user.displayName,
+                userUid: user.uid,
+                providerData: user.providerData,
+              },
+              null,
+              2,
+            ),
+          );
+        } catch (error) {
+          updateStatus(
+            "auth-status",
+            "error",
+            `❌ Google sign-in failed: ${error.message}`,
+          );
+          updateDetails(
+            "auth-details",
+            JSON.stringify(
+              {
+                success: false,
+                errorCode: error.code,
+                errorMessage: error.message,
+                errorStack: error.stack,
+              },
+              null,
+              2,
+            ),
+          );
+        }
+      }
+
+      // 5. Test Popup Blocker
+      function testPopupBlocker() {
+        try {
+          const testWindow = window.open("", "_blank", "width=1,height=1");
+          if (testWindow) {
+            testWindow.close();
+            updateStatus("auth-status", "success", "✅ Popups are allowed");
+          } else {
+            updateStatus(
+              "auth-status",
+              "error",
+              "❌ Popups are blocked - this will prevent Google sign-in",
+            );
+          }
+        } catch (error) {
+          updateStatus(
+            "auth-status",
+            "error",
+            `❌ Popup test failed: ${error.message}`,
+          );
+        }
+      }
+
+      // Initialize tests
+      async function runTests() {
+        const configOK = await checkConfiguration();
+
+        if (configOK) {
+          checkDomainAuthorization();
+          checkNetworkSecurity();
+        }
+      }
+
+      // Event listeners
+      document
+        .getElementById("test-google-signin")
+        .addEventListener("click", testGoogleSignIn);
+      document
+        .getElementById("test-popup")
+        .addEventListener("click", testPopupBlocker);
+
+      // Run tests on load
+      runTests();
+    </script>
+  </body>
+</html>

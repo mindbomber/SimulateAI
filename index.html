@@ -1134,11 +1134,17 @@
     <link rel="preload" href="./src/js/app.js" as="script" crossorigin />
 
     <!-- Load CSS Files -->
+    <link rel="stylesheet" href="./src/styles/css-layers.css" />
+    <link rel="stylesheet" href="./src/styles/design-tokens.css" />
     <link rel="stylesheet" href="./src/styles/media.css" />
     <link rel="stylesheet" href="./src/styles/shared-navigation.css" />
     <link rel="stylesheet" href="./src/styles/settings-menu.css" />
     <link rel="stylesheet" href="./src/styles/badge-modal.css" />
     <link rel="stylesheet" href="./src/styles/pwa-notifications.css" />
+    <link
+      rel="stylesheet"
+      href="./src/styles/components/gdpr-cookie-notice-fallback.css"
+    />
 
     <!-- Early theme initialization - Apply theme immediately to prevent FOUC -->
     <script src="./src/js/utils/early-theme-init.js"></script>
@@ -2180,5 +2186,12 @@
         }
       }
     </script>
+
+    <!-- GDPR Cookie Notice -->
+    <script
+      type="module"
+      src="./src/js/components/gdpr-cookie-notice.js"
+    ></script>
+    <script type="module" src="./src/js/utils/gdpr-init.js"></script>
   </body>
 </html>

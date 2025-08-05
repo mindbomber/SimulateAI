@@ -34,7 +34,7 @@ if (typeof self !== "undefined") {
   // Check if running in a browser environment
   appCheck = initializeAppCheck(app, {
     provider: new ReCaptchaV3Provider(
-      "6LfizIQrAAAAAETdjKY14uI3ckhF-JeUujcloH53",
+      "6LcuUpsrAAAAAEzAeX1qx0cjShEt7Nf0f73rvLjf",
     ),
     // Optional: enable debug mode locally
     isTokenAutoRefreshEnabled: true,

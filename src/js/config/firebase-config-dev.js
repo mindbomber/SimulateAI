@@ -15,9 +15,9 @@ export const firebaseConfig = {
 // VAPID Key for development (placeholder)
 export const VAPID_KEY = "dev-vapid-key-placeholder";
 
-// reCAPTCHA v3 Configuration (development)
+// reCAPTCHA Enterprise Configuration (development)
 export const recaptchaConfig = {
-  siteKey: "dev-recaptcha-site-key",
+  siteKey: "6LcuUpsrAAAAAEzAeX1qx0cjShEt7Nf0f73rvLjf", // Production Enterprise key for development testing
   action: "submit",
 };
 

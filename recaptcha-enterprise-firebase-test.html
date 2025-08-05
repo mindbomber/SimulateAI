@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>reCAPTCHA Enterprise Firebase Functions Test</title>
+    <script src="https://www.google.com/recaptcha/enterprise.js?render=6LcuUpsrAAAAAEzAeX1qx0cjShEt7Nf0f73rvLjf"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      button {
+        background: #4285f4;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin: 10px 5px;
+      }
+      button:hover {
+        background: #3367d6;
+      }
+      button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+      .result {
+        margin: 20px 0;
+        padding: 15px;
+        border-radius: 5px;
+        white-space: pre-wrap;
+        font-family: monospace;
+        font-size: 14px;
+      }
+      .success {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+      }
+      .error {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+      }
+      .info {
+        background: #d1ecf1;
+        border: 1px solid #bee5eb;
+        color: #0c5460;
+      }
+      .endpoints {
+        background: #e2e3e5;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 20px 0;
+      }
+      .endpoints h3 {
+        margin-top: 0;
+        color: #495057;
+      }
+      .endpoint {
+        font-family: monospace;
+        background: #f8f9fa;
+        padding: 8px;
+        border-radius: 3px;
+        margin: 5px 0;
+        word-break: break-all;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔒 reCAPTCHA Enterprise Firebase Functions Test</h1>
+
+      <div class="endpoints">
+        <h3>Deployed Firebase Functions:</h3>
+        <div class="endpoint">
+          <strong>Verification:</strong>
+          https://us-central1-simulateai-research.cloudfunctions.net/verifyRecaptcha
+        </div>
+        <div class="endpoint">
+          <strong>Health Check:</strong>
+          https://us-central1-simulateai-research.cloudfunctions.net/recaptchaHealth
+        </div>
+      </div>
+
+      <button onclick="testHealthCheck()">🏥 Test Health Check</button>
+      <button onclick="testVerification('high')">🔒 Test High Security</button>
+      <button onclick="testVerification('medium')">
+        🔐 Test Medium Security
+      </button>
+      <button onclick="testVerification('low')">🔓 Test Low Security</button>
+      <button onclick="clearResults()">🧹 Clear Results</button>
+
+      <div id="results"></div>
+    </div>
+
+    <script>
+      const SITE_KEY = "6LcuUpsrAAAAAEzAeX1qx0cjShEt7Nf0f73rvLjf";
+      const VERIFY_URL =
+        "https://us-central1-simulateai-research.cloudfunctions.net/verifyRecaptcha";
+      const HEALTH_URL =
+        "https://us-central1-simulateai-research.cloudfunctions.net/recaptchaHealth";
+
+      function addResult(content, type = "info") {
+        const resultsDiv = document.getElementById("results");
+        const resultDiv = document.createElement("div");
+        resultDiv.className = `result ${type}`;
+        resultDiv.textContent = content;
+        resultsDiv.appendChild(resultDiv);
+        resultsDiv.scrollTop = resultsDiv.scrollHeight;
+      }
+
+      function clearResults() {
+        document.getElementById("results").innerHTML = "";
+      }
+
+      async function testHealthCheck() {
+        addResult("🏥 Testing health check endpoint...", "info");
+
+        try {
+          const response = await fetch(HEALTH_URL);
+          const data = await response.json();
+
+          if (response.ok) {
+            addResult(
+              `✅ Health Check Success:\n${JSON.stringify(data, null, 2)}`,
+              "success",
+            );
+          } else {
+            addResult(
+              `❌ Health Check Failed:\n${JSON.stringify(data, null, 2)}`,
+              "error",
+            );
+          }
+        } catch (error) {
+          addResult(`❌ Health Check Error: ${error.message}`, "error");
+        }
+      }
+
+      async function testVerification(securityLevel) {
+        const button = event.target;
+        button.disabled = true;
+
+        addResult(
+          `🔍 Generating reCAPTCHA token for ${securityLevel} security test...`,
+          "info",
+        );
+
+        try {
+          // Generate reCAPTCHA token
+          const token = await grecaptcha.enterprise.execute(SITE_KEY, {
+            action: "domain_test",
+          });
+
+          addResult(
+            `✅ Token generated successfully (${token.substring(0, 50)}...)`,
+            "success",
+          );
+          addResult(
+            `🔒 Testing verification with ${securityLevel} security level...`,
+            "info",
+          );
+
+          // Test verification
+          const verifyResponse = await fetch(VERIFY_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              token: token,
+              action: "domain_test",
+              securityLevel: securityLevel,
+              siteKey: SITE_KEY,
+            }),
+          });
+
+          const verifyData = await verifyResponse.json();
+
+          if (verifyResponse.ok) {
+            if (verifyData.success) {
+              addResult(
+                `✅ Verification Success (${securityLevel}):\nScore: ${verifyData.score}\nReasons: ${verifyData.reasons.join(", ")}\nValid: ${verifyData.valid}`,
+                "success",
+              );
+            } else {
+              addResult(
+                `⚠️ Verification Failed (${securityLevel}):\nScore: ${verifyData.score}\nError: ${verifyData.error || "Score below threshold"}\nReasons: ${verifyData.reasons?.join(", ") || "None"}`,
+                "error",
+              );
+            }
+          } else {
+            addResult(
+              `❌ Verification API Error (${securityLevel}):\n${JSON.stringify(verifyData, null, 2)}`,
+              "error",
+            );
+          }
+        } catch (error) {
+          addResult(
+            `❌ Test Error (${securityLevel}): ${error.message}`,
+            "error",
+          );
+        } finally {
+          button.disabled = false;
+        }
+      }
+
+      // Test health check on page load
+      window.addEventListener("load", () => {
+        setTimeout(testHealthCheck, 1000);
+      });
+    </script>
+  </body>
+</html>

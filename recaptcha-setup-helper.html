@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>reCAPTCHA Enterprise Token Generator</title>
+    <script src="https://www.google.com/recaptcha/enterprise.js?render=6LcuUpsrAAAAAEzAeX1qx0cjShEt7Nf0f73rvLjf"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+      h1 {
+        color: #333;
+        margin-bottom: 20px;
+      }
+      .status {
+        background: #e7f3ff;
+        border: 1px solid #b8daff;
+        border-radius: 5px;
+        padding: 15px;
+        margin: 20px 0;
+        color: #004085;
+      }
+      button {
+        background: #4285f4;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin: 10px;
+      }
+      button:hover {
+        background: #3367d6;
+      }
+      button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+      .progress {
+        background: #f8f9fa;
+        border-radius: 5px;
+        padding: 20px;
+        margin: 20px 0;
+        font-family: monospace;
+        text-align: left;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      .success {
+        color: #28a745;
+      }
+      .error {
+        color: #dc3545;
+      }
+      .info {
+        color: #17a2b8;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔧 reCAPTCHA Enterprise Setup Helper</h1>
+
+      <div class="status">
+        <h3>📊 Dashboard Status: "Incomplete - Finish setting up your key"</h3>
+        <p>
+          This is normal for new Enterprise keys. We need to generate some token
+          requests to populate the dashboard.
+        </p>
+      </div>
+
+      <button onclick="generateTokens()" id="generateBtn">
+        🚀 Generate Test Tokens (10 requests)
+      </button>
+
+      <button onclick="generateBulkTokens()" id="bulkBtn">
+        ⚡ Generate Bulk Tokens (50 requests)
+      </button>
+
+      <button onclick="clearLog()">🧹 Clear Log</button>
+
+      <div id="progress" class="progress"></div>
+    </div>
+
+    <script>
+      const SITE_KEY = "6LcuUpsrAAAAAEzAeX1qx0cjShEt7Nf0f73rvLjf";
+
+      function log(message, type = "info") {
+        const progress = document.getElementById("progress");
+        const timestamp = new Date().toLocaleTimeString();
+        const div = document.createElement("div");
+        div.className = type;
+        div.textContent = `[${timestamp}] ${message}`;
+        progress.appendChild(div);
+        progress.scrollTop = progress.scrollHeight;
+      }
+
+      function clearLog() {
+        document.getElementById("progress").innerHTML = "";
+      }
+
+      async function generateSingleToken(action, index) {
+        try {
+          const token = await grecaptcha.enterprise.execute(SITE_KEY, {
+            action: action,
+          });
+          log(
+            `✅ Token ${index + 1} generated successfully (${action}) - ${token.substring(0, 30)}...`,
+            "success",
+          );
+          return true;
+        } catch (error) {
+          log(
+            `❌ Token ${index + 1} generation failed: ${error.message}`,
+            "error",
+          );
+          return false;
+        }
+      }
+
+      async function generateTokens() {
+        const btn = document.getElementById("generateBtn");
+        btn.disabled = true;
+
+        log("🚀 Starting token generation (10 requests)...", "info");
+
+        const actions = [
+          "auth_login",
+          "auth_signup",
+          "submit_form",
+          "contact_form",
+          "domain_test",
+          "quick_test",
+          "feedback_form",
+          "scenario_submit",
+          "research_consent",
+          "email_subscribe",
+        ];
+
+        let successCount = 0;
+
+        for (let i = 0; i < 10; i++) {
+          const action = actions[i % actions.length];
+          const success = await generateSingleToken(action, i);
+          if (success) successCount++;
+
+          // Small delay between requests
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        }
+
+        log(
+          `🎯 Generation complete: ${successCount}/10 tokens created successfully`,
+          "success",
+        );
+        log(
+          "💡 Check your reCAPTCHA Enterprise console in 2-3 minutes for data updates",
+          "info",
+        );
+
+        btn.disabled = false;
+      }
+
+      async function generateBulkTokens() {
+        const btn = document.getElementById("bulkBtn");
+        btn.disabled = true;
+
+        log("⚡ Starting bulk token generation (50 requests)...", "info");
+
+        const actions = [
+          "auth_login",
+          "auth_signup",
+          "submit_form",
+          "contact_form",
+          "domain_test",
+          "quick_test",
+          "feedback_form",
+          "scenario_submit",
+          "research_consent",
+          "email_subscribe",
+        ];
+
+        let successCount = 0;
+
+        for (let i = 0; i < 50; i++) {
+          const action = actions[i % actions.length];
+          const success = await generateSingleToken(action, i);
+          if (success) successCount++;
+
+          // Shorter delay for bulk
+          await new Promise((resolve) => setTimeout(resolve, 200));
+
+          // Progress update every 10 tokens
+          if ((i + 1) % 10 === 0) {
+            log(`📊 Progress: ${i + 1}/50 tokens processed`, "info");
+          }
+        }
+
+        log(
+          `🎯 Bulk generation complete: ${successCount}/50 tokens created successfully`,
+          "success",
+        );
+        log(
+          "💡 Your reCAPTCHA Enterprise dashboard should update within 2-3 minutes",
+          "success",
+        );
+        log(
+          '🔄 The "Incomplete" status should change to "Active" once data appears',
+          "info",
+        );
+
+        btn.disabled = false;
+      }
+
+      // Auto-generate a few tokens on page load
+      window.addEventListener("load", async () => {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        log("🔄 Auto-generating initial tokens...", "info");
+
+        for (let i = 0; i < 3; i++) {
+          await generateSingleToken("domain_test", i);
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+
+        log(
+          "✅ Initial setup complete. Use buttons above to generate more tokens.",
+          "success",
+        );
+      });
+    </script>
+  </body>
+</html>
