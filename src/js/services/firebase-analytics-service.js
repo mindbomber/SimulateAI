@@ -383,38 +383,72 @@ export class FirebaseAnalyticsService {
   }
 
   /**
-   * Track errors and exceptions
+   * Track errors and exceptions (with filtering to reduce noise)
    */
   async trackError(error, context = {}) {
+    // Filter out non-critical errors to reduce analytics noise
+    const errorMessage = error.message || "Unknown error";
+    const errorName = error.name || "Error";
+
+    // Skip common non-critical errors
+    const skipPatterns = [
+      /Network request failed/i,
+      /Failed to fetch/i,
+      /Loading chunk \d+ failed/i,
+      /Script error/i,
+      /Non-Error promise rejection captured/i,
+      /ResizeObserver loop limit exceeded/i,
+      /timeout/i,
+    ];
+
+    const isNonCritical = skipPatterns.some(
+      (pattern) => pattern.test(errorMessage) || pattern.test(errorName),
+    );
+
+    // Only track critical errors in analytics to reduce noise
+    const isCritical =
+      context.fatal ||
+      context.critical ||
+      errorName.includes("TypeError") ||
+      errorName.includes("ReferenceError") ||
+      errorMessage.includes("is not defined");
+
     const errorEvent = {
       type: ANALYTICS_CONFIG.EVENTS.ERROR_OCCURRED,
       timestamp: Date.now(),
       sessionId: this.sessionData.sessionId,
       userId: this.sessionData.userId,
       error: {
-        message: error.message || "Unknown error",
+        message: errorMessage,
         stack: error.stack || "No stack trace",
-        name: error.name || "Error",
+        name: errorName,
       },
-      context,
+      context: {
+        ...context,
+        filtered: isNonCritical,
+        critical: isCritical,
+      },
       url: window.location.href,
       userAgent: navigator.userAgent,
     };
 
-    // Log to Firebase Analytics with safety check
-    if (this.analytics && typeof logEvent === "function") {
+    // Only send critical errors to Firebase Analytics to reduce noise
+    if (isCritical && this.analytics && typeof logEvent === "function") {
       try {
         logEvent(this.analytics, ANALYTICS_CONFIG.EVENTS.ERROR_OCCURRED, {
-          error_type: error.name || "Unknown",
+          error_type: errorName,
           error_fatal: context.fatal || false,
+          error_critical: isCritical,
         });
       } catch (analyticsError) {
         console.warn("Analytics error tracking failed:", analyticsError);
       }
     }
 
-    // Store detailed error in Firestore
-    await this.storeError(errorEvent);
+    // Store detailed error in Firestore only for critical errors or debugging
+    if (isCritical || context.debug) {
+      await this.storeError(errorEvent);
+    }
 
     return errorEvent;
   }

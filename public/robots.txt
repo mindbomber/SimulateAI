@@ -29,7 +29,7 @@ Disallow: /authservice-*
 Disallow: /clear-storage.html
 
 # Sitemap location
-Sitemap: https://www.simulateai.io/sitemap.xml
+Sitemap: https://simulateai.io/sitemap.xml
 
 # Crawl-delay (optional - helps prevent overwhelming your server)
 Crawl-delay: 1

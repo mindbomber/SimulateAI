@@ -2627,10 +2627,22 @@ class StorageManager {
     // Log error
     logger.error(`StorageManager ${operation} error:`, errorInfo);
 
-    // Emit error event
-    this.emit(STORAGE_EVENTS.ERROR_OCCURRED, errorInfo);
+    // Only emit error events for critical storage issues to reduce analytics noise
+    const isCriticalStorageError =
+      error.message?.includes("QuotaExceededError") ||
+      error.message?.includes("SecurityError") ||
+      error.message?.includes("InvalidStateError") ||
+      operation === "critical_operation";
 
-    // Store error for debugging (with size limit)
+    if (isCriticalStorageError) {
+      // Emit error event only for critical issues
+      this.emit(STORAGE_EVENTS.ERROR_OCCURRED, {
+        ...errorInfo,
+        critical: true,
+      });
+    }
+
+    // Store error for debugging (with size limit) but don't emit event for every minor issue
     try {
       const errors = this.getSession("storage_errors", []);
       errors.push(errorInfo);

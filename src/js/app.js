@@ -44,6 +44,9 @@ import ScenarioGenerator from "./core/scenario-generator.js";
 import PerformanceMonitor from "./utils/performance-monitor.js"; // Phase 3.3: PerformanceMonitor integration
 import { ComponentRegistry } from "./utils/component-registry.js"; // Phase 3.4: ComponentRegistry integration
 
+// Import debugging and monitoring tools
+import ErrorAnalyticsDashboard from "./utils/error-analytics-dashboard.js";
+
 // Import MCP integrations
 import MCPIntegrationManager from "./integrations/mcp-integration-manager.js";
 
@@ -399,6 +402,9 @@ class SimulateAIApp {
     this.errorRecoveryStrategies = new Map();
     this.criticalErrorCount = 0;
     this.errorPatterns = new Map();
+
+    // Error Analytics Dashboard for debugging
+    this.errorAnalyticsDashboard = null;
 
     // Onboarding tour
     this.onboardingTour = null;
@@ -2225,6 +2231,15 @@ class SimulateAIApp {
   initializeErrorHandling() {
     // Create error boundary element
     this.errorBoundary = document.getElementById("error-boundary");
+
+    // Initialize Error Analytics Dashboard for debugging (dev mode only)
+    if (
+      window.location.hostname === "localhost" ||
+      localStorage.getItem("debug") === "true"
+    ) {
+      this.errorAnalyticsDashboard = new ErrorAnalyticsDashboard();
+      AppDebug.log("Error Analytics Dashboard initialized for debugging");
+    }
 
     // Global error handlers
     window.addEventListener("error", (event) => {
