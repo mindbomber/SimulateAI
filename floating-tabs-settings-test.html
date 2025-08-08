@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Floating Tabs Settings Test</title>
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .test-container {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .status-indicator {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+      }
+      .status-success {
+        background: #10b981;
+      }
+      .status-error {
+        background: #ef4444;
+      }
+      .status-warning {
+        background: #f59e0b;
+      }
+      .test-button {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 10px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      .test-button:hover {
+        background: #5a67d8;
+      }
+      .settings-info {
+        background: #f3f4f6;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 10px 0;
+      }
+      .expected-behavior {
+        background: #ecfdf5;
+        border-left: 4px solid #10b981;
+        padding: 15px;
+        margin: 15px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🧪 Floating Tabs Settings Test</h1>
+      <p>This page tests the corrected floating tabs toggle behavior.</p>
+
+      <div class="expected-behavior">
+        <h3>✅ Expected Behavior:</h3>
+        <ul>
+          <li>
+            <strong>Toggle Right (ON):</strong> Tabs are visible and functional
+          </li>
+          <li><strong>Toggle Left (OFF):</strong> Tabs are hidden</li>
+          <li>
+            <strong>Default State:</strong> All tabs ON (toggle right, checked)
+          </li>
+          <li>
+            <strong>Donation Tab Special Rule:</strong> Non-donors cannot turn
+            it off
+          </li>
+        </ul>
+      </div>
+
+      <div class="settings-info">
+        <h3>🔧 Current Settings Status:</h3>
+        <div id="settings-status">Checking...</div>
+      </div>
+
+      <div class="settings-info">
+        <h3>👁️ Tab Visibility Status:</h3>
+        <div id="visibility-status">Checking...</div>
+      </div>
+
+      <div class="settings-info">
+        <h3>🎯 Test Controls:</h3>
+        <button class="test-button" onclick="simulateDonation()">
+          🎁 Simulate Donation (Test Only)
+        </button>
+        <button class="test-button" onclick="resetDonorStatus()">
+          🔄 Reset Donor Status
+        </button>
+        <button class="test-button" onclick="refreshStatus()">
+          📊 Refresh Status
+        </button>
+      </div>
+
+      <div class="settings-info">
+        <h3>📋 Test Instructions:</h3>
+        <ol>
+          <li>
+            Check that all toggles show as
+            <strong>ON (right position)</strong> by default
+          </li>
+          <li>
+            Try turning each tab OFF - tabs should disappear from right edge
+          </li>
+          <li>
+            Try turning donation tab OFF as non-donor - should prevent and show
+            message
+          </li>
+          <li>
+            Simulate donation, then try turning donation tab OFF - should work
+          </li>
+          <li>Reset donor status and verify restriction returns</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Import required scripts -->
+    <script type="module" src="src/js/components/settings-manager.js"></script>
+    <script type="module" src="src/js/utils/donation-tracker.js"></script>
+    <script
+      type="module"
+      src="src/js/components/floating-action-tab.js"
+    ></script>
+    <script
+      type="module"
+      src="src/js/components/floating-surprise-tab.js"
+    ></script>
+    <script type="module" src="src/js/components/floating-tour-tab.js"></script>
+
+    <script>
+      let settingsManager;
+
+      // Wait for components to load
+      setTimeout(() => {
+        settingsManager = window.settingsManager;
+        checkStatus();
+
+        // Listen for settings changes
+        window.addEventListener("settingsChanged", checkStatus);
+      }, 1000);
+
+      function checkStatus() {
+        updateSettingsStatus();
+        updateVisibilityStatus();
+      }
+
+      function updateSettingsStatus() {
+        const statusDiv = document.getElementById("settings-status");
+        if (!settingsManager) {
+          statusDiv.innerHTML =
+            '<span class="status-indicator status-error"></span>Settings Manager not loaded';
+          return;
+        }
+
+        const settings = settingsManager.settings;
+        const isDonor = settingsManager.isDonor;
+
+        const html = `
+                <div><span class="status-indicator ${settings.surpriseTabEnabled ? "status-success" : "status-error"}"></span>Surprise Tab: ${settings.surpriseTabEnabled ? "ON" : "OFF"}</div>
+                <div><span class="status-indicator ${settings.tourTabEnabled ? "status-success" : "status-error"}"></span>Tour Tab: ${settings.tourTabEnabled ? "ON" : "OFF"}</div>
+                <div><span class="status-indicator ${settings.donateTabEnabled ? "status-success" : "status-error"}"></span>Donation Tab: ${settings.donateTabEnabled ? "ON" : "OFF"}</div>
+                <div><span class="status-indicator ${isDonor ? "status-success" : "status-warning"}"></span>Donor Status: ${isDonor ? "DONOR" : "NON-DONOR"}</div>
+            `;
+        statusDiv.innerHTML = html;
+      }
+
+      function updateVisibilityStatus() {
+        const statusDiv = document.getElementById("visibility-status");
+
+        const donateTab = document.querySelector(
+          ".floating-tab-link, .floating-action-tab-link",
+        );
+        const surpriseTab = document.querySelector(
+          ".floating-surprise-tab-link",
+        );
+        const tourTab = document.querySelector(".floating-tour-tab-link");
+
+        const html = `
+                <div><span class="status-indicator ${donateTab && donateTab.style.display !== "none" ? "status-success" : "status-error"}"></span>Donation Tab Visible: ${donateTab && donateTab.style.display !== "none" ? "YES" : "NO"}</div>
+                <div><span class="status-indicator ${surpriseTab && surpriseTab.style.display !== "none" ? "status-success" : "status-error"}"></span>Surprise Tab Visible: ${surpriseTab && surpriseTab.style.display !== "none" ? "YES" : "NO"}</div>
+                <div><span class="status-indicator ${tourTab && tourTab.style.display !== "none" ? "status-success" : "status-error"}"></span>Tour Tab Visible: ${tourTab && tourTab.style.display !== "none" ? "YES" : "NO"}</div>
+            `;
+        statusDiv.innerHTML = html;
+      }
+
+      function simulateDonation() {
+        if (window.DonationTracker) {
+          window.DonationTracker.simulateDonation();
+          setTimeout(checkStatus, 500);
+        } else {
+          alert("DonationTracker not available");
+        }
+      }
+
+      function resetDonorStatus() {
+        if (window.DonationTracker) {
+          window.DonationTracker.resetDonorStatus();
+          setTimeout(checkStatus, 500);
+        } else {
+          alert("DonationTracker not available");
+        }
+      }
+
+      function refreshStatus() {
+        checkStatus();
+      }
+    </script>
+  </body>
+</html>

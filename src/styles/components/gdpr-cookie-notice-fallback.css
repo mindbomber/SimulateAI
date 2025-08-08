@@ -3,30 +3,31 @@
  * Simplified version without CSS layers for immediate use
  */
 
-/* Cookie Notice Container */
+/* Cookie Notice Container - Compact Version */
 .gdpr-cookie-notice {
   position: fixed;
-  left: 0;
-  right: 0;
+  left: 20px;
+  right: 20px;
   z-index: 9999;
   background: #ffffff;
   border: 1px solid #e5e7eb;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   transform: translateY(100%);
   transition: transform 0.3s ease-in-out;
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  max-height: 80vh;
-  overflow-y: auto;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .gdpr-cookie-notice.gdpr-notice-bottom {
-  bottom: 0;
+  bottom: 20px;
   border-top: 2px solid #1a73e8;
 }
 
 .gdpr-cookie-notice.gdpr-notice-top {
-  top: 0;
+  top: 20px;
   transform: translateY(-100%);
   border-bottom: 2px solid #1a73e8;
 }
@@ -35,72 +36,51 @@
   transform: translateY(0);
 }
 
-/* Notice Content */
+/* Notice Content - Simplified */
 .gdpr-notice-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 24px;
-  align-items: start;
+  padding: 16px;
+  text-align: center;
 }
 
 .gdpr-notice-text h3 {
-  margin: 0 0 12px 0;
+  margin: 0 0 8px 0;
   color: #111827;
-  font-size: 1.125rem;
+  font-size: 16px;
   font-weight: 600;
 }
 
 .gdpr-notice-text p {
-  margin: 0 0 12px 0;
+  margin: 0 0 16px 0;
   color: #6b7280;
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
-/* Cookie Types List */
+/* Cookie Types List - Hidden for compact design */
 .gdpr-cookie-types {
-  margin: 12px 0;
-  padding-left: 16px;
-  list-style: none;
+  display: none; /* Hide detailed cookie types for compact design */
 }
 
 .gdpr-cookie-types li {
-  margin-bottom: 8px;
-  color: #6b7280;
-  position: relative;
+  display: none;
 }
 
 .gdpr-cookie-types li:before {
-  content: "🍪";
-  position: absolute;
-  left: -16px;
-  top: 0;
+  display: none;
 }
 
 .gdpr-cookie-types strong {
-  color: #111827;
-  font-weight: 500;
+  display: none;
 }
 
-/* Actions Section */
+/* Actions Section - Compact */
 .gdpr-notice-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  min-width: 280px;
+  margin-top: 12px;
 }
 
-/* Cookie Preferences */
+/* Cookie Preferences - Hidden by default for compact design */
 .gdpr-cookie-preferences {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  display: none; /* Hide detailed preferences for compact design */
 }
 
 /* Custom Checkboxes */
@@ -165,24 +145,25 @@
   display: block;
 }
 
-/* Buttons */
+/* Buttons - Horizontal layout */
 .gdpr-buttons {
   display: flex;
-  flex-direction: column;
   gap: 8px;
+  justify-content: center;
 }
 
 .gdpr-btn {
-  padding: 12px 16px;
+  padding: 8px 16px;
   border: none;
-  border-radius: 8px;
-  font-size: 0.875rem;
+  border-radius: 6px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
   text-decoration: none;
   display: inline-block;
+  white-space: nowrap;
 }
 
 .gdpr-btn-primary {
@@ -281,50 +262,45 @@
   font-size: 1.125rem;
 }
 
-/* Responsive Design */
+/* Responsive Design - Keep compact on all devices */
 @media (max-width: 768px) {
-  .gdpr-notice-content {
-    grid-template-columns: 1fr;
-    gap: 16px;
-    padding: 16px;
+  .gdpr-cookie-notice {
+    left: 10px;
+    right: 10px;
+    max-width: none;
   }
 
-  .gdpr-notice-actions {
-    min-width: auto;
-  }
-
-  .gdpr-buttons {
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-
-  .gdpr-btn {
-    flex: 1;
-    min-width: 120px;
-  }
-
-  .gdpr-confirmation {
-    bottom: 16px;
-    right: 16px;
-    left: 16px;
-  }
-}
-
-@media (max-width: 480px) {
   .gdpr-notice-content {
     padding: 12px;
   }
 
   .gdpr-buttons {
     flex-direction: column;
+    gap: 6px;
   }
 
   .gdpr-btn {
-    flex: none;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .gdpr-notice-content {
+    padding: 10px;
   }
 
-  .gdpr-cookie-types li {
-    font-size: 0.875rem;
+  .gdpr-notice-text h3 {
+    font-size: 15px;
+  }
+
+  .gdpr-notice-text p {
+    font-size: 13px;
+  }
+
+  .gdpr-btn {
+    padding: 8px 12px;
+    font-size: 13px;
   }
 }
 

@@ -970,6 +970,12 @@
     color: var(--theme-text-secondary);
   }
 
+  body.dark-mode .dilemma-section h3,
+  body.dark-mode .ethical-question-section h3,
+  body.dark-mode .options-section h3 {
+    color: var(--theme-text-primary);
+  }
+
   body.dark-mode .option-card {
     background: var(--theme-bg-secondary);
     border: 1px solid var(--theme-border);

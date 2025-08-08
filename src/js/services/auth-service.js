@@ -317,98 +317,105 @@ export class AuthService {
 
     modal.open();
 
-    // Set up authentication event handlers
-    this.setupAuthEventHandlers(modal);
+    // Set up authentication event handlers after modal content is rendered
+    // Use a small delay to ensure DOM is ready
+    setTimeout(() => {
+      this.setupAuthEventHandlers(modal);
+    }, 100);
   }
 
   /**
    * Set up all authentication event handlers
    */
   setupAuthEventHandlers(modal) {
-    // Social login handlers
-    document
-      .getElementById("google-signin-btn")
+    // Use modal element as context instead of document to scope the queries
+    const modalElement = modal.element;
+
+    // Social login handlers - scope to modal element
+    modalElement
+      .querySelector("#google-signin-btn")
       ?.addEventListener("click", async () => {
         await this.signInWithProvider("google", modal);
       });
 
-    document
-      .getElementById("facebook-signin-btn")
+    modalElement
+      .querySelector("#facebook-signin-btn")
       ?.addEventListener("click", async () => {
         await this.signInWithProvider("facebook", modal);
       });
 
-    document
-      .getElementById("twitter-signin-btn")
+    modalElement
+      .querySelector("#twitter-signin-btn")
       ?.addEventListener("click", async () => {
         await this.signInWithProvider("twitter", modal);
       });
 
-    document
-      .getElementById("github-signin-btn")
+    modalElement
+      .querySelector("#github-signin-btn")
       ?.addEventListener("click", async () => {
         await this.signInWithProvider("github", modal);
       });
 
     // Email form toggle
-    document
-      .getElementById("show-email-form-btn")
+    modalElement
+      .querySelector("#show-email-form-btn")
       ?.addEventListener("click", () => {
-        document.getElementById("email-auth-form").style.display = "block";
-        document.getElementById("show-email-form-btn").style.display = "none";
+        modalElement.querySelector("#email-auth-form").style.display = "block";
+        modalElement.querySelector("#show-email-form-btn").style.display =
+          "none";
       });
 
     // Tab switching
-    document.getElementById("signin-tab")?.addEventListener("click", () => {
-      this.switchAuthTab("signin");
+    modalElement.querySelector("#signin-tab")?.addEventListener("click", () => {
+      this.switchAuthTab("signin", modalElement);
     });
 
-    document.getElementById("signup-tab")?.addEventListener("click", () => {
-      this.switchAuthTab("signup");
+    modalElement.querySelector("#signup-tab")?.addEventListener("click", () => {
+      this.switchAuthTab("signup", modalElement);
     });
 
     // Email form handlers
-    document
-      .getElementById("email-signin-form")
+    modalElement
+      .querySelector("#email-signin-form")
       ?.addEventListener("submit", async (e) => {
         e.preventDefault();
         await this.handleEmailSignIn(modal);
       });
 
-    document
-      .getElementById("email-signup-form")
+    modalElement
+      .querySelector("#email-signup-form")
       ?.addEventListener("submit", async (e) => {
         e.preventDefault();
         await this.handleEmailSignUp(modal);
       });
 
     // Forgot password handler
-    document
-      .getElementById("forgot-password-btn")
+    modalElement
+      .querySelector("#forgot-password-btn")
       ?.addEventListener("click", async () => {
-        await this.handleForgotPassword();
+        await this.handleForgotPassword(modalElement);
       });
   }
 
   /**
    * Switch between sign in and sign up tabs
    */
-  switchAuthTab(tab) {
-    const signinTab = document.getElementById("signin-tab");
-    const signupTab = document.getElementById("signup-tab");
-    const signinForm = document.getElementById("email-signin-form");
-    const signupForm = document.getElementById("email-signup-form");
+  switchAuthTab(tab, modalElement = document) {
+    const signinTab = modalElement.querySelector("#signin-tab");
+    const signupTab = modalElement.querySelector("#signup-tab");
+    const signinForm = modalElement.querySelector("#email-signin-form");
+    const signupForm = modalElement.querySelector("#email-signup-form");
 
     if (tab === "signin") {
-      signinTab.classList.add("active");
-      signupTab.classList.remove("active");
-      signinForm.style.display = "block";
-      signupForm.style.display = "none";
+      signinTab?.classList.add("active");
+      signupTab?.classList.remove("active");
+      if (signinForm) signinForm.style.display = "block";
+      if (signupForm) signupForm.style.display = "none";
     } else {
-      signinTab.classList.remove("active");
-      signupTab.classList.add("active");
-      signinForm.style.display = "none";
-      signupForm.style.display = "block";
+      signinTab?.classList.remove("active");
+      signupTab?.classList.add("active");
+      if (signinForm) signinForm.style.display = "none";
+      if (signupForm) signupForm.style.display = "block";
     }
   }
 
@@ -420,7 +427,8 @@ export class AuthService {
     try {
       // Show loading state
       const btnId = `${provider}-signin-btn`;
-      const signinBtn = document.getElementById(btnId);
+      const context = modal?.element || document;
+      const signinBtn = context.querySelector(`#${btnId}`);
       if (signinBtn) {
         signinBtn.disabled = true;
         signinBtn.innerHTML = "Signing in...";
@@ -471,7 +479,18 @@ export class AuthService {
           return;
         } else {
           // For desktop popup - normal flow
-          if (modal) modal.close();
+          if (modal) {
+            try {
+              modal.close();
+              console.log("Auth modal closed successfully");
+            } catch (error) {
+              console.warn("Failed to close auth modal:", error);
+              // Try alternative method to close modal
+              if (modal.element && modal.element.parentNode) {
+                modal.element.parentNode.removeChild(modal.element);
+              }
+            }
+          }
           this.showSuccessMessage(
             "Welcome! You have been signed in successfully.",
           );
@@ -520,8 +539,9 @@ export class AuthService {
    */
   async handleEmailSignIn(modal) {
     try {
-      const email = document.getElementById("signin-email").value;
-      const password = document.getElementById("signin-password").value;
+      const modalElement = modal?.element || document;
+      const email = modalElement.querySelector("#signin-email")?.value;
+      const password = modalElement.querySelector("#signin-password")?.value;
 
       if (!email || !password) {
         this.showErrorMessage("Please enter both email and password.");
@@ -534,7 +554,18 @@ export class AuthService {
       );
 
       if (result.success) {
-        if (modal) modal.close();
+        if (modal) {
+          try {
+            modal.close();
+            console.log("Email sign-in modal closed successfully");
+          } catch (error) {
+            console.warn("Failed to close email sign-in modal:", error);
+            // Try alternative method to close modal
+            if (modal.element && modal.element.parentNode) {
+              modal.element.parentNode.removeChild(modal.element);
+            }
+          }
+        }
         this.showSuccessMessage(
           "Welcome back! You have been signed in successfully.",
         );
@@ -556,10 +587,12 @@ export class AuthService {
    */
   async handleEmailSignUp(modal) {
     try {
-      const name = document.getElementById("signup-name").value;
-      const email = document.getElementById("signup-email").value;
-      const password = document.getElementById("signup-password").value;
-      const confirmPassword = document.getElementById("signup-confirm").value;
+      const modalElement = modal?.element || document;
+      const name = modalElement.querySelector("#signup-name")?.value;
+      const email = modalElement.querySelector("#signup-email")?.value;
+      const password = modalElement.querySelector("#signup-password")?.value;
+      const confirmPassword =
+        modalElement.querySelector("#signup-confirm")?.value;
 
       if (!name || !email || !password || !confirmPassword) {
         this.showErrorMessage("Please fill in all fields.");
@@ -598,7 +631,18 @@ export class AuthService {
           });
         }
 
-        if (modal) modal.close();
+        if (modal) {
+          try {
+            modal.close();
+            console.log("Email sign-up modal closed successfully");
+          } catch (error) {
+            console.warn("Failed to close email sign-up modal:", error);
+            // Try alternative method to close modal
+            if (modal.element && modal.element.parentNode) {
+              modal.element.parentNode.removeChild(modal.element);
+            }
+          }
+        }
         this.showSuccessMessage(
           "Account created successfully! Welcome to SimulateAI.",
         );
@@ -618,8 +662,9 @@ export class AuthService {
   /**
    * Handle forgot password
    */
-  async handleForgotPassword() {
-    const email = document.getElementById("signin-email").value;
+  async handleForgotPassword(modalElement = document) {
+    const emailInput = modalElement.querySelector("#signin-email");
+    const email = emailInput?.value;
 
     if (!email) {
       this.showErrorMessage("Please enter your email address first.");

@@ -96,7 +96,7 @@ body:has(.pre-launch-modal) .floating-tour-tab-link {
   top: 50%;
   right: 0;
   transform: translateY(-50%);
-  z-index: 1000;
+  z-index: 999;
   text-decoration: none;
   color: inherit;
   display: block;
@@ -573,7 +573,7 @@ svg.floating-action-tab-arrow-icon {
   top: 22%;
   right: 0;
   transform: translateY(-50%);
-  z-index: 1001;
+  z-index: 999;
   width: var(--floating-tab-width, 280px);
   pointer-events: none; /* Ensure no hover on invisible areas */
 }

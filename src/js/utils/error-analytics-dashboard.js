@@ -34,25 +34,28 @@ class ErrorAnalyticsDashboard {
    * Setup error event listeners
    */
   setupErrorListeners() {
-    // Global error handler
-    window.addEventListener("error", (event) => {
-      this.trackError({
-        type: "JavaScript Error",
-        message: event.message,
-        filename: event.filename,
-        lineno: event.lineno,
-        source: "global",
+    // Only setup if main error handler not already installed
+    if (!window._simulateAIErrorHandlerInstalled) {
+      // Global error handler
+      window.addEventListener("error", (event) => {
+        this.trackError({
+          type: "JavaScript Error",
+          message: event.message,
+          filename: event.filename,
+          lineno: event.lineno,
+          source: "global",
+        });
       });
-    });
 
-    // Unhandled promise rejections
-    window.addEventListener("unhandledrejection", (event) => {
-      this.trackError({
-        type: "Unhandled Promise",
-        message: event.reason?.toString() || "Promise rejection",
-        source: "promise",
+      // Unhandled promise rejections
+      window.addEventListener("unhandledrejection", (event) => {
+        this.trackError({
+          type: "Unhandled Promise",
+          message: event.reason?.toString() || "Promise rejection",
+          source: "promise",
+        });
       });
-    });
+    }
 
     // Listen for storage errors
     if (window.storageManager) {

@@ -520,6 +520,13 @@
    * Dark mode overrides belong here in the overrides layer.
    */
 
+  /* Body dark mode background */
+  body.dark-mode,
+  body.theme-dark {
+    background-color: var(--theme-bg-primary) !important;
+    color: var(--theme-text-primary) !important;
+  }
+
   /* Navigation dark mode */
   body.dark-mode .main-nav,
   body.theme-dark .main-nav {

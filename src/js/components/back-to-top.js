@@ -207,7 +207,7 @@ class BackToTop {
         color: "#007acc",
         fontSize: "1.8rem",
         cursor: "pointer",
-        zIndex: "99999",
+        zIndex: "1000",
         opacity: "0",
         visibility: "hidden",
         transition: "all 0.3s ease",

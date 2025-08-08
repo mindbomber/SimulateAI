@@ -107,7 +107,12 @@ class SettingsManager {
       window.dispatchEvent(
         new CustomEvent("settingsManagerReady", {
           detail: {
-            settings: this.settings,
+            settings: {
+              surpriseTabEnabled: this.getSetting("surpriseTabEnabled"),
+              tourTabEnabled: this.getSetting("tourTabEnabled"),
+              donateTabEnabled: this.getSetting("donateTabEnabled"),
+              ...this.settings, // Include other settings
+            },
             isDonor: this.isDonor,
             appConfig: this.appConfig,
             settingsSchema: this.settingsSchema,
@@ -1422,29 +1427,31 @@ class SettingsManager {
     // Update toggle states only if different
     if (
       elements.surpriseToggle &&
-      elements.surpriseToggle.checked !== this.settings.surpriseTabEnabled
+      elements.surpriseToggle.checked !== this.getSetting("surpriseTabEnabled")
     ) {
       updates.push(
         () =>
-          (elements.surpriseToggle.checked = this.settings.surpriseTabEnabled),
+          (elements.surpriseToggle.checked =
+            this.getSetting("surpriseTabEnabled")),
       );
     }
 
     if (
       elements.tourToggle &&
-      elements.tourToggle.checked !== this.settings.tourTabEnabled
+      elements.tourToggle.checked !== this.getSetting("tourTabEnabled")
     ) {
       updates.push(
-        () => (elements.tourToggle.checked = this.settings.tourTabEnabled),
+        () => (elements.tourToggle.checked = this.getSetting("tourTabEnabled")),
       );
     }
 
     if (
       elements.donateToggle &&
-      elements.donateToggle.checked !== this.settings.donateTabEnabled
+      elements.donateToggle.checked !== this.getSetting("donateTabEnabled")
     ) {
       updates.push(
-        () => (elements.donateToggle.checked = this.settings.donateTabEnabled),
+        () =>
+          (elements.donateToggle.checked = this.getSetting("donateTabEnabled")),
       );
     }
 
@@ -1467,7 +1474,7 @@ class SettingsManager {
         }
       } else {
         if (
-          !this.settings.donateTabEnabled &&
+          !this.getSetting("donateTabEnabled") &&
           !donateToggleWrapper?.classList.contains("settings-disabled")
         ) {
           updates.push(() => {
@@ -1721,11 +1728,19 @@ class SettingsManager {
   }
 
   notifySettingsChanged() {
+    // Create a complete settings object with defaults resolved
+    const completeSettings = {
+      surpriseTabEnabled: this.getSetting("surpriseTabEnabled"),
+      tourTabEnabled: this.getSetting("tourTabEnabled"),
+      donateTabEnabled: this.getSetting("donateTabEnabled"),
+      ...this.settings, // Include other settings
+    };
+
     // Dispatch custom event for other components to listen to
     window.dispatchEvent(
       new CustomEvent("settingsChanged", {
         detail: {
-          settings: this.settings,
+          settings: completeSettings,
           isDonor: this.isDonor,
         },
       }),

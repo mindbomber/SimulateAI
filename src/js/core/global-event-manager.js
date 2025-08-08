@@ -503,22 +503,24 @@ class GlobalEventManager {
    * Set up system-level events
    */
   setupSystemEvents() {
-    // Error handling
-    window.addEventListener("error", (event) => {
-      this.notifyComponents("error", { event });
-      this.trackEvent("js_error", {
-        message: event.message,
-        filename: event.filename,
-        lineno: event.lineno,
+    // Error handling only if main error handler not already installed
+    if (!window._simulateAIErrorHandlerInstalled) {
+      window.addEventListener("error", (event) => {
+        this.notifyComponents("error", { event });
+        this.trackEvent("js_error", {
+          message: event.message,
+          filename: event.filename,
+          lineno: event.lineno,
+        });
       });
-    });
 
-    window.addEventListener("unhandledrejection", (event) => {
-      this.notifyComponents("unhandled_rejection", { event });
-      this.trackEvent("unhandled_promise_rejection", {
-        reason: event.reason?.toString(),
+      window.addEventListener("unhandledrejection", (event) => {
+        this.notifyComponents("unhandled_rejection", { event });
+        this.trackEvent("unhandled_promise_rejection", {
+          reason: event.reason?.toString(),
+        });
       });
-    });
+    }
 
     // Theme change detection
     const reducedMotionQuery = window.matchMedia?.(

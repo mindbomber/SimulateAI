@@ -262,6 +262,7 @@ class FloatingActionTab {
 
   listenToSettings() {
     console.log("FloatingActionTab: Setting up settings listeners");
+
     // Listen for settings changes
     window.addEventListener("settingsChanged", (e) => {
       console.log(
@@ -269,7 +270,12 @@ class FloatingActionTab {
         e.detail,
       );
       const { settings } = e.detail;
-      this.updateVisibility(settings.donateTabEnabled);
+      // Use the getSetting method to ensure we get the default if undefined
+      const enabled =
+        settings.donateTabEnabled !== undefined
+          ? settings.donateTabEnabled
+          : true; // Default to true if undefined
+      this.updateVisibility(enabled);
     });
 
     // Listen for settings manager ready
@@ -279,7 +285,12 @@ class FloatingActionTab {
         e.detail,
       );
       const { settings } = e.detail;
-      this.updateVisibility(settings.donateTabEnabled);
+      // Use the getSetting method to ensure we get the default if undefined
+      const enabled =
+        settings.donateTabEnabled !== undefined
+          ? settings.donateTabEnabled
+          : true; // Default to true if undefined
+      this.updateVisibility(enabled);
     });
   }
 
@@ -295,9 +306,10 @@ class FloatingActionTab {
         this.updateVisibility(enabled);
       } else {
         console.log(
-          "FloatingActionTab: Settings manager not ready, showing tab by default",
+          "FloatingActionTab: Settings manager not ready, using default (true)",
         );
-        // Show by default if settings manager is not ready
+        // Default to true (ON) when settings manager is not ready
+        // This ensures fresh browser sessions show the tab initially
         this.updateVisibility(true);
       }
     };
@@ -305,11 +317,10 @@ class FloatingActionTab {
     // Try immediately
     applySettings();
 
-    // Also try after a short delay in case settings manager isn't ready
+    // Also try after settings manager loads
     setTimeout(applySettings, 100);
-
-    // Try one more time after a longer delay
     setTimeout(applySettings, 500);
+    setTimeout(applySettings, 1000);
   }
 
   updateVisibility(enabled) {
@@ -320,10 +331,11 @@ class FloatingActionTab {
       !!this.link,
     );
     if (this.link) {
-      // TEMPORARY DEBUG: Always show for testing
-      this.link.style.display = "block"; // enabled ? "block" : "none";
+      // Show tab when enabled (toggle right), hide when disabled (toggle left)
+      this.link.style.display = enabled ? "block" : "none";
       console.log(
-        "FloatingActionTab: Set display to block (FORCED FOR DEBUGGING)",
+        "FloatingActionTab: Set display to",
+        enabled ? "block" : "none",
       );
     }
   }
@@ -367,11 +379,6 @@ class FloatingActionTab {
     // Add to the end of the body
     document.body.appendChild(this.link);
     console.log("FloatingActionTab: Attached to DOM, element:", this.link);
-
-    // Force visibility for debugging
-    this.link.style.display = "block";
-    this.link.style.visibility = "visible";
-    console.log("FloatingActionTab: Forced visibility");
   }
 
   bindEvents() {

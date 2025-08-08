@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Onboarding Tour Fix Verification</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f5f5f5;
+        line-height: 1.6;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 12px;
+        text-align: center;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .test-section {
+        background: white;
+        border-radius: 8px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        border-left: 4px solid #667eea;
+      }
+
+      .success {
+        border-left-color: #28a745;
+        background: #f8fff9;
+      }
+
+      .warning {
+        border-left-color: #ffc107;
+        background: #fffef8;
+      }
+
+      .error {
+        border-left-color: #dc3545;
+        background: #fff8f8;
+      }
+
+      .button {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1rem;
+        margin: 8px 5px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+      }
+
+      .button:hover {
+        background: #5a6fd8;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+
+      .button.danger {
+        background: #dc3545;
+      }
+
+      .button.danger:hover {
+        background: #c82333;
+      }
+
+      .status {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .status.warning {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
+
+      .code-block {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        padding: 15px;
+        font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+        font-size: 0.9rem;
+        margin: 15px 0;
+        overflow-x: auto;
+      }
+
+      .test-result {
+        padding: 15px;
+        border-radius: 6px;
+        margin: 10px 0;
+        font-weight: 500;
+      }
+
+      .test-result.pass {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .test-result.fail {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>🔧 Onboarding Tour Fix Verification</h1>
+      <p>Testing the async hasCompletedTour() fix for automatic tour start</p>
+    </div>
+
+    <div class="test-section">
+      <h3>🐛 Issue Identified</h3>
+      <p>
+        <strong>Problem:</strong> The onboarding tour was not starting
+        automatically for new users, even after clearing browsing data.
+      </p>
+
+      <div class="code-block">
+        <strong>Root Cause:</strong><br />
+        // ❌ WRONG - hasCompletedTour() is async but called without await<br />
+        if (this.onboardingTour.hasCompletedTour()) {<br />
+        &nbsp;&nbsp;// This always returned a Promise (truthy), blocking tour
+        start<br />
+        }<br /><br />
+
+        // ✅ FIXED - Now properly awaited<br />
+        const hasCompleted = await this.onboardingTour.hasCompletedTour();<br />
+        if (hasCompleted) {<br />
+        &nbsp;&nbsp;// Now correctly checks the actual boolean value<br />
+        }
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h3>🔧 Fix Implemented</h3>
+      <p>
+        Updated <code>checkAndStartOnboardingTour()</code> method in app.js:
+      </p>
+
+      <ol>
+        <li>Made the method <code>async</code></li>
+        <li>
+          Added <code>await</code> when calling <code>hasCompletedTour()</code>
+        </li>
+        <li>Added proper error handling with fallback logic</li>
+        <li>Enhanced debugging logs for better troubleshooting</li>
+      </ol>
+    </div>
+
+    <div class="test-section">
+      <h3>🧪 Verification Tests</h3>
+      <button class="button" onclick="runTests()">
+        Run Verification Tests
+      </button>
+      <button class="button danger" onclick="simulateFreshUser()">
+        Simulate Fresh User
+      </button>
+      <button class="button" onclick="checkTourState()">
+        Check Current State
+      </button>
+
+      <div id="test-results"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>📋 Expected Behavior</h3>
+      <ul>
+        <li>
+          <strong>Fresh Browser:</strong> Tour should auto-start after clearing
+          localStorage
+        </li>
+        <li>
+          <strong>Returning User:</strong> Tour should NOT auto-start if already
+          completed
+        </li>
+        <li>
+          <strong>Error Handling:</strong> Fallback to first-time visit check if
+          hasCompletedTour() fails
+        </li>
+        <li>
+          <strong>Timing:</strong> 500ms delay to ensure UI is ready before
+          starting tour
+        </li>
+      </ul>
+    </div>
+
+    <script type="module">
+      import logger from "./src/js/utils/logger.js";
+      import { simpleStorage } from "./src/js/utils/simple-storage.js";
+
+      window.runTests = async function () {
+        const resultsContainer = document.getElementById("test-results");
+        resultsContainer.innerHTML = "<h4>🔍 Running Tests...</h4>";
+
+        const tests = [];
+
+        // Test 1: Check if the method is now async
+        try {
+          if (
+            window.app &&
+            typeof window.app.checkAndStartOnboardingTour === "function"
+          ) {
+            const method = window.app.checkAndStartOnboardingTour;
+            const isAsync = method.constructor.name === "AsyncFunction";
+            tests.push({
+              name: "checkAndStartOnboardingTour is async",
+              passed: isAsync,
+              details: isAsync
+                ? "Method is properly async"
+                : "Method is not async",
+            });
+          } else {
+            tests.push({
+              name: "checkAndStartOnboardingTour exists",
+              passed: false,
+              details: "Method not found on app instance",
+            });
+          }
+        } catch (error) {
+          tests.push({
+            name: "Method accessibility test",
+            passed: false,
+            details: `Error: ${error.message}`,
+          });
+        }
+
+        // Test 2: Check hasCompletedTour method
+        try {
+          if (
+            window.onboardingTourInstance &&
+            typeof window.onboardingTourInstance.hasCompletedTour === "function"
+          ) {
+            const method = window.onboardingTourInstance.hasCompletedTour;
+            const isAsync = method.constructor.name === "AsyncFunction";
+            tests.push({
+              name: "hasCompletedTour is async",
+              passed: isAsync,
+              details: isAsync
+                ? "Method is properly async"
+                : "Method should be async",
+            });
+          } else {
+            tests.push({
+              name: "hasCompletedTour exists",
+              passed: false,
+              details: "OnboardingTour instance not found",
+            });
+          }
+        } catch (error) {
+          tests.push({
+            name: "hasCompletedTour test",
+            passed: false,
+            details: `Error: ${error.message}`,
+          });
+        }
+
+        // Test 3: Check storage state for first-time visit
+        const hasVisited = simpleStorage.get("has_visited", false);
+        const tourCompleted = simpleStorage.get("tour_completed", false);
+        tests.push({
+          name: "Fresh user detection",
+          passed: !hasVisited && !tourCompleted,
+          details: `has_visited: ${hasVisited}, tour_completed: ${tourCompleted}`,
+        });
+
+        // Test 4: Check if tour instance exists
+        const tourExists = !!window.onboardingTourInstance;
+        tests.push({
+          name: "OnboardingTour instance exists",
+          passed: tourExists,
+          details: tourExists
+            ? "Tour instance available"
+            : "No tour instance found",
+        });
+
+        // Test 5: Check if we're on app page
+        const isAppPage =
+          window.location.pathname.includes("app.html") ||
+          document.querySelector(".categories-grid") !== null;
+        tests.push({
+          name: "On app page",
+          passed: isAppPage,
+          details: isAppPage ? "Correct page for tour" : "Not on app page",
+        });
+
+        // Display results
+        let html = "<h4>📊 Test Results:</h4>";
+        let allPassed = true;
+
+        tests.forEach((test) => {
+          const statusClass = test.passed ? "pass" : "fail";
+          const statusIcon = test.passed ? "✅" : "❌";
+          allPassed = allPassed && test.passed;
+
+          html += `
+            <div class="test-result ${statusClass}">
+              ${statusIcon} <strong>${test.name}</strong><br>
+              <small>${test.details}</small>
+            </div>
+          `;
+        });
+
+        html += `<div class="test-result ${allPassed ? "pass" : "fail"}">
+          <strong>Overall Result: ${allPassed ? "ALL TESTS PASSED" : "SOME TESTS FAILED"}</strong>
+        </div>`;
+
+        resultsContainer.innerHTML = html;
+      };
+
+      window.simulateFreshUser = function () {
+        console.log("🔄 Simulating fresh user by clearing storage...");
+
+        // Clear all onboarding-related storage
+        localStorage.removeItem("has_visited");
+        localStorage.removeItem("tour_completed");
+        localStorage.removeItem("onboarding_tour_data");
+
+        // Show confirmation
+        const resultsContainer = document.getElementById("test-results");
+        resultsContainer.innerHTML = `
+          <div class="test-result pass">
+            ✅ <strong>Fresh User Simulated</strong><br>
+            <small>Cleared: has_visited, tour_completed, onboarding_tour_data</small><br>
+            <small>Now refresh the page to test auto-start behavior</small>
+          </div>
+          <button class="button" onclick="window.location.reload()">Refresh Page</button>
+        `;
+      };
+
+      window.checkTourState = function () {
+        const hasVisited = simpleStorage.get("has_visited", false);
+        const tourCompleted = simpleStorage.get("tour_completed", false);
+        const tourActive = window.onboardingTourInstance?.isActive || false;
+
+        const resultsContainer = document.getElementById("test-results");
+        resultsContainer.innerHTML = `
+          <h4>📊 Current Tour State:</h4>
+          <div class="test-result ${!hasVisited ? "pass" : "fail"}">
+            <strong>has_visited:</strong> ${hasVisited}<br>
+            <small>${!hasVisited ? "User appears to be new" : "User has visited before"}</small>
+          </div>
+          <div class="test-result ${!tourCompleted ? "pass" : "fail"}">
+            <strong>tour_completed:</strong> ${tourCompleted}<br>
+            <small>${!tourCompleted ? "Tour not yet completed" : "Tour already completed"}</small>
+          </div>
+          <div class="test-result ${tourActive ? "pass" : "warning"}">
+            <strong>tour_active:</strong> ${tourActive}<br>
+            <small>${tourActive ? "Tour is currently running" : "Tour is not active"}</small>
+          </div>
+          <div class="test-result ${!hasVisited && !tourCompleted ? "pass" : "fail"}">
+            <strong>Should auto-start:</strong> ${!hasVisited && !tourCompleted}<br>
+            <small>Tour should auto-start for new users who haven't completed it</small>
+          </div>
+        `;
+      };
+
+      // Auto-run initial state check
+      window.addEventListener("load", () => {
+        setTimeout(checkTourState, 1000);
+      });
+    </script>
+  </body>
+</html>

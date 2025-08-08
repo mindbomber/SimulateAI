@@ -3365,11 +3365,14 @@ if (typeof window !== "undefined") {
   }
 
   // Global error handler for unhandled analytics errors
-  window.addEventListener("error", (event) => {
-    if (event.filename && event.filename.includes("analytics")) {
-      logger.warn("Analytics module error:", event.error);
-    }
-  });
+  // Only install if main error handler not already installed
+  if (!window._simulateAIErrorHandlerInstalled) {
+    window.addEventListener("error", (event) => {
+      if (event.filename && event.filename.includes("analytics")) {
+        logger.warn("Analytics module error:", event.error);
+      }
+    });
+  }
 }
 
 // Export for ES6 modules

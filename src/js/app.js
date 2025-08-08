@@ -1158,7 +1158,8 @@ class SimulateAIApp {
         this.onboardingTour = new OnboardingTour();
         window.onboardingTourInstance = this.onboardingTour;
         this.instrumentOnboardingTour(this.onboardingTour);
-        this.checkAndStartOnboardingTour();
+        // Use await for async method
+        await this.checkAndStartOnboardingTour();
         this._updateComponentHealth("onboarding_system", "healthy");
       } else if (!isAppPage) {
         AppDebug.info("Skipping onboarding tour - not on app page");
@@ -2232,6 +2233,24 @@ class SimulateAIApp {
     // Create error boundary element
     this.errorBoundary = document.getElementById("error-boundary");
 
+    // Ensure error boundary exists, create if missing
+    if (!this.errorBoundary) {
+      console.warn("Error boundary element missing, creating fallback");
+      this.errorBoundary = document.createElement("div");
+      this.errorBoundary.id = "error-boundary";
+      this.errorBoundary.style.display = "none";
+      this.errorBoundary.innerHTML = `
+        <div class="error-content">
+          <div class="error-message"></div>
+          <div class="error-actions">
+            <button class="error-retry-btn">Try Again</button>
+            <button class="error-dismiss-btn">Dismiss</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(this.errorBoundary);
+    }
+
     // Initialize Error Analytics Dashboard for debugging (dev mode only)
     if (
       window.location.hostname === "localhost" ||
@@ -2241,15 +2260,30 @@ class SimulateAIApp {
       AppDebug.log("Error Analytics Dashboard initialized for debugging");
     }
 
-    // Global error handlers
-    window.addEventListener("error", (event) => {
-      const error = event.error || event.message || event;
-      this.handleError(error, "A JavaScript error occurred");
-    });
+    // Global error handlers with deduplication
+    if (!window._simulateAIErrorHandlerInstalled) {
+      window._simulateAIErrorHandlerInstalled = true;
 
-    window.addEventListener("unhandledrejection", (event) => {
-      this.handleError(event.reason, "An unhandled promise rejection occurred");
-    });
+      window.addEventListener("error", (event) => {
+        // Prevent multiple handlers from firing
+        if (event._simulateAIHandled) return;
+        event._simulateAIHandled = true;
+
+        const error = event.error || event.message || event;
+        this.handleError(error, "A JavaScript error occurred");
+      });
+
+      window.addEventListener("unhandledrejection", (event) => {
+        // Prevent multiple handlers from firing
+        if (event._simulateAIHandled) return;
+        event._simulateAIHandled = true;
+
+        this.handleError(
+          event.reason,
+          "An unhandled promise rejection occurred",
+        );
+      });
+    }
 
     AppDebug.log("Error handling initialized");
   }
@@ -2524,9 +2558,23 @@ class SimulateAIApp {
    * Show error in error boundary
    */
   showError(message, isRecoverable = true) {
+    // Prevent multiple error alerts in a short time
+    if (this._lastErrorAlert && Date.now() - this._lastErrorAlert < 5000) {
+      console.warn("Suppressing duplicate error alert:", message);
+      return;
+    }
+
     if (!this.errorBoundary) {
-      // Fallback to alert if no error boundary
-      alert(message);
+      // Last resort fallback - but prevent spamming
+      this._lastErrorAlert = Date.now();
+      console.error(
+        "Error boundary missing, falling back to console:",
+        message,
+      );
+      // Only show alert for critical errors, not general ones
+      if (message.includes("critical") || message.includes("fatal")) {
+        alert(message);
+      }
       return;
     }
 
@@ -3661,25 +3709,43 @@ class SimulateAIApp {
   /**
    * Check if this is a first-time visit and start onboarding tour
    */
-  checkAndStartOnboardingTour() {
+  async checkAndStartOnboardingTour() {
     if (!this.onboardingTour) {
+      AppDebug.log("No onboarding tour instance available");
       return;
     }
 
-    // Check if user has completed the tour
-    if (this.onboardingTour.hasCompletedTour()) {
-      AppDebug.log("User has already completed onboarding tour");
-      return;
-    }
+    AppDebug.log("Checking onboarding tour auto-start conditions...");
 
-    // Check if this is a first-time visit
-    if (this.onboardingTour.isFirstTimeVisit()) {
-      AppDebug.log("First-time visit detected, starting onboarding tour");
-      // Small delay to ensure all UI is ready
-      const UI_READY_DELAY = 500; // ms
-      setTimeout(() => {
-        this.onboardingTour.startTour(1);
-      }, UI_READY_DELAY);
+    try {
+      // Check if user has completed the tour (async method)
+      const hasCompleted = await this.onboardingTour.hasCompletedTour();
+      if (hasCompleted) {
+        AppDebug.log("User has already completed onboarding tour");
+        return;
+      }
+
+      // Check if this is a first-time visit
+      const isFirstTime = this.onboardingTour.isFirstTimeVisit();
+      if (isFirstTime) {
+        AppDebug.log("First-time visit detected, starting onboarding tour");
+        // Small delay to ensure all UI is ready
+        const UI_READY_DELAY = 500; // ms
+        setTimeout(() => {
+          this.onboardingTour.startTour(1);
+        }, UI_READY_DELAY);
+      } else {
+        AppDebug.log("Not a first-time visit, tour will not auto-start");
+      }
+    } catch (error) {
+      AppDebug.error("Error checking onboarding tour conditions:", error);
+      // Fallback: check if this is a first-time visit anyway
+      if (this.onboardingTour.isFirstTimeVisit()) {
+        AppDebug.log("Fallback: Starting tour for first-time visit");
+        setTimeout(() => {
+          this.onboardingTour.startTour(1);
+        }, 500);
+      }
     }
   }
 
@@ -7081,16 +7147,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   });
-});
-
-/**
- * Fallback for script loading issues
- */
-window.addEventListener("error", (event) => {
-  const errorMessage =
-    event.message || event.error?.message || "Unknown error occurred";
-  AppDebug.error("Error occurred:", errorMessage);
-  AppDebug.error("Event details:", event);
 });
 
 // Initialize the application

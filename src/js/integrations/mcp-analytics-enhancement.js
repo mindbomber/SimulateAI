@@ -346,7 +346,10 @@ class MCPAnalyticsEnhancement {
    */
   setupErrorBoundaries() {
     // Only set up browser-specific error handling in browser environment
-    if (typeof window !== "undefined") {
+    if (
+      typeof window !== "undefined" &&
+      !window._simulateAIErrorHandlerInstalled
+    ) {
       window.addEventListener("error", (event) => {
         this.trackError(event.error, {
           type: "javascript_error",

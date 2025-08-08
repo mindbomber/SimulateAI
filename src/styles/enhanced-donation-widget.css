@@ -701,3 +701,24 @@ body.dark-mode .accordion-content {
 body.dark-mode .accordion-content-inner {
   color: var(--theme-text-primary);
 }
+
+/* Button styles for dark mode */
+body.dark-mode .btn-outline {
+  background: var(--theme-bg-secondary);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+body.dark-mode .btn-outline:hover {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+body.dark-mode .btn-text {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .btn-text:hover {
+  color: var(--theme-text-primary);
+}

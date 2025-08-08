@@ -191,23 +191,25 @@ export class FirebaseAnalyticsService {
       });
     });
 
-    // Track errors
-    window.addEventListener("error", (event) => {
-      this.trackError(event.error, {
-        message: event.message,
-        filename: event.filename,
-        lineno: event.lineno,
-        colno: event.colno,
+    // Track errors only if main error handler not already installed
+    if (!window._simulateAIErrorHandlerInstalled) {
+      window.addEventListener("error", (event) => {
+        this.trackError(event.error, {
+          message: event.message,
+          filename: event.filename,
+          lineno: event.lineno,
+          colno: event.colno,
+        });
       });
-    });
 
-    // Track unhandled promise rejections
-    window.addEventListener("unhandledrejection", (event) => {
-      this.trackError(event.reason, {
-        type: "unhandled_promise_rejection",
-        promise: event.promise,
+      // Track unhandled promise rejections
+      window.addEventListener("unhandledrejection", (event) => {
+        this.trackError(event.reason, {
+          type: "unhandled_promise_rejection",
+          promise: event.promise,
+        });
       });
-    });
+    }
 
     // Start session tracking
     this.startSession();

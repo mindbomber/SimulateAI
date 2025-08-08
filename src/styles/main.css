@@ -1809,6 +1809,17 @@
     color: var(--theme-text-secondary);
   }
 
+  /* Main section titles */
+  body.dark-mode .main-content .main-section-title,
+  body.theme-dark .main-content .main-section-title {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .main-section-description,
+  body.theme-dark .main-section-description {
+    color: var(--theme-text-secondary);
+  }
+
   /* Navigation dark mode styles moved to shared-navigation.css for component ownership */
 
   /* Hero dark mode styles moved to hero-consolidated.css for semantic ownership */

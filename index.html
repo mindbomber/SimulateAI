@@ -1099,6 +1099,131 @@
           transform: none;
         }
       }
+
+      /* Dark Mode Support for How It Works Section */
+      body.dark-mode .how-it-works,
+      body.theme-dark .how-it-works {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        color: var(--theme-text-primary, #f1f5f9);
+      }
+
+      body.dark-mode .steps-list li,
+      body.theme-dark .steps-list li {
+        background: var(--theme-bg-secondary, #1e293b);
+        color: var(--theme-text-primary, #f1f5f9);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--theme-border, #334155);
+      }
+
+      body.dark-mode .steps-list li::before,
+      body.theme-dark .steps-list li::before {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+      }
+
+      /* Dark Mode Support for Section Intro */
+      body.dark-mode .section-intro,
+      body.theme-dark .section-intro {
+        background: var(--theme-bg-secondary, #1e293b);
+        color: var(--theme-text-primary, #f1f5f9);
+      }
+
+      /* Dark Mode Support for Feature Cards */
+      body.dark-mode .feature-card,
+      body.theme-dark .feature-card {
+        background: var(--theme-bg-secondary, #1e293b);
+        color: var(--theme-text-primary, #f1f5f9);
+        border-color: var(--theme-border, #334155);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      }
+
+      body.dark-mode .feature-card:hover,
+      body.theme-dark .feature-card:hover {
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+      }
+
+      body.dark-mode .feature-card h3,
+      body.theme-dark .feature-card h3 {
+        color: var(--theme-text-primary, #f1f5f9);
+      }
+
+      body.dark-mode .feature-card p,
+      body.theme-dark .feature-card p {
+        color: var(--theme-text-secondary, #cbd5e1);
+      }
+
+      /* Dark Mode Support for Research Highlight */
+      body.dark-mode .research-highlight,
+      body.theme-dark .research-highlight {
+        background: linear-gradient(135deg, #2d1b3d 0%, #3a1e3a 100%);
+        border-color: var(--theme-accent-purple, #8b5cf6);
+        color: var(--theme-text-primary, #f1f5f9);
+      }
+
+      body.dark-mode .research-highlight h2,
+      body.theme-dark .research-highlight h2 {
+        color: var(--theme-accent-purple, #a78bfa);
+      }
+
+      body.dark-mode .benefit-item,
+      body.theme-dark .benefit-item {
+        background: var(--theme-bg-secondary, #1e293b);
+        color: var(--theme-text-primary, #f1f5f9);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Dark Mode Support for Audience Cards */
+      body.dark-mode .audience-card,
+      body.theme-dark .audience-card {
+        background: linear-gradient(135deg, #1e3a2e 0%, #2d5a3d 100%);
+        border-color: var(--theme-accent-green, #10b981);
+        color: var(--theme-text-primary, #f1f5f9);
+      }
+
+      body.dark-mode .audience-card h3,
+      body.theme-dark .audience-card h3 {
+        color: var(--theme-accent-green, #34d399);
+      }
+
+      /* Dark Mode Support for Privacy Section */
+      body.dark-mode .privacy-section,
+      body.theme-dark .privacy-section {
+        background: linear-gradient(135deg, #1e2a3a 0%, #2d1b3d 100%);
+        border-color: var(--theme-accent-blue, #3b82f6);
+        color: var(--theme-text-primary, #f1f5f9);
+      }
+
+      body.dark-mode .privacy-item,
+      body.theme-dark .privacy-item {
+        background: var(--theme-bg-secondary, #1e293b);
+        color: var(--theme-text-primary, #f1f5f9);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      body.dark-mode .privacy-item .checkmark,
+      body.theme-dark .privacy-item .checkmark {
+        color: var(--theme-accent-green, #10b981);
+      }
+
+      /* Dark Mode Support for Community Section */
+      body.dark-mode .community-section,
+      body.theme-dark .community-section {
+        background: linear-gradient(135deg, #1a2332 0%, #2d3748 100%);
+        color: var(--theme-text-primary, #f1f5f9);
+      }
+
+      body.dark-mode .community-button,
+      body.theme-dark .community-button {
+        background: var(--theme-bg-secondary, #1e293b);
+        color: var(--theme-accent-blue, #60a5fa);
+        border-color: var(--theme-accent-blue, #3b82f6);
+      }
+
+      body.dark-mode .community-button:hover,
+      body.theme-dark .community-button:hover {
+        background: var(--theme-accent-blue, #3b82f6);
+        color: var(--theme-text-primary, #f1f5f9);
+      }
     </style>
 
     <!-- PWA Manifest and Icons -->

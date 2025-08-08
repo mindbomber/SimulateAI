@@ -1393,6 +1393,107 @@
     transform: translateY(-1px);
   }
 
+  /* Navigation-specific Button Styles - Namespaced to avoid conflicts */
+  /* High specificity to override global button styles */
+  .nav-auth-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.625rem 1.25rem !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    font-size: 0.9rem !important;
+    letter-spacing: -0.01em !important;
+    text-decoration: none !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    min-height: var(--touch-target-min, 44px) !important;
+    border: 1px solid transparent;
+    cursor: pointer !important;
+    line-height: 1.4 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Navigation Outline Button Variant - Higher specificity */
+  .nav-group-auth .nav-auth-btn.nav-btn-outline,
+  .auth-section .nav-auth-btn.nav-btn-outline,
+  .nav-auth-btn.nav-btn-outline {
+    color: var(--nav-text-color, #64748b) !important;
+    background: transparent !important;
+    border-color: var(--nav-border-color, rgba(148, 163, 184, 0.3)) !important;
+  }
+
+  .nav-group-auth .nav-auth-btn.nav-btn-outline:hover,
+  .auth-section .nav-auth-btn.nav-btn-outline:hover,
+  .nav-auth-btn.nav-btn-outline:hover {
+    color: var(--nav-text-hover, #1e293b) !important;
+    background: var(--nav-bg-hover, #f8fafc) !important;
+    border-color: var(--nav-border-hover, rgba(148, 163, 184, 0.5)) !important;
+  }
+
+  .nav-group-auth .nav-auth-btn.nav-btn-outline:focus,
+  .auth-section .nav-auth-btn.nav-btn-outline:focus,
+  .nav-auth-btn.nav-btn-outline:focus {
+    outline: 2px solid var(--color-primary, #4f46e5) !important;
+    outline-offset: 2px !important;
+  }
+
+  /* Navigation Primary Button Variant - Higher specificity */
+  .nav-group-auth .nav-auth-btn.nav-btn-primary,
+  .auth-section .nav-auth-btn.nav-btn-primary,
+  .nav-auth-btn.nav-btn-primary {
+    color: white !important;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+    box-shadow: 0 1px 3px rgba(99, 102, 241, 0.4) !important;
+  }
+
+  .nav-group-auth .nav-auth-btn.nav-btn-primary:hover,
+  .auth-section .nav-auth-btn.nav-btn-primary:hover,
+  .nav-auth-btn.nav-btn-primary:hover {
+    background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%) !important;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4) !important;
+    transform: translateY(-1px) !important;
+  }
+
+  .nav-group-auth .nav-auth-btn.nav-btn-primary:focus,
+  .auth-section .nav-auth-btn.nav-btn-primary:focus,
+  .nav-auth-btn.nav-btn-primary:focus {
+    outline: 2px solid var(--color-primary, #4f46e5) !important;
+    outline-offset: 2px !important;
+  }
+
+  /* Dark mode support for navigation buttons - Enhanced specificity */
+  body.dark-mode .nav-group-auth .nav-auth-btn.nav-btn-outline,
+  body.dark-mode .auth-section .nav-auth-btn.nav-btn-outline,
+  body.dark-mode .nav-auth-btn.nav-btn-outline {
+    color: var(--theme-text-primary, #f0f6fc) !important;
+    border-color: var(--theme-border, rgba(255, 255, 255, 0.2)) !important;
+    background: transparent !important;
+  }
+
+  body.dark-mode .nav-group-auth .nav-auth-btn.nav-btn-outline:hover,
+  body.dark-mode .auth-section .nav-auth-btn.nav-btn-outline:hover,
+  body.dark-mode .nav-auth-btn.nav-btn-outline:hover {
+    color: var(--theme-text-primary, #f0f6fc) !important;
+    background: var(--theme-bg-secondary, rgba(255, 255, 255, 0.1)) !important;
+    border-color: var(
+      --theme-border-hover,
+      rgba(255, 255, 255, 0.3)
+    ) !important;
+  }
+
+  body.dark-mode .nav-group-auth .nav-auth-btn.nav-btn-primary,
+  body.dark-mode .auth-section .nav-auth-btn.nav-btn-primary,
+  body.dark-mode .nav-auth-btn.nav-btn-primary {
+    color: white !important;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+  }
+
+  body.dark-mode .nav-group-auth .nav-auth-btn.nav-btn-primary:hover,
+  body.dark-mode .auth-section .nav-auth-btn.nav-btn-primary:hover,
+  body.dark-mode .nav-auth-btn.nav-btn-primary:hover {
+    background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%) !important;
+  }
+
   /* Dropdown Menu Styles */
   .dropdown-menu {
     position: absolute;
@@ -1891,7 +1992,6 @@
       font-weight: 550 !important;
       line-height: 1.4 !important;
       letter-spacing: -0.025em !important;
-      color: #1e293b !important;
     }
 
     /* Show all groups in mobile */
@@ -2804,6 +2904,14 @@
   body.dark-mode .main-nav {
     background: var(--theme-bg-primary);
     border-bottom: 1px solid var(--theme-border);
+  }
+
+  /* Dark mode override for force-visible navigation states */
+  body.dark-mode .main-nav.force-visible,
+  body.dark-mode .main-nav.open,
+  body.dark-mode .main-nav.mobile-force-visible,
+  body.dark-mode .main-nav.js-open {
+    background: #2d2d2d !important;
   }
 
   body.dark-mode .nav-link {

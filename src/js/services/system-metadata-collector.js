@@ -265,24 +265,26 @@ export class SystemMetadataCollector {
       this.performanceMetrics.loadTimes.push(loadTime);
     }
 
-    // Monitor errors
-    window.addEventListener("error", (event) => {
-      this.performanceMetrics.errors.push({
-        message: event.message,
-        filename: event.filename,
-        lineno: event.lineno,
-        timestamp: new Date(),
+    // Monitor errors only if main error handler not already installed
+    if (!window._simulateAIErrorHandlerInstalled) {
+      window.addEventListener("error", (event) => {
+        this.performanceMetrics.errors.push({
+          message: event.message,
+          filename: event.filename,
+          lineno: event.lineno,
+          timestamp: new Date(),
+        });
       });
-    });
 
-    // Monitor unhandled promise rejections
-    window.addEventListener("unhandledrejection", (event) => {
-      this.performanceMetrics.errors.push({
-        message: "Unhandled Promise Rejection",
-        reason: event.reason,
-        timestamp: new Date(),
+      // Monitor unhandled promise rejections
+      window.addEventListener("unhandledrejection", (event) => {
+        this.performanceMetrics.errors.push({
+          message: "Unhandled Promise Rejection",
+          reason: event.reason,
+          timestamp: new Date(),
+        });
       });
-    });
+    }
   }
 
   /**

@@ -987,9 +987,104 @@
     border: 1px solid var(--theme-border);
   }
 
+  /* Radar explanation dark mode */
+  body.dark-mode .radar-explanation {
+    background: rgba(102, 126, 234, 0.1);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    color: var(--theme-text-primary);
+  }
+
+  /* Feature items dark mode */
+  body.dark-mode .feature-item {
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+  }
+
+  body.dark-mode .feature-item h5 {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .feature-item p {
+    color: var(--theme-text-secondary);
+  }
+
+  /* Interpretation guide dark mode */
+  body.dark-mode .interpretation-guide {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+  }
+
+  body.dark-mode .interpretation-guide h5 {
+    color: var(--color-amber-300, #fcd34d);
+  }
+
+  body.dark-mode .interpretation-guide p {
+    color: var(--theme-text-secondary);
+  }
+
+  /* Dimensions grid dark mode */
+  body.dark-mode .dimensions-grid {
+    background: var(--theme-bg-secondary);
+    border-color: var(--theme-border);
+  }
+
+  body.dark-mode .dimension-item h5 {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .dimension-item p {
+    color: var(--theme-text-secondary);
+  }
+
+  /* Ethics reminder dark mode */
+  body.dark-mode .ethics-reminder {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+  }
+
+  body.dark-mode .ethics-reminder p {
+    color: var(--color-green-300, #86efac);
+  }
+
+  body.dark-mode .ethics-reminder strong {
+    color: var(--color-green-200, #bbf7d0);
+  }
+
+  /* Simulation overview dark mode */
+  body.dark-mode .simulation-overview {
+    background: var(--theme-bg-secondary);
+    border-color: var(--theme-border);
+  }
+
+  body.dark-mode .simulation-overview h3 {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .simulation-overview p {
+    color: var(--theme-text-secondary);
+  }
+
+  /* Overview Meta Dark Mode */
+  body.dark-mode .overview-meta {
+    background: var(--theme-bg-primary);
+    border: 1px solid var(--theme-border);
+  }
+
+  body.dark-mode .meta-item {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .meta-label {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .meta-value {
+    color: var(--theme-text-secondary);
+  }
+
   /* Learning objectives */
   body.dark-mode .learning-objectives {
-    background: var(--theme-bg-primary);
+    background: #2d2d2d;
     border: 1px solid var(--theme-border);
   }
 
@@ -1001,6 +1096,20 @@
   body.dark-mode .objective-item {
     color: var(--theme-text-secondary);
     border-bottom: 1px solid var(--theme-border);
+  }
+
+  /* Preparation section dark mode */
+  body.dark-mode .preparation-section {
+    background: var(--theme-bg-primary);
+    border: 1px solid var(--theme-border);
+  }
+
+  body.dark-mode .preparation-section h4 {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .tip-item {
+    color: var(--theme-text-secondary);
   }
 
   /* Context dimensions */
@@ -1115,6 +1224,58 @@
   body.dark-mode .educator-section .resource-item:hover {
     border-color: var(--color-primary);
     box-shadow: 0 2px 8px var(--theme-shadow-hover);
+  }
+
+  body.dark-mode .resource-description {
+    color: var(--theme-text-secondary);
+  }
+
+  /* General Resource Elements Dark Mode */
+  body.dark-mode .resources-section {
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+  }
+
+  body.dark-mode .resource-item {
+    background: var(--theme-bg-primary);
+    border-color: var(--theme-border);
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .resource-item:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px var(--theme-shadow-hover);
+  }
+
+  body.dark-mode .resource-content {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .resource-title {
+    color: var(--theme-text-primary);
+  }
+
+  /* Discussion questions dark mode */
+  body.dark-mode .discussion-questions {
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .discussion-questions h4,
+  body.dark-mode .discussion-questions h5 {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .discussion-questions p,
+  body.dark-mode .discussion-questions li {
+    color: var(--theme-text-secondary);
+  }
+
+  body.dark-mode .discussion-questions .question-item {
+    background: var(--theme-bg-primary);
+    border: 1px solid var(--theme-border);
+    color: var(--theme-text-secondary);
   }
 
   /* Educator section - theme-dark support */
@@ -3417,6 +3578,17 @@
 
   body.dark-mode .coverage-label {
     color: #d1d5db;
+  }
+
+  /* Extension Activities and Standards Alignment Dark Mode */
+  body.dark-mode .extension-activities,
+  body.dark-mode .standards-alignment {
+    color: var(--theme-text-primary, #e5e7eb);
+  }
+
+  body.dark-mode .extension-activities li,
+  body.dark-mode .standards-alignment li {
+    color: var(--theme-text-primary, #e5e7eb);
   }
 
   /* Professional Development Dark Mode */

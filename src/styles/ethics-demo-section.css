@@ -645,3 +645,201 @@
     }
   }
 }
+
+/* ================================
+   DARK MODE SUPPORT
+   ================================ */
+
+@layer overrides {
+  /* Ethics Demo Section Dark Mode */
+  body.dark-mode .ethics-demo-section,
+  body.theme-dark .ethics-demo-section {
+    background: linear-gradient(
+      135deg,
+      var(--theme-bg-primary, #1a1a1a) 0%,
+      var(--theme-bg-secondary, #2a2a2a) 100%
+    );
+    border-top-color: var(--theme-border, #333);
+    border-bottom-color: var(--theme-border, #333);
+  }
+
+  /* Section Header Dark Mode */
+  body.dark-mode .demo-section-title,
+  body.theme-dark .demo-section-title {
+    color: var(--theme-text-primary, #f1f5f9);
+    background: linear-gradient(
+      135deg,
+      var(--color-primary, #1a73e8) 0%,
+      var(--color-primary-light, #4285f4) 100%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  body.dark-mode .demo-section-description,
+  body.theme-dark .demo-section-description {
+    color: var(--theme-text-secondary, #94a3b8);
+  }
+
+  /* Demo Controls Panel Dark Mode */
+  body.dark-mode .demo-controls-panel,
+  body.theme-dark .demo-controls-panel {
+    background: var(--theme-bg-secondary, #2a2a2a);
+    border-color: var(--theme-border, #333);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  }
+
+  body.dark-mode .controls-title,
+  body.theme-dark .controls-title {
+    color: var(--theme-text-primary, #f1f5f9);
+  }
+
+  body.dark-mode .controls-description,
+  body.theme-dark .controls-description {
+    color: var(--theme-text-secondary, #94a3b8);
+  }
+
+  /* Radar Chart Panel Dark Mode */
+  body.dark-mode .radar-chart-panel,
+  body.theme-dark .radar-chart-panel {
+    background: var(--theme-bg-secondary, #2a2a2a);
+    border-color: var(--theme-border, #333);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Demo Buttons Dark Mode */
+  body.dark-mode .demo-controls-grid.horizontal .demo-btn,
+  body.theme-dark .demo-controls-grid.horizontal .demo-btn {
+    background: linear-gradient(135deg, #3730a3 0%, #4338ca 100%);
+    color: var(--theme-text-primary, #f1f5f9);
+    box-shadow: 0 2px 4px rgba(55, 48, 163, 0.3);
+  }
+
+  body.dark-mode .demo-controls-grid.horizontal .demo-btn:hover,
+  body.theme-dark .demo-controls-grid.horizontal .demo-btn:hover {
+    box-shadow: 0 4px 12px rgba(55, 48, 163, 0.4);
+  }
+
+  body.dark-mode .demo-controls-grid.horizontal .demo-btn.active,
+  body.theme-dark .demo-controls-grid.horizontal .demo-btn.active {
+    background: linear-gradient(135deg, #047857 0%, #059669 100%);
+    box-shadow: 0 4px 12px rgba(4, 120, 87, 0.4);
+  }
+
+  /* Help Sections Dark Mode */
+  body.dark-mode .radar-instructions-accordion,
+  body.dark-mode .ethics-glossary-accordion,
+  body.theme-dark .radar-instructions-accordion,
+  body.theme-dark .ethics-glossary-accordion {
+    background: var(--theme-bg-secondary, #2a2a2a);
+    border-color: var(--theme-border, #333);
+  }
+
+  body.dark-mode .accordion-header,
+  body.theme-dark .accordion-header {
+    background: var(--theme-bg-primary, #1a1a1a);
+    color: var(--theme-text-primary, #f1f5f9);
+  }
+
+  body.dark-mode .accordion-header:hover,
+  body.theme-dark .accordion-header:hover {
+    background: var(--theme-bg-hover, #333);
+  }
+
+  body.dark-mode .demo-help-sections .accordion-title,
+  body.theme-dark .demo-help-sections .accordion-title {
+    color: var(--theme-text-primary, #f1f5f9);
+  }
+
+  body.dark-mode .demo-help-sections .accordion-content,
+  body.theme-dark .demo-help-sections .accordion-content {
+    background: var(--theme-bg-secondary, #2a2a2a);
+    border-color: var(--theme-border, #333);
+    box-shadow:
+      0 10px 25px rgba(0, 0, 0, 0.4),
+      0 4px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  body.dark-mode .accordion-content-inner,
+  body.theme-dark .accordion-content-inner {
+    color: var(--theme-text-secondary, #94a3b8);
+  }
+
+  /* Glossary Items Dark Mode */
+  body.dark-mode .glossary-item h4,
+  body.theme-dark .glossary-item h4 {
+    color: var(--theme-text-primary, #f1f5f9);
+  }
+
+  body.dark-mode .glossary-item p,
+  body.theme-dark .glossary-item p {
+    color: var(--theme-text-secondary, #94a3b8);
+  }
+
+  body.dark-mode .glossary-note,
+  body.theme-dark .glossary-note {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+
+  body.dark-mode .glossary-note p,
+  body.theme-dark .glossary-note p {
+    color: var(--color-blue-300, #93c5fd);
+  }
+
+  /* Orientation Suggestion Dark Mode */
+  body.dark-mode .orientation-suggestion,
+  body.theme-dark .orientation-suggestion {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.3);
+  }
+
+  body.dark-mode .message-text,
+  body.theme-dark .message-text {
+    color: var(--color-amber-300, #fcd34d);
+  }
+
+  /* Demo Feedback Popover Dark Mode */
+  body.dark-mode .demo-feedback-popover,
+  body.theme-dark .demo-feedback-popover {
+    background: var(--theme-bg-secondary, #2a2a2a);
+    color: var(--theme-text-primary, #f1f5f9);
+    border-color: var(--theme-border, #333);
+    box-shadow:
+      0 10px 25px rgba(0, 0, 0, 0.4),
+      0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  body.dark-mode .demo-feedback-popover h5,
+  body.dark-mode .demo-feedback-popover .popover-title,
+  body.theme-dark .demo-feedback-popover h5,
+  body.theme-dark .demo-feedback-popover .popover-title {
+    color: var(--color-primary, #1a73e8);
+  }
+
+  body.dark-mode .demo-feedback-popover p,
+  body.dark-mode .demo-feedback-popover .popover-description,
+  body.theme-dark .demo-feedback-popover p,
+  body.theme-dark .demo-feedback-popover .popover-description {
+    color: var(--theme-text-secondary, #94a3b8);
+  }
+
+  body.dark-mode .demo-feedback-popover .pattern-emphasis,
+  body.dark-mode .demo-feedback-popover .popover-footer,
+  body.theme-dark .demo-feedback-popover .pattern-emphasis,
+  body.theme-dark .demo-feedback-popover .popover-footer {
+    color: var(--theme-text-muted, #64748b);
+    border-top-color: var(--theme-border, #333);
+  }
+
+  body.dark-mode .popover-arrow,
+  body.theme-dark .popover-arrow {
+    border-top-color: var(--theme-bg-secondary, #2a2a2a);
+  }
+
+  body.dark-mode .popover-arrow::before,
+  body.theme-dark .popover-arrow::before {
+    border-top-color: var(--theme-border, #333);
+  }
+}

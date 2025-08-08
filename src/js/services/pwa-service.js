@@ -708,6 +708,12 @@ export class PWAService {
    * Show install prompt with enhanced deduplication
    */
   showInstallPrompt() {
+    // Disable PWA install prompt from service - using index.html version instead
+    console.log(
+      "📱 PWA install prompt disabled in service - using index.html version",
+    );
+    return;
+
     // Recheck installation status first
     this.checkInstallationStatus();
 
