@@ -49,6 +49,7 @@ import {
   browserSessionPersistence,
   browserLocalPersistence,
   inMemoryPersistence,
+  connectAuthEmulator,
 } from "firebase/auth";
 import {
   getFirestore,
@@ -64,6 +65,7 @@ import {
   updateDoc,
   deleteDoc,
   onSnapshot,
+  connectFirestoreEmulator,
 } from "firebase/firestore";
 import {
   getStorage,
@@ -71,6 +73,7 @@ import {
   uploadBytes,
   getDownloadURL,
   deleteObject,
+  connectStorageEmulator,
 } from "firebase/storage";
 import { getAnalytics, logEvent } from "firebase/analytics";
 import { getPerformance } from "firebase/performance";
@@ -482,6 +485,67 @@ export class FirebaseService {
         this.storage = getStorage(this.app);
         this.analytics = getAnalytics(this.app);
         this.performance = getPerformance(this.app);
+
+        // 🔥 Connect to Firebase Emulators if enabled in dev config
+        if (
+          devConfig.useEmulators &&
+          window.location.hostname === "localhost"
+        ) {
+          console.log("🔧 Connecting to Firebase Emulators...");
+          try {
+            // Connect to Auth Emulator
+            if (!this.auth.emulatorConfig) {
+              connectAuthEmulator(
+                this.auth,
+                `http://localhost:${devConfig.emulatorPorts.auth}`,
+                {
+                  disableWarnings: true,
+                },
+              );
+              console.log(
+                `✅ Connected to Auth Emulator on port ${devConfig.emulatorPorts.auth}`,
+              );
+            }
+
+            // Connect to Firestore Emulator
+            if (
+              !this.db._delegate._settings?.host?.includes(
+                devConfig.emulatorPorts.firestore.toString(),
+              )
+            ) {
+              connectFirestoreEmulator(
+                this.db,
+                "localhost",
+                devConfig.emulatorPorts.firestore,
+              );
+              console.log(
+                `✅ Connected to Firestore Emulator on port ${devConfig.emulatorPorts.firestore}`,
+              );
+            }
+
+            // Connect to Storage Emulator
+            if (
+              !this.storage.app.options.storageBucket?.includes("localhost")
+            ) {
+              connectStorageEmulator(
+                this.storage,
+                "localhost",
+                devConfig.emulatorPorts.storage,
+              );
+              console.log(
+                `✅ Connected to Storage Emulator on port ${devConfig.emulatorPorts.storage}`,
+              );
+            }
+          } catch (emulatorError) {
+            console.warn(
+              "⚠️ Firebase Emulator connection failed:",
+              emulatorError,
+            );
+            console.log(
+              "💡 Make sure emulators are running: firebase emulators:start",
+            );
+          }
+        }
 
         // Initialize messaging service with error handling
         try {

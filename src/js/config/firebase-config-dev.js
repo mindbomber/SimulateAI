@@ -57,7 +57,7 @@ export const securityConfig = {
 // Development Configuration
 export const devConfig = {
   enableDebugLogging: true,
-  useEmulators: false,
+  useEmulators: true, // 🔥 ENABLED for emulator development
   emulatorPorts: {
     auth: 9099,
     firestore: 8080,
