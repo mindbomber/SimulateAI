@@ -369,13 +369,80 @@ export function sanitizeClassroomName(name) {
  */
 export function generateClassroomShareUrl(
   classroomCode,
-  baseUrl = window.location.origin,
+  optionsOrBase = (function () {
+    try {
+      const { origin, pathname } = window.location;
+      if (pathname && pathname.toLowerCase().includes("app.html")) {
+        return `${origin}${pathname}`;
+      }
+      return `${origin}/app.html`;
+    } catch (_) {
+      return "/app.html";
+    }
+  })(),
 ) {
-  if (!classroomCode) {
-    return baseUrl;
+  // Backward compatibility: second arg can be baseUrl string
+  const isString = typeof optionsOrBase === "string";
+  const baseUrl = isString
+    ? optionsOrBase
+    : optionsOrBase?.baseUrl ||
+      (function () {
+        try {
+          const { origin, pathname } = window.location;
+          if (pathname && pathname.toLowerCase().includes("app.html")) {
+            return `${origin}${pathname}`;
+          }
+          return `${origin}/app.html`;
+        } catch (_) {
+          return "/app.html";
+        }
+      })();
+
+  if (!classroomCode) return baseUrl;
+
+  const params = new URLSearchParams();
+  params.set("join", classroomCode);
+
+  // If options contains a seed payload, embed a compact base64 seed
+  if (!isString && optionsOrBase?.seed) {
+    try {
+      const seed = optionsOrBase.seed;
+      // Minimal classroom seed (avoid large fields)
+      const compactSeed = {
+        classroomId: seed.classroomId,
+        classroomName: seed.classroomName,
+        classroomCode: seed.classroomCode,
+        instructorName: seed.instructorName,
+        selectedScenarios: Array.isArray(seed.selectedScenarios)
+          ? seed.selectedScenarios.map((s) => ({
+              id: s.id || s.scenarioId || s.title,
+              title: s.title,
+              category: s.category,
+            }))
+          : [],
+        settings: seed.settings || {},
+        sessionStatus: seed.sessionStatus || {
+          isLive: false,
+          isPaused: false,
+          currentScenario: 0,
+          startTime: null,
+          completedAt: null,
+        },
+      };
+      const encoded = btoa(
+        unescape(encodeURIComponent(JSON.stringify(compactSeed))),
+      );
+      params.set("seed", encoded);
+    } catch (e) {
+      logger.warn(
+        "ClassroomUtils",
+        "Failed to embed classroom seed in share URL",
+        e,
+      );
+    }
   }
 
-  return `${baseUrl}?join=${encodeURIComponent(classroomCode)}`;
+  return `${baseUrl}?${params.toString()}`;
 }
 
 /**

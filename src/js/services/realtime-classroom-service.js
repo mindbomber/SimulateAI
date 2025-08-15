@@ -99,29 +99,7 @@ export default class RealtimeClassroomService {
    * @returns {Promise<Object>} Created classroom with code and ID
    */
   async createClassroom(classroomData) {
-    // Wait for initialization to complete before proceeding with timeout
-    if (this.initializationPromise) {
-      try {
-        // Add timeout to prevent infinite hanging
-        await Promise.race([
-          this.initializationPromise,
-          new Promise((_, reject) =>
-            setTimeout(
-              () => reject(new Error("Initialization timeout")),
-              10000,
-            ),
-          ),
-        ]);
-      } catch (error) {
-        logger.warn(
-          "RealtimeClassroomService",
-          "Initialization failed or timed out during classroom creation, forcing fallback mode",
-          error,
-        );
-        this.fallbackMode = true;
-        this.isConnected = false;
-      }
-    }
+    // Do not block on initialization; proceed with hybrid path immediately
 
     // Note: We allow creation in both connected and fallback modes
     // The service handles both Firebase and localStorage automatically
@@ -155,13 +133,62 @@ export default class RealtimeClassroomService {
         },
       };
 
-      if (this.fallbackMode) {
-        // Use localStorage fallback
-        return await this.createClassroomFallback(classroom);
-      } else {
-        // Use Firebase Realtime Database
-        return await this.createClassroomFirebase(classroom);
+      // Prefer Firebase if possible; fallback on failure
+      // Ensure database exists if app is available
+      if (!this.database && this.firebaseService?.app) {
+        try {
+          this.database = getDatabase(this.firebaseService.app);
+        } catch (e) {
+          // ignore
+        }
       }
+
+      if (this.database) {
+        try {
+          const result = await Promise.race([
+            this.createClassroomFirebase(classroom),
+            new Promise((_, reject) =>
+              setTimeout(
+                () => reject(new Error("Firebase write timeout (create)")),
+                4000,
+              ),
+            ),
+          ]);
+          // Broadcast to other tabs so students in fallback can discover it
+          this.broadcastClassroom(result);
+          return result;
+        } catch (e) {
+          logger.warn(
+            "RealtimeClassroomService",
+            "Firebase create failed or timed out; using fallback",
+            e,
+          );
+          const created = await this.createClassroomFallback(classroom);
+          this.broadcastClassroom(created);
+          // Best-effort background publish to Firebase when possible
+          this.publishClassroomToFirebaseIfPossible(created).catch((err) =>
+            logger.warn(
+              "RealtimeClassroomService",
+              "Background publish to Firebase failed",
+              err,
+            ),
+          );
+          return created;
+        }
+      }
+
+      // No database—fallback
+      const created = await this.createClassroomFallback(classroom);
+      this.broadcastClassroom(created);
+      // Best-effort background publish to Firebase when possible
+      this.publishClassroomToFirebaseIfPossible(created).catch((err) =>
+        logger.warn(
+          "RealtimeClassroomService",
+          "Background publish to Firebase failed",
+          err,
+        ),
+      );
+      return created;
     } catch (error) {
       logger.error(
         "RealtimeClassroomService",
@@ -195,7 +222,102 @@ export default class RealtimeClassroomService {
       },
     );
 
+    // Mirror to localStorage so fallback-mode students can still find the classroom
+    try {
+      const existingClassrooms = JSON.parse(
+        localStorage.getItem("simulateai_classrooms") || "{}",
+      );
+      if (!existingClassrooms[classroom.classroomCode]) {
+        existingClassrooms[classroom.classroomCode] = classroom;
+        localStorage.setItem(
+          "simulateai_classrooms",
+          JSON.stringify(existingClassrooms),
+        );
+        logger.debug(
+          "RealtimeClassroomService",
+          "Mirrored classroom to fallback store",
+          { classroomCode: classroom.classroomCode },
+        );
+      }
+    } catch (mirrorError) {
+      logger.warn(
+        "RealtimeClassroomService",
+        "Failed to mirror classroom to fallback store",
+        mirrorError,
+      );
+    }
+
     return classroom;
+  }
+
+  /**
+   * Attempt to publish a locally-created classroom to Firebase in the background
+   * This helps cross-device discovery when initial creation used fallback mode
+   * @private
+   */
+  async publishClassroomToFirebaseIfPossible(classroom) {
+    try {
+      if (!this.firebaseService?.app) return;
+      // Ensure db exists
+      if (!this.database) {
+        try {
+          this.database = getDatabase(this.firebaseService.app);
+        } catch (_) {
+          return; // Can't initialize db
+        }
+      }
+
+      if (!this.database) return;
+
+      const classroomRef = ref(
+        this.database,
+        `classrooms/${classroom.classroomCode}`,
+      );
+
+      // If already exists, skip
+      let exists = false;
+      try {
+        const snapshot = await Promise.race([
+          get(classroomRef),
+          new Promise((_, reject) =>
+            setTimeout(
+              () => reject(new Error("Firebase read timeout (publish check)")),
+              3000,
+            ),
+          ),
+        ]);
+        exists = snapshot.exists();
+      } catch (_) {
+        // Read failed; proceed with best-effort write
+      }
+
+      if (!exists) {
+        await Promise.race([
+          set(classroomRef, {
+            ...classroom,
+            dateCreated: classroom.dateCreated || serverTimestamp(),
+          }),
+          new Promise((_, reject) =>
+            setTimeout(
+              () => reject(new Error("Firebase write timeout (publish)")),
+              3000,
+            ),
+          ),
+        ]);
+        logger.info(
+          "RealtimeClassroomService",
+          "Published fallback-created classroom to Firebase",
+          { classroomCode: classroom.classroomCode },
+        );
+      }
+    } catch (error) {
+      // Swallow; best-effort background task
+      logger.debug(
+        "RealtimeClassroomService",
+        "Publish to Firebase skipped/failed",
+        error,
+      );
+    }
   }
 
   /**
@@ -246,25 +368,179 @@ export default class RealtimeClassroomService {
    * @returns {Promise<Object>} Classroom data and student info
    */
   async joinClassroom(classroomCode, studentId, nickname) {
-    if (!this.isConnected) {
-      throw new Error("Database not connected");
-    }
+    // Do not block on initialization; attempt hybrid immediately
 
     try {
       // Validate classroom code format
       if (!validateClassroomCode(classroomCode)) {
         throw new Error("Invalid classroom code format");
       }
+      // Try Firebase first if available; otherwise fallback
+      let classroom = null;
+      let usingFirebase = false;
 
-      // Check if classroom exists
-      const classroomRef = ref(this.database, `classrooms/${classroomCode}`);
-      const snapshot = await get(classroomRef);
-
-      if (!snapshot.exists()) {
-        throw new Error("Classroom not found");
+      // If we don't have a database yet but app exists, try to create one
+      if (!this.database && this.firebaseService?.app) {
+        try {
+          this.database = getDatabase(this.firebaseService.app);
+        } catch (e) {
+          // ignore; we'll rely on fallback
+        }
       }
 
-      const classroom = snapshot.val();
+      if (this.database) {
+        try {
+          const classroomRef = ref(
+            this.database,
+            `classrooms/${classroomCode}`,
+          );
+          const snapshot = await Promise.race([
+            get(classroomRef),
+            new Promise((_, reject) =>
+              setTimeout(
+                () => reject(new Error("Firebase read timeout (join)")),
+                5000,
+              ),
+            ),
+          ]);
+          if (snapshot.exists()) {
+            classroom = snapshot.val();
+            usingFirebase = true;
+          }
+        } catch (e) {
+          logger.warn(
+            "RealtimeClassroomService",
+            "Firebase read failed during join; will try fallback",
+            e,
+          );
+        }
+      }
+
+      // If not found via Firebase, check localStorage fallback
+      if (!classroom) {
+        try {
+          const existingClassrooms = JSON.parse(
+            localStorage.getItem("simulateai_classrooms") || "{}",
+          );
+          classroom = existingClassrooms[classroomCode] || null;
+        } catch (e) {
+          // ignore
+        }
+
+        // Edge-case: teacher created via Firebase but local student is offline and
+        // localStorage doesn’t have the classroom yet. Make a one-time best-effort
+        // attempt to mirror from Firebase to localStorage, then retry lookup.
+        if (!classroom && this.database) {
+          try {
+            const classroomRef = ref(
+              this.database,
+              `classrooms/${classroomCode}`,
+            );
+            const snapshot = await Promise.race([
+              get(classroomRef),
+              new Promise((_, reject) =>
+                setTimeout(
+                  () => reject(new Error("Firebase read timeout (mirror)")),
+                  2500,
+                ),
+              ),
+            ]);
+            if (snapshot.exists()) {
+              const fbClassroom = snapshot.val();
+              try {
+                const existing = JSON.parse(
+                  localStorage.getItem("simulateai_classrooms") || "{}",
+                );
+                existing[classroomCode] = fbClassroom;
+                localStorage.setItem(
+                  "simulateai_classrooms",
+                  JSON.stringify(existing),
+                );
+                classroom = fbClassroom;
+              } catch (_) {
+                // ignore
+              }
+            }
+          } catch (_) {
+            // ignore
+          }
+        }
+
+        // Final small window: listen for a BroadcastChannel announce from teacher tab
+        if (!classroom && typeof BroadcastChannel !== "undefined") {
+          classroom = await new Promise((resolve) => {
+            let resolved = false;
+            try {
+              const bc = new BroadcastChannel("simulateai_classrooms");
+              const waitMs = 2500;
+              const timer = setTimeout(() => {
+                if (!resolved) {
+                  resolved = true;
+                  try {
+                    bc.close();
+                  } catch (closeErr) {
+                    logger.debug(
+                      "RealtimeClassroomService",
+                      "BC close timeout error",
+                      closeErr,
+                    );
+                  }
+                  resolve(null);
+                }
+              }, waitMs);
+              bc.onmessage = (evt) => {
+                const data = evt?.data;
+                if (
+                  data?.type === "classroom_created" &&
+                  data?.classroom?.classroomCode === classroomCode
+                ) {
+                  try {
+                    const existing = JSON.parse(
+                      localStorage.getItem("simulateai_classrooms") || "{}",
+                    );
+                    existing[classroomCode] = data.classroom;
+                    localStorage.setItem(
+                      "simulateai_classrooms",
+                      JSON.stringify(existing),
+                    );
+                  } catch (storeErr) {
+                    logger.debug(
+                      "RealtimeClassroomService",
+                      "Broadcast mirror store error",
+                      storeErr,
+                    );
+                  }
+                  if (!resolved) {
+                    resolved = true;
+                    clearTimeout(timer);
+                    try {
+                      bc.close();
+                    } catch (closeErr) {
+                      logger.debug(
+                        "RealtimeClassroomService",
+                        "BC close message error",
+                        closeErr,
+                      );
+                    }
+                    resolve(data.classroom);
+                  }
+                }
+              };
+            } catch (err) {
+              logger.debug(
+                "RealtimeClassroomService",
+                "BroadcastChannel unsupported/error",
+                err,
+              );
+              resolve(null);
+            }
+          });
+        }
+      }
+
+      if (!classroom) {
+        throw new Error("Classroom not found");
+      }
 
       // Check if session is still accepting students
       if (
@@ -281,7 +557,7 @@ export default class RealtimeClassroomService {
       }
 
       // Check if student already joined
-      if (classroom.roster[studentId]) {
+      if (classroom.roster && classroom.roster[studentId]) {
         logger.warn(
           "RealtimeClassroomService",
           "Student already in classroom",
@@ -305,25 +581,123 @@ export default class RealtimeClassroomService {
         lastSeen: serverTimestamp(),
       };
 
-      const rosterRef = ref(
-        this.database,
-        `classrooms/${classroomCode}/roster/${studentId}`,
-      );
-      await set(rosterRef, studentInfo);
+      if (usingFirebase) {
+        const rosterRef = ref(
+          this.database,
+          `classrooms/${classroomCode}/roster/${studentId}`,
+        );
+        try {
+          await Promise.race([
+            set(rosterRef, studentInfo),
+            new Promise((_, reject) =>
+              setTimeout(
+                () => reject(new Error("Firebase write timeout (roster)")),
+                3000,
+              ),
+            ),
+          ]);
+          // Notify other tabs promptly with student payload
+          this.broadcastRosterUpdate(classroomCode, {
+            studentId,
+            studentInfo,
+          });
+        } catch (e) {
+          logger.warn(
+            "RealtimeClassroomService",
+            "Firebase roster write failed; falling back",
+            e,
+          );
+          // Seed localStorage with classroom so fallback can proceed
+          try {
+            const existingClassrooms = JSON.parse(
+              localStorage.getItem("simulateai_classrooms") || "{}",
+            );
+            if (!existingClassrooms[classroomCode]) {
+              existingClassrooms[classroomCode] = classroom;
+              localStorage.setItem(
+                "simulateai_classrooms",
+                JSON.stringify(existingClassrooms),
+              );
+            }
+          } catch (_) {
+            // ignore
+          }
+          return await this.joinClassroomFallback(
+            classroomCode,
+            studentId,
+            nickname,
+          );
+        }
 
-      // Initialize student choices structure
-      const choicesRef = ref(
-        this.database,
-        `classrooms/${classroomCode}/studentChoices/${studentId}`,
-      );
-      await set(choicesRef, {
-        scenarios: {},
-        overallProgress: {
-          completed: 0,
-          total: classroom.selectedScenarios.length,
-          currentScenario: null,
-        },
-      });
+        // Initialize student choices structure
+        const choicesRef = ref(
+          this.database,
+          `classrooms/${classroomCode}/studentChoices/${studentId}`,
+        );
+        try {
+          await Promise.race([
+            set(choicesRef, {
+              scenarios: {},
+              overallProgress: {
+                completed: 0,
+                total: classroom.selectedScenarios.length,
+                currentScenario: null,
+              },
+            }),
+            new Promise((_, reject) =>
+              setTimeout(
+                () => reject(new Error("Firebase write timeout (choices)")),
+                3000,
+              ),
+            ),
+          ]);
+        } catch (e) {
+          logger.warn(
+            "RealtimeClassroomService",
+            "Firebase choices write failed; falling back",
+            e,
+          );
+          // Seed and fallback
+          try {
+            const existingClassrooms = JSON.parse(
+              localStorage.getItem("simulateai_classrooms") || "{}",
+            );
+            if (!existingClassrooms[classroomCode]) {
+              existingClassrooms[classroomCode] = classroom;
+              localStorage.setItem(
+                "simulateai_classrooms",
+                JSON.stringify(existingClassrooms),
+              );
+            }
+          } catch (_) {
+            // ignore
+          }
+          return await this.joinClassroomFallback(
+            classroomCode,
+            studentId,
+            nickname,
+          );
+        }
+      } else {
+        // Use fallback write path
+        const result = await this.joinClassroomFallback(
+          classroomCode,
+          studentId,
+          nickname,
+        );
+        // Notify other tabs promptly with student payload
+        this.broadcastRosterUpdate(classroomCode, {
+          studentId,
+          studentInfo: result.studentInfo,
+        });
+        // Best-effort background publish to Firebase for cross-profile discovery
+        this.publishRosterEntryToFirebaseIfPossible(
+          classroomCode,
+          studentId,
+          result.studentInfo,
+        ).catch(() => {});
+        return result;
+      }
 
       logger.info("RealtimeClassroomService", "Student joined classroom", {
         classroomCode,
@@ -347,6 +721,203 @@ export default class RealtimeClassroomService {
   }
 
   /**
+   * Broadcast classroom creation so other tabs (student) can discover it immediately
+   * @private
+   */
+  broadcastClassroom(classroom) {
+    try {
+      if (typeof BroadcastChannel === "undefined") return;
+      const bc = new BroadcastChannel("simulateai_classrooms");
+      bc.postMessage({ type: "classroom_created", classroom });
+      // Close shortly to avoid keeping channel open
+      setTimeout(() => {
+        try {
+          bc.close();
+        } catch (e) {
+          logger.debug(
+            "RealtimeClassroomService",
+            "BC close deferred error",
+            e,
+          );
+        }
+      }, 100);
+    } catch (e) {
+      // Best effort only
+    }
+  }
+
+  /**
+   * Best-effort background publish of a roster entry to Firebase when fallback was used
+   * @private
+   * @param {string} classroomCode
+   * @param {string} studentId
+   * @param {Object} studentInfo
+   */
+  async publishRosterEntryToFirebaseIfPossible(
+    classroomCode,
+    studentId,
+    studentInfo,
+  ) {
+    try {
+      if (!this.firebaseService?.app) return;
+      if (!this.database) {
+        try {
+          this.database = getDatabase(this.firebaseService.app);
+        } catch (_) {
+          return;
+        }
+      }
+      if (!this.database) return;
+
+      const rosterRef = ref(
+        this.database,
+        `classrooms/${classroomCode}/roster/${studentId}`,
+      );
+      await Promise.race([
+        set(rosterRef, studentInfo),
+        new Promise((_, reject) =>
+          setTimeout(
+            () => reject(new Error("Firebase write timeout (roster publish)")),
+            3000,
+          ),
+        ),
+      ]);
+    } catch (e) {
+      // best-effort only
+    }
+  }
+
+  /**
+   * Broadcast a roster update so other tabs (e.g., teacher) refresh immediately
+   * @private
+   * @param {string} classroomCode
+   */
+  broadcastRosterUpdate(classroomCode, payload = null) {
+    try {
+      if (typeof BroadcastChannel === "undefined") return;
+      const bc = new BroadcastChannel("simulateai_classrooms");
+      bc.postMessage({ type: "roster_updated", classroomCode, payload });
+      setTimeout(() => {
+        try {
+          bc.close();
+        } catch (e) {
+          logger.debug(
+            "RealtimeClassroomService",
+            "BC close deferred error",
+            e,
+          );
+        }
+      }, 100);
+    } catch (_) {
+      // Best-effort only
+    }
+  }
+
+  /**
+   * Join a classroom using localStorage fallback
+   * @private
+   */
+  async joinClassroomFallback(classroomCode, studentId, nickname) {
+    try {
+      // Validate classroom code format
+      if (!validateClassroomCode(classroomCode)) {
+        throw new Error("Invalid classroom code format");
+      }
+
+      const existingClassrooms = JSON.parse(
+        localStorage.getItem("simulateai_classrooms") || "{}",
+      );
+
+      const classroom = existingClassrooms[classroomCode];
+      if (!classroom) {
+        throw new Error("Classroom not found");
+      }
+
+      // Late join and capacity checks
+      if (
+        classroom.sessionStatus?.isLive &&
+        !classroom.settings?.allowLateJoining
+      ) {
+        throw new Error("Session is live and not accepting new students");
+      }
+
+      const roster = classroom.roster || {};
+      const currentRosterSize = Object.keys(roster).length;
+      const maxStudents =
+        classroom.settings?.maxStudents || CLASSROOM_CONSTANTS.MAX_STUDENTS;
+      if (currentRosterSize >= maxStudents) {
+        throw new Error("Classroom is full");
+      }
+
+      // If already joined, return existing
+      if (roster[studentId]) {
+        logger.warn(
+          "RealtimeClassroomService",
+          "Student already in classroom (fallback)",
+          {
+            classroomCode,
+            studentId,
+          },
+        );
+        return {
+          classroomCode,
+          ...classroom,
+          studentInfo: roster[studentId],
+        };
+      }
+
+      // Add student
+      const now = Date.now();
+      const studentInfo = {
+        nickname,
+        joinedAt: now,
+        isActive: true,
+        lastSeen: now,
+      };
+
+      classroom.roster = { ...roster, [studentId]: studentInfo };
+
+      // Initialize student choices
+      classroom.studentChoices = classroom.studentChoices || {};
+      classroom.studentChoices[studentId] = {
+        scenarios: {},
+        overallProgress: {
+          completed: 0,
+          total: (classroom.selectedScenarios || []).length,
+          currentScenario: null,
+          lastUpdated: now,
+        },
+      };
+
+      // Persist
+      existingClassrooms[classroomCode] = classroom;
+      localStorage.setItem(
+        "simulateai_classrooms",
+        JSON.stringify(existingClassrooms),
+      );
+
+      logger.info(
+        "RealtimeClassroomService",
+        "Student joined classroom (fallback)",
+        { classroomCode, studentId, nickname },
+      );
+
+      return {
+        classroomCode,
+        ...classroom,
+        studentInfo,
+      };
+    } catch (error) {
+      logger.error(
+        "RealtimeClassroomService",
+        "Failed to join classroom in fallback mode",
+        error,
+      );
+      throw error;
+    }
+  }
+
+  /**
    * Start a live session for a classroom
    * @param {string} classroomCode - Classroom code
    * @param {string} instructorId - Instructor's Firebase UID
@@ -354,23 +925,118 @@ export default class RealtimeClassroomService {
    */
   async startLiveSession(classroomCode, instructorId) {
     try {
+      if (this.fallbackMode || !this.database) {
+        const existingClassrooms = JSON.parse(
+          localStorage.getItem("simulateai_classrooms") || "{}",
+        );
+        const classroom = existingClassrooms[classroomCode];
+        if (!classroom) throw new Error("Classroom not found");
+
+        classroom.sessionStatus = {
+          isLive: true,
+          isPaused: false,
+          currentScenario: 0,
+          startTime: Date.now(),
+          completedAt: null,
+        };
+        existingClassrooms[classroomCode] = classroom;
+        localStorage.setItem(
+          "simulateai_classrooms",
+          JSON.stringify(existingClassrooms),
+        );
+
+        // Notify same-profile tabs immediately
+        try {
+          this.broadcastSessionStatusUpdate(
+            classroomCode,
+            classroom.sessionStatus,
+          );
+        } catch (e) {
+          // best-effort notify failure
+        }
+
+        logger.info(
+          "RealtimeClassroomService",
+          "Live session started (fallback)",
+          {
+            classroomCode,
+            instructorId,
+          },
+        );
+        return;
+      }
       const sessionStatusRef = ref(
         this.database,
         `classrooms/${classroomCode}/sessionStatus`,
       );
 
-      await set(sessionStatusRef, {
-        isLive: true,
-        isPaused: false,
-        currentScenario: 0,
-        startTime: serverTimestamp(),
-        completedAt: null,
-      });
+      // Attempt Firebase write with timeout; on timeout, fall back to local strategy
+      try {
+        await Promise.race([
+          set(sessionStatusRef, {
+            isLive: true,
+            isPaused: false,
+            currentScenario: 0,
+            startTime: serverTimestamp(),
+            completedAt: null,
+          }),
+          new Promise((_, reject) =>
+            setTimeout(
+              () => reject(new Error("Firebase write timeout (start session)")),
+              4000,
+            ),
+          ),
+        ]);
 
-      logger.info("RealtimeClassroomService", "Live session started", {
-        classroomCode,
-        instructorId,
-      });
+        logger.info("RealtimeClassroomService", "Live session started", {
+          classroomCode,
+          instructorId,
+        });
+      } catch (err) {
+        logger.warn(
+          "RealtimeClassroomService",
+          "Firebase write failed/timed out for startLiveSession; applying fallback locally",
+          err,
+        );
+
+        // Local mirror fallback so same-profile students update immediately
+        const existingClassrooms = JSON.parse(
+          localStorage.getItem("simulateai_classrooms") || "{}",
+        );
+        const classroom = existingClassrooms[classroomCode] || {};
+        const status = {
+          isLive: true,
+          isPaused: false,
+          currentScenario: 0,
+          startTime: Date.now(),
+          completedAt: null,
+        };
+        classroom.sessionStatus = status;
+        existingClassrooms[classroomCode] = classroom;
+        localStorage.setItem(
+          "simulateai_classrooms",
+          JSON.stringify(existingClassrooms),
+        );
+
+        try {
+          this.broadcastSessionStatusUpdate(classroomCode, status);
+        } catch (_) {
+          // best-effort: BroadcastChannel may be unavailable
+        }
+
+        // Best-effort background publish to Firebase (no await)
+        try {
+          set(sessionStatusRef, {
+            isLive: true,
+            isPaused: false,
+            currentScenario: 0,
+            startTime: serverTimestamp(),
+            completedAt: null,
+          }).catch(() => {});
+        } catch (_) {
+          // ignore background publish errors
+        }
+      }
     } catch (error) {
       logger.error(
         "RealtimeClassroomService",
@@ -389,6 +1055,26 @@ export default class RealtimeClassroomService {
    */
   async pauseSession(classroomCode, isPaused) {
     try {
+      if (this.fallbackMode || !this.database) {
+        const existingClassrooms = JSON.parse(
+          localStorage.getItem("simulateai_classrooms") || "{}",
+        );
+        const classroom = existingClassrooms[classroomCode];
+        if (!classroom) throw new Error("Classroom not found");
+        classroom.sessionStatus = classroom.sessionStatus || {};
+        classroom.sessionStatus.isPaused = isPaused;
+        existingClassrooms[classroomCode] = classroom;
+        localStorage.setItem(
+          "simulateai_classrooms",
+          JSON.stringify(existingClassrooms),
+        );
+        logger.info(
+          "RealtimeClassroomService",
+          `Session ${isPaused ? "paused" : "resumed"} (fallback)`,
+          { classroomCode },
+        );
+        return;
+      }
       const pauseRef = ref(
         this.database,
         `classrooms/${classroomCode}/sessionStatus/isPaused`,
@@ -413,12 +1099,66 @@ export default class RealtimeClassroomService {
   }
 
   /**
+   * Broadcast session status update to same-profile tabs
+   * @param {string} classroomCode
+   * @param {Object} status
+   */
+  broadcastSessionStatusUpdate(classroomCode, status) {
+    if (typeof BroadcastChannel === "undefined") return;
+    try {
+      const bc = new BroadcastChannel("simulateai_classrooms");
+      bc.postMessage({
+        type: "session_status_updated",
+        classroomCode,
+        status,
+      });
+      // Close shortly to avoid keeping channel open
+      setTimeout(() => {
+        try {
+          bc.close();
+        } catch (_) {
+          // ignore close errors
+        }
+      }, 150);
+    } catch (_) {
+      // ignore broadcast errors
+    }
+  }
+
+  /**
    * Complete a classroom session
    * @param {string} classroomCode - Classroom code
    * @returns {Promise<void>}
    */
   async completeSession(classroomCode) {
     try {
+      if (this.fallbackMode || !this.database) {
+        const existingClassrooms = JSON.parse(
+          localStorage.getItem("simulateai_classrooms") || "{}",
+        );
+        const classroom = existingClassrooms[classroomCode];
+        if (!classroom) throw new Error("Classroom not found");
+        classroom.sessionStatus = {
+          isLive: false,
+          isPaused: false,
+          currentScenario: null,
+          startTime: null,
+          completedAt: Date.now(),
+        };
+        existingClassrooms[classroomCode] = classroom;
+        localStorage.setItem(
+          "simulateai_classrooms",
+          JSON.stringify(existingClassrooms),
+        );
+        logger.info(
+          "RealtimeClassroomService",
+          "Session completed (fallback)",
+          {
+            classroomCode,
+          },
+        );
+        return;
+      }
       const sessionStatusRef = ref(
         this.database,
         `classrooms/${classroomCode}/sessionStatus`,
@@ -462,6 +1202,51 @@ export default class RealtimeClassroomService {
     metadata = {},
   ) {
     try {
+      if (this.fallbackMode || !this.database) {
+        const existingClassrooms = JSON.parse(
+          localStorage.getItem("simulateai_classrooms") || "{}",
+        );
+        const classroom = existingClassrooms[classroomCode];
+        if (!classroom) throw new Error("Classroom not found");
+
+        const now = Date.now();
+        const choiceData = {
+          choice,
+          timestamp: now,
+          isComplete: true,
+          responseTime: metadata.responseTime || null,
+          confidence: metadata.confidence || null,
+        };
+
+        classroom.studentChoices = classroom.studentChoices || {};
+        const student = classroom.studentChoices[studentId] || {
+          scenarios: {},
+          overallProgress: {
+            completed: 0,
+            total: (classroom.selectedScenarios || []).length,
+            currentScenario: null,
+            lastUpdated: now,
+          },
+        };
+        student.scenarios = { ...student.scenarios, [scenarioId]: choiceData };
+        classroom.studentChoices[studentId] = student;
+
+        // Update progress
+        await this.updateStudentProgress(classroomCode, studentId, scenarioId);
+
+        existingClassrooms[classroomCode] = classroom;
+        localStorage.setItem(
+          "simulateai_classrooms",
+          JSON.stringify(existingClassrooms),
+        );
+
+        logger.info(
+          "RealtimeClassroomService",
+          "Student choice submitted (fallback)",
+          { classroomCode, studentId, scenarioId, choice },
+        );
+        return;
+      }
       const choiceData = {
         choice,
         timestamp: serverTimestamp(),
@@ -504,6 +1289,35 @@ export default class RealtimeClassroomService {
    */
   async updateStudentProgress(classroomCode, studentId, currentScenarioId) {
     try {
+      if (this.fallbackMode || !this.database) {
+        const existingClassrooms = JSON.parse(
+          localStorage.getItem("simulateai_classrooms") || "{}",
+        );
+        const classroom = existingClassrooms[classroomCode];
+        if (!classroom) throw new Error("Classroom not found");
+
+        const scenarios =
+          classroom.studentChoices?.[studentId]?.scenarios || {};
+        const completed = Object.keys(scenarios).length;
+        const total = (classroom.selectedScenarios || []).length;
+
+        classroom.studentChoices = classroom.studentChoices || {};
+        classroom.studentChoices[studentId] =
+          classroom.studentChoices[studentId] || {};
+        classroom.studentChoices[studentId].overallProgress = {
+          completed,
+          total,
+          currentScenario: currentScenarioId,
+          lastUpdated: Date.now(),
+        };
+
+        existingClassrooms[classroomCode] = classroom;
+        localStorage.setItem(
+          "simulateai_classrooms",
+          JSON.stringify(existingClassrooms),
+        );
+        return;
+      }
       // Get current choices to calculate completed count
       const choicesRef = ref(
         this.database,
@@ -549,18 +1363,149 @@ export default class RealtimeClassroomService {
    * @returns {Function} Unsubscribe function
    */
   listenToRoster(classroomCode, callback) {
-    const rosterRef = ref(this.database, `classrooms/${classroomCode}/roster`);
     const listenerId = `roster_${classroomCode}`;
 
-    const unsubscribe = onValue(rosterRef, (snapshot) => {
-      const roster = snapshot.val() || {};
-      callback(roster);
-    });
+    // Combined strategy: localStorage polling + BroadcastChannel + Firebase onValue + Firebase periodic GET
+    let lastJson = "";
+    const emit = (roster) => {
+      try {
+        const j = JSON.stringify(roster || {});
+        if (j !== lastJson) {
+          lastJson = j;
+          callback(roster || {});
+        }
+      } catch (_) {
+        callback(roster || {});
+      }
+    };
 
-    this.listeners.set(listenerId, unsubscribe);
+    const cleanups = [];
 
+    // Local polling always on as safety net
+    const pollId = setInterval(() => {
+      try {
+        const existing = JSON.parse(
+          localStorage.getItem("simulateai_classrooms") || "{}",
+        );
+        const cls = existing[classroomCode] || {};
+        emit(cls.roster || {});
+      } catch (e) {
+        logger.debug("RealtimeClassroomService", "Roster poll failed", e);
+      }
+    }, 1000);
+    cleanups.push(() => clearInterval(pollId));
+
+    // BroadcastChannel merge for cross-tab same-profile
+    try {
+      if (typeof BroadcastChannel !== "undefined") {
+        const bc = new BroadcastChannel("simulateai_classrooms");
+        const onMsg = (evt) => {
+          try {
+            if (
+              evt?.data?.type === "roster_updated" &&
+              evt.data.classroomCode === classroomCode
+            ) {
+              const existing = JSON.parse(
+                localStorage.getItem("simulateai_classrooms") || "{}",
+              );
+              const cls = existing[classroomCode] || {};
+              const payload = evt.data.payload;
+              if (payload && payload.studentId && payload.studentInfo) {
+                cls.roster = cls.roster || {};
+                cls.roster[payload.studentId] = payload.studentInfo;
+                existing[classroomCode] = cls;
+                try {
+                  localStorage.setItem(
+                    "simulateai_classrooms",
+                    JSON.stringify(existing),
+                  );
+                } catch (_) {
+                  /* ignore */
+                }
+              }
+              emit((existing[classroomCode] || {}).roster || {});
+            }
+          } catch (e) {
+            logger.debug("RealtimeClassroomService", "BC roster msg error", e);
+          }
+        };
+        bc.addEventListener("message", onMsg);
+        cleanups.push(() => {
+          try {
+            bc.removeEventListener("message", onMsg);
+            bc.close();
+          } catch (_) {
+            /* ignore */
+          }
+        });
+      }
+    } catch (_) {
+      /* ignore */
+    }
+
+    // Firebase listeners (if available)
+    if (this.database) {
+      try {
+        const rosterRef = ref(
+          this.database,
+          `classrooms/${classroomCode}/roster`,
+        );
+        const unsubscribe = onValue(rosterRef, (snapshot) => {
+          emit(snapshot.val() || {});
+        });
+        cleanups.push(() => unsubscribe());
+
+        // Periodic GET to mirror into localStorage for cross-profile scenarios
+        const fbPollId = setInterval(async () => {
+          try {
+            const snap = await Promise.race([
+              get(rosterRef),
+              new Promise((_, reject) =>
+                setTimeout(
+                  () =>
+                    reject(new Error("Firebase read timeout (roster poll)")),
+                  3000,
+                ),
+              ),
+            ]);
+            const data =
+              typeof snap?.val === "function" ? snap.val() : snap?.val || {};
+            const roster = data && typeof data === "object" ? data : {};
+            if (Object.keys(roster).length > 0) {
+              try {
+                const existing = JSON.parse(
+                  localStorage.getItem("simulateai_classrooms") || "{}",
+                );
+                const cls = existing[classroomCode] || {};
+                cls.roster = { ...(cls.roster || {}), ...roster };
+                existing[classroomCode] = cls;
+                localStorage.setItem(
+                  "simulateai_classrooms",
+                  JSON.stringify(existing),
+                );
+              } catch (_) {
+                /* ignore */
+              }
+              emit(roster);
+            }
+          } catch (_) {
+            /* ignore */
+          }
+        }, 3500);
+        cleanups.push(() => clearInterval(fbPollId));
+      } catch (e) {
+        logger.debug(
+          "RealtimeClassroomService",
+          "Firebase roster listen failed",
+          e,
+        );
+      }
+    }
+
+    this.listeners.set(listenerId, () => cleanups.forEach((fn) => fn && fn()));
     return () => {
-      unsubscribe();
+      const unsub = this.listeners.get(listenerId);
+      if (unsub) unsub();
       this.listeners.delete(listenerId);
     };
   }
@@ -572,21 +1517,161 @@ export default class RealtimeClassroomService {
    * @returns {Function} Unsubscribe function
    */
   listenToSessionStatus(classroomCode, callback) {
-    const statusRef = ref(
-      this.database,
-      `classrooms/${classroomCode}/sessionStatus`,
-    );
     const listenerId = `status_${classroomCode}`;
 
-    const unsubscribe = onValue(statusRef, (snapshot) => {
-      const status = snapshot.val() || {};
-      callback(status);
-    });
+    // Hybrid strategy: localStorage polling + BroadcastChannel + Firebase onValue + periodic Firebase GET
+    let lastJson = "";
+    const emit = (status) => {
+      try {
+        const j = JSON.stringify(status || {});
+        if (j !== lastJson) {
+          lastJson = j;
+          callback(status || {});
+        }
+      } catch (e) {
+        callback(status || {});
+      }
+    };
 
-    this.listeners.set(listenerId, unsubscribe);
+    const cleanups = [];
 
+    // LocalStorage poll (always on for fast local updates)
+    const pollId = setInterval(() => {
+      try {
+        const existingClassrooms = JSON.parse(
+          localStorage.getItem("simulateai_classrooms") || "{}",
+        );
+        const classroom = existingClassrooms[classroomCode] || {};
+        emit(classroom.sessionStatus || {});
+      } catch (e) {
+        logger.warn("RealtimeClassroomService", "Status poll failed", e);
+      }
+    }, 1000);
+    cleanups.push(() => clearInterval(pollId));
+
+    // BroadcastChannel merge for same-profile tabs
+    if (typeof BroadcastChannel !== "undefined") {
+      try {
+        const bc = new BroadcastChannel("simulateai_classrooms");
+        const handler = (event) => {
+          const data = event?.data;
+          if (
+            data?.type === "session_status_updated" &&
+            data?.classroomCode === classroomCode &&
+            data?.status
+          ) {
+            // Mirror into localStorage
+            try {
+              const existingClassrooms = JSON.parse(
+                localStorage.getItem("simulateai_classrooms") || "{}",
+              );
+              const classroom = existingClassrooms[classroomCode] || {};
+              classroom.sessionStatus = data.status;
+              existingClassrooms[classroomCode] = classroom;
+              localStorage.setItem(
+                "simulateai_classrooms",
+                JSON.stringify(existingClassrooms),
+              );
+            } catch (_) {
+              // ignore localStorage mirror errors
+            }
+            emit(data.status);
+          }
+        };
+        bc.addEventListener("message", handler);
+        cleanups.push(() => {
+          try {
+            bc.removeEventListener("message", handler);
+            bc.close();
+          } catch (_) {
+            // ignore BroadcastChannel cleanup errors
+          }
+        });
+      } catch (e) {
+        logger.warn(
+          "RealtimeClassroomService",
+          "BroadcastChannel unsupported/error (status)",
+          e,
+        );
+      }
+    }
+
+    if (this.database) {
+      // Firebase onValue listener
+      const statusRef = ref(
+        this.database,
+        `classrooms/${classroomCode}/sessionStatus`,
+      );
+      try {
+        const unsubscribe = onValue(statusRef, (snapshot) => {
+          const status = snapshot.val() || {};
+          // Mirror to localStorage for local consumers
+          try {
+            const existingClassrooms = JSON.parse(
+              localStorage.getItem("simulateai_classrooms") || "{}",
+            );
+            const classroom = existingClassrooms[classroomCode] || {};
+            classroom.sessionStatus = status;
+            existingClassrooms[classroomCode] = classroom;
+            localStorage.setItem(
+              "simulateai_classrooms",
+              JSON.stringify(existingClassrooms),
+            );
+          } catch (_) {
+            // ignore localStorage mirror errors
+          }
+          emit(status);
+        });
+        cleanups.push(() => unsubscribe());
+      } catch (e) {
+        logger.warn(
+          "RealtimeClassroomService",
+          "onValue listener failed for session status",
+          e,
+        );
+      }
+
+      // Periodic Firebase GET mirror (covers cases where onValue is blocked)
+      const periodicId = setInterval(async () => {
+        try {
+          const snapshot = await Promise.race([
+            get(statusRef),
+            new Promise((_, reject) =>
+              setTimeout(
+                () => reject(new Error("Firebase read timeout (status poll)")),
+                3500,
+              ),
+            ),
+          ]);
+          if (snapshot && snapshot.exists()) {
+            const status = snapshot.val() || {};
+            try {
+              const existingClassrooms = JSON.parse(
+                localStorage.getItem("simulateai_classrooms") || "{}",
+              );
+              const classroom = existingClassrooms[classroomCode] || {};
+              classroom.sessionStatus = status;
+              existingClassrooms[classroomCode] = classroom;
+              localStorage.setItem(
+                "simulateai_classrooms",
+                JSON.stringify(existingClassrooms),
+              );
+            } catch (_) {
+              // ignore localStorage mirror errors
+            }
+            emit(status);
+          }
+        } catch (e) {
+          // Network instability; ignore
+        }
+      }, 3500);
+      cleanups.push(() => clearInterval(periodicId));
+    }
+
+    this.listeners.set(listenerId, () => cleanups.forEach((fn) => fn && fn()));
     return () => {
-      unsubscribe();
+      const unsub = this.listeners.get(listenerId);
+      if (unsub) unsub();
       this.listeners.delete(listenerId);
     };
   }
@@ -598,21 +1683,112 @@ export default class RealtimeClassroomService {
    * @returns {Function} Unsubscribe function
    */
   listenToStudentChoices(classroomCode, callback) {
-    const choicesRef = ref(
-      this.database,
-      `classrooms/${classroomCode}/studentChoices`,
-    );
-    const listenerId = `choices_${classroomCode}`;
+    const listenerId = `roster_${classroomCode}`;
 
-    const unsubscribe = onValue(choicesRef, (snapshot) => {
-      const choices = snapshot.val() || {};
-      callback(choices);
-    });
+    // We'll combine sources: Firebase (if available), localStorage polling, and BroadcastChannel pings.
+    let lastJson = "";
 
-    this.listeners.set(listenerId, unsubscribe);
+    const emit = (roster) => {
+      try {
+        const j = JSON.stringify(roster || {});
+        if (j !== lastJson) {
+          lastJson = j;
+          callback(roster || {});
+        }
+      } catch (e) {
+        callback(roster || {});
+      }
+    };
 
+    const cleanups = [];
+
+    // Local polling always active as safety net
+    const intervalId = setInterval(() => {
+      try {
+        const existingClassrooms = JSON.parse(
+          localStorage.getItem("simulateai_classrooms") || "{}",
+        );
+        const classroom = existingClassrooms[classroomCode] || {};
+        emit(classroom.roster || {});
+      } catch (e) {
+        logger.debug("RealtimeClassroomService", "Roster poll failed", e);
+      }
+    }, 1000);
+    cleanups.push(() => clearInterval(intervalId));
+
+    // BroadcastChannel nudge: when a student joins via fallback, signal a refresh
+    try {
+      if (typeof BroadcastChannel !== "undefined") {
+        const bc = new BroadcastChannel("simulateai_classrooms");
+        const onMsg = (evt) => {
+          try {
+            if (
+              evt?.data?.type === "roster_updated" &&
+              evt.data.classroomCode === classroomCode
+            ) {
+              // Merge payload (if any) into localStorage mirror, then emit
+              const existing = JSON.parse(
+                localStorage.getItem("simulateai_classrooms") || "{}",
+              );
+              const classroom = existing[classroomCode] || {};
+              const payload = evt.data.payload;
+              if (payload && payload.studentId && payload.studentInfo) {
+                classroom.roster = classroom.roster || {};
+                classroom.roster[payload.studentId] = payload.studentInfo;
+                existing[classroomCode] = classroom;
+                try {
+                  localStorage.setItem(
+                    "simulateai_classrooms",
+                    JSON.stringify(existing),
+                  );
+                } catch (_) {
+                  // ignore
+                }
+              }
+              emit((existing[classroomCode] || {}).roster || {});
+            }
+          } catch (e) {
+            logger.debug("RealtimeClassroomService", "BC roster msg error", e);
+          }
+        };
+        bc.addEventListener("message", onMsg);
+        cleanups.push(() => {
+          try {
+            bc.removeEventListener("message", onMsg);
+            bc.close();
+          } catch (_) {
+            // ignore
+          }
+        });
+      }
+    } catch (_) {
+      // ignore
+    }
+
+    // Firebase listener if available
+    if (this.database) {
+      try {
+        const rosterRef = ref(
+          this.database,
+          `classrooms/${classroomCode}/roster`,
+        );
+        const unsubscribe = onValue(rosterRef, (snapshot) => {
+          emit(snapshot.val() || {});
+        });
+        cleanups.push(() => unsubscribe());
+      } catch (e) {
+        logger.debug(
+          "RealtimeClassroomService",
+          "Firebase roster listen failed",
+          e,
+        );
+      }
+    }
+
+    this.listeners.set(listenerId, () => cleanups.forEach((fn) => fn && fn()));
     return () => {
-      unsubscribe();
+      const unsub = this.listeners.get(listenerId);
+      if (unsub) unsub();
       this.listeners.delete(listenerId);
     };
   }
@@ -623,29 +1799,7 @@ export default class RealtimeClassroomService {
    * @returns {Promise<string>} Unique 6-character classroom code
    */
   async generateUniqueClassroomCode() {
-    // Wait for initialization to complete with timeout
-    if (this.initializationPromise) {
-      try {
-        // Add a timeout to prevent infinite hanging
-        await Promise.race([
-          this.initializationPromise,
-          new Promise((_, reject) =>
-            setTimeout(
-              () => reject(new Error("Initialization timeout")),
-              10000,
-            ),
-          ),
-        ]);
-      } catch (error) {
-        logger.warn(
-          "RealtimeClassroomService",
-          "Initialization failed or timed out, forcing fallback mode",
-          error,
-        );
-        this.fallbackMode = true;
-        this.isConnected = false;
-      }
-    }
+    // Do not block on initialization; proceed hybrid immediately
 
     let attempts = 0;
     const maxAttempts = 10;
@@ -653,8 +1807,16 @@ export default class RealtimeClassroomService {
     while (attempts < maxAttempts) {
       const code = generateClassroomCode();
 
-      // Always use fallback mode if database is not properly initialized
-      if (this.fallbackMode || !this.database) {
+      // Prefer Firebase if database is available; else use fallback
+      if (!this.database && this.firebaseService?.app) {
+        try {
+          this.database = getDatabase(this.firebaseService.app);
+        } catch (e) {
+          // ignore
+        }
+      }
+
+      if (!this.database) {
         // Check in localStorage
         const existingClassrooms = JSON.parse(
           localStorage.getItem("simulateai_classrooms") || "{}",
@@ -670,7 +1832,15 @@ export default class RealtimeClassroomService {
         try {
           // Check if code already exists in Firebase
           const classroomRef = ref(this.database, `classrooms/${code}`);
-          const snapshot = await get(classroomRef);
+          const snapshot = await Promise.race([
+            get(classroomRef),
+            new Promise((_, reject) =>
+              setTimeout(
+                () => reject(new Error("Firebase read timeout (code check)")),
+                3000,
+              ),
+            ),
+          ]);
 
           if (!snapshot.exists()) {
             logger.info(
@@ -686,7 +1856,6 @@ export default class RealtimeClassroomService {
             "Firebase check failed, using fallback",
             error,
           );
-          this.fallbackMode = true;
 
           const existingClassrooms = JSON.parse(
             localStorage.getItem("simulateai_classrooms") || "{}",
@@ -712,17 +1881,18 @@ export default class RealtimeClassroomService {
    */
   async getClassroom(classroomCode) {
     try {
-      const classroomRef = ref(this.database, `classrooms/${classroomCode}`);
-      const snapshot = await get(classroomRef);
-
-      if (!snapshot.exists()) {
-        return null;
+      if (this.fallbackMode || !this.database) {
+        const existingClassrooms = JSON.parse(
+          localStorage.getItem("simulateai_classrooms") || "{}",
+        );
+        const classroom = existingClassrooms[classroomCode];
+        return classroom ? { classroomCode, ...classroom } : null;
       }
 
-      return {
-        classroomCode,
-        ...snapshot.val(),
-      };
+      const classroomRef = ref(this.database, `classrooms/${classroomCode}`);
+      const snapshot = await get(classroomRef);
+      if (!snapshot.exists()) return null;
+      return { classroomCode, ...snapshot.val() };
     } catch (error) {
       logger.error(
         "RealtimeClassroomService",
@@ -741,6 +1911,31 @@ export default class RealtimeClassroomService {
    */
   async removeStudent(classroomCode, studentId) {
     try {
+      if (this.fallbackMode || !this.database) {
+        const existingClassrooms = JSON.parse(
+          localStorage.getItem("simulateai_classrooms") || "{}",
+        );
+        const classroom = existingClassrooms[classroomCode];
+        if (!classroom) throw new Error("Classroom not found");
+        if (classroom.roster && classroom.roster[studentId]) {
+          delete classroom.roster[studentId];
+        }
+        if (classroom.studentChoices && classroom.studentChoices[studentId]) {
+          delete classroom.studentChoices[studentId];
+        }
+        existingClassrooms[classroomCode] = classroom;
+        localStorage.setItem(
+          "simulateai_classrooms",
+          JSON.stringify(existingClassrooms),
+        );
+
+        logger.info(
+          "RealtimeClassroomService",
+          "Student removed from classroom (fallback)",
+          { classroomCode, studentId },
+        );
+        return;
+      }
       const rosterRef = ref(
         this.database,
         `classrooms/${classroomCode}/roster/${studentId}`,

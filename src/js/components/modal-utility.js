@@ -187,6 +187,17 @@ class ModalUtility {
     }
   }
 
+  // Backward compatibility aliases
+  show() {
+    // Some components still call show(); delegate to open()
+    this.open();
+  }
+
+  hide() {
+    // Some components still call hide(); delegate to close()
+    this.close();
+  }
+
   _setPageInert(inert) {
     // Get all direct children of body except our modal and onboarding elements
     const bodyChildren = Array.from(document.body.children);

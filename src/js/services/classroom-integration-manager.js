@@ -145,7 +145,11 @@ class ClassroomIntegrationManager {
 
       // Extract classroom code from URL if present
       const urlParams = new URLSearchParams(window.location.search);
-      const classroomCode = urlParams.get("classroom") || urlParams.get("code");
+      // Support multiple param names for backward compatibility and share links
+      const classroomCode =
+        urlParams.get("join") ||
+        urlParams.get("classroom") ||
+        urlParams.get("code");
 
       // Show student join classroom modal
       await this.studentModals.initialize();
@@ -626,7 +630,10 @@ class ClassroomIntegrationManager {
   async handleJoinClassroomAsGuest() {
     // Extract classroom code from URL if present
     const urlParams = new URLSearchParams(window.location.search);
-    const classroomCode = urlParams.get("classroom") || urlParams.get("code");
+    const classroomCode =
+      urlParams.get("join") ||
+      urlParams.get("classroom") ||
+      urlParams.get("code");
 
     // Show student join classroom modal with guest limitations
     await this.studentModals.initialize(true); // Pass guest mode flag
@@ -817,7 +824,10 @@ class ClassroomIntegrationManager {
    */
   async handleURLClassroomJoin() {
     const urlParams = new URLSearchParams(window.location.search);
-    const classroomCode = urlParams.get("classroom") || urlParams.get("code");
+    const classroomCode =
+      urlParams.get("join") ||
+      urlParams.get("classroom") ||
+      urlParams.get("code");
 
     if (classroomCode) {
       logger.info(

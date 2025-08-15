@@ -48,6 +48,31 @@
     </script>
     <meta name="author" content="SimulateAI Educational Platform" />
 
+    <!-- Preserve query params like ?join=CODE when navigating from root to app.html -->
+    <script>
+      (function () {
+        try {
+          var hasQuery =
+            window.location.search && window.location.search.length > 1;
+          // Only redirect on localhost/dev, and only if we have a query string
+          var isLocal =
+            location.hostname === "localhost" ||
+            location.hostname === "127.0.0.1";
+          if (
+            isLocal &&
+            hasQuery &&
+            !location.pathname.toLowerCase().includes("app.html")
+          ) {
+            var target =
+              "/app.html" + window.location.search + window.location.hash;
+            window.location.replace(target);
+          }
+        } catch (e) {
+          // no-op
+        }
+      })();
+    </script>
+
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="website" />
     <meta

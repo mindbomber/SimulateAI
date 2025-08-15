@@ -422,7 +422,7 @@ export default class TeacherClassroomModals {
     modal
       .querySelector("#cancel-create-classroom")
       ?.addEventListener("click", () => {
-        this.createClassroomModal.hide();
+        this.createClassroomModal.close();
       });
   }
 
@@ -739,8 +739,8 @@ export default class TeacherClassroomModals {
       // Store current classroom
       this.currentClassroom = result;
 
-      // Hide create modal and show code modal
-      this.createClassroomModal.hide();
+      // Close create modal and show code modal
+      this.createClassroomModal.close();
       this.showClassroomCodeModal(result);
 
       logClassroomEvent("classroom_created", {
@@ -784,7 +784,7 @@ export default class TeacherClassroomModals {
       onClose: () => this.handleClassroomCodeClose(),
     });
 
-    this.classroomCodeModal.show();
+    this.classroomCodeModal.open();
     this.setupClassroomCodeEvents(classroom);
     this.startRosterListener(classroom.classroomCode);
   }
@@ -1091,9 +1091,11 @@ export default class TeacherClassroomModals {
         });
       });
 
-    // Copy share URL
+    // Copy share URL (with lightweight classroom seed to aid discovery)
     modal.querySelector("#copy-share-url")?.addEventListener("click", () => {
-      const shareUrl = generateClassroomShareUrl(classroom.classroomCode);
+      const shareUrl = generateClassroomShareUrl(classroom.classroomCode, {
+        seed: classroom,
+      });
       navigator.clipboard.writeText(shareUrl).then(() => {
         this.showSuccessToast("Share link copied to clipboard");
       });
@@ -1117,13 +1119,14 @@ export default class TeacherClassroomModals {
    */
   async startLiveSession(classroom) {
     try {
+      const instructorId = this.currentInstructor?.uid || "guest_instructor";
       await this.classroomService.startLiveSession(
         classroom.classroomCode,
-        this.currentInstructor.uid,
+        instructorId,
       );
 
-      // Hide code modal and show live session modal
-      this.classroomCodeModal.hide();
+      // Close code modal and show live session modal
+      this.classroomCodeModal.close();
       this.showLiveSessionModal(classroom);
 
       logClassroomEvent("session_started", {
@@ -1155,9 +1158,130 @@ export default class TeacherClassroomModals {
       onClose: () => this.handleLiveSessionClose(),
     });
 
-    this.liveSessionModal.show();
+    this.liveSessionModal.open();
     this.setupLiveSessionEvents(classroom);
     this.startLiveSessionListeners(classroom.classroomCode);
+  }
+
+  /**
+   * Setup live session event handlers (pause/resume/export/complete)
+   */
+  setupLiveSessionEvents(classroom) {
+    const modal = this.liveSessionModal?.element;
+    if (!modal) return;
+
+    const pauseBtn = modal.querySelector("#pause-session");
+    const resumeBtn = modal.querySelector("#resume-session");
+    const completeBtn = modal.querySelector("#complete-session");
+    const exportBtn = modal.querySelector("#export-data");
+
+    pauseBtn?.addEventListener("click", async () => {
+      try {
+        await this.classroomService.pauseSession(classroom.classroomCode, true);
+        pauseBtn.style.display = "none";
+        resumeBtn.style.display = "inline-block";
+      } catch (e) {
+        this.showErrorToast("Failed to pause session");
+      }
+    });
+
+    resumeBtn?.addEventListener("click", async () => {
+      try {
+        await this.classroomService.pauseSession(
+          classroom.classroomCode,
+          false,
+        );
+        resumeBtn.style.display = "none";
+        pauseBtn.style.display = "inline-block";
+      } catch (e) {
+        this.showErrorToast("Failed to resume session");
+      }
+    });
+
+    completeBtn?.addEventListener("click", async () => {
+      try {
+        await this.classroomService.completeSession(classroom.classroomCode);
+        this.liveSessionModal?.close();
+        this.showSuccessToast("Session completed");
+      } catch (e) {
+        this.showErrorToast("Failed to complete session");
+      }
+    });
+
+    exportBtn?.addEventListener("click", () => {
+      // Placeholder export; can be wired to real data export later
+      this.showInfoToast("Exporting session data...");
+    });
+  }
+
+  /**
+   * Start live session listeners for status, roster, and choices
+   */
+  startLiveSessionListeners(classroomCode) {
+    const modal = this.liveSessionModal?.element;
+    if (!modal) return;
+
+    const statusEl = modal.querySelector("#session-status");
+    const countEl = modal.querySelector("#live-student-count");
+    const durationEl = modal.querySelector("#session-duration");
+
+    let startTimeMs = null;
+
+    const formatDuration = (ms) => {
+      if (!ms || ms < 0) return "00:00";
+      const totalSec = Math.floor(ms / 1000);
+      const m = String(Math.floor(totalSec / 60)).padStart(2, "0");
+      const s = String(totalSec % 60).padStart(2, "0");
+      return `${m}:${s}`;
+    };
+
+    // Session status listener
+    const statusUnsub = this.classroomService.listenToSessionStatus(
+      classroomCode,
+      (status) => {
+        // Update UI
+        if (status?.isLive) {
+          statusEl?.classList.add("live");
+          statusEl && (statusEl.textContent = "🔴 LIVE");
+          startTimeMs = status.startTime || startTimeMs || Date.now();
+        } else if (status?.isPaused) {
+          statusEl?.classList.remove("live");
+          statusEl && (statusEl.textContent = "⏸️ PAUSED");
+        } else {
+          statusEl?.classList.remove("live");
+          statusEl && (statusEl.textContent = "⏳ WAITING");
+        }
+      },
+    );
+    this.activeListeners.push({
+      name: "live_status",
+      unsubscribe: statusUnsub,
+    });
+
+    // Roster listener for count
+    const rosterUnsub = this.classroomService.listenToRoster(
+      classroomCode,
+      (roster) => {
+        const count = Object.keys(roster || {}).length;
+        countEl && (countEl.textContent = String(count));
+      },
+    );
+    this.activeListeners.push({
+      name: "live_roster",
+      unsubscribe: rosterUnsub,
+    });
+
+    // Duration ticker
+    const intervalId = setInterval(() => {
+      if (startTimeMs != null) {
+        durationEl &&
+          (durationEl.textContent = formatDuration(Date.now() - startTimeMs));
+      }
+    }, 1000);
+    this.activeListeners.push({
+      name: "live_duration",
+      unsubscribe: () => clearInterval(intervalId),
+    });
   }
 
   /**
@@ -1402,9 +1526,9 @@ export default class TeacherClassroomModals {
     this.activeListeners = [];
 
     // Close modals
-    this.createClassroomModal?.hide();
-    this.classroomCodeModal?.hide();
-    this.liveSessionModal?.hide();
+    this.createClassroomModal?.close();
+    this.classroomCodeModal?.close();
+    this.liveSessionModal?.close();
 
     logger.info("TeacherClassroomModals", "Cleanup completed");
   }

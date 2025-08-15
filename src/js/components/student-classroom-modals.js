@@ -36,6 +36,10 @@ export default class StudentClassroomModals {
     this.finalChoicesModal = null;
 
     this.initialized = false;
+
+    // Internal flag to distinguish intentional programmatic closes
+    // (e.g., starting session) from user-initiated closes (leaving)
+    this._suppressWaitingRoomClose = false;
   }
 
   /**
@@ -83,6 +87,41 @@ export default class StudentClassroomModals {
   async showJoinClassroomModal(prefilledCode = "", isGuestMode = false) {
     try {
       await this.initialize(isGuestMode);
+
+      // Seed import: if share link contains a compact classroom seed, import it to localStorage
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const seedEncoded = params.get("seed");
+        if (seedEncoded) {
+          const json = decodeURIComponent(escape(atob(seedEncoded)));
+          const seed = JSON.parse(json);
+          if (seed && seed.classroomCode) {
+            const store = JSON.parse(
+              localStorage.getItem("simulateai_classrooms") || "{}",
+            );
+            if (!store[seed.classroomCode]) {
+              store[seed.classroomCode] = seed;
+              localStorage.setItem(
+                "simulateai_classrooms",
+                JSON.stringify(store),
+              );
+              logger.info(
+                "StudentClassroomModals",
+                "Imported classroom seed from share link",
+                { classroomCode: seed.classroomCode },
+              );
+            }
+            // If no code prefilled, use the seed’s code
+            if (!prefilledCode) prefilledCode = seed.classroomCode;
+          }
+        }
+      } catch (seedErr) {
+        logger.debug(
+          "StudentClassroomModals",
+          "Seed import skipped/failed",
+          seedErr,
+        );
+      }
 
       const modalContent = this.buildJoinClassroomContent(
         prefilledCode,
@@ -250,7 +289,7 @@ export default class StudentClassroomModals {
     modal
       .querySelector("#cancel-join-classroom")
       ?.addEventListener("click", () => {
-        this.joinClassroomModal.hide();
+        this.joinClassroomModal.close();
       });
 
     // Enter key submission
@@ -360,24 +399,46 @@ export default class StudentClassroomModals {
       // Show loading state
       this.showJoinLoading(true);
 
-      // Save nickname if requested
+      // Save nickname if requested (non-blocking)
       if (rememberNickname) {
-        await this.saveNickname(nickname);
+        this.saveNickname(nickname).catch((err) =>
+          logger.warn("StudentClassroomModals", "Nickname save failed", err),
+        );
       }
 
       // Join classroom
+      logger.info("StudentClassroomModals", "Attempting to join classroom", {
+        classroomCode,
+        studentId: this.currentStudent.uid,
+      });
       const result = await this.classroomService.joinClassroom(
         classroomCode,
         this.currentStudent.uid,
         nickname,
       );
 
+      if (!result || !result.studentInfo) {
+        logger.warn(
+          "StudentClassroomModals",
+          "Join returned no result or missing studentInfo",
+          result,
+        );
+        this.showErrorToast(
+          "Join failed unexpectedly. Please try again or refresh the page.",
+        );
+        return;
+      }
+
       // Store current classroom and student info
       this.currentClassroom = result;
       this.studentInfo = result.studentInfo;
 
-      // Hide join modal and show waiting room
-      this.joinClassroomModal.hide();
+      // Close join modal and show waiting room
+      logger.info(
+        "StudentClassroomModals",
+        "Join success, opening waiting room",
+      );
+      this.joinClassroomModal.close();
       this.showWaitingRoomModal(result);
 
       logClassroomEvent("student_joined", {
@@ -387,7 +448,6 @@ export default class StudentClassroomModals {
       });
     } catch (error) {
       logger.error("StudentClassroomModals", "Failed to join classroom", error);
-      this.showJoinLoading(false);
 
       // Show specific error messages
       let errorMessage = "Failed to join classroom";
@@ -403,6 +463,9 @@ export default class StudentClassroomModals {
       }
 
       this.showErrorToast(errorMessage);
+    } finally {
+      // Always stop loading state to prevent overlay hang
+      this.showJoinLoading(false);
     }
   }
 
@@ -421,7 +484,7 @@ export default class StudentClassroomModals {
       onClose: () => this.handleWaitingRoomClose(),
     });
 
-    this.waitingRoomModal.show();
+    this.waitingRoomModal.open();
     this.setupWaitingRoomEvents(classroom);
     this.startWaitingRoomListeners(classroom.classroomCode);
   }
@@ -525,7 +588,13 @@ export default class StudentClassroomModals {
     // Start session (when instructor starts)
     modal
       .querySelector("#start-session-button")
-      ?.addEventListener("click", () => {
+      ?.addEventListener("click", (e) => {
+        // Prevent any default form submission or bubbling to modal close
+        e.preventDefault();
+        e.stopPropagation();
+        // Mark that we are transitioning into the scenario flow so the
+        // waiting room close callback does not treat this as a "leave"
+        this._suppressWaitingRoomClose = true;
         this.startScenarioSession(classroom);
       });
   }
@@ -650,7 +719,7 @@ export default class StudentClassroomModals {
           this.currentStudent.uid,
         );
 
-        this.waitingRoomModal.hide();
+        this.waitingRoomModal.close();
         this.cleanup();
 
         logClassroomEvent("student_left", {
@@ -675,15 +744,41 @@ export default class StudentClassroomModals {
    */
   async startScenarioSession(classroom) {
     try {
-      // Hide waiting room modal
-      this.waitingRoomModal.hide();
+      // Close waiting room modal
+      // Ensure the waiting room's onClose handler doesn't prompt to leave
+      this._suppressWaitingRoomClose = true;
+      this.waitingRoomModal.close();
 
-      // Start the scenario flow using existing scenario system
-      // This would integrate with the existing scenario modal system
+      // Start the scenario flow using the existing scenario system
       this.showInfoToast("Starting scenario session...");
 
-      // For now, we'll show a placeholder that integrates with the existing system
-      this.integrateWithExistingScenarioSystem(classroom);
+      // Basic guards
+      const scenarios = (classroom && classroom.selectedScenarios) || [];
+      if (!scenarios.length) {
+        logger.warn(
+          "StudentClassroomModals",
+          "No scenarios available to launch",
+        );
+        this.showErrorToast("No scenarios available in this session");
+        return;
+      }
+
+      // Attach one-time event bridges for scenario completion and sequencing
+      this.attachScenarioEventBridges();
+
+      // Launch the first scenario in the sequence
+      const first = scenarios[0];
+      const scenarioId = first.scenarioId || first.id || first.scenario || null;
+      if (!scenarioId) {
+        logger.error(
+          "StudentClassroomModals",
+          "Unable to determine scenarioId for first scenario",
+          first,
+        );
+        this.showErrorToast("Failed to launch first scenario");
+        return;
+      }
+      await this.launchScenario(scenarioId, first.categoryId || null);
 
       logClassroomEvent("scenario_session_started", {
         classroom_code: classroom.classroomCode,
@@ -705,23 +800,177 @@ export default class StudentClassroomModals {
    * This is where we'd connect to the existing scenario modal flow
    */
   integrateWithExistingScenarioSystem(classroom) {
-    // This would call into the existing scenario system
-    // For now, we'll create a simple progress tracker
+    // Deprecated placeholder retained for backward compatibility
+    // Use startScenarioSession -> launchScenario instead.
+    const scenarios = (classroom && classroom.selectedScenarios) || [];
+    if (!scenarios.length) return;
+    const first = scenarios[0];
+    const scenarioId = first.scenarioId || first.id || first.scenario || null;
+    if (scenarioId) {
+      this.attachScenarioEventBridges();
+      this.launchScenario(scenarioId, first.categoryId || null);
+    }
+  }
 
-    console.log("🎯 Starting classroom scenario session");
-    console.log("Classroom:", classroom.classroomName);
-    console.log("Scenarios to complete:", classroom.selectedScenarios.length);
-    console.log("First scenario:", classroom.selectedScenarios[0]);
+  /**
+   * Launch a scenario using existing app APIs with resilient fallbacks
+   */
+  async launchScenario(scenarioId, categoryId = null) {
+    try {
+      // Preferred: use MainGrid API (can accept null categoryId)
+      if (
+        window.app &&
+        window.app.categoryGrid &&
+        typeof window.app.categoryGrid.openScenarioModal === "function"
+      ) {
+        window.app.categoryGrid.openScenarioModal(
+          scenarioId,
+          categoryId || null,
+        );
+        return;
+      }
 
-    // In the actual implementation, this would:
-    // 1. Load the first scenario from classroom.selectedScenarios[0]
-    // 2. Open the existing scenario modal system
-    // 3. Pass classroom context so choices get submitted to real-time database
-    // 4. Track progress through the scenario sequence
+      // Next: use a globally available ScenarioModal instance if present
+      if (window.app && window.app.scenarioModal) {
+        await window.app.scenarioModal.open(scenarioId, categoryId || null);
+        return;
+      }
 
-    this.showInfoToast(
-      `Ready to start with: ${classroom.selectedScenarios[0].title}`,
-    );
+      // Fallback: dynamic import and open directly
+      const { default: ScenarioModal } = await import("./scenario-modal.js");
+      const modal = new ScenarioModal();
+      await modal.open(scenarioId, categoryId || null);
+    } catch (err) {
+      logger.error("StudentClassroomModals", "Failed to launch scenario", err);
+      this.showErrorToast(`Failed to open scenario: ${scenarioId}`);
+    }
+  }
+
+  /**
+   * Attach document-level listeners to bridge scenario events to classroom service
+   */
+  attachScenarioEventBridges() {
+    if (this._scenarioHandlersAttached) return;
+
+    this._onScenarioCompleted = async (event) => {
+      try {
+        const detail = event?.detail || {};
+        const scenarioId = detail.scenarioId || detail.currentScenarioId;
+        const selected = detail.selectedOption || detail.option || {};
+        const choiceValue =
+          selected.id ||
+          selected.value ||
+          selected.text ||
+          selected.label ||
+          null;
+
+        if (scenarioId && choiceValue) {
+          await this.classroomService.submitStudentChoice(
+            this.currentClassroom.classroomCode,
+            this.currentStudent.uid,
+            scenarioId,
+            choiceValue,
+            {
+              confidence: selected.confidence ?? null,
+            },
+          );
+        }
+      } catch (e) {
+        logger.warn(
+          "StudentClassroomModals",
+          "Failed to submit student choice from scenario event",
+          e,
+        );
+      }
+    };
+
+    this._onScenarioClosed = async (event) => {
+      try {
+        const detail = event?.detail || {};
+        const completed = !!detail.completed;
+        const scenarioId = detail.scenarioId || detail.currentScenarioId;
+        if (!this.currentClassroom) return;
+
+        // Find next scenario and launch if available
+        const nextId = this.getNextScenarioId(scenarioId);
+        if (completed && nextId) {
+          // Small delay to ensure previous modal teardown completes
+          setTimeout(() => this.launchScenario(nextId, null), 250);
+          return;
+        }
+
+        // If no next scenario and we have completion, show final summary
+        if (completed && !nextId) {
+          try {
+            const refreshed = await this.classroomService.getClassroom(
+              this.currentClassroom.classroomCode,
+            );
+            const studentChoices = refreshed?.studentChoices?.[
+              this.currentStudent.uid
+            ] || {
+              scenarios: {},
+            };
+            this.showFinalChoicesModal(studentChoices);
+          } catch (err) {
+            logger.warn(
+              "StudentClassroomModals",
+              "Failed to fetch classroom for final summary",
+              err,
+            );
+            this.showFinalChoicesModal({ scenarios: {} });
+          }
+        }
+      } catch (e) {
+        logger.warn(
+          "StudentClassroomModals",
+          "Error handling scenario modal closed event",
+          e,
+        );
+      }
+    };
+
+    document.addEventListener("scenario-completed", this._onScenarioCompleted);
+    document.addEventListener("scenario-modal-closed", this._onScenarioClosed);
+    this._scenarioHandlersAttached = true;
+  }
+
+  /**
+   * Remove scenario event bridges
+   */
+  detachScenarioEventBridges() {
+    if (!this._scenarioHandlersAttached) return;
+    try {
+      document.removeEventListener(
+        "scenario-completed",
+        this._onScenarioCompleted,
+      );
+      document.removeEventListener(
+        "scenario-modal-closed",
+        this._onScenarioClosed,
+      );
+    } catch (_) {
+      // ignore
+    }
+    this._scenarioHandlersAttached = false;
+    this._onScenarioCompleted = null;
+    this._onScenarioClosed = null;
+  }
+
+  /**
+   * Compute next scenario id from current classroom sequence
+   */
+  getNextScenarioId(currentScenarioId) {
+    try {
+      const list = (this.currentClassroom?.selectedScenarios || []).map(
+        (s) => s.scenarioId || s.id || s.scenario,
+      );
+      if (!list.length) return null;
+      const idx = list.indexOf(currentScenarioId);
+      if (idx === -1) return null;
+      return list[idx + 1] || null;
+    } catch (_) {
+      return null;
+    }
   }
 
   /**
@@ -738,7 +987,7 @@ export default class StudentClassroomModals {
       onClose: () => this.handleFinalChoicesClose(),
     });
 
-    this.finalChoicesModal.show();
+    this.finalChoicesModal.open();
     this.setupFinalChoicesEvents();
   }
 
@@ -838,7 +1087,7 @@ export default class StudentClassroomModals {
    * Handle finishing the session
    */
   handleFinishSession() {
-    this.finalChoicesModal.hide();
+    this.finalChoicesModal.close();
     this.cleanup();
 
     this.showSuccessToast(
@@ -949,15 +1198,19 @@ export default class StudentClassroomModals {
     });
     this.activeListeners = [];
 
+    // Detach scenario bridges if attached
+    this.detachScenarioEventBridges?.();
+
     // Close modals
-    this.joinClassroomModal?.hide();
-    this.waitingRoomModal?.hide();
-    this.finalChoicesModal?.hide();
+    this.joinClassroomModal?.close();
+    this.waitingRoomModal?.close();
+    this.finalChoicesModal?.close();
 
     // Clear state
     this.currentClassroom = null;
     this.studentInfo = null;
     this.sessionStatus = null;
+    this._scenarioHandlersAttached = false;
 
     logger.info("StudentClassroomModals", "Cleanup completed");
   }
@@ -968,7 +1221,13 @@ export default class StudentClassroomModals {
   }
 
   handleWaitingRoomClose() {
-    // Confirm before leaving
+    // If we're programmatically closing to start the session, skip leave flow
+    if (this._suppressWaitingRoomClose) {
+      this._suppressWaitingRoomClose = false;
+      return; // do not treat as a leave action
+    }
+
+    // Confirm before leaving only on user-initiated closes
     if (this.currentClassroom) {
       this.handleLeaveClassroom();
     }
