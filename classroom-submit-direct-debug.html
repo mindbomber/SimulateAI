@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Direct Classroom Submit Debug</title>
+    <link rel="stylesheet" href="./src/styles/main.css" />
+    <style>
+      .debug-container {
+        max-width: 1000px;
+        margin: 20px auto;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+      }
+      .status {
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 5px;
+        font-weight: bold;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .info {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+      .warning {
+        background: #fff3cd;
+        color: #856404;
+      }
+      .test-button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      .test-button:hover {
+        background: #0056b3;
+      }
+      .debug-output {
+        background: #000;
+        color: #0f0;
+        padding: 15px;
+        border-radius: 4px;
+        font-family: "Courier New", monospace;
+        font-size: 12px;
+        max-height: 400px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="debug-container">
+      <h1>🔧 Direct Classroom Submit Debug</h1>
+
+      <div id="status"></div>
+
+      <div class="controls">
+        <button class="test-button" onclick="openModalTest()">
+          🏫 Open Create Classroom Modal
+        </button>
+        <button class="test-button" onclick="directSubmitTest()">
+          ⚡ Direct Submit Test
+        </button>
+        <button class="test-button" onclick="clearOutput()">
+          🗑️ Clear Output
+        </button>
+      </div>
+
+      <h2>Debug Console:</h2>
+      <div id="debug-output" class="debug-output">Ready for debugging...\n</div>
+    </div>
+
+    <script type="module">
+      import ClassroomIntegrationManager from "./src/js/services/classroom-integration-manager.js";
+      import TeacherClassroomModals from "./src/js/components/teacher-classroom-modals.js";
+      import FirebaseService from "./src/js/services/firebase-service.js";
+      import DataHandler from "./src/js/core/data-handler.js";
+
+      let dataHandler, firebaseService, teacherModals, classroomManager;
+
+      // Debug logging function
+      window.debugLog = function (message, data = null) {
+        const output = document.getElementById("debug-output");
+        const timestamp = new Date().toLocaleTimeString();
+        let logMessage = `[${timestamp}] ${message}`;
+        if (data) {
+          logMessage += "\n" + JSON.stringify(data, null, 2);
+        }
+        output.textContent += logMessage + "\n";
+        output.scrollTop = output.scrollHeight;
+        console.log(message, data);
+      };
+
+      window.clearOutput = function () {
+        document.getElementById("debug-output").textContent = "Cleared...\n";
+      };
+
+      window.showStatus = function (message, type = "info") {
+        const statusDiv = document.getElementById("status");
+        statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+      };
+
+      // Override console.error to capture errors
+      const originalError = console.error;
+      console.error = function (...args) {
+        debugLog("❌ CONSOLE ERROR: " + args.join(" "));
+        originalError.apply(console, args);
+      };
+
+      // Capture unhandled promise rejections
+      window.addEventListener("unhandledrejection", function (event) {
+        debugLog("❌ UNHANDLED PROMISE REJECTION: " + event.reason);
+      });
+
+      // Initialize services
+      async function initServices() {
+        try {
+          debugLog("🚀 Initializing services...");
+
+          dataHandler = new DataHandler();
+          await dataHandler.initialize();
+          debugLog("✅ DataHandler initialized");
+
+          firebaseService = new FirebaseService();
+          await firebaseService.initialize();
+          debugLog("✅ FirebaseService initialized");
+
+          teacherModals = new TeacherClassroomModals(
+            dataHandler,
+            firebaseService,
+          );
+          await teacherModals.initialize(true); // Guest mode
+          debugLog("✅ TeacherClassroomModals initialized");
+
+          showStatus("Services initialized successfully!", "success");
+        } catch (error) {
+          debugLog("❌ Service initialization failed: " + error.message);
+          showStatus(
+            "Service initialization failed: " + error.message,
+            "error",
+          );
+          throw error;
+        }
+      }
+
+      // Test opening the modal
+      window.openModalTest = async function () {
+        try {
+          debugLog("🔍 Opening create classroom modal...");
+          await teacherModals.showCreateClassroomModal(true);
+          debugLog("✅ Modal opened successfully");
+          showStatus(
+            "Modal opened - now you can test the submit button!",
+            "success",
+          );
+
+          // Add event listener to intercept submit
+          setTimeout(() => {
+            const modal = teacherModals.createClassroomModal?.element;
+            if (modal) {
+              const submitButton = modal.querySelector(
+                "#create-classroom-submit",
+              );
+              if (submitButton) {
+                debugLog("📌 Found submit button, adding debug listener");
+
+                // Remove existing listeners
+                const newSubmitButton = submitButton.cloneNode(true);
+                submitButton.parentNode.replaceChild(
+                  newSubmitButton,
+                  submitButton,
+                );
+
+                // Add our debug listener
+                newSubmitButton.addEventListener("click", async function (e) {
+                  e.preventDefault();
+                  debugLog("🔥 SUBMIT BUTTON CLICKED!");
+
+                  try {
+                    // Call the original handler with debug
+                    debugLog("🔄 Calling handleCreateClassroomSubmit...");
+                    await teacherModals.handleCreateClassroomSubmit();
+                    debugLog("✅ handleCreateClassroomSubmit completed");
+                  } catch (error) {
+                    debugLog(
+                      "❌ handleCreateClassroomSubmit failed: " + error.message,
+                    );
+                    debugLog("❌ Error stack: " + error.stack);
+                  }
+                });
+              } else {
+                debugLog("❌ Submit button not found in modal");
+              }
+            } else {
+              debugLog("❌ Modal element not found");
+            }
+          }, 500);
+        } catch (error) {
+          debugLog("❌ Failed to open modal: " + error.message);
+          showStatus("Failed to open modal: " + error.message, "error");
+        }
+      };
+
+      // Test direct submit
+      window.directSubmitTest = async function () {
+        try {
+          debugLog("⚡ Testing direct classroom creation...");
+
+          const testData = {
+            classroomName: "Debug Test Classroom " + Date.now(),
+            instructorId: "debug_instructor_123",
+            instructorName: "Debug Instructor",
+            selectedScenarios: [
+              {
+                scenarioId: "test_scenario_1",
+                title: "Test Scenario",
+                category: "Ethics",
+                order: 0,
+              },
+            ],
+          };
+
+          debugLog("📋 Test data prepared:", testData);
+
+          const result =
+            await teacherModals.classroomService.createClassroom(testData);
+          debugLog("✅ Direct creation successful:", result);
+          showStatus(
+            `Direct test successful! Code: ${result.classroomCode}`,
+            "success",
+          );
+        } catch (error) {
+          debugLog("❌ Direct test failed: " + error.message);
+          debugLog("❌ Error stack: " + error.stack);
+          showStatus("Direct test failed: " + error.message, "error");
+        }
+      };
+
+      // Initialize on load
+      document.addEventListener("DOMContentLoaded", async () => {
+        try {
+          await initServices();
+          debugLog("🎯 Debug environment ready");
+        } catch (error) {
+          debugLog(
+            "💥 Failed to initialize debug environment: " + error.message,
+          );
+        }
+      });
+    </script>
+  </body>
+</html>

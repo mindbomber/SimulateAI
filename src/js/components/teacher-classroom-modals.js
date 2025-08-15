@@ -35,7 +35,33 @@ export default class TeacherClassroomModals {
     this.classroomCodeModal = null;
     this.liveSessionModal = null;
 
+    // Prevent infinite loop flags
+    this.updateInProgress = false;
+    this.lastUpdateTime = 0;
+
+    // Create debounced update function
+    this.debouncedUpdateDisplay = this.debounce(
+      this.updateSelectedScenariosDisplay.bind(this),
+      150,
+    );
+
     this.initialized = false;
+  }
+
+  /**
+   * Debounce utility to prevent rapid successive calls
+   * @private
+   */
+  debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
   }
 
   /**
@@ -426,6 +452,11 @@ export default class TeacherClassroomModals {
    * Handle adding scenario to selection
    */
   handleAddScenario(event) {
+    // Prevent rapid-fire clicks that could cause infinite loops
+    if (this.updateInProgress) {
+      return;
+    }
+
     const scenarioId = event.currentTarget.dataset.scenarioId;
     const scenario = this.findScenarioById(scenarioId);
 
@@ -453,62 +484,87 @@ export default class TeacherClassroomModals {
       return;
     }
 
-    // Add to selection
-    this.selectedScenarios.push({
-      ...scenario,
-      order: this.selectedScenarios.length,
-    });
+    // Set update flag to prevent infinite loops
+    this.updateInProgress = true;
 
-    // Update UI
-    this.updateSelectedScenariosDisplay();
-    this.validateCreateClassroomForm();
+    try {
+      // Add to selection
+      this.selectedScenarios.push({
+        ...scenario,
+        order: this.selectedScenarios.length,
+      });
 
-    // Update button state
-    event.currentTarget.textContent = "✓ Added";
-    event.currentTarget.disabled = true;
-    event.currentTarget.className = "btn btn-sm btn-success";
+      // Update UI with debounce
+      this.debouncedUpdateDisplay();
+      this.validateCreateClassroomForm();
 
-    logClassroomEvent("scenario_added", {
-      scenario_id: scenarioId,
-      selection_count: this.selectedScenarios.length,
-    });
+      // Update button state
+      event.currentTarget.textContent = "✓ Added";
+      event.currentTarget.disabled = true;
+      event.currentTarget.className = "btn btn-sm btn-success";
+
+      logClassroomEvent("scenario_added", {
+        scenario_id: scenarioId,
+        selection_count: this.selectedScenarios.length,
+      });
+    } finally {
+      // Clear update flag after a short delay
+      setTimeout(() => {
+        this.updateInProgress = false;
+      }, 100);
+    }
   }
 
   /**
    * Handle removing scenario from selection
    */
   handleRemoveScenario(event) {
+    // Prevent rapid-fire clicks that could cause infinite loops
+    if (this.updateInProgress) {
+      return;
+    }
+
     const scenarioItem = event.currentTarget.closest(".selected-scenario-item");
     const scenarioId = scenarioItem.dataset.scenarioId;
 
-    // Remove from selection
-    this.selectedScenarios = this.selectedScenarios.filter(
-      (s) => s.id !== scenarioId,
-    );
+    // Set update flag
+    this.updateInProgress = true;
 
-    // Update orders
-    this.selectedScenarios.forEach((scenario, index) => {
-      scenario.order = index;
-    });
+    try {
+      // Remove from selection
+      this.selectedScenarios = this.selectedScenarios.filter(
+        (s) => s.id !== scenarioId,
+      );
 
-    // Update UI
-    this.updateSelectedScenariosDisplay();
-    this.validateCreateClassroomForm();
+      // Update orders
+      this.selectedScenarios.forEach((scenario, index) => {
+        scenario.order = index;
+      });
 
-    // Re-enable add button
-    const addButton = this.createClassroomModal.element.querySelector(
-      `.add-scenario[data-scenario-id="${scenarioId}"]`,
-    );
-    if (addButton) {
-      addButton.textContent = "➕ Add";
-      addButton.disabled = false;
-      addButton.className = "btn btn-sm btn-primary add-scenario";
+      // Update UI with debounce
+      this.debouncedUpdateDisplay();
+      this.validateCreateClassroomForm();
+
+      // Re-enable add button
+      const addButton = this.createClassroomModal.element.querySelector(
+        `.add-scenario[data-scenario-id="${scenarioId}"]`,
+      );
+      if (addButton) {
+        addButton.textContent = "➕ Add";
+        addButton.disabled = false;
+        addButton.className = "btn btn-sm btn-primary add-scenario";
+      }
+
+      logClassroomEvent("scenario_removed", {
+        scenario_id: scenarioId,
+        selection_count: this.selectedScenarios.length,
+      });
+    } finally {
+      // Clear update flag after a short delay
+      setTimeout(() => {
+        this.updateInProgress = false;
+      }, 100);
     }
-
-    logClassroomEvent("scenario_removed", {
-      scenario_id: scenarioId,
-      selection_count: this.selectedScenarios.length,
-    });
   }
 
   /**
@@ -622,10 +678,19 @@ export default class TeacherClassroomModals {
    */
   async handleCreateClassroomSubmit() {
     try {
+      console.log("🔥 handleCreateClassroomSubmit called");
+      console.log("Current instructor:", this.currentInstructor);
+      console.log("Selected scenarios:", this.selectedScenarios);
+
       if (!this.validateCreateClassroomForm()) {
-        this.showErrorToast("Please complete all required fields");
+        console.log("❌ Form validation failed");
+        this.showErrorToast(
+          "Please complete all required fields and select at least one scenario",
+        );
         return;
       }
+
+      console.log("✅ Form validation passed");
 
       const modal = this.createClassroomModal.element;
       const formData = {
@@ -638,7 +703,7 @@ export default class TeacherClassroomModals {
         maxStudents: parseInt(modal.querySelector("#max-students").value),
         allowLateJoining: modal.querySelector("#allow-late-joining").checked,
         showProgress: modal.querySelector("#show-progress").checked,
-        sessionDate: modal.querySelector("#session-date").value,
+        sessionDate: new Date().toISOString(), // Use current date since no date field exists
         selectedScenarios: this.selectedScenarios.map((scenario, index) => ({
           scenarioId: scenario.id,
           title: scenario.title,
@@ -647,12 +712,15 @@ export default class TeacherClassroomModals {
         })),
       };
 
+      console.log("📋 Form data prepared:", formData);
+
       // Show loading state
       const submitButton = modal.querySelector("#create-classroom-submit");
-      const originalText = submitButton.innerHTML;
       submitButton.innerHTML =
         '<span class="loading-spinner"></span> Creating...';
       submitButton.disabled = true;
+
+      console.log("🔄 Calling classroomService.createClassroom...");
 
       // Create classroom
       const classroomData = {
@@ -662,7 +730,11 @@ export default class TeacherClassroomModals {
         selectedScenarios: formData.selectedScenarios,
       };
 
+      console.log("🏫 Classroom data for service:", classroomData);
+
       const result = await this.classroomService.createClassroom(classroomData);
+
+      console.log("✅ Classroom creation successful:", result);
 
       // Store current classroom
       this.currentClassroom = result;
@@ -677,6 +749,7 @@ export default class TeacherClassroomModals {
         max_students: formData.maxStudents,
       });
     } catch (error) {
+      console.error("❌ handleCreateClassroomSubmit error:", error);
       logger.error(
         "TeacherClassroomModals",
         "Failed to create classroom",
@@ -862,12 +935,60 @@ export default class TeacherClassroomModals {
       "#selected-scenarios-list",
     );
     if (container) {
+      // Store scroll position
+      const scrollTop = container.scrollTop;
+
+      // Update content
       container.innerHTML = this.buildSelectedScenariosContent();
 
-      // Re-attach event listeners
-      container.querySelectorAll(".remove-scenario").forEach((button) => {
-        button.addEventListener("click", this.handleRemoveScenario.bind(this));
+      // Restore scroll position
+      container.scrollTop = scrollTop;
+
+      // Remove all existing event listeners first to prevent duplicates
+      const oldButtons = container.querySelectorAll(
+        ".remove-scenario, .move-up, .move-down",
+      );
+      oldButtons.forEach((button) => {
+        button.replaceWith(button.cloneNode(true));
       });
+
+      // Re-attach event listeners with proper delegation
+      this.attachSelectedScenarioEvents(container);
+    }
+  }
+
+  /**
+   * Attach event listeners to selected scenario buttons
+   * @private
+   */
+  attachSelectedScenarioEvents(container) {
+    // Use event delegation to prevent duplicate listeners
+    container.removeEventListener("click", this.handleSelectedScenarioClick);
+    container.addEventListener(
+      "click",
+      this.handleSelectedScenarioClick.bind(this),
+    );
+  }
+
+  /**
+   * Handle clicks on selected scenario elements (using delegation)
+   * @private
+   */
+  handleSelectedScenarioClick(event) {
+    const button = event.target.closest(
+      ".remove-scenario, .move-up, .move-down",
+    );
+    if (!button) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (button.classList.contains("remove-scenario")) {
+      this.handleRemoveScenario(event);
+    } else if (button.classList.contains("move-up")) {
+      this.handleMoveScenarioUp(event);
+    } else if (button.classList.contains("move-down")) {
+      this.handleMoveScenarioDown(event);
     }
   }
 

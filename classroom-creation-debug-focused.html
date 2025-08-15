@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Classroom Creation Debug - SimulateAI</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .debug-log {
+        background: #1a1a1a;
+        color: #00ff00;
+        font-family: "Courier New", monospace;
+        padding: 15px;
+        border-radius: 5px;
+        max-height: 500px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        margin: 10px 0;
+      }
+      .test-button {
+        margin: 5px;
+        padding: 10px 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container mt-4">
+      <h1>🔍 Classroom Creation Debug Tool</h1>
+      <p class="text-muted">
+        Debugging why classroom creation button gets stuck on "Creating..."
+      </p>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>Quick Tests</h5>
+            </div>
+            <div class="card-body">
+              <button id="test-imports" class="btn btn-primary test-button">
+                Test Module Imports
+              </button>
+              <button id="test-firebase" class="btn btn-secondary test-button">
+                Test Firebase Service
+              </button>
+              <button id="test-datahandler" class="btn btn-info test-button">
+                Test DataHandler
+              </button>
+              <button
+                id="test-classroom-service"
+                class="btn btn-warning test-button"
+              >
+                Test Classroom Service
+              </button>
+              <button
+                id="test-modal-creation"
+                class="btn btn-success test-button"
+              >
+                Test Modal Creation
+              </button>
+              <button
+                id="simulate-classroom"
+                class="btn btn-danger test-button"
+              >
+                🏫 Simulate Classroom Creation
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>Service Status</h5>
+            </div>
+            <div class="card-body">
+              <div id="service-status">
+                <div class="status-item">
+                  Firebase: <span id="firebase-status">Unknown</span>
+                </div>
+                <div class="status-item">
+                  DataHandler: <span id="datahandler-status">Unknown</span>
+                </div>
+                <div class="status-item">
+                  Classroom Service:
+                  <span id="classroom-service-status">Unknown</span>
+                </div>
+                <div class="status-item">
+                  Modal Utility: <span id="modal-status">Unknown</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h5>Debug Output</h5>
+            </div>
+            <div class="card-body">
+              <div id="debug-log" class="debug-log">
+                === Classroom Creation Debug Tool === Ready to debug classroom
+                creation issues...
+              </div>
+              <button id="clear-log" class="btn btn-sm btn-outline-secondary">
+                Clear Log
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script type="module">
+      let debugServices = {
+        firebase: null,
+        dataHandler: null,
+        classroomService: null,
+        teacherModals: null,
+      };
+
+      function log(message, type = "info") {
+        const logElement = document.getElementById("debug-log");
+        const timestamp = new Date().toLocaleTimeString();
+        const prefix =
+          type === "error"
+            ? "❌"
+            : type === "success"
+              ? "✅"
+              : type === "warning"
+                ? "⚠️"
+                : "ℹ️";
+        logElement.textContent += `\n[${timestamp}] ${prefix} ${message}`;
+        logElement.scrollTop = logElement.scrollHeight;
+      }
+
+      function updateStatus(service, status) {
+        const element = document.getElementById(`${service}-status`);
+        if (element) {
+          element.textContent = status;
+          element.style.color = status.includes("Error")
+            ? "red"
+            : status.includes("Ready")
+              ? "green"
+              : "orange";
+        }
+      }
+
+      // Test imports
+      async function testImports() {
+        log("🔄 Testing module imports...");
+
+        try {
+          // Test DataHandler import
+          const { default: DataHandler } = await import(
+            "./src/js/core/data-handler.js"
+          );
+          log("✅ DataHandler imported successfully");
+          updateStatus("datahandler", "Import OK");
+
+          // Test Firebase Service import
+          const { FirebaseService } = await import(
+            "./src/js/services/firebase-service.js"
+          );
+          log("✅ FirebaseService imported successfully");
+          updateStatus("firebase", "Import OK");
+
+          // Test Modal Utility import
+          const { default: ModalUtility } = await import(
+            "./src/js/components/modal-utility.js"
+          );
+          log("✅ ModalUtility imported successfully");
+          updateStatus("modal", "Import OK");
+
+          // Test Realtime Classroom Service import
+          const { default: RealtimeClassroomService } = await import(
+            "./src/js/services/realtime-classroom-service.js"
+          );
+          log("✅ RealtimeClassroomService imported successfully");
+          updateStatus("classroom-service", "Import OK");
+
+          // Test Teacher Classroom Modals import
+          const { default: TeacherClassroomModals } = await import(
+            "./src/js/components/teacher-classroom-modals.js"
+          );
+          log("✅ TeacherClassroomModals imported successfully");
+
+          log("🎉 All imports successful!");
+          return true;
+        } catch (error) {
+          log(`❌ Import failed: ${error.message}`, "error");
+          log(`Stack: ${error.stack}`, "error");
+          return false;
+        }
+      }
+
+      // Test Firebase Service
+      async function testFirebaseService() {
+        log("🔄 Testing Firebase Service initialization...");
+
+        try {
+          const { FirebaseService } = await import(
+            "./src/js/services/firebase-service.js"
+          );
+          debugServices.firebase = new FirebaseService();
+
+          // Try to initialize
+          await debugServices.firebase.initialize({
+            enableOffline: true,
+            guestMode: true,
+          });
+
+          log("✅ Firebase Service initialized successfully");
+          updateStatus("firebase", "Ready");
+          return true;
+        } catch (error) {
+          log(`❌ Firebase Service failed: ${error.message}`, "error");
+          updateStatus("firebase", "Error");
+          return false;
+        }
+      }
+
+      // Test DataHandler
+      async function testDataHandler() {
+        log("🔄 Testing DataHandler initialization...");
+
+        try {
+          const { default: DataHandler } = await import(
+            "./src/js/core/data-handler.js"
+          );
+
+          debugServices.dataHandler = new DataHandler({
+            appName: "SimulateAI",
+            version: "1.80",
+            firebaseService: debugServices.firebase || null,
+          });
+
+          await debugServices.dataHandler.initialize();
+
+          log("✅ DataHandler initialized successfully");
+          updateStatus("datahandler", "Ready");
+          return true;
+        } catch (error) {
+          log(`❌ DataHandler failed: ${error.message}`, "error");
+          updateStatus("datahandler", "Error");
+          return false;
+        }
+      }
+
+      // Test Classroom Service
+      async function testClassroomService() {
+        log("🔄 Testing Classroom Service initialization...");
+
+        try {
+          const { default: RealtimeClassroomService } = await import(
+            "./src/js/services/realtime-classroom-service.js"
+          );
+
+          if (!debugServices.firebase) {
+            throw new Error("Firebase service required for classroom service");
+          }
+
+          debugServices.classroomService = new RealtimeClassroomService(
+            debugServices.firebase,
+          );
+          await debugServices.classroomService.initialize();
+
+          log("✅ Classroom Service initialized successfully");
+          updateStatus("classroom-service", "Ready");
+          return true;
+        } catch (error) {
+          log(`❌ Classroom Service failed: ${error.message}`, "error");
+          updateStatus("classroom-service", "Error");
+          return false;
+        }
+      }
+
+      // Test Modal Creation
+      async function testModalCreation() {
+        log("🔄 Testing Modal creation...");
+
+        try {
+          const { default: ModalUtility } = await import(
+            "./src/js/components/modal-utility.js"
+          );
+
+          const testModal = new ModalUtility({
+            title: "Test Modal",
+            content:
+              "<p>This is a test modal to verify modal creation works.</p>",
+            size: "medium",
+          });
+
+          testModal.open();
+
+          setTimeout(() => {
+            testModal.hide();
+            log("✅ Modal creation test successful");
+          }, 2000);
+
+          updateStatus("modal", "Ready");
+          return true;
+        } catch (error) {
+          log(`❌ Modal creation failed: ${error.message}`, "error");
+          updateStatus("modal", "Error");
+          return false;
+        }
+      }
+
+      // Simulate complete classroom creation flow
+      async function simulateClassroomCreation() {
+        log("🔄 Starting full classroom creation simulation...");
+
+        try {
+          // Step 1: Initialize all services
+          if (!debugServices.firebase) await testFirebaseService();
+          if (!debugServices.dataHandler) await testDataHandler();
+          if (!debugServices.classroomService) await testClassroomService();
+
+          // Step 2: Create teacher modals instance
+          const { default: TeacherClassroomModals } = await import(
+            "./src/js/components/teacher-classroom-modals.js"
+          );
+
+          debugServices.teacherModals = new TeacherClassroomModals(
+            debugServices.dataHandler,
+            debugServices.firebase,
+          );
+
+          // Step 3: Initialize in guest mode
+          await debugServices.teacherModals.initialize(true);
+          log("✅ Teacher modals initialized");
+
+          // Step 4: Simulate classroom creation data
+          const mockClassroomData = {
+            classroomName: "Debug Test Classroom",
+            instructorId: "debug_instructor_" + Date.now(),
+            instructorName: "Debug Instructor",
+            selectedScenarios: [
+              {
+                scenarioId: "test1",
+                title: "Test Scenario 1",
+                category: "Ethics",
+                order: 0,
+              },
+            ],
+          };
+
+          log("🔄 Attempting classroom creation...");
+          log(`Data: ${JSON.stringify(mockClassroomData, null, 2)}`);
+
+          // Step 5: Try to create classroom
+          const result =
+            await debugServices.classroomService.createClassroom(
+              mockClassroomData,
+            );
+
+          log("🎉 Classroom creation successful!");
+          log(`Result: ${JSON.stringify(result, null, 2)}`, "success");
+
+          return result;
+        } catch (error) {
+          log(
+            `❌ Classroom creation simulation failed: ${error.message}`,
+            "error",
+          );
+          log(`Stack: ${error.stack}`, "error");
+
+          // Additional debugging info
+          log("🔍 Debug info:");
+          log(`Firebase initialized: ${!!debugServices.firebase}`);
+          log(`DataHandler initialized: ${!!debugServices.dataHandler}`);
+          log(
+            `Classroom service initialized: ${!!debugServices.classroomService}`,
+          );
+          log(`Teacher modals initialized: ${!!debugServices.teacherModals}`);
+
+          return null;
+        }
+      }
+
+      // Event listeners
+      document
+        .getElementById("test-imports")
+        .addEventListener("click", testImports);
+      document
+        .getElementById("test-firebase")
+        .addEventListener("click", testFirebaseService);
+      document
+        .getElementById("test-datahandler")
+        .addEventListener("click", testDataHandler);
+      document
+        .getElementById("test-classroom-service")
+        .addEventListener("click", testClassroomService);
+      document
+        .getElementById("test-modal-creation")
+        .addEventListener("click", testModalCreation);
+      document
+        .getElementById("simulate-classroom")
+        .addEventListener("click", simulateClassroomCreation);
+
+      document.getElementById("clear-log").addEventListener("click", () => {
+        document.getElementById("debug-log").textContent =
+          "=== Classroom Creation Debug Tool ===\nLog cleared...";
+      });
+
+      // Auto-start with imports test
+      log("🚀 Debug tool loaded. Starting with imports test...");
+      setTimeout(testImports, 1000);
+    </script>
+  </body>
+</html>

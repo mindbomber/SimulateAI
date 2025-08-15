@@ -28,8 +28,11 @@ export default class RealtimeClassroomService {
     this.database = null;
     this.listeners = new Map(); // Track active listeners for cleanup
     this.isConnected = false;
+    this.fallbackMode = false; // Use localStorage when Firebase is unavailable
+    this.initializationPromise = null; // Track initialization status
 
-    this.initializeDatabase();
+    // Start initialization but don't wait for it in constructor
+    this.initializationPromise = this.initializeDatabase();
   }
 
   /**
@@ -38,24 +41,51 @@ export default class RealtimeClassroomService {
    */
   async initializeDatabase() {
     try {
-      if (!this.firebaseService.app) {
-        throw new Error("Firebase app not initialized");
+      // Check if Firebase service and app are properly initialized
+      if (!this.firebaseService || !this.firebaseService.app) {
+        logger.warn(
+          "RealtimeClassroomService",
+          "Firebase app not initialized, using fallback mode",
+        );
+        this.fallbackMode = true;
+        this.isConnected = true; // Mark as connected for fallback mode
+        return;
       }
 
+      // Try to initialize the database
       this.database = getDatabase(this.firebaseService.app);
-      this.isConnected = true;
 
-      logger.info(
-        "RealtimeClassroomService",
-        "Database initialized successfully",
-      );
+      // Test the connection with a simple operation
+      try {
+        const testRef = ref(this.database, ".info/connected");
+        // This will throw if database URL is invalid or connection fails
+        await get(testRef);
+        this.isConnected = true;
+        this.fallbackMode = false;
+
+        logger.info(
+          "RealtimeClassroomService",
+          "Database initialized successfully with Firebase",
+        );
+      } catch (connectionError) {
+        logger.warn(
+          "RealtimeClassroomService",
+          "Firebase database connection failed, using fallback mode",
+          connectionError,
+        );
+        this.fallbackMode = true;
+        this.isConnected = true; // Mark as connected for fallback mode
+        this.database = null; // Clear the database reference
+      }
     } catch (error) {
-      logger.error(
+      logger.warn(
         "RealtimeClassroomService",
-        "Failed to initialize database",
+        "Failed to initialize database, using fallback mode",
         error,
       );
-      throw error;
+      this.fallbackMode = true;
+      this.isConnected = true; // Mark as connected for fallback mode
+      this.database = null; // Clear the database reference
     }
   }
 
@@ -69,9 +99,32 @@ export default class RealtimeClassroomService {
    * @returns {Promise<Object>} Created classroom with code and ID
    */
   async createClassroom(classroomData) {
-    if (!this.isConnected) {
-      throw new Error("Database not connected");
+    // Wait for initialization to complete before proceeding with timeout
+    if (this.initializationPromise) {
+      try {
+        // Add timeout to prevent infinite hanging
+        await Promise.race([
+          this.initializationPromise,
+          new Promise((_, reject) =>
+            setTimeout(
+              () => reject(new Error("Initialization timeout")),
+              10000,
+            ),
+          ),
+        ]);
+      } catch (error) {
+        logger.warn(
+          "RealtimeClassroomService",
+          "Initialization failed or timed out during classroom creation, forcing fallback mode",
+          error,
+        );
+        this.fallbackMode = true;
+        this.isConnected = false;
+      }
     }
+
+    // Note: We allow creation in both connected and fallback modes
+    // The service handles both Firebase and localStorage automatically
 
     try {
       // Generate unique classroom code
@@ -81,9 +134,10 @@ export default class RealtimeClassroomService {
       const classroom = {
         classroomId: `classroom_${Date.now()}`,
         classroomName: classroomData.classroomName,
+        classroomCode: classroomCode,
         instructorId: classroomData.instructorId,
         instructorName: classroomData.instructorName,
-        dateCreated: serverTimestamp(),
+        dateCreated: new Date().toISOString(),
         selectedScenarios: classroomData.selectedScenarios || [],
         sessionStatus: {
           isLive: false,
@@ -101,29 +155,83 @@ export default class RealtimeClassroomService {
         },
       };
 
-      // Save to database
-      const classroomRef = ref(this.database, `classrooms/${classroomCode}`);
-      await set(classroomRef, classroom);
-
-      logger.info(
-        "RealtimeClassroomService",
-        "Classroom created successfully",
-        {
-          classroomCode,
-          instructorId: classroomData.instructorId,
-          scenarioCount: classroomData.selectedScenarios.length,
-        },
-      );
-
-      return {
-        classroomCode,
-        classroomId: classroom.classroomId,
-        ...classroom,
-      };
+      if (this.fallbackMode) {
+        // Use localStorage fallback
+        return await this.createClassroomFallback(classroom);
+      } else {
+        // Use Firebase Realtime Database
+        return await this.createClassroomFirebase(classroom);
+      }
     } catch (error) {
       logger.error(
         "RealtimeClassroomService",
         "Failed to create classroom",
+        error,
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Create classroom using Firebase Realtime Database
+   * @private
+   */
+  async createClassroomFirebase(classroom) {
+    const classroomRef = ref(
+      this.database,
+      `classrooms/${classroom.classroomCode}`,
+    );
+    await set(classroomRef, {
+      ...classroom,
+      dateCreated: serverTimestamp(), // Use Firebase server timestamp
+    });
+
+    logger.info(
+      "RealtimeClassroomService",
+      "Classroom created successfully in Firebase",
+      {
+        classroomCode: classroom.classroomCode,
+        instructorId: classroom.instructorId,
+      },
+    );
+
+    return classroom;
+  }
+
+  /**
+   * Create classroom using localStorage fallback
+   * @private
+   */
+  async createClassroomFallback(classroom) {
+    try {
+      // Get existing classrooms from localStorage
+      const existingClassrooms = JSON.parse(
+        localStorage.getItem("simulateai_classrooms") || "{}",
+      );
+
+      // Add new classroom
+      existingClassrooms[classroom.classroomCode] = classroom;
+
+      // Save back to localStorage
+      localStorage.setItem(
+        "simulateai_classrooms",
+        JSON.stringify(existingClassrooms),
+      );
+
+      logger.info(
+        "RealtimeClassroomService",
+        "Classroom created successfully in fallback mode",
+        {
+          classroomCode: classroom.classroomCode,
+          instructorId: classroom.instructorId,
+        },
+      );
+
+      return classroom;
+    } catch (error) {
+      logger.error(
+        "RealtimeClassroomService",
+        "Failed to create classroom in fallback mode",
         error,
       );
       throw error;
@@ -515,18 +623,78 @@ export default class RealtimeClassroomService {
    * @returns {Promise<string>} Unique 6-character classroom code
    */
   async generateUniqueClassroomCode() {
+    // Wait for initialization to complete with timeout
+    if (this.initializationPromise) {
+      try {
+        // Add a timeout to prevent infinite hanging
+        await Promise.race([
+          this.initializationPromise,
+          new Promise((_, reject) =>
+            setTimeout(
+              () => reject(new Error("Initialization timeout")),
+              10000,
+            ),
+          ),
+        ]);
+      } catch (error) {
+        logger.warn(
+          "RealtimeClassroomService",
+          "Initialization failed or timed out, forcing fallback mode",
+          error,
+        );
+        this.fallbackMode = true;
+        this.isConnected = false;
+      }
+    }
+
     let attempts = 0;
     const maxAttempts = 10;
 
     while (attempts < maxAttempts) {
       const code = generateClassroomCode();
 
-      // Check if code already exists
-      const classroomRef = ref(this.database, `classrooms/${code}`);
-      const snapshot = await get(classroomRef);
+      // Always use fallback mode if database is not properly initialized
+      if (this.fallbackMode || !this.database) {
+        // Check in localStorage
+        const existingClassrooms = JSON.parse(
+          localStorage.getItem("simulateai_classrooms") || "{}",
+        );
+        if (!existingClassrooms[code]) {
+          logger.info(
+            "RealtimeClassroomService",
+            `Generated classroom code in fallback mode: ${code}`,
+          );
+          return code;
+        }
+      } else {
+        try {
+          // Check if code already exists in Firebase
+          const classroomRef = ref(this.database, `classrooms/${code}`);
+          const snapshot = await get(classroomRef);
 
-      if (!snapshot.exists()) {
-        return code;
+          if (!snapshot.exists()) {
+            logger.info(
+              "RealtimeClassroomService",
+              `Generated classroom code: ${code}`,
+            );
+            return code;
+          }
+        } catch (error) {
+          // If Firebase fails, fall back to localStorage
+          logger.warn(
+            "RealtimeClassroomService",
+            "Firebase check failed, using fallback",
+            error,
+          );
+          this.fallbackMode = true;
+
+          const existingClassrooms = JSON.parse(
+            localStorage.getItem("simulateai_classrooms") || "{}",
+          );
+          if (!existingClassrooms[code]) {
+            return code;
+          }
+        }
       }
 
       attempts++;

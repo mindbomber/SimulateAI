@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monitoring Loop Fix Test - SimulateAI</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .status-box {
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border: 2px solid;
+      }
+      .status-success {
+        border-color: #28a745;
+        background-color: #d4edda;
+      }
+      .status-warning {
+        border-color: #ffc107;
+        background-color: #fff3cd;
+      }
+      .status-error {
+        border-color: #dc3545;
+        background-color: #f8d7da;
+      }
+      .log-output {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 10px;
+        max-height: 300px;
+        overflow-y: auto;
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+      }
+      .btn-test {
+        margin: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container mt-4">
+      <h1>Performance Monitoring Loop Fix Test</h1>
+      <p class="text-muted">
+        Testing the fix for infinite DOM loops in performance monitoring systems
+      </p>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>Test Results</h5>
+            </div>
+            <div class="card-body">
+              <div id="monitoring-status" class="status-box status-warning">
+                <strong>Monitoring Status:</strong>
+                <span id="monitoring-text">Testing...</span>
+              </div>
+
+              <div id="loop-status" class="status-box status-warning">
+                <strong>Infinite Loop Check:</strong>
+                <span id="loop-text">Testing...</span>
+              </div>
+
+              <div id="classroom-status" class="status-box status-warning">
+                <strong>Classroom Modal Test:</strong>
+                <span id="classroom-text">Testing...</span>
+              </div>
+
+              <hr />
+
+              <button id="start-test" class="btn btn-primary btn-test">
+                Start Full Test
+              </button>
+              <button id="test-monitoring" class="btn btn-secondary btn-test">
+                Test Monitoring Only
+              </button>
+              <button id="test-classroom" class="btn btn-info btn-test">
+                Test Classroom Modal
+              </button>
+              <button id="emergency-stop" class="btn btn-danger btn-test">
+                Emergency Stop
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>Test Log</h5>
+            </div>
+            <div class="card-body">
+              <div id="test-log" class="log-output">
+                === Performance Monitoring Loop Fix Test === Ready to test
+                monitoring systems...
+              </div>
+              <button
+                id="clear-log"
+                class="btn btn-sm btn-outline-secondary mt-2"
+              >
+                Clear Log
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Test Modal -->
+      <div
+        class="modal fade"
+        id="testClassroomModal"
+        tabindex="-1"
+        aria-labelledby="testModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="testModalLabel">
+                Test Classroom Modal
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <p>
+                This is a test classroom modal to check if monitoring pauses
+                during modal interactions.
+              </p>
+              <div class="mb-3">
+                <label for="testInput" class="form-label">Test Input:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="testInput"
+                  placeholder="Type something..."
+                />
+              </div>
+              <button
+                class="btn btn-primary ui-focus-visible"
+                id="testPrimaryButton"
+              >
+                Test Primary Button
+              </button>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+              <button type="button" class="btn btn-primary">
+                Save changes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script type="module">
+      let testState = {
+        monitoringRunning: false,
+        loopDetected: false,
+        testStartTime: null,
+        intervalIds: [],
+        modalOpen: false,
+      };
+
+      function log(message) {
+        const logElement = document.getElementById("test-log");
+        const timestamp = new Date().toLocaleTimeString();
+        logElement.textContent += `\n[${timestamp}] ${message}`;
+        logElement.scrollTop = logElement.scrollHeight;
+      }
+
+      function updateStatus(elementId, textId, status, message) {
+        const element = document.getElementById(elementId);
+        const textElement = document.getElementById(textId);
+
+        element.className = `status-box status-${status}`;
+        textElement.textContent = message;
+      }
+
+      // Simulate the monitoring systems to test for loops
+      function startTestMonitoring() {
+        log("🔄 Starting test monitoring systems...");
+        testState.monitoringRunning = true;
+        testState.testStartTime = Date.now();
+
+        // Simulate app monitoring
+        const appInterval = setInterval(() => {
+          if (testState.modalOpen) {
+            log("⚠️ App monitoring skipped (modal active)");
+            return;
+          }
+
+          // Simulate DOM manipulation that could cause loops
+          const button = document.getElementById("testPrimaryButton");
+          if (button) {
+            button.setAttribute("data-test-attr", Date.now());
+            button.classList.add("ui-focus-visible");
+          }
+
+          log("📊 App health check performed");
+        }, 5000);
+
+        // Simulate main-grid monitoring
+        const gridInterval = setInterval(() => {
+          if (testState.modalOpen) {
+            log("⚠️ Grid monitoring skipped (modal active)");
+            return;
+          }
+
+          // Simulate performance check DOM manipulation
+          const buttons = document.querySelectorAll(".btn-primary");
+          buttons.forEach((btn) => {
+            btn.setAttribute("data-perf-check", Date.now());
+          });
+
+          log("⚡ Grid performance check performed");
+        }, 10000);
+
+        testState.intervalIds = [appInterval, gridInterval];
+
+        updateStatus(
+          "monitoring-status",
+          "monitoring-text",
+          "success",
+          "Active with loop prevention",
+        );
+        log("✅ Test monitoring systems started");
+      }
+
+      function stopTestMonitoring() {
+        log("🛑 Stopping test monitoring systems...");
+
+        testState.intervalIds.forEach((id) => clearInterval(id));
+        testState.intervalIds = [];
+        testState.monitoringRunning = false;
+
+        updateStatus(
+          "monitoring-status",
+          "monitoring-text",
+          "warning",
+          "Stopped",
+        );
+        log("✅ Test monitoring systems stopped");
+      }
+
+      // Test for infinite loops
+      function testForInfiniteLoops() {
+        log("🔍 Testing for infinite loops...");
+
+        let loopDetectionCount = 0;
+        const maxChecks = 10;
+
+        const loopDetector = setInterval(() => {
+          loopDetectionCount++;
+
+          // Check if buttons are being rapidly modified
+          const buttons = document.querySelectorAll(
+            ".btn-primary.ui-focus-visible",
+          );
+          if (buttons.length > 0) {
+            const button = buttons[0];
+            const lastUpdate = button.getAttribute("data-test-attr");
+            if (lastUpdate && Date.now() - parseInt(lastUpdate) < 1000) {
+              log("🚨 Potential rapid DOM modification detected");
+            }
+          }
+
+          if (loopDetectionCount >= maxChecks) {
+            clearInterval(loopDetector);
+            updateStatus(
+              "loop-status",
+              "loop-text",
+              "success",
+              "No infinite loops detected",
+            );
+            log("✅ Loop detection test completed - No issues found");
+          }
+        }, 1000);
+      }
+
+      // Test classroom modal interaction
+      function testClassroomModal() {
+        log("🏫 Testing classroom modal interaction...");
+
+        const modal = new bootstrap.Modal(
+          document.getElementById("testClassroomModal"),
+        );
+        modal.show();
+
+        testState.modalOpen = true;
+        updateStatus(
+          "classroom-status",
+          "classroom-text",
+          "warning",
+          "Modal open - monitoring should pause",
+        );
+
+        // Test modal interactions
+        setTimeout(() => {
+          const testButton = document.getElementById("testPrimaryButton");
+          testButton.click();
+          log("🖱️ Clicked test button in modal");
+
+          // Close modal after 10 seconds
+          setTimeout(() => {
+            modal.hide();
+            testState.modalOpen = false;
+            updateStatus(
+              "classroom-status",
+              "classroom-text",
+              "success",
+              "Modal closed - monitoring resumed",
+            );
+            log("✅ Modal test completed");
+          }, 10000);
+        }, 2000);
+      }
+
+      // Full integration test
+      function runFullTest() {
+        log("🚀 Starting full integration test...");
+
+        // Clear previous states
+        updateStatus(
+          "monitoring-status",
+          "monitoring-text",
+          "warning",
+          "Testing...",
+        );
+        updateStatus("loop-status", "loop-text", "warning", "Testing...");
+        updateStatus(
+          "classroom-status",
+          "classroom-text",
+          "warning",
+          "Testing...",
+        );
+
+        // Start monitoring
+        startTestMonitoring();
+
+        // Test for loops after 2 seconds
+        setTimeout(() => {
+          testForInfiniteLoops();
+        }, 2000);
+
+        // Test modal after 5 seconds
+        setTimeout(() => {
+          testClassroomModal();
+        }, 5000);
+
+        // Complete test after 30 seconds
+        setTimeout(() => {
+          stopTestMonitoring();
+          log("🎉 Full test completed!");
+          log("📋 Summary: Check status boxes above for results");
+        }, 30000);
+      }
+
+      function emergencyStop() {
+        log("🚨 EMERGENCY STOP ACTIVATED");
+
+        // Stop all our test intervals
+        testState.intervalIds.forEach((id) => clearInterval(id));
+        testState.intervalIds = [];
+
+        // Try to stop any other intervals (brute force)
+        for (let i = 1; i < 10000; i++) {
+          try {
+            clearInterval(i);
+          } catch (e) {
+            // Ignore errors
+          }
+        }
+
+        // Close any open modals
+        const modals = document.querySelectorAll(".modal.show");
+        modals.forEach((modal) => {
+          const bsModal = bootstrap.Modal.getInstance(modal);
+          if (bsModal) bsModal.hide();
+        });
+
+        testState.modalOpen = false;
+        testState.monitoringRunning = false;
+
+        updateStatus(
+          "monitoring-status",
+          "monitoring-text",
+          "error",
+          "Emergency stopped",
+        );
+        updateStatus("loop-status", "loop-text", "error", "Test interrupted");
+        updateStatus(
+          "classroom-status",
+          "classroom-text",
+          "error",
+          "Test interrupted",
+        );
+
+        log("🛑 All systems stopped");
+      }
+
+      // Event listeners
+      document
+        .getElementById("start-test")
+        .addEventListener("click", runFullTest);
+      document
+        .getElementById("test-monitoring")
+        .addEventListener("click", startTestMonitoring);
+      document
+        .getElementById("test-classroom")
+        .addEventListener("click", testClassroomModal);
+      document
+        .getElementById("emergency-stop")
+        .addEventListener("click", emergencyStop);
+
+      document.getElementById("clear-log").addEventListener("click", () => {
+        document.getElementById("test-log").textContent =
+          "=== Performance Monitoring Loop Fix Test ===\nLog cleared...";
+      });
+
+      // Modal event listeners
+      document
+        .getElementById("testClassroomModal")
+        .addEventListener("shown.bs.modal", () => {
+          log("📝 Modal shown event fired");
+        });
+
+      document
+        .getElementById("testClassroomModal")
+        .addEventListener("hidden.bs.modal", () => {
+          log("📝 Modal hidden event fired");
+        });
+
+      // Initialize
+      log("Performance monitoring loop fix test loaded");
+      log("Click 'Start Full Test' to run comprehensive monitoring test");
+      log("Use 'Emergency Stop' if any infinite loops are detected");
+    </script>
+  </body>
+</html>

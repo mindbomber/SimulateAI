@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Classroom Creation Detailed Debug - SimulateAI</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .debug-section {
+        background: white;
+        margin: 20px 0;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+      }
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .status.warning {
+        background: #fff3cd;
+        color: #856404;
+      }
+      .status.info {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      button:disabled {
+        background: #6c757d;
+      }
+      .log-output {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        padding: 15px;
+        border-radius: 4px;
+        max-height: 400px;
+        overflow-y: auto;
+        font-family: monospace;
+        font-size: 12px;
+      }
+      .form-test {
+        border: 2px solid #007bff;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+      .test-input {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      .scenario-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+        margin: 10px 0;
+      }
+      .scenario-item {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        cursor: pointer;
+        text-align: center;
+      }
+      .scenario-item.selected {
+        background: #007bff;
+        color: white;
+      }
+      .step-by-step {
+        counter-reset: step-counter;
+      }
+      .step {
+        counter-increment: step-counter;
+        position: relative;
+        padding-left: 40px;
+        margin: 15px 0;
+      }
+      .step::before {
+        content: counter(step-counter);
+        position: absolute;
+        left: 0;
+        top: 0;
+        background: #007bff;
+        color: white;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔍 Classroom Creation Detailed Debug</h1>
+    <p>Comprehensive debugging for classroom creation issues in guest mode</p>
+
+    <div class="debug-section">
+      <h2>🚀 Service Initialization Status</h2>
+      <div id="service-status"></div>
+      <button onclick="checkServices()">Check All Services</button>
+    </div>
+
+    <div class="debug-section">
+      <h2>🎯 Direct Classroom Creation Test</h2>
+
+      <div class="form-test">
+        <h3>Test Classroom Creation Form</h3>
+        <input
+          type="text"
+          id="test-classroom-name"
+          class="test-input"
+          placeholder="Enter classroom name"
+          value="Debug Test Classroom"
+        />
+
+        <div>
+          <h4>Select Scenarios:</h4>
+          <div id="scenarios-grid" class="scenario-grid">
+            <!-- Scenarios will be loaded here -->
+          </div>
+        </div>
+
+        <div>
+          <label for="test-session-date">Session Date:</label>
+          <input
+            type="date"
+            id="test-session-date"
+            class="test-input"
+            value=""
+          />
+        </div>
+
+        <div class="step-by-step">
+          <div class="step">
+            <button onclick="validateForm()">Step 1: Validate Form Data</button>
+            <div id="validation-result"></div>
+          </div>
+
+          <div class="step">
+            <button onclick="checkGuestMode()">
+              Step 2: Verify Guest Mode
+            </button>
+            <div id="guest-mode-result"></div>
+          </div>
+
+          <div class="step">
+            <button onclick="testServiceCall()">
+              Step 3: Test Service Call
+            </button>
+            <div id="service-call-result"></div>
+          </div>
+
+          <div class="step">
+            <button onclick="createClassroomDirectly()">
+              Step 4: Create Classroom
+            </button>
+            <div id="creation-result"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="debug-section">
+      <h2>📋 Debug Console Output</h2>
+      <div id="debug-log" class="log-output"></div>
+      <button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <script type="module">
+      // Debug logging system
+      const originalConsole = {
+        log: console.log,
+        warn: console.warn,
+        error: console.error,
+        info: console.info,
+      };
+
+      function logToConsole(level, ...args) {
+        const timestamp = new Date().toISOString().split("T")[1].split(".")[0];
+        const logEntry = `[${timestamp}] ${level.toUpperCase()}: ${args.join(" ")}`;
+
+        // Call original console method
+        originalConsole[level](...args);
+
+        // Add to debug log
+        const debugLog = document.getElementById("debug-log");
+        const logDiv = document.createElement("div");
+        logDiv.textContent = logEntry;
+        logDiv.style.color =
+          level === "error" ? "red" : level === "warn" ? "orange" : "black";
+        debugLog.appendChild(logDiv);
+        debugLog.scrollTop = debugLog.scrollHeight;
+      }
+
+      // Override console methods
+      console.log = (...args) => logToConsole("log", ...args);
+      console.warn = (...args) => logToConsole("warn", ...args);
+      console.error = (...args) => logToConsole("error", ...args);
+      console.info = (...args) => logToConsole("info", ...args);
+
+      let services = {};
+      let selectedScenarios = [];
+
+      async function loadServices() {
+        try {
+          console.log("Loading services...");
+
+          // Import main services
+          const { default: ClassroomIntegrationManager } = await import(
+            "./src/js/integrations/classroom-integration-manager.js"
+          );
+          const { default: RealtimeClassroomService } = await import(
+            "./src/js/services/realtime-classroom-service.js"
+          );
+          const { ETHICAL_CATEGORIES } = await import(
+            "./src/data/categories.js"
+          );
+
+          services.classroomManager = new ClassroomIntegrationManager();
+          services.realtimeService = new RealtimeClassroomService();
+          services.categories = ETHICAL_CATEGORIES;
+
+          console.log("✅ Services loaded successfully");
+          return true;
+        } catch (error) {
+          console.error("❌ Service loading failed:", error);
+          return false;
+        }
+      }
+
+      window.checkServices = async function () {
+        const statusDiv = document.getElementById("service-status");
+        statusDiv.innerHTML =
+          '<div class="status info">Checking services...</div>';
+
+        const servicesLoaded = await loadServices();
+
+        if (servicesLoaded) {
+          let statusHTML =
+            '<div class="status success">✅ All services loaded successfully</div>';
+
+          // Check individual services
+          if (services.classroomManager) {
+            statusHTML +=
+              '<div class="status success">✅ ClassroomIntegrationManager ready</div>';
+          }
+          if (services.realtimeService) {
+            statusHTML +=
+              '<div class="status success">✅ RealtimeClassroomService ready</div>';
+          }
+          if (services.categories) {
+            statusHTML += `<div class="status success">✅ Categories loaded (${Object.keys(services.categories).length} categories)</div>`;
+            loadScenarios();
+          }
+
+          statusDiv.innerHTML = statusHTML;
+        } else {
+          statusDiv.innerHTML =
+            '<div class="status error">❌ Service loading failed</div>';
+        }
+      };
+
+      function loadScenarios() {
+        const grid = document.getElementById("scenarios-grid");
+        grid.innerHTML = "";
+
+        const categories = services.categories;
+        Object.entries(categories).forEach(([categoryId, category]) => {
+          if (category.scenarios) {
+            category.scenarios.forEach((scenario, index) => {
+              const scenarioDiv = document.createElement("div");
+              scenarioDiv.className = "scenario-item";
+              scenarioDiv.textContent = scenario.title;
+              scenarioDiv.dataset.categoryId = categoryId;
+              scenarioDiv.dataset.scenarioIndex = index;
+              scenarioDiv.onclick = () =>
+                toggleScenario(scenarioDiv, categoryId, index, scenario);
+              grid.appendChild(scenarioDiv);
+            });
+          }
+        });
+
+        console.log(`Loaded ${grid.children.length} scenarios for selection`);
+      }
+
+      function toggleScenario(element, categoryId, scenarioIndex, scenario) {
+        const scenarioId = `${categoryId}-${scenarioIndex}`;
+
+        if (element.classList.contains("selected")) {
+          element.classList.remove("selected");
+          selectedScenarios = selectedScenarios.filter(
+            (s) => s.id !== scenarioId,
+          );
+        } else {
+          element.classList.add("selected");
+          selectedScenarios.push({
+            id: scenarioId,
+            categoryId,
+            scenarioIndex,
+            title: scenario.title,
+            scenario,
+          });
+        }
+
+        console.log(
+          `Scenario selection updated. Total selected: ${selectedScenarios.length}`,
+        );
+      }
+
+      window.validateForm = function () {
+        const resultDiv = document.getElementById("validation-result");
+        const classroomName = document.getElementById(
+          "test-classroom-name",
+        ).value;
+        const sessionDate = document.getElementById("test-session-date").value;
+
+        console.log("🔍 Validating form data...");
+        console.log("Classroom name:", classroomName);
+        console.log("Session date:", sessionDate);
+        console.log("Selected scenarios:", selectedScenarios.length);
+
+        let isValid = true;
+        let errors = [];
+
+        if (!classroomName || classroomName.trim().length === 0) {
+          errors.push("Classroom name is required");
+          isValid = false;
+        }
+
+        if (!sessionDate) {
+          console.warn("⚠️ No session date selected, will use current date");
+        }
+
+        if (selectedScenarios.length === 0) {
+          errors.push("At least one scenario must be selected");
+          isValid = false;
+        }
+
+        if (isValid) {
+          resultDiv.innerHTML =
+            '<div class="status success">✅ Form validation passed</div>';
+          console.log("✅ Form validation successful");
+        } else {
+          resultDiv.innerHTML = `<div class="status error">❌ Validation errors: ${errors.join(", ")}</div>`;
+          console.error("❌ Form validation failed:", errors);
+        }
+
+        return isValid;
+      };
+
+      window.checkGuestMode = async function () {
+        const resultDiv = document.getElementById("guest-mode-result");
+
+        try {
+          console.log("🔍 Checking guest mode status...");
+
+          // Initialize guest mode
+          await services.classroomManager.initializeGuestMode();
+
+          // Check if guest mode is active
+          const isGuest = services.classroomManager.isGuestMode;
+
+          if (isGuest) {
+            resultDiv.innerHTML =
+              '<div class="status success">✅ Guest mode is active</div>';
+            console.log("✅ Guest mode confirmed active");
+          } else {
+            resultDiv.innerHTML =
+              '<div class="status error">❌ Guest mode not active</div>';
+            console.error("❌ Guest mode not active");
+          }
+
+          return isGuest;
+        } catch (error) {
+          resultDiv.innerHTML = `<div class="status error">❌ Guest mode check failed: ${error.message}</div>`;
+          console.error("❌ Guest mode check failed:", error);
+          return false;
+        }
+      };
+
+      window.testServiceCall = async function () {
+        const resultDiv = document.getElementById("service-call-result");
+
+        try {
+          console.log("🔍 Testing service call...");
+
+          // Test if service has required methods
+          if (!services.realtimeService.createClassroom) {
+            throw new Error("createClassroom method not found on service");
+          }
+
+          console.log("✅ Service method exists");
+
+          // Test service initialization
+          const isInitialized =
+            await services.realtimeService.initializeDatabase();
+
+          if (isInitialized) {
+            resultDiv.innerHTML =
+              '<div class="status success">✅ Service ready for classroom creation</div>';
+            console.log("✅ Service initialization successful");
+            return true;
+          } else {
+            resultDiv.innerHTML =
+              '<div class="status warning">⚠️ Service in fallback mode</div>';
+            console.warn("⚠️ Service operating in fallback mode");
+            return true; // Still allow creation in fallback mode
+          }
+        } catch (error) {
+          resultDiv.innerHTML = `<div class="status error">❌ Service test failed: ${error.message}</div>`;
+          console.error("❌ Service test failed:", error);
+          return false;
+        }
+      };
+
+      window.createClassroomDirectly = async function () {
+        const resultDiv = document.getElementById("creation-result");
+
+        try {
+          console.log("🚀 Attempting direct classroom creation...");
+          resultDiv.innerHTML =
+            '<div class="status info">🔄 Creating classroom...</div>';
+
+          // Prepare classroom data
+          const classroomName = document
+            .getElementById("test-classroom-name")
+            .value.trim();
+          const sessionDate =
+            document.getElementById("test-session-date").value ||
+            new Date().toISOString().split("T")[0];
+
+          const classroomData = {
+            name: classroomName,
+            sessionDate: sessionDate,
+            scenarios: selectedScenarios.map((s) => ({
+              categoryId: s.categoryId,
+              scenarioIndex: s.scenarioIndex,
+              title: s.title,
+            })),
+            createdAt: new Date().toISOString(),
+            type: "guest",
+          };
+
+          console.log("📊 Classroom data prepared:", classroomData);
+
+          // Attempt to create classroom
+          const result =
+            await services.realtimeService.createClassroom(classroomData);
+
+          console.log("🎉 Classroom creation result:", result);
+
+          if (result && result.id) {
+            resultDiv.innerHTML = `<div class="status success">✅ Classroom created successfully! ID: ${result.id}</div>`;
+            console.log("✅ Classroom creation successful, ID:", result.id);
+          } else {
+            resultDiv.innerHTML =
+              '<div class="status error">❌ Classroom creation returned no ID</div>';
+            console.error("❌ Classroom creation failed - no ID returned");
+          }
+        } catch (error) {
+          resultDiv.innerHTML = `<div class="status error">❌ Classroom creation failed: ${error.message}</div>`;
+          console.error("❌ Classroom creation error:", error);
+          console.error("Error stack:", error.stack);
+        }
+      };
+
+      window.clearLog = function () {
+        document.getElementById("debug-log").innerHTML = "";
+      };
+
+      // Set default date to today
+      document.getElementById("test-session-date").value = new Date()
+        .toISOString()
+        .split("T")[0];
+
+      // Auto-load services on page load
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log("🔧 Debug page loaded, checking services...");
+        checkServices();
+      });
+    </script>
+  </body>
+</html>

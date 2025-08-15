@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Guest Mode Classroom Debug</title>
+    <link rel="stylesheet" href="./src/styles/main.css" />
+    <style>
+      .debug-container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+      }
+      .status {
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 5px;
+        font-weight: bold;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .info {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+      .warning {
+        background: #fff3cd;
+        color: #856404;
+      }
+      .test-button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      .test-button:hover {
+        background: #0056b3;
+      }
+      .debug-output {
+        background: #000;
+        color: #0f0;
+        padding: 15px;
+        border-radius: 4px;
+        font-family: "Courier New", monospace;
+        font-size: 12px;
+        max-height: 500px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+      }
+      .step {
+        padding: 10px;
+        margin: 5px 0;
+        border-left: 4px solid #007bff;
+        background: #f8f9fa;
+      }
+      .step.success {
+        border-color: #28a745;
+        background: #d4edda;
+      }
+      .step.error {
+        border-color: #dc3545;
+        background: #f8d7da;
+      }
+      .step.warning {
+        border-color: #ffc107;
+        background: #fff3cd;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="debug-container">
+      <h1>🧪 Guest Mode Classroom Creation Debug</h1>
+      <p>
+        This page specifically tests guest mode classroom creation with detailed
+        step-by-step debugging.
+      </p>
+
+      <div id="status"></div>
+
+      <div class="controls">
+        <button class="test-button" onclick="runFullGuestModeTest()">
+          🚀 Run Full Guest Mode Test
+        </button>
+        <button class="test-button" onclick="testStepByStep()">
+          📋 Step-by-Step Test
+        </button>
+        <button class="test-button" onclick="clearOutput()">
+          🗑️ Clear Output
+        </button>
+      </div>
+
+      <h2>Test Steps:</h2>
+      <div id="test-steps"></div>
+
+      <h2>Debug Console:</h2>
+      <div id="debug-output" class="debug-output">
+        Ready for guest mode testing...\n
+      </div>
+    </div>
+
+    <script type="module">
+      import TeacherClassroomModals from "./src/js/components/teacher-classroom-modals.js";
+      import FirebaseService from "./src/js/services/firebase-service.js";
+      import DataHandler from "./src/js/core/data-handler.js";
+
+      let dataHandler, firebaseService, teacherModals;
+
+      // Debug logging function
+      window.debugLog = function (message, data = null) {
+        const output = document.getElementById("debug-output");
+        const timestamp = new Date().toLocaleTimeString();
+        let logMessage = `[${timestamp}] ${message}`;
+        if (data) {
+          logMessage += "\n" + JSON.stringify(data, null, 2);
+        }
+        output.textContent += logMessage + "\n";
+        output.scrollTop = output.scrollHeight;
+        console.log(message, data);
+      };
+
+      window.clearOutput = function () {
+        document.getElementById("debug-output").textContent = "Cleared...\n";
+        document.getElementById("test-steps").innerHTML = "";
+      };
+
+      window.showStatus = function (message, type = "info") {
+        document.getElementById("status").innerHTML =
+          `<div class="status ${type}">${message}</div>`;
+      };
+
+      function addStep(message, type = "info") {
+        const stepsDiv = document.getElementById("test-steps");
+        stepsDiv.innerHTML += `<div class="step ${type}">${message}</div>`;
+      }
+
+      // Capture all errors
+      window.addEventListener("error", function (event) {
+        debugLog("❌ GLOBAL ERROR: " + event.error.message);
+        debugLog("Stack: " + event.error.stack);
+      });
+
+      window.addEventListener("unhandledrejection", function (event) {
+        debugLog("❌ UNHANDLED PROMISE REJECTION: " + event.reason);
+      });
+
+      // Initialize services
+      async function initServices() {
+        try {
+          debugLog("🚀 Initializing services for guest mode testing...");
+          addStep("🚀 Initializing services...", "info");
+
+          dataHandler = new DataHandler();
+          await dataHandler.initialize();
+          debugLog("✅ DataHandler initialized");
+          addStep("✅ DataHandler initialized", "success");
+
+          firebaseService = new FirebaseService();
+          await firebaseService.initialize();
+          debugLog("✅ FirebaseService initialized");
+          debugLog("Firebase app status:", {
+            hasApp: !!firebaseService.app,
+            isConfigured: firebaseService.isFirebaseConfigured,
+          });
+          addStep("✅ FirebaseService initialized", "success");
+
+          teacherModals = new TeacherClassroomModals(
+            dataHandler,
+            firebaseService,
+          );
+          debugLog("✅ TeacherClassroomModals created");
+          addStep("✅ TeacherClassroomModals created", "success");
+
+          showStatus("Services initialized successfully!", "success");
+          return true;
+        } catch (error) {
+          debugLog("❌ Service initialization failed: " + error.message);
+          debugLog("Error stack:", error.stack);
+          addStep(
+            "❌ Service initialization failed: " + error.message,
+            "error",
+          );
+          showStatus(
+            "Service initialization failed: " + error.message,
+            "error",
+          );
+          return false;
+        }
+      }
+
+      // Test guest mode initialization
+      async function testGuestModeInit() {
+        try {
+          debugLog("🔍 Testing guest mode initialization...");
+          addStep("🔍 Testing guest mode initialization...", "info");
+
+          await teacherModals.initialize(true); // Guest mode
+
+          debugLog(
+            "Current instructor after guest init:",
+            teacherModals.currentInstructor,
+          );
+
+          if (teacherModals.currentInstructor) {
+            addStep("✅ Guest instructor created successfully", "success");
+            debugLog("✅ Guest instructor created:", {
+              uid: teacherModals.currentInstructor.uid,
+              displayName: teacherModals.currentInstructor.displayName,
+              isGuest: teacherModals.currentInstructor.isGuest,
+            });
+          } else {
+            addStep("❌ Guest instructor not created", "error");
+            throw new Error("Guest instructor not created");
+          }
+
+          return true;
+        } catch (error) {
+          debugLog("❌ Guest mode initialization failed: " + error.message);
+          addStep(
+            "❌ Guest mode initialization failed: " + error.message,
+            "error",
+          );
+          return false;
+        }
+      }
+
+      // Test classroom service
+      async function testClassroomService() {
+        try {
+          debugLog("🔍 Testing classroom service...");
+          addStep("🔍 Testing classroom service...", "info");
+
+          const service = teacherModals.classroomService;
+
+          debugLog("Classroom service info:", {
+            exists: !!service,
+            isConnected: service?.isConnected,
+            fallbackMode: service?.fallbackMode,
+          });
+
+          if (service && service.isConnected) {
+            addStep("✅ Classroom service is connected", "success");
+            if (service.fallbackMode) {
+              addStep("ℹ️ Using fallback mode (localStorage)", "warning");
+            } else {
+              addStep("ℹ️ Using Firebase mode", "info");
+            }
+          } else {
+            addStep("❌ Classroom service not connected", "error");
+            throw new Error("Classroom service not connected");
+          }
+
+          return true;
+        } catch (error) {
+          debugLog("❌ Classroom service test failed: " + error.message);
+          addStep(
+            "❌ Classroom service test failed: " + error.message,
+            "error",
+          );
+          return false;
+        }
+      }
+
+      // Test actual classroom creation
+      async function testClassroomCreation() {
+        try {
+          debugLog("🔍 Testing actual classroom creation...");
+          addStep("🔍 Testing actual classroom creation...", "info");
+
+          const testData = {
+            classroomName: "Guest Mode Test Classroom " + Date.now(),
+            instructorId: teacherModals.currentInstructor.uid,
+            instructorName: teacherModals.currentInstructor.displayName,
+            selectedScenarios: [
+              {
+                scenarioId: "test_scenario_1",
+                title: "Test Scenario",
+                category: "Ethics",
+                order: 0,
+              },
+            ],
+          };
+
+          debugLog("Test data prepared:", testData);
+          addStep("📋 Test data prepared", "info");
+
+          debugLog("Calling createClassroom...");
+          const result =
+            await teacherModals.classroomService.createClassroom(testData);
+
+          debugLog("✅ Classroom creation successful:", result);
+          addStep("✅ Classroom created successfully!", "success");
+          addStep(`📋 Classroom Code: ${result.classroomCode}`, "success");
+          addStep(`🏫 Classroom Name: ${result.classroomName}`, "success");
+
+          return result;
+        } catch (error) {
+          debugLog("❌ Classroom creation failed: " + error.message);
+          debugLog("Error stack:", error.stack);
+          addStep("❌ Classroom creation failed: " + error.message, "error");
+          throw error;
+        }
+      }
+
+      // Run full test
+      window.runFullGuestModeTest = async function () {
+        try {
+          clearOutput();
+          showStatus("Running full guest mode test...", "info");
+
+          const serviceInit = await initServices();
+          if (!serviceInit) return;
+
+          const guestInit = await testGuestModeInit();
+          if (!guestInit) return;
+
+          const serviceTest = await testClassroomService();
+          if (!serviceTest) return;
+
+          const result = await testClassroomCreation();
+
+          showStatus(
+            `✅ All tests passed! Classroom created: ${result.classroomCode}`,
+            "success",
+          );
+        } catch (error) {
+          showStatus(`❌ Test failed: ${error.message}`, "error");
+          debugLog("❌ Full test failed: " + error.message);
+        }
+      };
+
+      // Step by step test
+      window.testStepByStep = async function () {
+        clearOutput();
+        showStatus("Run step-by-step test manually...", "info");
+
+        addStep(
+          'Click "Run Full Guest Mode Test" to start comprehensive testing',
+          "info",
+        );
+      };
+
+      // Initialize on load
+      document.addEventListener("DOMContentLoaded", () => {
+        debugLog("🎯 Guest mode debug environment ready");
+      });
+    </script>
+  </body>
+</html>

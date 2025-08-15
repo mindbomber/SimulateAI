@@ -447,24 +447,129 @@ class MainGrid {
 
   /**
    * Start health monitoring intervals
+   * FIXED: Added loop prevention and throttling to prevent infinite DOM loops
    */
   _startHealthMonitoring() {
     if (!this.enterpriseConfig.monitoringEnabled) return;
 
-    // Health check interval
+    // Add monitoring state tracking to prevent infinite loops
+    this.monitoringState = {
+      healthCheckRunning: false,
+      performanceCheckRunning: false,
+      telemetryFlushRunning: false,
+      lastHealthCheck: 0,
+      lastPerformanceCheck: 0,
+      lastTelemetryFlush: 0,
+    };
+
+    // Health check interval with loop prevention
     this.healthCheckInterval = setInterval(() => {
-      this._performHealthCheck();
+      // Prevent overlapping executions and check if classroom modal is active
+      if (
+        !this.monitoringState.healthCheckRunning &&
+        !this._isClassroomModalActive()
+      ) {
+        this.monitoringState.healthCheckRunning = true;
+        const now = Date.now();
+        // Throttle to prevent rapid execution
+        if (now - this.monitoringState.lastHealthCheck > 10000) {
+          try {
+            this._performHealthCheck();
+            this.monitoringState.lastHealthCheck = now;
+          } catch (error) {
+            logger.warn("MainGrid health check failed:", error);
+          }
+        }
+        this.monitoringState.healthCheckRunning = false;
+      }
     }, ENTERPRISE_CONSTANTS.HEALTH_CHECK_INTERVAL);
 
-    // Performance monitoring interval
+    // Performance monitoring interval with loop prevention
     this.performanceMonitoringInterval = setInterval(() => {
-      this._performPerformanceCheck();
+      // Prevent overlapping executions and check if classroom modal is active
+      if (
+        !this.monitoringState.performanceCheckRunning &&
+        !this._isClassroomModalActive()
+      ) {
+        this.monitoringState.performanceCheckRunning = true;
+        const now = Date.now();
+        // Throttle to prevent rapid execution
+        if (now - this.monitoringState.lastPerformanceCheck > 60000) {
+          try {
+            this._performPerformanceCheck();
+            this.monitoringState.lastPerformanceCheck = now;
+          } catch (error) {
+            logger.warn("MainGrid performance check failed:", error);
+          }
+        }
+        this.monitoringState.performanceCheckRunning = false;
+      }
     }, 60000); // Every minute
 
-    // Telemetry flush interval
+    // Telemetry flush interval with loop prevention
     this.telemetryFlushInterval = setInterval(() => {
-      this._flushTelemetry();
+      // Prevent overlapping executions and check if classroom modal is active
+      if (
+        !this.monitoringState.telemetryFlushRunning &&
+        !this._isClassroomModalActive()
+      ) {
+        this.monitoringState.telemetryFlushRunning = true;
+        const now = Date.now();
+        // Throttle to prevent rapid execution
+        if (now - this.monitoringState.lastTelemetryFlush > 30000) {
+          try {
+            this._flushTelemetry();
+            this.monitoringState.lastTelemetryFlush = now;
+          } catch (error) {
+            logger.warn("MainGrid telemetry flush failed:", error);
+          }
+        }
+        this.monitoringState.telemetryFlushRunning = false;
+      }
     }, 30000); // Every 30 seconds
+  }
+
+  /**
+   * Check if classroom modal is currently active to pause monitoring
+   * ADDED: Helper method to prevent monitoring during modal interactions
+   */
+  _isClassroomModalActive() {
+    // Check for visible modal elements that could conflict with monitoring
+    const modals = document.querySelectorAll(
+      '.modal.show, .modal-backdrop, [data-modal-active="true"]',
+    );
+    const classroomModals = document.querySelectorAll(
+      '[id*="classroom"], [class*="classroom"]',
+    );
+    const focusedButton = document.activeElement;
+
+    // Check if any modal is visible
+    if (modals.length > 0) {
+      return true;
+    }
+
+    // Check if classroom-related modals are active
+    if (classroomModals.length > 0) {
+      for (const modal of classroomModals) {
+        if (modal.style.display !== "none" && modal.offsetParent !== null) {
+          return true;
+        }
+      }
+    }
+
+    // Check if focus is on a button that might be part of classroom modal
+    if (focusedButton && focusedButton.tagName === "BUTTON") {
+      const buttonClasses = focusedButton.className;
+      if (
+        buttonClasses.includes("btn-primary") ||
+        buttonClasses.includes("ui-focus-visible")
+      ) {
+        // This is likely the button causing the DOM breakpoint
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**

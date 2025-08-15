@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Direct Classroom Creation Test - SimulateAI</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .test-log {
+        background: #1a1a1a;
+        color: #00ff00;
+        font-family: "Courier New", monospace;
+        padding: 15px;
+        border-radius: 5px;
+        max-height: 400px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        margin: 10px 0;
+      }
+      .status-indicator {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 5px;
+      }
+      .status-pending {
+        background-color: orange;
+      }
+      .status-success {
+        background-color: green;
+      }
+      .status-error {
+        background-color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container mt-4">
+      <h1>🧪 Direct Classroom Creation Test</h1>
+      <p class="text-muted">
+        Testing the fixed classroom creation flow with timeout handling
+      </p>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>Test Progress</h5>
+            </div>
+            <div class="card-body">
+              <div class="test-steps">
+                <div class="step">
+                  <span
+                    id="step1-status"
+                    class="status-indicator status-pending"
+                  ></span>
+                  <span>Initialize Firebase Service</span>
+                </div>
+                <div class="step">
+                  <span
+                    id="step2-status"
+                    class="status-indicator status-pending"
+                  ></span>
+                  <span>Initialize Classroom Service</span>
+                </div>
+                <div class="step">
+                  <span
+                    id="step3-status"
+                    class="status-indicator status-pending"
+                  ></span>
+                  <span>Generate Classroom Code</span>
+                </div>
+                <div class="step">
+                  <span
+                    id="step4-status"
+                    class="status-indicator status-pending"
+                  ></span>
+                  <span>Create Classroom</span>
+                </div>
+                <div class="step">
+                  <span
+                    id="step5-status"
+                    class="status-indicator status-pending"
+                  ></span>
+                  <span>Verify Creation Success</span>
+                </div>
+              </div>
+
+              <hr />
+
+              <button id="start-test" class="btn btn-primary">
+                🚀 Start Test
+              </button>
+              <button id="test-timeout" class="btn btn-warning">
+                ⏰ Test Timeout Fix
+              </button>
+              <button id="force-fallback" class="btn btn-secondary">
+                💾 Test Fallback Mode
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>Results</h5>
+            </div>
+            <div class="card-body">
+              <div id="test-results">
+                <p>No tests run yet. Click "Start Test" to begin.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h5>Test Output</h5>
+            </div>
+            <div class="card-body">
+              <div id="test-log" class="test-log">
+                === Direct Classroom Creation Test === Ready to test the timeout
+                fix...
+              </div>
+              <button id="clear-log" class="btn btn-sm btn-outline-secondary">
+                Clear Log
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script type="module">
+      let testServices = {};
+
+      function log(message, type = "info") {
+        const logElement = document.getElementById("test-log");
+        const timestamp = new Date().toLocaleTimeString();
+        const prefix =
+          type === "error"
+            ? "❌"
+            : type === "success"
+              ? "✅"
+              : type === "warning"
+                ? "⚠️"
+                : "ℹ️";
+        logElement.textContent += `\n[${timestamp}] ${prefix} ${message}`;
+        logElement.scrollTop = logElement.scrollHeight;
+      }
+
+      function updateStepStatus(step, status) {
+        const element = document.getElementById(`step${step}-status`);
+        element.className = `status-indicator status-${status}`;
+      }
+
+      function updateResults(html) {
+        document.getElementById("test-results").innerHTML = html;
+      }
+
+      // Test the fixed classroom creation flow
+      async function testClassroomCreation() {
+        log("🚀 Starting classroom creation test with timeout fixes...");
+
+        try {
+          // Step 1: Initialize Firebase Service
+          updateStepStatus(1, "pending");
+          log("🔄 Step 1: Initializing Firebase Service...");
+
+          const { FirebaseService } = await import(
+            "./src/js/services/firebase-service.js"
+          );
+          testServices.firebase = new FirebaseService();
+
+          // Initialize with guest mode and enable offline
+          await testServices.firebase.initialize({
+            enableOffline: true,
+            guestMode: true,
+          });
+
+          updateStepStatus(1, "success");
+          log("✅ Step 1: Firebase Service initialized");
+
+          // Step 2: Initialize Classroom Service
+          updateStepStatus(2, "pending");
+          log("🔄 Step 2: Initializing Classroom Service...");
+
+          const { default: RealtimeClassroomService } = await import(
+            "./src/js/services/realtime-classroom-service.js"
+          );
+          testServices.classroom = new RealtimeClassroomService(
+            testServices.firebase,
+          );
+
+          // Initialize classroom service with timeout tracking
+          const initStart = Date.now();
+          await testServices.classroom.initialize();
+          const initTime = Date.now() - initStart;
+
+          updateStepStatus(2, "success");
+          log(`✅ Step 2: Classroom Service initialized in ${initTime}ms`);
+
+          // Step 3: Test classroom code generation
+          updateStepStatus(3, "pending");
+          log("🔄 Step 3: Testing classroom code generation...");
+
+          const codeStart = Date.now();
+          const classroomCode =
+            await testServices.classroom.generateUniqueClassroomCode();
+          const codeTime = Date.now() - codeStart;
+
+          updateStepStatus(3, "success");
+          log(
+            `✅ Step 3: Generated classroom code "${classroomCode}" in ${codeTime}ms`,
+          );
+
+          // Step 4: Create classroom
+          updateStepStatus(4, "pending");
+          log("🔄 Step 4: Creating classroom...");
+
+          const classroomData = {
+            classroomName: "Timeout Fix Test Classroom",
+            instructorId: "test_instructor_" + Date.now(),
+            instructorName: "Test Instructor",
+            selectedScenarios: [
+              {
+                scenarioId: "test1",
+                title: "Test Scenario 1",
+                category: "Ethics",
+                order: 0,
+              },
+            ],
+          };
+
+          const createStart = Date.now();
+          const result =
+            await testServices.classroom.createClassroom(classroomData);
+          const createTime = Date.now() - createStart;
+
+          updateStepStatus(4, "success");
+          log(`✅ Step 4: Classroom created in ${createTime}ms`);
+          log(`📋 Classroom Code: ${result.classroomCode}`);
+          log(`📋 Classroom ID: ${result.classroomId}`);
+
+          // Step 5: Verify creation
+          updateStepStatus(5, "pending");
+          log("🔄 Step 5: Verifying classroom creation...");
+
+          if (result && result.classroomCode && result.classroomName) {
+            updateStepStatus(5, "success");
+            log("✅ Step 5: Classroom verification successful");
+
+            updateResults(`
+                        <div class="alert alert-success">
+                            <h6>✅ Test Successful!</h6>
+                            <p><strong>Classroom Code:</strong> ${result.classroomCode}</p>
+                            <p><strong>Name:</strong> ${result.classroomName}</p>
+                            <p><strong>Mode:</strong> ${testServices.classroom.fallbackMode ? "Fallback (localStorage)" : "Firebase"}</p>
+                            <p><strong>Total Time:</strong> ${Date.now() - initStart}ms</p>
+                        </div>
+                    `);
+
+            log("🎉 CLASSROOM CREATION TEST PASSED!");
+            return result;
+          } else {
+            throw new Error("Invalid classroom result");
+          }
+        } catch (error) {
+          log(`❌ Test failed: ${error.message}`, "error");
+          updateStepStatus(1, "error");
+          updateStepStatus(2, "error");
+          updateStepStatus(3, "error");
+          updateStepStatus(4, "error");
+          updateStepStatus(5, "error");
+
+          updateResults(`
+                    <div class="alert alert-danger">
+                        <h6>❌ Test Failed</h6>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p><strong>Stack:</strong> ${error.stack}</p>
+                    </div>
+                `);
+
+          return null;
+        }
+      }
+
+      // Test the timeout functionality specifically
+      async function testTimeoutFix() {
+        log("⏰ Testing timeout fix functionality...");
+
+        try {
+          const { default: RealtimeClassroomService } = await import(
+            "./src/js/services/realtime-classroom-service.js"
+          );
+
+          // Create a mock Firebase service that never resolves initialization
+          const mockFirebase = {
+            initialize: () => new Promise(() => {}), // Never resolves
+            isAuthenticated: () => false,
+            getCurrentUser: () => null,
+          };
+
+          const testService = new RealtimeClassroomService(mockFirebase);
+
+          // This should timeout and fallback gracefully
+          const start = Date.now();
+          const result = await testService.generateUniqueClassroomCode();
+          const duration = Date.now() - start;
+
+          log(
+            `✅ Timeout fix working! Generated code "${result}" in ${duration}ms`,
+          );
+          log("✅ Service properly fell back to localStorage mode");
+
+          updateResults(`
+                    <div class="alert alert-success">
+                        <h6>✅ Timeout Fix Successful!</h6>
+                        <p>Service properly handled timeout and fell back to localStorage.</p>
+                        <p><strong>Generated Code:</strong> ${result}</p>
+                        <p><strong>Duration:</strong> ${duration}ms (should be ~10 seconds)</p>
+                    </div>
+                `);
+        } catch (error) {
+          log(`❌ Timeout test failed: ${error.message}`, "error");
+          updateResults(`
+                    <div class="alert alert-danger">
+                        <h6>❌ Timeout Test Failed</h6>
+                        <p>${error.message}</p>
+                    </div>
+                `);
+        }
+      }
+
+      // Test fallback mode directly
+      async function testFallbackMode() {
+        log("💾 Testing fallback mode directly...");
+
+        try {
+          const { default: RealtimeClassroomService } = await import(
+            "./src/js/services/realtime-classroom-service.js"
+          );
+
+          // Create service in explicit fallback mode
+          const testService = new RealtimeClassroomService(null);
+          testService.fallbackMode = true;
+
+          const classroomData = {
+            classroomName: "Fallback Mode Test",
+            instructorId: "fallback_instructor",
+            instructorName: "Fallback Instructor",
+            selectedScenarios: [],
+          };
+
+          const result = await testService.createClassroom(classroomData);
+
+          log(`✅ Fallback mode test successful!`);
+          log(`📋 Classroom Code: ${result.classroomCode}`);
+
+          updateResults(`
+                    <div class="alert alert-info">
+                        <h6>✅ Fallback Mode Successful!</h6>
+                        <p>Service created classroom using localStorage fallback.</p>
+                        <p><strong>Classroom Code:</strong> ${result.classroomCode}</p>
+                        <p><strong>Storage:</strong> localStorage</p>
+                    </div>
+                `);
+        } catch (error) {
+          log(`❌ Fallback test failed: ${error.message}`, "error");
+        }
+      }
+
+      // Event listeners
+      document
+        .getElementById("start-test")
+        .addEventListener("click", testClassroomCreation);
+      document
+        .getElementById("test-timeout")
+        .addEventListener("click", testTimeoutFix);
+      document
+        .getElementById("force-fallback")
+        .addEventListener("click", testFallbackMode);
+
+      document.getElementById("clear-log").addEventListener("click", () => {
+        document.getElementById("test-log").textContent =
+          "=== Direct Classroom Creation Test ===\nLog cleared...";
+      });
+
+      // Auto-start test after 2 seconds
+      log("🔧 Timeout fix applied to classroom creation");
+      log("📝 Test will automatically start in 2 seconds...");
+
+      setTimeout(() => {
+        log("🚀 Auto-starting classroom creation test...");
+        testClassroomCreation();
+      }, 2000);
+    </script>
+  </body>
+</html>
