@@ -5,6 +5,7 @@
 export const firebaseConfig = {
   apiKey: "dev-placeholder-api-key",
   authDomain: "simulateai-research.firebaseapp.com",
+  databaseURL: "https://simulateai-research-default-rtdb.firebaseio.com",
   projectId: "simulateai-research",
   storageBucket: "simulateai-research.appspot.com",
   messagingSenderId: "123456789012",
@@ -63,6 +64,7 @@ export const devConfig = {
     firestore: 8080,
     storage: 9199,
     functions: 5001,
+    database: 9000,
   },
 };
 

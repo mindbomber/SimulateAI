@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Classroom Categories Integration Test</title>
+    <link rel="stylesheet" href="src/styles/css-layers.css" />
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        margin: 20px;
+        background: var(--color-background);
+        color: var(--color-text);
+      }
+      .test-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .test-section {
+        margin: 20px 0;
+        padding: 20px;
+        background: var(--color-background-elevated);
+        border-radius: 8px;
+        border: 1px solid var(--color-border);
+      }
+      .scenario-item {
+        margin: 10px 0;
+        padding: 15px;
+        background: var(--color-background);
+        border-radius: 6px;
+        border: 1px solid var(--color-border);
+      }
+      .category-group {
+        margin: 15px 0;
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .category-header {
+        background: var(--color-background-elevated);
+        padding: 15px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--color-border);
+      }
+      .category-header:hover {
+        background: var(--color-background-hover);
+      }
+      .category-scenarios {
+        padding: 0;
+      }
+      .scenario-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .btn-primary {
+        background: var(--color-primary);
+        color: white;
+      }
+      .btn-outline {
+        background: transparent;
+        border: 1px solid var(--color-border);
+        color: var(--color-text);
+      }
+      .scenario-meta {
+        display: flex;
+        gap: 10px;
+        margin-top: 8px;
+      }
+      .difficulty {
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        text-transform: capitalize;
+      }
+      .difficulty.beginner {
+        background: #e3f2fd;
+        color: #1976d2;
+      }
+      .difficulty.intermediate {
+        background: #fff3e0;
+        color: #f57c00;
+      }
+      .difficulty.advanced {
+        background: #fce4ec;
+        color: #c2185b;
+      }
+      .estimated-time {
+        font-size: 12px;
+        color: var(--color-text-secondary);
+      }
+      .expand-icon {
+        transition: transform 0.2s;
+      }
+      .expand-icon.expanded {
+        transform: rotate(90deg);
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+      }
+      .status.success {
+        background: #e8f5e8;
+        color: #2e7d32;
+        border: 1px solid #c8e6c9;
+      }
+      .status.error {
+        background: #ffebee;
+        color: #c62828;
+        border: 1px solid #ffcdd2;
+      }
+      .debug-section {
+        margin-top: 20px;
+        padding: 15px;
+        background: #f5f5f5;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🏫 Classroom Categories Integration Test</h1>
+
+      <div class="test-section">
+        <h2>📊 Integration Status</h2>
+        <div id="integration-status">Loading...</div>
+      </div>
+
+      <div class="test-section">
+        <h2>🗂️ Categories & Scenarios Display</h2>
+        <p>
+          This shows how the real categories and scenarios will appear in the
+          classroom creation modal:
+        </p>
+
+        <button id="test-classroom-btn" class="btn btn-primary">
+          🏫 Test Classroom Creation Modal
+        </button>
+
+        <div id="categories-preview" style="margin-top: 20px">
+          <!-- Categories will be loaded here -->
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h2>🔍 Debug Information</h2>
+        <div id="debug-info" class="debug-section">
+          Loading debug information...
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal placeholder -->
+    <div id="modal-container"></div>
+
+    <script type="module">
+      import TeacherClassroomModals from "./src/js/components/teacher-classroom-modals.js";
+      import ModalUtility from "./src/js/components/modal-utility.js";
+      import { ETHICAL_CATEGORIES } from "./src/data/categories.js";
+
+      class ClassroomCategoriesTest {
+        constructor() {
+          this.teacherModals = null;
+          this.debugInfo = [];
+          this.init();
+        }
+
+        async init() {
+          try {
+            // Initialize modal utility
+            const modalContainer = document.getElementById("modal-container");
+
+            // Create a mock data handler and firebase service for testing
+            const mockDataHandler = {
+              getUserProfile: () =>
+                Promise.resolve({
+                  displayName: "Test Teacher",
+                  role: "teacher",
+                  uid: "test-teacher-123",
+                }),
+            };
+
+            const mockFirebaseService = {
+              getCurrentUser: () => ({
+                uid: "test-teacher-123",
+                displayName: "Test Teacher",
+              }),
+            };
+
+            // Initialize teacher modals
+            this.teacherModals = new TeacherClassroomModals(
+              mockDataHandler,
+              mockFirebaseService,
+            );
+            await this.teacherModals.initialize(false); // Not guest mode
+
+            this.displayIntegrationStatus();
+            this.displayCategoriesPreview();
+            this.displayDebugInfo();
+            this.setupEventListeners();
+          } catch (error) {
+            console.error("Initialization error:", error);
+            this.displayError("Failed to initialize: " + error.message);
+          }
+        }
+
+        displayIntegrationStatus() {
+          const statusContainer = document.getElementById("integration-status");
+          const categoriesCount = Object.keys(ETHICAL_CATEGORIES).length;
+
+          let totalScenarios = 0;
+          Object.values(ETHICAL_CATEGORIES).forEach((category) => {
+            if (category.scenarios) {
+              totalScenarios += category.scenarios.length;
+            }
+          });
+
+          statusContainer.innerHTML = `
+                    <div class="status success">
+                        ✅ Integration Successful!<br>
+                        📁 ${categoriesCount} categories loaded<br>
+                        🎯 ${totalScenarios} scenarios available<br>
+                        🔄 Real data integration active
+                    </div>
+                `;
+        }
+
+        displayCategoriesPreview() {
+          const previewContainer =
+            document.getElementById("categories-preview");
+
+          if (!this.teacherModals) {
+            previewContainer.innerHTML =
+              '<div class="status error">❌ Teacher modals not initialized</div>';
+            return;
+          }
+
+          try {
+            // Get the real categories content
+            const categoriesHTML = this.teacherModals.buildCategoriesContent();
+            previewContainer.innerHTML = categoriesHTML;
+
+            // Add event listeners for category expansion
+            previewContainer
+              .querySelectorAll(".category-header")
+              .forEach((header) => {
+                header.addEventListener("click", (e) => {
+                  const categoryGroup =
+                    e.currentTarget.closest(".category-group");
+                  const scenarios = categoryGroup.querySelector(
+                    ".category-scenarios",
+                  );
+                  const expandIcon =
+                    e.currentTarget.querySelector(".expand-icon");
+
+                  const isExpanded =
+                    e.currentTarget.getAttribute("aria-expanded") === "true";
+
+                  if (isExpanded) {
+                    scenarios.style.display = "none";
+                    expandIcon.textContent = "▶";
+                    e.currentTarget.setAttribute("aria-expanded", "false");
+                  } else {
+                    scenarios.style.display = "block";
+                    expandIcon.textContent = "▼";
+                    e.currentTarget.setAttribute("aria-expanded", "true");
+                  }
+                });
+              });
+          } catch (error) {
+            console.error("Categories preview error:", error);
+            previewContainer.innerHTML = `<div class="status error">❌ Error displaying categories: ${error.message}</div>`;
+          }
+        }
+
+        displayDebugInfo() {
+          const debugContainer = document.getElementById("debug-info");
+
+          const debugData = {
+            "Categories Available": Object.keys(ETHICAL_CATEGORIES).length,
+            "Sample Categories": Object.keys(ETHICAL_CATEGORIES).slice(0, 3),
+            "Teacher Modals Initialized": !!this.teacherModals,
+            "Available Scenarios Count": this.teacherModals
+              ? this.teacherModals.availableScenarios.length
+              : 0,
+            "Sample Scenarios": this.teacherModals
+              ? this.teacherModals.availableScenarios
+                  .slice(0, 3)
+                  .map((s) => `${s.title} (${s.category})`)
+              : [],
+          };
+
+          debugContainer.innerHTML = Object.entries(debugData)
+            .map(
+              ([key, value]) =>
+                `<strong>${key}:</strong> ${JSON.stringify(value, null, 2)}`,
+            )
+            .join("<br><br>");
+        }
+
+        setupEventListeners() {
+          document
+            .getElementById("test-classroom-btn")
+            .addEventListener("click", async () => {
+              try {
+                if (this.teacherModals) {
+                  await this.teacherModals.showCreateClassroomModal(false);
+                } else {
+                  alert("Teacher modals not initialized");
+                }
+              } catch (error) {
+                console.error("Modal test error:", error);
+                alert("Error opening modal: " + error.message);
+              }
+            });
+        }
+
+        displayError(message) {
+          const statusContainer = document.getElementById("integration-status");
+          statusContainer.innerHTML = `<div class="status error">❌ ${message}</div>`;
+        }
+      }
+
+      // Start the test
+      window.addEventListener("DOMContentLoaded", () => {
+        new ClassroomCategoriesTest();
+      });
+
+      // Global error handling
+      window.addEventListener("error", (e) => {
+        console.error("Global error:", e.error);
+        const statusContainer = document.getElementById("integration-status");
+        if (statusContainer) {
+          statusContainer.innerHTML = `<div class="status error">❌ Error: ${e.error.message}</div>`;
+        }
+      });
+    </script>
+  </body>
+</html>

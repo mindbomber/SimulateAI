@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom Submit Debug Test</title>
+    <link rel="stylesheet" href="./src/styles/main.css">
+    <style>
+        .debug-panel {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 8px;
+        }
+        .debug-output {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .test-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #5a6fd8;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Classroom Submit Debug Test</h1>
+        
+        <div class="debug-panel">
+            <h2>📋 Test Scenario</h2>
+            <p>This page tests the classroom creation submit functionality to identify why it's not working.</p>
+            
+            <div class="controls">
+                <button class="test-button" onclick="testFirebaseStatus()">Test Firebase Status</button>
+                <button class="test-button" onclick="testRealtimeDatabase()">Test Realtime Database</button>
+                <button class="test-button" onclick="testClassroomService()">Test Classroom Service</button>
+                <button class="test-button" onclick="testCreateClassroom()">Test Create Classroom</button>
+                <button class="test-button" onclick="clearDebugOutput()">Clear Output</button>
+            </div>
+        </div>
+
+        <div class="debug-panel">
+            <h2>🔍 Debug Output</h2>
+            <div id="debug-output" class="debug-output">Ready for testing...\n</div>
+        </div>
+
+        <div class="debug-panel">
+            <h2>🎛️ Manual Classroom Creation Test</h2>
+            <div id="test-form">
+                <input type="text" id="test-classroom-name" placeholder="Test Classroom Name" value="Debug Test Classroom">
+                <input type="text" id="test-instructor-name" placeholder="Instructor Name" value="Debug Instructor">
+                <button class="test-button" onclick="manualCreateTest()">Create Test Classroom</button>
+            </div>
+            <div id="test-status"></div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js';
+        import { getDatabase, ref, set, get, onValue } from 'https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js';
+
+        // Make Firebase available globally for testing
+        window.Firebase = {
+            initializeApp,
+            getDatabase,
+            ref,
+            set,
+            get,
+            onValue,
+            getAuth
+        };
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC_Q7K6zOjvOQ8kak-yy8NuPnr0L5QLQ8U",
+            authDomain: "simulateai-a1b2c.firebaseapp.com",
+            databaseURL: "https://simulateai-a1b2c-default-rtdb.firebaseio.com",
+            projectId: "simulateai-a1b2c",
+            storageBucket: "simulateai-a1b2c.appspot.com",
+            messagingSenderId: "468504183360",
+            appId: "1:468504183360:web:7cc6c89053c2a0a8012345"
+        };
+
+        // Initialize Firebase
+        window.firebaseApp = initializeApp(firebaseConfig);
+        window.database = getDatabase(window.firebaseApp);
+        window.auth = getAuth(window.firebaseApp);
+
+        debugLog("✅ Firebase modules loaded and initialized");
+    </script>
+
+    <script type="module">
+        // Import our services
+        import RealtimeClassroomService from './src/js/services/realtime-classroom-service.js';
+        import FirebaseService from './src/js/services/firebase-service.js';
+        import logger from './src/js/utils/logger.js';
+
+        window.debugLog = function(message, data = null) {
+            const output = document.getElementById('debug-output');
+            const timestamp = new Date().toLocaleTimeString();
+            let logMessage = `[${timestamp}] ${message}`;
+            if (data) {
+                logMessage += '\n' + JSON.stringify(data, null, 2);
+            }
+            output.textContent += logMessage + '\n';
+            output.scrollTop = output.scrollHeight;
+            console.log(message, data);
+        };
+
+        window.clearDebugOutput = function() {
+            document.getElementById('debug-output').textContent = 'Cleared...\n';
+        };
+
+        window.showStatus = function(message, type = 'info') {
+            const statusDiv = document.getElementById('test-status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        };
+
+        // Test Firebase Status
+        window.testFirebaseStatus = function() {
+            debugLog("🔍 Testing Firebase Status...");
+            
+            try {
+                debugLog("Firebase App:", {
+                    name: window.firebaseApp.name,
+                    options: window.firebaseApp.options
+                });
+                
+                debugLog("Database URL:", window.firebaseApp.options.databaseURL);
+                debugLog("Auth Domain:", window.firebaseApp.options.authDomain);
+                
+                debugLog("✅ Firebase app is properly initialized");
+            } catch (error) {
+                debugLog("❌ Firebase status error:", error.message);
+            }
+        };
+
+        // Test Realtime Database connection
+        window.testRealtimeDatabase = async function() {
+            debugLog("🔍 Testing Realtime Database connection...");
+            
+            try {
+                const testRef = window.Firebase.ref(window.database, 'test');
+                await window.Firebase.set(testRef, {
+                    message: "Test connection",
+                    timestamp: Date.now()
+                });
+                
+                const snapshot = await window.Firebase.get(testRef);
+                if (snapshot.exists()) {
+                    debugLog("✅ Realtime Database connection successful");
+                    debugLog("Test data:", snapshot.val());
+                } else {
+                    debugLog("❌ No data written to database");
+                }
+            } catch (error) {
+                debugLog("❌ Realtime Database error:", error.message);
+                debugLog("Error details:", error);
+            }
+        };
+
+        // Test Classroom Service initialization
+        window.testClassroomService = async function() {
+            debugLog("🔍 Testing Classroom Service...");
+            
+            try {
+                // Create a mock firebase service
+                const mockFirebaseService = {
+                    app: window.firebaseApp,
+                    getCurrentUser: () => Promise.resolve({
+                        uid: 'test_teacher_123',
+                        displayName: 'Test Teacher',
+                        email: 'test@example.com'
+                    })
+                };
+                
+                const classroomService = new RealtimeClassroomService(mockFirebaseService);
+                debugLog("✅ Classroom service created successfully");
+                
+                // Test if it's connected
+                debugLog("Service connected:", classroomService.isConnected);
+                
+                window.testClassroomService = classroomService;
+                
+            } catch (error) {
+                debugLog("❌ Classroom service error:", error.message);
+                debugLog("Error details:", error);
+            }
+        };
+
+        // Test actual classroom creation
+        window.testCreateClassroom = async function() {
+            debugLog("🔍 Testing Classroom Creation...");
+            
+            try {
+                if (!window.testClassroomService) {
+                    await window.testClassroomService();
+                }
+                
+                const classroomData = {
+                    classroomName: "Debug Test Classroom",
+                    instructorId: "test_teacher_123",
+                    instructorName: "Debug Instructor",
+                    selectedScenarios: [
+                        {
+                            scenarioId: "test_scenario_1",
+                            title: "Test Scenario",
+                            category: "test",
+                            order: 0
+                        }
+                    ]
+                };
+                
+                debugLog("Creating classroom with data:", classroomData);
+                
+                const result = await window.testClassroomService.createClassroom(classroomData);
+                debugLog("✅ Classroom created successfully:", result);
+                
+            } catch (error) {
+                debugLog("❌ Classroom creation failed:", error.message);
+                debugLog("Error stack:", error.stack);
+            }
+        };
+
+        // Manual classroom creation test
+        window.manualCreateTest = async function() {
+            const name = document.getElementById('test-classroom-name').value;
+            const instructor = document.getElementById('test-instructor-name').value;
+            
+            if (!name || !instructor) {
+                showStatus("Please fill in both fields", "error");
+                return;
+            }
+            
+            showStatus("Creating classroom...", "info");
+            debugLog(`🔧 Manual classroom creation test: ${name} by ${instructor}`);
+            
+            try {
+                await window.testClassroomService();
+                
+                const classroomData = {
+                    classroomName: name,
+                    instructorId: "manual_test_" + Date.now(),
+                    instructorName: instructor,
+                    selectedScenarios: []
+                };
+                
+                const result = await window.testClassroomService.createClassroom(classroomData);
+                
+                showStatus(`✅ Classroom created! Code: ${result.classroomCode}`, "success");
+                debugLog("✅ Manual creation successful:", result);
+                
+            } catch (error) {
+                showStatus(`❌ Creation failed: ${error.message}`, "error");
+                debugLog("❌ Manual creation failed:", error);
+            }
+        };
+
+        debugLog("🚀 Debug environment ready");
+    </script>
+</body>
+</html>

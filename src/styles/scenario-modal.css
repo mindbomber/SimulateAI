@@ -14,7 +14,7 @@
     height: 100%;
     background: rgb(0 0 0 / 60%);
     backdrop-filter: blur(8px);
-    z-index: 1050;
+    z-index: 16000; /* Higher than classroom modal (15000) */
     opacity: 0;
     transition: opacity 0.3s ease;
   }
@@ -30,7 +30,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 1055;
+    z-index: 16005; /* Higher than scenario backdrop */
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -458,7 +458,7 @@
       0 25px 50px rgb(0 0 0 / 15%),
       0 10px 25px rgb(102 126 234 / 10%),
       inset 0 1px 0 rgb(255 255 255 / 80%);
-    z-index: 1100; /* Increased to avoid conflicts with CategoryHeader tooltips (z-index: 1200) */
+    z-index: 16010; /* Higher than scenario modal for reflection overlay */
     min-width: 500px;
     max-width: 650px;
     opacity: 0;

@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Guest Mode Classroom Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .debug-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .button-group {
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      .debug-output {
+        background: #f8f9fa;
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        max-height: 300px;
+        overflow-y: auto;
+        font-family: monospace;
+        font-size: 12px;
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+      }
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .status.warning {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="debug-container">
+      <h1>Guest Mode Classroom Test</h1>
+
+      <div class="status" id="status">Loading guest mode components...</div>
+
+      <div class="button-group">
+        <h3>Test Guest Mode Classroom</h3>
+        <button id="test-guest-create">Test Guest Create Classroom</button>
+        <button id="test-guest-join">Test Guest Join Classroom</button>
+      </div>
+
+      <div class="debug-output" id="debug-output">
+        <div>Debug output will appear here...</div>
+      </div>
+    </div>
+
+    <script type="module">
+      let debugOutput = document.getElementById("debug-output");
+      let status = document.getElementById("status");
+
+      function log(message, type = "info") {
+        const timestamp = new Date().toLocaleTimeString();
+        const div = document.createElement("div");
+        div.style.color =
+          type === "error"
+            ? "#d32f2f"
+            : type === "success"
+              ? "#2e7d32"
+              : "#1976d2";
+        div.textContent = `[${timestamp}] ${message}`;
+        debugOutput.appendChild(div);
+        debugOutput.scrollTop = debugOutput.scrollHeight;
+        console.log(message);
+      }
+
+      function setStatus(message, type = "info") {
+        status.textContent = message;
+        status.className = `status ${type}`;
+      }
+
+      // Test guest mode without Firebase initialization
+      async function testGuestCreateClassroom() {
+        log("=== TESTING GUEST CREATE CLASSROOM ===");
+        try {
+          // Create mock firebase service for guest mode
+          const mockFirebaseService = {
+            getCurrentUser: () => null,
+            isConfigured: () => false,
+          };
+
+          // Create mock data handler for guest mode
+          const mockDataHandler = {
+            initialized: true,
+            isGuest: true,
+          };
+
+          log("✓ Mock services created");
+
+          // Import classroom integration manager
+          const { default: ClassroomIntegrationManager } = await import(
+            "/src/js/services/classroom-integration-manager.js"
+          );
+          log("✓ Classroom Integration Manager imported");
+
+          // Create manager with mock services
+          const manager = new ClassroomIntegrationManager(
+            mockDataHandler,
+            mockFirebaseService,
+          );
+          log("✓ Manager created with mock services");
+
+          // Test guest mode directly
+          const guestUser = {
+            uid: `guest_instructor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            displayName: "Guest Instructor",
+            email: null,
+            isGuest: true,
+          };
+
+          manager.currentUser = guestUser;
+          log("✓ Guest user created:", guestUser.displayName);
+
+          // Try to handle create classroom as guest
+          await manager.handleCreateClassroomAsGuest();
+          log("✓ Guest create classroom completed successfully", "success");
+          setStatus("Guest create classroom working", "success");
+        } catch (error) {
+          log(`✗ Guest create classroom failed: ${error.message}`, "error");
+          setStatus("Guest create classroom failed", "error");
+          console.error("Full error:", error);
+        }
+      }
+
+      async function testGuestJoinClassroom() {
+        log("=== TESTING GUEST JOIN CLASSROOM ===");
+        try {
+          // Create mock firebase service for guest mode
+          const mockFirebaseService = {
+            getCurrentUser: () => null,
+            isConfigured: () => false,
+          };
+
+          // Create mock data handler for guest mode
+          const mockDataHandler = {
+            initialized: true,
+            isGuest: true,
+          };
+
+          log("✓ Mock services created");
+
+          // Import classroom integration manager
+          const { default: ClassroomIntegrationManager } = await import(
+            "/src/js/services/classroom-integration-manager.js"
+          );
+          log("✓ Classroom Integration Manager imported");
+
+          // Create manager with mock services
+          const manager = new ClassroomIntegrationManager(
+            mockDataHandler,
+            mockFirebaseService,
+          );
+          log("✓ Manager created with mock services");
+
+          // Test guest mode directly
+          const guestUser = {
+            uid: `guest_student_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            displayName: "Guest Student",
+            email: null,
+            isGuest: true,
+          };
+
+          manager.currentUser = guestUser;
+          log("✓ Guest user created:", guestUser.displayName);
+
+          // Try to handle join classroom as guest
+          await manager.handleJoinClassroomAsGuest();
+          log("✓ Guest join classroom completed successfully", "success");
+          setStatus("Guest join classroom working", "success");
+        } catch (error) {
+          log(`✗ Guest join classroom failed: ${error.message}`, "error");
+          setStatus("Guest join classroom failed", "error");
+          console.error("Full error:", error);
+        }
+      }
+
+      // Set up button event listeners
+      document
+        .getElementById("test-guest-create")
+        .addEventListener("click", testGuestCreateClassroom);
+      document
+        .getElementById("test-guest-join")
+        .addEventListener("click", testGuestJoinClassroom);
+
+      // Initialize page
+      setStatus("Ready to test guest mode", "success");
+      log("Guest mode test page loaded");
+    </script>
+  </body>
+</html>

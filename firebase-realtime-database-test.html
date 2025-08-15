@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Firebase Realtime Database Test - SimulateAI</title>
+    <link rel="stylesheet" href="src/styles/css-layers.css" />
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 2rem;
+        line-height: 1.6;
+      }
+      .test-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: #f9f9f9;
+      }
+      .status {
+        padding: 1rem;
+        margin: 1rem 0;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+      .status.success {
+        background: #d1f2d1;
+        color: #0f5132;
+        border: 1px solid #a3d977;
+      }
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .status.info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+      .test-section {
+        margin: 2rem 0;
+        padding: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      button {
+        padding: 0.5rem 1rem;
+        margin: 0.25rem;
+        border: none;
+        border-radius: 4px;
+        background: #007bff;
+        color: white;
+        cursor: pointer;
+        font-size: 0.9rem;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      button:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+      }
+      .log {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        padding: 1rem;
+        margin: 1rem 0;
+        font-family: monospace;
+        font-size: 0.85rem;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      .classroom-form {
+        display: grid;
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+      }
+      .form-group label {
+        font-weight: bold;
+        margin-bottom: 0.25rem;
+      }
+      .form-group input,
+      .form-group select {
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🔥 Firebase Realtime Database Integration Test</h1>
+      <p>
+        Testing Firebase Realtime Database connectivity and Classroom Service
+        functionality
+      </p>
+
+      <!-- Connection Status -->
+      <div class="test-section">
+        <h2>🔌 Connection Status</h2>
+        <div id="connection-status" class="status info">Initializing...</div>
+        <button onclick="testConnection()">Test Connection</button>
+        <button onclick="startEmulators()">Start Emulators</button>
+      </div>
+
+      <!-- Service Health Check -->
+      <div class="test-section">
+        <h2>🏥 Service Health Check</h2>
+        <div id="health-status" class="status info">Not checked</div>
+        <button onclick="checkServiceHealth()">Check Health</button>
+      </div>
+
+      <!-- Classroom Creation Test -->
+      <div class="test-section">
+        <h2>🏫 Classroom Creation Test</h2>
+        <div class="classroom-form">
+          <div class="form-group">
+            <label for="classroom-name">Classroom Name:</label>
+            <input
+              type="text"
+              id="classroom-name"
+              value="AI Ethics 101 - Test"
+            />
+          </div>
+          <div class="form-group">
+            <label for="instructor-name">Instructor Name:</label>
+            <input type="text" id="instructor-name" value="Prof. Test" />
+          </div>
+          <div class="form-group">
+            <label for="scenario-count">Number of Test Scenarios:</label>
+            <select id="scenario-count">
+              <option value="3">3 scenarios</option>
+              <option value="5">5 scenarios</option>
+              <option value="10">10 scenarios</option>
+            </select>
+          </div>
+        </div>
+        <button onclick="createTestClassroom()">Create Test Classroom</button>
+        <div id="classroom-result" class="status info" style="display: none">
+          Waiting...
+        </div>
+        <div id="current-classroom-code" style="display: none"></div>
+      </div>
+
+      <!-- Student Join Test -->
+      <div class="test-section">
+        <h2>👨‍🎓 Student Join Test</h2>
+        <div class="classroom-form">
+          <div class="form-group">
+            <label for="join-code">Classroom Code:</label>
+            <input type="text" id="join-code" placeholder="ABC-123" />
+          </div>
+          <div class="form-group">
+            <label for="student-nickname">Student Nickname:</label>
+            <input type="text" id="student-nickname" value="TestStudent" />
+          </div>
+        </div>
+        <button onclick="joinTestClassroom()">Join Classroom</button>
+        <button onclick="generateTestStudents()">
+          Generate 5 Test Students
+        </button>
+        <div id="join-result" class="status info" style="display: none">
+          Waiting...
+        </div>
+      </div>
+
+      <!-- Live Session Test -->
+      <div class="test-section">
+        <h2>🔴 Live Session Management</h2>
+        <button onclick="startLiveSession()">Start Live Session</button>
+        <button onclick="pauseSession()">Pause Session</button>
+        <button onclick="resumeSession()">Resume Session</button>
+        <button onclick="completeSession()">Complete Session</button>
+        <div id="session-result" class="status info" style="display: none">
+          Waiting...
+        </div>
+      </div>
+
+      <!-- Real-Time Listeners Test -->
+      <div class="test-section">
+        <h2>⚡ Real-Time Updates Test</h2>
+        <button onclick="startListeners()">Start Real-Time Listeners</button>
+        <button onclick="stopListeners()">Stop Listeners</button>
+        <div id="listeners-status" class="status info">No listeners active</div>
+        <div id="realtime-updates" class="log"></div>
+      </div>
+
+      <!-- Data Operations Test -->
+      <div class="test-section">
+        <h2>📊 Data Operations Test</h2>
+        <button onclick="submitTestChoice()">Submit Test Choice</button>
+        <button onclick="getClassroomData()">Get Classroom Data</button>
+        <button onclick="exportTestData()">Export Test Data</button>
+        <div id="data-result" class="status info" style="display: none">
+          Waiting...
+        </div>
+      </div>
+
+      <!-- Activity Log -->
+      <div class="test-section">
+        <h2>📝 Activity Log</h2>
+        <button onclick="clearLog()">Clear Log</button>
+        <div id="activity-log" class="log"></div>
+      </div>
+    </div>
+
+    <!-- Import Firebase Service and Realtime Classroom Service -->
+    <script type="module">
+      import { FirebaseService } from "./src/js/services/firebase-service.js";
+      import RealtimeClassroomService from "./src/js/services/realtime-classroom-service.js";
+      import { CLASSROOM_CONSTANTS } from "./src/js/constants/classroom-constants.js";
+
+      // Global variables for testing
+      window.firebaseService = null;
+      window.classroomService = null;
+      window.currentClassroomCode = null;
+      window.currentStudentId = "test-student-" + Date.now();
+      window.currentInstructorId = "test-instructor-" + Date.now();
+      window.activeListeners = [];
+
+      // Initialize services
+      async function initializeServices() {
+        try {
+          log("🚀 Initializing Firebase Service...");
+
+          // Initialize Firebase Service
+          window.firebaseService = new FirebaseService();
+          await window.firebaseService.initialize();
+
+          log("✅ Firebase Service initialized");
+          updateConnectionStatus("success", "Firebase Service connected");
+
+          // Initialize Realtime Classroom Service
+          window.classroomService = new RealtimeClassroomService(
+            window.firebaseService,
+          );
+
+          log("✅ Realtime Classroom Service initialized");
+
+          // Check health
+          const health = window.classroomService.healthCheck();
+          log("🏥 Service Health: " + JSON.stringify(health, null, 2));
+        } catch (error) {
+          log("❌ Initialization failed: " + error.message);
+          updateConnectionStatus(
+            "error",
+            "Initialization failed: " + error.message,
+          );
+        }
+      }
+
+      // Test functions
+      window.testConnection = async function () {
+        try {
+          updateConnectionStatus("info", "Testing connection...");
+
+          if (!window.firebaseService) {
+            throw new Error("Firebase service not initialized");
+          }
+
+          if (!window.classroomService) {
+            throw new Error("Classroom service not initialized");
+          }
+
+          const health = window.classroomService.healthCheck();
+          log("🔍 Connection test result: " + JSON.stringify(health, null, 2));
+
+          if (health.isConnected) {
+            updateConnectionStatus(
+              "success",
+              "All services connected and healthy",
+            );
+          } else {
+            updateConnectionStatus("error", "Services not connected properly");
+          }
+        } catch (error) {
+          log("❌ Connection test failed: " + error.message);
+          updateConnectionStatus(
+            "error",
+            "Connection test failed: " + error.message,
+          );
+        }
+      };
+
+      window.startEmulators = function () {
+        log(
+          "💡 To start Firebase emulators, run this command in your terminal:",
+        );
+        log(
+          "firebase emulators:start --import=./emulator-data --export-on-exit",
+        );
+        log("");
+        log("Make sure you are in the project root directory.");
+        log("Emulators will run on:");
+        log("- Auth: http://localhost:9099");
+        log("- Firestore: http://localhost:8080");
+        log("- Storage: http://localhost:9199");
+        log("- Database: http://localhost:9000");
+        log("- UI: http://localhost:4000");
+      };
+
+      window.checkServiceHealth = function () {
+        try {
+          if (!window.classroomService) {
+            updateStatus(
+              "health-status",
+              "error",
+              "Classroom service not initialized",
+            );
+            return;
+          }
+
+          const health = window.classroomService.healthCheck();
+          log("🏥 Health check: " + JSON.stringify(health, null, 2));
+
+          if (health.status === "healthy") {
+            updateStatus(
+              "health-status",
+              "success",
+              `Service healthy - ${health.activeListeners} active listeners`,
+            );
+          } else {
+            updateStatus(
+              "health-status",
+              "error",
+              `Service status: ${health.status}`,
+            );
+          }
+        } catch (error) {
+          log("❌ Health check failed: " + error.message);
+          updateStatus(
+            "health-status",
+            "error",
+            "Health check failed: " + error.message,
+          );
+        }
+      };
+
+      window.createTestClassroom = async function () {
+        try {
+          updateStatus("classroom-result", "info", "Creating classroom...");
+
+          if (!window.classroomService) {
+            throw new Error("Classroom service not initialized");
+          }
+
+          const classroomName = document.getElementById("classroom-name").value;
+          const instructorName =
+            document.getElementById("instructor-name").value;
+          const scenarioCount = parseInt(
+            document.getElementById("scenario-count").value,
+          );
+
+          // Generate test scenarios
+          const selectedScenarios = [];
+          for (let i = 1; i <= scenarioCount; i++) {
+            selectedScenarios.push({
+              scenarioId: `test-scenario-${i}`,
+              title: `Test Scenario ${i}`,
+              category: "AI Ethics",
+              order: i,
+            });
+          }
+
+          const classroomData = {
+            classroomName,
+            instructorId: window.currentInstructorId,
+            instructorName,
+            selectedScenarios,
+          };
+
+          log(
+            "📝 Creating classroom with data: " +
+              JSON.stringify(classroomData, null, 2),
+          );
+
+          const result =
+            await window.classroomService.createClassroom(classroomData);
+
+          window.currentClassroomCode = result.classroomCode;
+
+          log("✅ Classroom created successfully!");
+          log("📋 Classroom code: " + result.classroomCode);
+          log("🆔 Classroom ID: " + result.classroomId);
+
+          updateStatus(
+            "classroom-result",
+            "success",
+            `Classroom created! Code: ${result.classroomCode}`,
+          );
+
+          // Show classroom code for joining
+          const codeDisplay = document.getElementById("current-classroom-code");
+          codeDisplay.innerHTML = `<strong>📋 Current Classroom Code: ${result.classroomCode}</strong>`;
+          codeDisplay.style.display = "block";
+
+          // Auto-fill join code
+          document.getElementById("join-code").value = result.classroomCode;
+        } catch (error) {
+          log("❌ Classroom creation failed: " + error.message);
+          updateStatus(
+            "classroom-result",
+            "error",
+            "Creation failed: " + error.message,
+          );
+        }
+      };
+
+      window.joinTestClassroom = async function () {
+        try {
+          updateStatus("join-result", "info", "Joining classroom...");
+
+          if (!window.classroomService) {
+            throw new Error("Classroom service not initialized");
+          }
+
+          const classroomCode = document
+            .getElementById("join-code")
+            .value.toUpperCase();
+          const nickname = document.getElementById("student-nickname").value;
+
+          if (!classroomCode || !nickname) {
+            throw new Error("Please enter both classroom code and nickname");
+          }
+
+          log(`👨‍🎓 Student joining classroom ${classroomCode} as "${nickname}"`);
+
+          const result = await window.classroomService.joinClassroom(
+            classroomCode,
+            window.currentStudentId,
+            nickname,
+          );
+
+          log("✅ Successfully joined classroom!");
+          log("👥 Roster size: " + Object.keys(result.roster || {}).length);
+
+          updateStatus(
+            "join-result",
+            "success",
+            `Joined as "${nickname}"! Roster size: ${Object.keys(result.roster || {}).length}`,
+          );
+        } catch (error) {
+          log("❌ Join classroom failed: " + error.message);
+          updateStatus("join-result", "error", "Join failed: " + error.message);
+        }
+      };
+
+      window.generateTestStudents = async function () {
+        try {
+          if (!window.currentClassroomCode) {
+            throw new Error(
+              "No classroom available. Create a classroom first.",
+            );
+          }
+
+          updateStatus("join-result", "info", "Generating test students...");
+
+          const students = ["Alice", "Bob", "Charlie", "Diana", "Eve"];
+
+          for (let i = 0; i < students.length; i++) {
+            const studentId = `test-student-${Date.now()}-${i}`;
+            const nickname = students[i];
+
+            try {
+              await window.classroomService.joinClassroom(
+                window.currentClassroomCode,
+                studentId,
+                nickname,
+              );
+              log(`✅ ${nickname} joined the classroom`);
+
+              // Small delay to avoid overwhelming the database
+              await new Promise((resolve) => setTimeout(resolve, 200));
+            } catch (error) {
+              log(`❌ Failed to add ${nickname}: ${error.message}`);
+            }
+          }
+
+          updateStatus(
+            "join-result",
+            "success",
+            "Test students generated successfully!",
+          );
+        } catch (error) {
+          log("❌ Generate test students failed: " + error.message);
+          updateStatus(
+            "join-result",
+            "error",
+            "Generation failed: " + error.message,
+          );
+        }
+      };
+
+      window.startLiveSession = async function () {
+        try {
+          if (!window.currentClassroomCode) {
+            throw new Error(
+              "No classroom available. Create a classroom first.",
+            );
+          }
+
+          updateStatus("session-result", "info", "Starting live session...");
+
+          await window.classroomService.startLiveSession(
+            window.currentClassroomCode,
+            window.currentInstructorId,
+          );
+
+          log("🔴 Live session started!");
+          updateStatus(
+            "session-result",
+            "success",
+            "Live session is now active",
+          );
+        } catch (error) {
+          log("❌ Start session failed: " + error.message);
+          updateStatus(
+            "session-result",
+            "error",
+            "Start failed: " + error.message,
+          );
+        }
+      };
+
+      window.pauseSession = async function () {
+        try {
+          if (!window.currentClassroomCode) {
+            throw new Error("No classroom available");
+          }
+
+          await window.classroomService.pauseSession(
+            window.currentClassroomCode,
+            true,
+          );
+          log("⏸️ Session paused");
+          updateStatus("session-result", "info", "Session paused");
+        } catch (error) {
+          log("❌ Pause session failed: " + error.message);
+          updateStatus(
+            "session-result",
+            "error",
+            "Pause failed: " + error.message,
+          );
+        }
+      };
+
+      window.resumeSession = async function () {
+        try {
+          if (!window.currentClassroomCode) {
+            throw new Error("No classroom available");
+          }
+
+          await window.classroomService.pauseSession(
+            window.currentClassroomCode,
+            false,
+          );
+          log("▶️ Session resumed");
+          updateStatus("session-result", "success", "Session resumed");
+        } catch (error) {
+          log("❌ Resume session failed: " + error.message);
+          updateStatus(
+            "session-result",
+            "error",
+            "Resume failed: " + error.message,
+          );
+        }
+      };
+
+      window.completeSession = async function () {
+        try {
+          if (!window.currentClassroomCode) {
+            throw new Error("No classroom available");
+          }
+
+          await window.classroomService.completeSession(
+            window.currentClassroomCode,
+          );
+          log("✅ Session completed");
+          updateStatus(
+            "session-result",
+            "success",
+            "Session completed successfully",
+          );
+        } catch (error) {
+          log("❌ Complete session failed: " + error.message);
+          updateStatus(
+            "session-result",
+            "error",
+            "Complete failed: " + error.message,
+          );
+        }
+      };
+
+      window.startListeners = function () {
+        try {
+          if (!window.currentClassroomCode) {
+            throw new Error(
+              "No classroom available. Create a classroom first.",
+            );
+          }
+
+          // Stop existing listeners first
+          window.stopListeners();
+
+          log("⚡ Starting real-time listeners...");
+
+          // Roster listener
+          const rosterUnsubscribe = window.classroomService.listenToRoster(
+            window.currentClassroomCode,
+            (roster) => {
+              const count = Object.keys(roster).length;
+              logRealtime(`👥 Roster updated: ${count} students`);
+              Object.values(roster).forEach((student) => {
+                logRealtime(
+                  `  - ${student.nickname} (${student.isActive ? "active" : "inactive"})`,
+                );
+              });
+            },
+          );
+          window.activeListeners.push({
+            name: "roster",
+            unsubscribe: rosterUnsubscribe,
+          });
+
+          // Session status listener
+          const statusUnsubscribe =
+            window.classroomService.listenToSessionStatus(
+              window.currentClassroomCode,
+              (status) => {
+                logRealtime(
+                  `🔴 Session status: ${status.isLive ? "LIVE" : "WAITING"} ${status.isPaused ? "(PAUSED)" : ""}`,
+                );
+              },
+            );
+          window.activeListeners.push({
+            name: "status",
+            unsubscribe: statusUnsubscribe,
+          });
+
+          // Student choices listener
+          const choicesUnsubscribe =
+            window.classroomService.listenToStudentChoices(
+              window.currentClassroomCode,
+              (choices) => {
+                const studentCount = Object.keys(choices).length;
+                logRealtime(
+                  `📊 Student choices updated: ${studentCount} students with data`,
+                );
+              },
+            );
+          window.activeListeners.push({
+            name: "choices",
+            unsubscribe: choicesUnsubscribe,
+          });
+
+          updateStatus(
+            "listeners-status",
+            "success",
+            `${window.activeListeners.length} listeners active`,
+          );
+        } catch (error) {
+          log("❌ Start listeners failed: " + error.message);
+          updateStatus(
+            "listeners-status",
+            "error",
+            "Start listeners failed: " + error.message,
+          );
+        }
+      };
+
+      window.stopListeners = function () {
+        try {
+          window.activeListeners.forEach((listener) => {
+            try {
+              listener.unsubscribe();
+              log(`🔇 Stopped ${listener.name} listener`);
+            } catch (error) {
+              log(
+                `⚠️ Failed to stop ${listener.name} listener: ${error.message}`,
+              );
+            }
+          });
+
+          window.activeListeners = [];
+          updateStatus("listeners-status", "info", "All listeners stopped");
+        } catch (error) {
+          log("❌ Stop listeners failed: " + error.message);
+          updateStatus(
+            "listeners-status",
+            "error",
+            "Stop listeners failed: " + error.message,
+          );
+        }
+      };
+
+      window.submitTestChoice = async function () {
+        try {
+          if (!window.currentClassroomCode) {
+            throw new Error("No classroom available");
+          }
+
+          updateStatus("data-result", "info", "Submitting test choice...");
+
+          await window.classroomService.submitStudentChoice(
+            window.currentClassroomCode,
+            window.currentStudentId,
+            "test-scenario-1",
+            "option-a",
+            {
+              responseTime: 5000,
+              confidence: 8,
+            },
+          );
+
+          log("📝 Test choice submitted successfully");
+          updateStatus(
+            "data-result",
+            "success",
+            "Choice submitted successfully",
+          );
+        } catch (error) {
+          log("❌ Submit choice failed: " + error.message);
+          updateStatus(
+            "data-result",
+            "error",
+            "Submit failed: " + error.message,
+          );
+        }
+      };
+
+      window.getClassroomData = async function () {
+        try {
+          if (!window.currentClassroomCode) {
+            throw new Error("No classroom available");
+          }
+
+          updateStatus("data-result", "info", "Fetching classroom data...");
+
+          const data = await window.classroomService.getClassroom(
+            window.currentClassroomCode,
+          );
+
+          log("📊 Classroom data retrieved:");
+          log(JSON.stringify(data, null, 2));
+
+          updateStatus("data-result", "success", "Data retrieved successfully");
+        } catch (error) {
+          log("❌ Get classroom data failed: " + error.message);
+          updateStatus(
+            "data-result",
+            "error",
+            "Get data failed: " + error.message,
+          );
+        }
+      };
+
+      window.exportTestData = async function () {
+        try {
+          log("📤 Exporting test data... (simulated)");
+
+          // This would normally export real data
+          const mockData = {
+            exportTime: new Date().toISOString(),
+            classroomCode: window.currentClassroomCode,
+            message: "This is a test export simulation",
+          };
+
+          log("Export data: " + JSON.stringify(mockData, null, 2));
+          updateStatus("data-result", "success", "Test export completed");
+        } catch (error) {
+          log("❌ Export failed: " + error.message);
+          updateStatus(
+            "data-result",
+            "error",
+            "Export failed: " + error.message,
+          );
+        }
+      };
+
+      // Utility functions
+      function log(message) {
+        const timestamp = new Date().toLocaleTimeString();
+        const logElement = document.getElementById("activity-log");
+        logElement.innerHTML += `[${timestamp}] ${message}\n`;
+        logElement.scrollTop = logElement.scrollHeight;
+        console.log(message);
+      }
+
+      function logRealtime(message) {
+        const timestamp = new Date().toLocaleTimeString();
+        const logElement = document.getElementById("realtime-updates");
+        logElement.innerHTML += `[${timestamp}] ${message}\n`;
+        logElement.scrollTop = logElement.scrollHeight;
+      }
+
+      function updateConnectionStatus(type, message) {
+        updateStatus("connection-status", type, message);
+      }
+
+      function updateStatus(elementId, type, message) {
+        const element = document.getElementById(elementId);
+        element.className = `status ${type}`;
+        element.textContent = message;
+        element.style.display = "block";
+      }
+
+      window.clearLog = function () {
+        document.getElementById("activity-log").innerHTML = "";
+        document.getElementById("realtime-updates").innerHTML = "";
+      };
+
+      // Initialize on page load
+      window.addEventListener("load", () => {
+        log("🔥 Firebase Realtime Database Test Page Loaded");
+        log("📝 Initializing services...");
+        initializeServices();
+      });
+
+      // Cleanup on page unload
+      window.addEventListener("beforeunload", () => {
+        window.stopListeners();
+        if (window.classroomService) {
+          window.classroomService.cleanup();
+        }
+      });
+    </script>
+  </body>
+</html>

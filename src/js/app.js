@@ -54,6 +54,9 @@ import MCPIntegrationManager from "./integrations/mcp-integration-manager.js";
 import badgeManager from "./core/badge-manager.js";
 import badgeModal from "./components/badge-modal.js";
 
+// Import classroom collaboration system
+import ClassroomIntegrationManager from "./services/classroom-integration-manager.js";
+
 // Import user tracking system
 import "./user-tracking-init.js";
 
@@ -432,6 +435,10 @@ class SimulateAIApp {
     this.scenarioBrowserIntegration = null;
     this.scenarioBrowser = null;
     this.scenarioBrowserInitialized = false;
+
+    // Classroom Integration Manager
+    this.classroomIntegrationManager = null;
+    this.classroomIntegrationInitialized = false;
 
     // Debouncing for user actions
     this.lastSurpriseTime = 0; // Track last surprise me action for debouncing
@@ -1066,6 +1073,10 @@ class SimulateAIApp {
       // Scenario Browser Integration
       await this.initializeScenarioBrowserIntegration();
       this._updateComponentHealth("scenario_browser", "healthy");
+
+      // Classroom Integration
+      await this.initializeClassroomIntegration();
+      this._updateComponentHealth("classroom_integration", "healthy");
 
       // Scroll Reveal Header
       this.initializeScrollRevealHeader();
@@ -2066,6 +2077,37 @@ class SimulateAIApp {
       );
       // Continue without integration - app should still function
       this.scenarioBrowserInitialized = false;
+    }
+  }
+
+  /**
+   * Initialize classroom integration for teacher-student collaboration
+   */
+  async initializeClassroomIntegration() {
+    try {
+      AppDebug.log("Initializing classroom integration...");
+
+      // Create classroom integration manager
+      this.classroomIntegrationManager = new ClassroomIntegrationManager(
+        this.dataHandler,
+        this.firebaseService,
+      );
+
+      // Initialize the integration manager
+      await this.classroomIntegrationManager.initialize();
+
+      // Setup URL-based classroom joining
+      await this.classroomIntegrationManager.handleURLClassroomJoin();
+
+      this.classroomIntegrationInitialized = true;
+      AppDebug.log("Classroom integration initialized successfully");
+
+      // Make integration available globally for debugging
+      window.classroomIntegrationManager = this.classroomIntegrationManager;
+    } catch (error) {
+      AppDebug.error("Failed to initialize classroom integration:", error);
+      // Continue without integration - app should still function
+      this.classroomIntegrationInitialized = false;
     }
   }
 

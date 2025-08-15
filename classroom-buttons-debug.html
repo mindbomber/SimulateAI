@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Classroom Buttons Debug Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .debug-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .button-group {
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      .debug-output {
+        background: #f8f9fa;
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        max-height: 300px;
+        overflow-y: auto;
+        font-family: monospace;
+        font-size: 12px;
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+      }
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .status.warning {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="debug-container">
+      <h1>Classroom Buttons Debug Test</h1>
+
+      <div class="status" id="status">Loading components...</div>
+
+      <div class="button-group">
+        <h3>Classroom Buttons</h3>
+        <button id="create-classroom">Create Classroom</button>
+        <button id="join-classroom">Join Classroom</button>
+        <button id="test-direct-import">Test Direct Import</button>
+      </div>
+
+      <div class="button-group">
+        <h3>Debug Actions</h3>
+        <button onclick="checkModules()">Check Module Loading</button>
+        <button onclick="checkGlobalEventManager()">
+          Check Global Event Manager
+        </button>
+        <button onclick="checkClassroomManager()">
+          Check Classroom Manager
+        </button>
+        <button onclick="clearDebugOutput()">Clear Output</button>
+      </div>
+
+      <div class="debug-output" id="debug-output">
+        <div>Debug output will appear here...</div>
+      </div>
+    </div>
+
+    <script type="module">
+      let debugOutput = document.getElementById("debug-output");
+      let status = document.getElementById("status");
+
+      function log(message, type = "info") {
+        const timestamp = new Date().toLocaleTimeString();
+        const div = document.createElement("div");
+        div.style.color =
+          type === "error"
+            ? "#d32f2f"
+            : type === "success"
+              ? "#2e7d32"
+              : "#1976d2";
+        div.textContent = `[${timestamp}] ${message}`;
+        debugOutput.appendChild(div);
+        debugOutput.scrollTop = debugOutput.scrollHeight;
+        console.log(message);
+      }
+
+      window.log = log;
+
+      function setStatus(message, type = "info") {
+        status.textContent = message;
+        status.className = `status ${type}`;
+      }
+
+      window.clearDebugOutput = function () {
+        debugOutput.innerHTML = "<div>Debug output cleared...</div>";
+      };
+
+      // Test 1: Check if modules can be loaded
+      window.checkModules = async function () {
+        log("=== MODULE LOADING TEST ===");
+
+        const modules = [
+          "/src/js/core/global-event-manager.js",
+          "/src/js/services/classroom-integration-manager.js",
+          "/src/js/components/teacher-classroom-modals.js",
+          "/src/js/components/student-classroom-modals.js",
+        ];
+
+        for (const modulePath of modules) {
+          try {
+            log(`Testing import: ${modulePath}`);
+            const module = await import(modulePath);
+            log(`✓ Successfully imported: ${modulePath}`, "success");
+            log(`  - Default export: ${typeof module.default}`);
+          } catch (error) {
+            log(`✗ Failed to import ${modulePath}: ${error.message}`, "error");
+          }
+        }
+      };
+
+      // Test 2: Check Global Event Manager
+      window.checkGlobalEventManager = async function () {
+        log("=== GLOBAL EVENT MANAGER TEST ===");
+        try {
+          const { default: globalEventManager } = await import(
+            "/src/js/core/global-event-manager.js"
+          );
+          log("✓ Global Event Manager imported", "success");
+          log(`  - Initialized: ${globalEventManager.isInitialized}`);
+          log(`  - Type: ${typeof globalEventManager}`);
+
+          if (!globalEventManager.isInitialized) {
+            log("Initializing Global Event Manager...");
+            globalEventManager.initialize();
+            log("✓ Global Event Manager initialized", "success");
+          }
+        } catch (error) {
+          log(`✗ Global Event Manager error: ${error.message}`, "error");
+        }
+      };
+
+      // Test 3: Check Classroom Manager
+      window.checkClassroomManager = async function () {
+        log("=== CLASSROOM INTEGRATION MANAGER TEST ===");
+        try {
+          // First ensure global event manager is available
+          await window.checkGlobalEventManager();
+
+          const { default: ClassroomIntegrationManager } = await import(
+            "/src/js/services/classroom-integration-manager.js"
+          );
+          log("✓ Classroom Integration Manager imported", "success");
+
+          // Create a dummy data handler and firebase service for testing
+          const dummyDataHandler = { initialized: true };
+          const dummyFirebaseService = { initialized: true };
+
+          const manager = new ClassroomIntegrationManager(
+            dummyDataHandler,
+            dummyFirebaseService,
+          );
+          log("✓ Classroom Integration Manager created", "success");
+
+          await manager.initialize();
+          log("✓ Classroom Integration Manager initialized", "success");
+
+          window.testClassroomManager = manager;
+        } catch (error) {
+          log(
+            `✗ Classroom Integration Manager error: ${error.message}`,
+            "error",
+          );
+        }
+      };
+
+      // Test 4: Direct import test
+      window.testDirectImport = async function () {
+        log("=== DIRECT IMPORT TEST ===");
+        try {
+          await window.checkModules();
+          await window.checkGlobalEventManager();
+          await window.checkClassroomManager();
+          log("✓ All modules loaded successfully", "success");
+          setStatus("All components loaded and working", "success");
+        } catch (error) {
+          log(`✗ Direct import test failed: ${error.message}`, "error");
+          setStatus("Component loading failed", "error");
+        }
+      };
+
+      // Initialize tests on page load
+      async function initialize() {
+        log("Page loaded, starting basic tests...");
+        setStatus("Running initial tests...", "warning");
+
+        try {
+          // Test basic module loading
+          await window.testDirectImport();
+        } catch (error) {
+          log(`Initialization error: ${error.message}`, "error");
+          setStatus("Initialization failed", "error");
+        }
+      }
+
+      // Set up button event listeners
+      document
+        .getElementById("create-classroom")
+        .addEventListener("click", async () => {
+          log("Create Classroom button clicked!");
+          if (window.testClassroomManager) {
+            try {
+              // Try to trigger the create classroom modal
+              log("Attempting to open create classroom modal...");
+              await window.testClassroomManager.handleCreateClassroom();
+              log("✓ Create classroom modal opened", "success");
+            } catch (error) {
+              log(`✗ Create classroom error: ${error.message}`, "error");
+            }
+          } else {
+            log("Classroom manager not available. Running setup...", "warning");
+            await window.checkClassroomManager();
+          }
+        });
+
+      document
+        .getElementById("join-classroom")
+        .addEventListener("click", async () => {
+          log("Join Classroom button clicked!");
+          if (window.testClassroomManager) {
+            try {
+              // Try to trigger the join classroom modal
+              log("Attempting to open join classroom modal...");
+              await window.testClassroomManager.handleJoinClassroom();
+              log("✓ Join classroom modal opened", "success");
+            } catch (error) {
+              log(`✗ Join classroom error: ${error.message}`, "error");
+            }
+          } else {
+            log("Classroom manager not available. Running setup...", "warning");
+            await window.checkClassroomManager();
+          }
+        });
+
+      document
+        .getElementById("test-direct-import")
+        .addEventListener("click", window.testDirectImport);
+
+      // Initialize when page loads
+      initialize();
+    </script>
+  </body>
+</html>

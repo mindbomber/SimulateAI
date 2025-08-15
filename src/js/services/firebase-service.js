@@ -75,6 +75,7 @@ import {
   deleteObject,
   connectStorageEmulator,
 } from "firebase/storage";
+import { getDatabase, connectDatabaseEmulator } from "firebase/database";
 import { getAnalytics, logEvent } from "firebase/analytics";
 import { getPerformance } from "firebase/performance";
 
@@ -483,6 +484,7 @@ export class FirebaseService {
         this.auth = getAuth(this.app);
         this.db = getFirestore(this.app);
         this.storage = getStorage(this.app);
+        this.realtimeDb = getDatabase(this.app);
         this.analytics = getAnalytics(this.app);
         this.performance = getPerformance(this.app);
 
@@ -534,6 +536,20 @@ export class FirebaseService {
               );
               console.log(
                 `✅ Connected to Storage Emulator on port ${devConfig.emulatorPorts.storage}`,
+              );
+            }
+
+            // Connect to Realtime Database Emulator
+            if (
+              !this.realtimeDb.app.options.databaseURL?.includes("localhost")
+            ) {
+              connectDatabaseEmulator(
+                this.realtimeDb,
+                "localhost",
+                devConfig.emulatorPorts.database,
+              );
+              console.log(
+                `✅ Connected to Realtime Database Emulator on port ${devConfig.emulatorPorts.database}`,
               );
             }
           } catch (emulatorError) {

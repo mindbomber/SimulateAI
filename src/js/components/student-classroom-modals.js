@@ -1,0 +1,980 @@
+/**
+ * Student Classroom Modal Components
+ * Handles student-side classroom joining, waiting room, and session participation
+ * @class StudentClassroomModals
+ * @author SimulateAI Development Team
+ * @since 1.80.0
+ */
+
+import ModalUtility from "./modal-utility.js";
+import RealtimeClassroomService from "../services/realtime-classroom-service.js";
+import { CLASSROOM_CONSTANTS } from "../constants/classroom-constants.js";
+import {
+  validateClassroomCode,
+  validateNickname,
+  formatClassroomCode,
+  logClassroomEvent,
+} from "../utils/classroom-utils.js";
+import logger from "../utils/logger.js";
+
+export default class StudentClassroomModals {
+  constructor(dataHandler, firebaseService) {
+    this.dataHandler = dataHandler;
+    this.firebaseService = firebaseService;
+    this.classroomService = new RealtimeClassroomService(firebaseService);
+
+    // State management
+    this.currentClassroom = null;
+    this.currentStudent = null;
+    this.sessionStatus = null;
+    this.studentProgress = null;
+    this.activeListeners = [];
+
+    // Modal instances
+    this.joinClassroomModal = null;
+    this.waitingRoomModal = null;
+    this.finalChoicesModal = null;
+
+    this.initialized = false;
+  }
+
+  /**
+   * Initialize student classroom modals
+   * @param {boolean} isGuestMode - Whether initializing in guest mode
+   */
+  async initialize(isGuestMode = false) {
+    if (this.initialized) return;
+
+    try {
+      // Get current user as student (or use guest mode)
+      if (isGuestMode) {
+        // Create a temporary guest student object
+        this.currentStudent = {
+          uid: `guest_student_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          displayName: "Guest Student",
+          email: null,
+          isGuest: true,
+        };
+        logger.info("StudentClassroomModals", "Initialized in guest mode");
+      } else {
+        this.currentStudent = await this.firebaseService.getCurrentUser();
+        if (!this.currentStudent) {
+          throw new Error("User must be authenticated to join classrooms");
+        }
+        logger.info(
+          "StudentClassroomModals",
+          "Initialized with authenticated user",
+        );
+      }
+
+      this.initialized = true;
+      logger.info("StudentClassroomModals", "Initialized successfully", {
+        guestMode: isGuestMode,
+      });
+    } catch (error) {
+      logger.error("StudentClassroomModals", "Initialization failed", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Show join classroom modal
+   */
+  async showJoinClassroomModal(prefilledCode = "", isGuestMode = false) {
+    try {
+      await this.initialize(isGuestMode);
+
+      const modalContent = this.buildJoinClassroomContent(
+        prefilledCode,
+        isGuestMode,
+      );
+
+      const modalTitle = isGuestMode
+        ? "👨‍🎓 Join Classroom (Guest Mode)"
+        : "👨‍🎓 Join Classroom";
+
+      this.joinClassroomModal = new ModalUtility({
+        title: modalTitle,
+        content: modalContent,
+        size: "medium",
+        className: "student-join-classroom-modal",
+        onClose: () => this.handleJoinClassroomClose(),
+      });
+
+      this.joinClassroomModal.open();
+      this.setupJoinClassroomEvents();
+
+      // Focus on appropriate field
+      setTimeout(() => {
+        const focusField = prefilledCode
+          ? this.joinClassroomModal.element.querySelector("#student-nickname")
+          : this.joinClassroomModal.element.querySelector("#classroom-code");
+        focusField?.focus();
+      }, 100);
+
+      logClassroomEvent("join_classroom_modal_opened", {
+        student_id: this.currentStudent.uid,
+        prefilled_code: !!prefilledCode,
+      });
+    } catch (error) {
+      logger.error(
+        "StudentClassroomModals",
+        "Failed to show join classroom modal",
+        error,
+      );
+      this.showErrorToast("Failed to open classroom join dialog");
+    }
+  }
+
+  /**
+   * Build join classroom modal content
+   */
+  buildJoinClassroomContent(prefilledCode = "", isGuestMode = false) {
+    const guestNotice = isGuestMode
+      ? `
+      <div class="guest-mode-notice">
+        <div class="notice-content">
+          <i class="fas fa-info-circle"></i>
+          <strong>Guest Mode:</strong> You're joining as a temporary participant. Your progress won't be saved permanently.
+        </div>
+      </div>
+    `
+      : "";
+
+    return `
+      ${guestNotice}
+      <div class="join-classroom-form">
+        <!-- Instructions -->
+        <div class="join-instructions">
+          <p>Enter the classroom code provided by your instructor and choose a nickname to join the session.</p>
+        </div>
+
+        <!-- Form Fields -->
+        <div class="form-section">
+          <div class="form-group">
+            <label for="classroom-code" class="required">Classroom Code</label>
+            <input 
+              type="text" 
+              id="classroom-code" 
+              name="classroom-code"
+              placeholder="e.g., ABC-123"
+              maxlength="7"
+              value="${prefilledCode}"
+              autocomplete="off"
+              style="text-transform: uppercase;"
+              required
+            />
+            <small class="helper-text">Enter the 6-character code from your instructor</small>
+            <div class="validation-message" id="code-validation"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="student-nickname" class="required">Your Nickname</label>
+            <input 
+              type="text" 
+              id="student-nickname" 
+              name="student-nickname"
+              placeholder="e.g., Alex, Sam, Jordan"
+              maxlength="${CLASSROOM_CONSTANTS.NICKNAME_MAX_LENGTH}"
+              autocomplete="username"
+              required
+            />
+            <small class="helper-text">This is how you'll appear to your instructor and classmates</small>
+            <div class="validation-message" id="nickname-validation"></div>
+          </div>
+        </div>
+
+        <!-- Join Options -->
+        <div class="join-options">
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="remember-nickname" checked />
+              <span class="checkmark"></span>
+              Remember my nickname for future sessions
+            </label>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="cancel-join-classroom">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary" id="join-classroom-submit" disabled>
+            <span class="btn-icon">🚪</span>
+            Join Classroom
+          </button>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading-overlay" id="join-loading" style="display: none;">
+          <div class="loading-spinner"></div>
+          <p>Joining classroom...</p>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Setup event listeners for join classroom modal
+   */
+  setupJoinClassroomEvents() {
+    if (!this.joinClassroomModal?.element) return;
+
+    const modal = this.joinClassroomModal.element;
+
+    // Form validation
+    const codeInput = modal.querySelector("#classroom-code");
+    const nicknameInput = modal.querySelector("#student-nickname");
+    const submitButton = modal.querySelector("#join-classroom-submit");
+
+    // Real-time validation
+    codeInput?.addEventListener("input", this.handleCodeInputChange.bind(this));
+    nicknameInput?.addEventListener(
+      "input",
+      this.handleNicknameInputChange.bind(this),
+    );
+
+    // Code formatting
+    codeInput?.addEventListener("input", (e) => {
+      e.target.value = formatClassroomCode(e.target.value);
+    });
+
+    // Form submission
+    submitButton?.addEventListener(
+      "click",
+      this.handleJoinClassroomSubmit.bind(this),
+    );
+
+    // Cancel
+    modal
+      .querySelector("#cancel-join-classroom")
+      ?.addEventListener("click", () => {
+        this.joinClassroomModal.hide();
+      });
+
+    // Enter key submission
+    modal.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !submitButton.disabled) {
+        e.preventDefault();
+        this.handleJoinClassroomSubmit();
+      }
+    });
+
+    // Load saved nickname if available
+    this.loadSavedNickname();
+  }
+
+  /**
+   * Handle classroom code input changes with validation
+   */
+  handleCodeInputChange(event) {
+    const code = event.target.value;
+    const validation =
+      event.target.parentElement.querySelector("#code-validation");
+
+    if (code.length === 0) {
+      validation.textContent = "";
+      validation.className = "validation-message";
+    } else if (validateClassroomCode(code)) {
+      validation.textContent = "✓ Valid code format";
+      validation.className = "validation-message valid";
+    } else {
+      validation.textContent =
+        "✗ Code must be 3 letters, hyphen, 3 numbers (e.g., ABC-123)";
+      validation.className = "validation-message invalid";
+    }
+
+    this.validateJoinForm();
+  }
+
+  /**
+   * Handle nickname input changes with validation
+   */
+  handleNicknameInputChange(event) {
+    const nickname = event.target.value;
+    const validation = event.target.parentElement.querySelector(
+      "#nickname-validation",
+    );
+
+    if (nickname.length === 0) {
+      validation.textContent = "";
+      validation.className = "validation-message";
+    } else {
+      const result = validateNickname(nickname, []); // Will check uniqueness on server
+
+      if (result.isValid) {
+        validation.textContent = "✓ Valid nickname";
+        validation.className = "validation-message valid";
+      } else {
+        validation.textContent = "✗ " + result.message;
+        validation.className = "validation-message invalid";
+      }
+    }
+
+    this.validateJoinForm();
+  }
+
+  /**
+   * Validate join form and enable/disable submit button
+   */
+  validateJoinForm() {
+    const modal = this.joinClassroomModal?.element;
+    if (!modal) return false;
+
+    const code = modal.querySelector("#classroom-code")?.value?.trim();
+    const nickname = modal.querySelector("#student-nickname")?.value?.trim();
+    const submitButton = modal.querySelector("#join-classroom-submit");
+
+    const isValid =
+      validateClassroomCode(code) &&
+      nickname &&
+      nickname.length >= CLASSROOM_CONSTANTS.NICKNAME_MIN_LENGTH;
+
+    if (submitButton) {
+      submitButton.disabled = !isValid;
+    }
+
+    return isValid;
+  }
+
+  /**
+   * Handle join classroom form submission
+   */
+  async handleJoinClassroomSubmit() {
+    try {
+      if (!this.validateJoinForm()) {
+        this.showErrorToast("Please complete all required fields correctly");
+        return;
+      }
+
+      const modal = this.joinClassroomModal.element;
+      const classroomCode = modal
+        .querySelector("#classroom-code")
+        .value.trim()
+        .toUpperCase();
+      const nickname = modal.querySelector("#student-nickname").value.trim();
+      const rememberNickname =
+        modal.querySelector("#remember-nickname").checked;
+
+      // Show loading state
+      this.showJoinLoading(true);
+
+      // Save nickname if requested
+      if (rememberNickname) {
+        await this.saveNickname(nickname);
+      }
+
+      // Join classroom
+      const result = await this.classroomService.joinClassroom(
+        classroomCode,
+        this.currentStudent.uid,
+        nickname,
+      );
+
+      // Store current classroom and student info
+      this.currentClassroom = result;
+      this.studentInfo = result.studentInfo;
+
+      // Hide join modal and show waiting room
+      this.joinClassroomModal.hide();
+      this.showWaitingRoomModal(result);
+
+      logClassroomEvent("student_joined", {
+        classroom_code: classroomCode,
+        student_id: this.currentStudent.uid,
+        nickname: nickname,
+      });
+    } catch (error) {
+      logger.error("StudentClassroomModals", "Failed to join classroom", error);
+      this.showJoinLoading(false);
+
+      // Show specific error messages
+      let errorMessage = "Failed to join classroom";
+      if (error.message.includes("not found")) {
+        errorMessage =
+          "Classroom not found. Please check the code and try again.";
+      } else if (error.message.includes("full")) {
+        errorMessage =
+          "This classroom is full and cannot accept more students.";
+      } else if (error.message.includes("nickname")) {
+        errorMessage =
+          "This nickname is already taken. Please choose a different one.";
+      }
+
+      this.showErrorToast(errorMessage);
+    }
+  }
+
+  /**
+   * Show waiting room modal
+   */
+  showWaitingRoomModal(classroom) {
+    const modalContent = this.buildWaitingRoomContent(classroom);
+
+    this.waitingRoomModal = new ModalUtility({
+      title: `⏳ Waiting Room: ${classroom.classroomName}`,
+      content: modalContent,
+      size: "medium",
+      className: "student-waiting-room-modal",
+      closeOnBackdrop: false,
+      onClose: () => this.handleWaitingRoomClose(),
+    });
+
+    this.waitingRoomModal.show();
+    this.setupWaitingRoomEvents(classroom);
+    this.startWaitingRoomListeners(classroom.classroomCode);
+  }
+
+  /**
+   * Build waiting room modal content
+   */
+  buildWaitingRoomContent(classroom) {
+    return `
+      <div class="waiting-room-container">
+        <!-- Session Information -->
+        <div class="session-info">
+          <div class="classroom-details">
+            <h3>${classroom.classroomName}</h3>
+            <p>Instructor: ${classroom.instructorName}</p>
+            <p>Scenarios: ${classroom.selectedScenarios.length}</p>
+          </div>
+
+          <div class="student-info">
+            <div class="student-avatar">
+              ${this.studentInfo.nickname.charAt(0).toUpperCase()}
+            </div>
+            <div class="student-details">
+              <span class="student-nickname">${this.studentInfo.nickname}</span>
+              <span class="student-status">Waiting for session to start</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Session Status -->
+        <div class="session-status-display">
+          <div class="status-indicator" id="session-status-indicator">
+            <div class="status-icon waiting">⏳</div>
+            <div class="status-text">
+              <h4 id="status-title">Waiting for instructor</h4>
+              <p id="status-description">Your instructor will start the session shortly.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Class Roster -->
+        <div class="waiting-room-roster">
+          <h4>👥 Students in Classroom <span class="student-count" id="waiting-student-count">(1)</span></h4>
+          <div class="roster-list" id="waiting-roster-list">
+            <!-- Updated by real-time listeners -->
+          </div>
+        </div>
+
+        <!-- Session Preview -->
+        <div class="session-preview">
+          <h4>📋 Session Overview</h4>
+          <div class="scenario-preview-list">
+            ${classroom.selectedScenarios
+              .map(
+                (scenario, index) => `
+              <div class="scenario-preview-item">
+                <span class="scenario-number">${index + 1}</span>
+                <div class="scenario-info">
+                  <span class="scenario-title">${scenario.title}</span>
+                  <span class="scenario-category">${scenario.category}</span>
+                </div>
+              </div>
+            `,
+              )
+              .join("")}
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="waiting-room-actions">
+          <button type="button" class="btn btn-outline" id="leave-classroom">
+            🚪 Leave Classroom
+          </button>
+          <button type="button" class="btn btn-primary" id="start-session-button" style="display: none;">
+            🚀 Start Session
+          </button>
+        </div>
+
+        <!-- Connection Status -->
+        <div class="connection-status">
+          <span class="connection-indicator" id="connection-indicator">🟢</span>
+          <span class="connection-text">Connected</span>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Setup waiting room event listeners
+   */
+  setupWaitingRoomEvents(classroom) {
+    if (!this.waitingRoomModal?.element) return;
+
+    const modal = this.waitingRoomModal.element;
+
+    // Leave classroom
+    modal.querySelector("#leave-classroom")?.addEventListener("click", () => {
+      this.handleLeaveClassroom();
+    });
+
+    // Start session (when instructor starts)
+    modal
+      .querySelector("#start-session-button")
+      ?.addEventListener("click", () => {
+        this.startScenarioSession(classroom);
+      });
+  }
+
+  /**
+   * Start real-time listeners for waiting room
+   */
+  startWaitingRoomListeners(classroomCode) {
+    // Session status listener
+    const statusUnsubscribe = this.classroomService.listenToSessionStatus(
+      classroomCode,
+      this.handleSessionStatusUpdate.bind(this),
+    );
+    this.activeListeners.push({
+      name: "session_status",
+      unsubscribe: statusUnsubscribe,
+    });
+
+    // Roster listener
+    const rosterUnsubscribe = this.classroomService.listenToRoster(
+      classroomCode,
+      this.handleWaitingRosterUpdate.bind(this),
+    );
+    this.activeListeners.push({
+      name: "waiting_roster",
+      unsubscribe: rosterUnsubscribe,
+    });
+  }
+
+  /**
+   * Handle session status updates
+   */
+  handleSessionStatusUpdate(sessionStatus) {
+    this.sessionStatus = sessionStatus;
+
+    const modal = this.waitingRoomModal?.element;
+    if (!modal) return;
+
+    const statusIndicator = modal.querySelector("#session-status-indicator");
+    const statusTitle = modal.querySelector("#status-title");
+    const statusDescription = modal.querySelector("#status-description");
+    const startButton = modal.querySelector("#start-session-button");
+
+    if (sessionStatus.isLive) {
+      // Session started
+      statusIndicator.querySelector(".status-icon").textContent = "🔴";
+      statusIndicator.querySelector(".status-icon").className =
+        "status-icon live";
+      statusTitle.textContent = "Session Started!";
+      statusDescription.textContent =
+        "Click the button below to begin the scenarios.";
+      startButton.style.display = "block";
+
+      logClassroomEvent("session_started_notification", {
+        classroom_code: this.currentClassroom.classroomCode,
+        student_id: this.currentStudent.uid,
+      });
+    } else if (sessionStatus.isPaused) {
+      // Session paused
+      statusIndicator.querySelector(".status-icon").textContent = "⏸️";
+      statusIndicator.querySelector(".status-icon").className =
+        "status-icon paused";
+      statusTitle.textContent = "Session Paused";
+      statusDescription.textContent =
+        "The instructor has paused the session temporarily.";
+      startButton.style.display = "none";
+    } else {
+      // Waiting
+      statusIndicator.querySelector(".status-icon").textContent = "⏳";
+      statusIndicator.querySelector(".status-icon").className =
+        "status-icon waiting";
+      statusTitle.textContent = "Waiting for instructor";
+      statusDescription.textContent =
+        "Your instructor will start the session shortly.";
+      startButton.style.display = "none";
+    }
+  }
+
+  /**
+   * Handle waiting room roster updates
+   */
+  handleWaitingRosterUpdate(roster) {
+    const modal = this.waitingRoomModal?.element;
+    if (!modal) return;
+
+    const studentCount = modal.querySelector("#waiting-student-count");
+    const rosterList = modal.querySelector("#waiting-roster-list");
+
+    const students = Object.entries(roster || {});
+
+    // Update student count
+    if (studentCount) {
+      studentCount.textContent = `(${students.length})`;
+    }
+
+    // Update roster list
+    if (rosterList) {
+      rosterList.innerHTML = students
+        .map(
+          ([studentId, student]) => `
+        <div class="waiting-roster-item ${student.isActive ? "active" : "inactive"}">
+          <div class="student-avatar small">
+            ${student.nickname.charAt(0).toUpperCase()}
+          </div>
+          <span class="student-nickname">${student.nickname}</span>
+          ${studentId === this.currentStudent.uid ? '<span class="you-indicator">(You)</span>' : ""}
+        </div>
+      `,
+        )
+        .join("");
+    }
+  }
+
+  /**
+   * Handle leaving classroom
+   */
+  async handleLeaveClassroom() {
+    try {
+      if (confirm("Are you sure you want to leave the classroom?")) {
+        await this.classroomService.removeStudent(
+          this.currentClassroom.classroomCode,
+          this.currentStudent.uid,
+        );
+
+        this.waitingRoomModal.hide();
+        this.cleanup();
+
+        logClassroomEvent("student_left", {
+          classroom_code: this.currentClassroom.classroomCode,
+          student_id: this.currentStudent.uid,
+        });
+
+        this.showSuccessToast("Left classroom successfully");
+      }
+    } catch (error) {
+      logger.error(
+        "StudentClassroomModals",
+        "Failed to leave classroom",
+        error,
+      );
+      this.showErrorToast("Failed to leave classroom");
+    }
+  }
+
+  /**
+   * Start scenario session (transition from waiting room to scenarios)
+   */
+  async startScenarioSession(classroom) {
+    try {
+      // Hide waiting room modal
+      this.waitingRoomModal.hide();
+
+      // Start the scenario flow using existing scenario system
+      // This would integrate with the existing scenario modal system
+      this.showInfoToast("Starting scenario session...");
+
+      // For now, we'll show a placeholder that integrates with the existing system
+      this.integrateWithExistingScenarioSystem(classroom);
+
+      logClassroomEvent("scenario_session_started", {
+        classroom_code: classroom.classroomCode,
+        student_id: this.currentStudent.uid,
+        scenario_count: classroom.selectedScenarios.length,
+      });
+    } catch (error) {
+      logger.error(
+        "StudentClassroomModals",
+        "Failed to start scenario session",
+        error,
+      );
+      this.showErrorToast("Failed to start session");
+    }
+  }
+
+  /**
+   * Integrate with existing scenario system
+   * This is where we'd connect to the existing scenario modal flow
+   */
+  integrateWithExistingScenarioSystem(classroom) {
+    // This would call into the existing scenario system
+    // For now, we'll create a simple progress tracker
+
+    console.log("🎯 Starting classroom scenario session");
+    console.log("Classroom:", classroom.classroomName);
+    console.log("Scenarios to complete:", classroom.selectedScenarios.length);
+    console.log("First scenario:", classroom.selectedScenarios[0]);
+
+    // In the actual implementation, this would:
+    // 1. Load the first scenario from classroom.selectedScenarios[0]
+    // 2. Open the existing scenario modal system
+    // 3. Pass classroom context so choices get submitted to real-time database
+    // 4. Track progress through the scenario sequence
+
+    this.showInfoToast(
+      `Ready to start with: ${classroom.selectedScenarios[0].title}`,
+    );
+  }
+
+  /**
+   * Show final choices modal (after all scenarios completed)
+   */
+  showFinalChoicesModal(studentChoices) {
+    const modalContent = this.buildFinalChoicesContent(studentChoices);
+
+    this.finalChoicesModal = new ModalUtility({
+      title: "✅ Session Complete - Your Choices",
+      content: modalContent,
+      size: "large",
+      className: "student-final-choices-modal",
+      onClose: () => this.handleFinalChoicesClose(),
+    });
+
+    this.finalChoicesModal.show();
+    this.setupFinalChoicesEvents();
+  }
+
+  /**
+   * Build final choices modal content
+   */
+  buildFinalChoicesContent(studentChoices) {
+    const scenarios = this.currentClassroom?.selectedScenarios || [];
+
+    return `
+      <div class="final-choices-container">
+        <!-- Session Summary -->
+        <div class="session-summary">
+          <h3>🎉 Congratulations!</h3>
+          <p>You have completed all scenarios in this classroom session.</p>
+          
+          <div class="completion-stats">
+            <div class="stat-item">
+              <span class="stat-value">${scenarios.length}</span>
+              <span class="stat-label">Scenarios Completed</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">${this.currentClassroom?.classroomName}</span>
+              <span class="stat-label">Classroom</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Your Choices Review -->
+        <div class="choices-review">
+          <h4>📝 Your Choices Review</h4>
+          <div class="choices-list">
+            ${scenarios
+              .map((scenario, index) => {
+                const choice = studentChoices.scenarios?.[scenario.scenarioId];
+                return `
+                <div class="choice-review-item">
+                  <div class="scenario-header">
+                    <span class="scenario-number">${index + 1}</span>
+                    <div class="scenario-info">
+                      <h5>${scenario.title}</h5>
+                      <span class="scenario-category">${scenario.category}</span>
+                    </div>
+                  </div>
+                  <div class="choice-display">
+                    <span class="choice-label">Your choice:</span>
+                    <span class="choice-value">${choice?.choice || "No response recorded"}</span>
+                    ${choice?.confidence ? `<span class="confidence-level">Confidence: ${choice.confidence}/10</span>` : ""}
+                  </div>
+                </div>
+              `;
+              })
+              .join("")}
+          </div>
+        </div>
+
+        <!-- Thank You Message -->
+        <div class="thank-you-section">
+          <h4>🙏 Thank You for Participating!</h4>
+          <p>Your responses contribute to AI ethics education and research. If this session was part of a research study, your anonymized data will help improve AI ethics education.</p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="final-actions">
+          <button type="button" class="btn btn-outline" id="back-to-scenarios">
+            ← Back to Review
+          </button>
+          <button type="button" class="btn btn-primary" id="finish-session">
+            🏁 Finish Session
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Setup final choices modal events
+   */
+  setupFinalChoicesEvents() {
+    if (!this.finalChoicesModal?.element) return;
+
+    const modal = this.finalChoicesModal.element;
+
+    // Back to scenarios (for review)
+    modal.querySelector("#back-to-scenarios")?.addEventListener("click", () => {
+      // This would allow students to review their choices
+      this.showInfoToast("Review functionality would be implemented here");
+    });
+
+    // Finish session
+    modal.querySelector("#finish-session")?.addEventListener("click", () => {
+      this.handleFinishSession();
+    });
+  }
+
+  /**
+   * Handle finishing the session
+   */
+  handleFinishSession() {
+    this.finalChoicesModal.hide();
+    this.cleanup();
+
+    this.showSuccessToast(
+      "Thank you for participating! Session completed successfully.",
+    );
+
+    logClassroomEvent("session_completed", {
+      classroom_code: this.currentClassroom?.classroomCode,
+      student_id: this.currentStudent.uid,
+    });
+  }
+
+  /**
+   * Show loading state for join form
+   */
+  showJoinLoading(show) {
+    const modal = this.joinClassroomModal?.element;
+    if (!modal) return;
+
+    const loading = modal.querySelector("#join-loading");
+
+    if (show) {
+      loading.style.display = "flex";
+      // Disable form elements
+      modal
+        .querySelectorAll("input, button")
+        .forEach((el) => (el.disabled = true));
+    } else {
+      loading.style.display = "none";
+      // Re-enable form elements
+      modal
+        .querySelectorAll("input, button")
+        .forEach((el) => (el.disabled = false));
+      this.validateJoinForm(); // Re-validate to set correct button state
+    }
+  }
+
+  /**
+   * Load saved nickname from storage
+   */
+  async loadSavedNickname() {
+    try {
+      const savedNickname = await this.dataHandler.getData("saved_nickname");
+      if (savedNickname) {
+        const nicknameInput =
+          this.joinClassroomModal?.element?.querySelector("#student-nickname");
+        if (nicknameInput) {
+          nicknameInput.value = savedNickname;
+          this.handleNicknameInputChange({ target: nicknameInput });
+        }
+      }
+    } catch (error) {
+      // Ignore errors when loading saved nickname
+      logger.debug("StudentClassroomModals", "No saved nickname found");
+    }
+  }
+
+  /**
+   * Save nickname to storage
+   */
+  async saveNickname(nickname) {
+    try {
+      await this.dataHandler.saveData("saved_nickname", nickname);
+    } catch (error) {
+      logger.warn("StudentClassroomModals", "Failed to save nickname", error);
+    }
+  }
+
+  /**
+   * Show success toast message
+   */
+  showSuccessToast(message) {
+    // This would integrate with the existing toast system
+    console.log("✅ Success:", message);
+  }
+
+  /**
+   * Show error toast message
+   */
+  showErrorToast(message) {
+    // This would integrate with the existing toast system
+    console.log("❌ Error:", message);
+  }
+
+  /**
+   * Show info toast message
+   */
+  showInfoToast(message) {
+    // This would integrate with the existing toast system
+    console.log("ℹ️ Info:", message);
+  }
+
+  /**
+   * Cleanup method
+   */
+  cleanup() {
+    // Stop all active listeners
+    this.activeListeners.forEach((listener) => {
+      try {
+        listener.unsubscribe();
+      } catch (error) {
+        logger.warn(
+          "StudentClassroomModals",
+          `Failed to cleanup ${listener.name} listener`,
+          error,
+        );
+      }
+    });
+    this.activeListeners = [];
+
+    // Close modals
+    this.joinClassroomModal?.hide();
+    this.waitingRoomModal?.hide();
+    this.finalChoicesModal?.hide();
+
+    // Clear state
+    this.currentClassroom = null;
+    this.studentInfo = null;
+    this.sessionStatus = null;
+
+    logger.info("StudentClassroomModals", "Cleanup completed");
+  }
+
+  // Event handlers for close operations
+  handleJoinClassroomClose() {
+    // Clear form if needed
+  }
+
+  handleWaitingRoomClose() {
+    // Confirm before leaving
+    if (this.currentClassroom) {
+      this.handleLeaveClassroom();
+    }
+  }
+
+  handleFinalChoicesClose() {
+    this.cleanup();
+  }
+}
