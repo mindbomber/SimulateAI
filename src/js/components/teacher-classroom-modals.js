@@ -29,6 +29,8 @@ export default class TeacherClassroomModals {
     this.availableScenarios = [];
     this.selectedScenarios = [];
     this.activeListeners = [];
+    this.currentRoster = {};
+    this._lastRoster = {};
 
     // Modal instances
     this.createClassroomModal = null;
@@ -999,6 +1001,7 @@ export default class TeacherClassroomModals {
     const unsubscribe = this.classroomService.listenToRoster(
       classroomCode,
       (roster) => {
+        this._lastRoster = roster || {};
         this.updateRosterDisplay(roster);
       },
     );
@@ -1159,6 +1162,8 @@ export default class TeacherClassroomModals {
     });
 
     this.liveSessionModal.open();
+    // Ensure tabs work and non-active panels are hidden initially
+    this.setupTabNavigation();
     this.setupLiveSessionEvents(classroom);
     this.startLiveSessionListeners(classroom.classroomCode);
   }
@@ -1215,6 +1220,73 @@ export default class TeacherClassroomModals {
   }
 
   /**
+   * Initialize tab navigation for the live session modal
+   * - Adds click handlers to tab buttons
+   * - Shows only the active tab panel
+   */
+  setupTabNavigation() {
+    const modal = this.liveSessionModal?.element;
+    if (!modal) return;
+
+    const buttons = Array.from(
+      modal.querySelectorAll(".tab-navigation .tab-button"),
+    );
+    const panels = Array.from(
+      modal.querySelectorAll(".tab-content .tab-panel"),
+    );
+
+    const showTab = (tabName) => {
+      // Toggle button active state and aria-selected
+      buttons.forEach((btn) => {
+        const isActive = btn.dataset.tab === tabName;
+        btn.classList.toggle("active", isActive);
+        btn.setAttribute("aria-selected", String(isActive));
+      });
+
+      // Toggle panel visibility and active class
+      panels.forEach((panel) => {
+        const isActive = panel.id === `${tabName}-tab`;
+        panel.classList.toggle("active", isActive);
+        // Ensure only active panel is visible even without CSS support
+        if (isActive) {
+          panel.removeAttribute("hidden");
+          panel.style.display = "";
+        } else {
+          panel.setAttribute("hidden", "");
+          panel.style.display = "none";
+        }
+      });
+    };
+
+    // Attach handlers (once per open)
+    buttons.forEach((btn) => {
+      // Set a guard to prevent duplicate listeners across reopens
+      if (!btn.__tabHandlerBound) {
+        btn.addEventListener("click", () => showTab(btn.dataset.tab));
+        btn.__tabHandlerBound = true;
+      }
+      // A11y roles
+      btn.setAttribute("role", "tab");
+    });
+
+    // Initialize tablist/tabpanel a11y and hide non-active panels
+    const tabNav = modal.querySelector(".tab-navigation");
+    if (tabNav) tabNav.setAttribute("role", "tablist");
+    panels.forEach((panel) => {
+      panel.setAttribute("role", "tabpanel");
+      if (!panel.classList.contains("active")) {
+        panel.setAttribute("hidden", "");
+        panel.style.display = "none";
+      }
+    });
+
+    // Ensure a default active tab (details) is shown
+    const defaultBtn =
+      buttons.find((b) => b.classList.contains("active")) || buttons[0];
+    if (defaultBtn) showTab(defaultBtn.dataset.tab);
+  }
+
+  /**
    * Start live session listeners for status, roster, and choices
    */
   startLiveSessionListeners(classroomCode) {
@@ -1264,6 +1336,7 @@ export default class TeacherClassroomModals {
       (roster) => {
         const count = Object.keys(roster || {}).length;
         countEl && (countEl.textContent = String(count));
+        this.currentRoster = roster || {};
       },
     );
     this.activeListeners.push({
@@ -1282,6 +1355,34 @@ export default class TeacherClassroomModals {
       name: "live_duration",
       unsubscribe: () => clearInterval(intervalId),
     });
+
+    // Student choices/progress listener for Overview & Choices tabs
+    const choicesUnsub = this.classroomService.listenToStudentChoices(
+      classroomCode,
+      (studentChoices) => {
+        try {
+          this.renderOverviewProgress(studentChoices);
+          this.renderChoicesGrid(studentChoices);
+        } catch (e) {
+          logger.debug(
+            "TeacherClassroomModals",
+            "render live choices/progress failed",
+            e,
+          );
+        }
+      },
+    );
+    this.activeListeners.push({
+      name: "live_choices",
+      unsubscribe: choicesUnsub,
+    });
+  }
+
+  /**
+   * Resolve a studentId to a display nickname using current roster
+   */
+  lookupNickname(studentId) {
+    return this.currentRoster?.[studentId]?.nickname || studentId;
   }
 
   /**
@@ -1484,6 +1585,205 @@ export default class TeacherClassroomModals {
   }
 
   /**
+   * Render Overview tab progress grid based on studentChoices
+   * @param {Object} studentChoices
+   */
+  renderOverviewProgress(studentChoices = {}) {
+    const container = this.liveSessionModal?.element?.querySelector(
+      "#student-progress-grid",
+    );
+    const progressVis = this.liveSessionModal?.element?.querySelector(
+      "#progress-visualization",
+    );
+    if (!container) return;
+
+    const entries = Object.entries(studentChoices || {});
+
+    if (entries.length === 0) {
+      container.innerHTML = `
+        <div class="progress-empty"><p>No student progress yet.</p></div>
+      `;
+      return;
+    }
+
+    // Build simple cards showing per-student completion
+    const totalScenarios = (this.currentClassroom?.selectedScenarios || [])
+      .length;
+    const cards = entries
+      .map(([studentId, data]) => {
+        const nickname = this.lookupNickname(studentId);
+        const completed =
+          (data?.overallProgress?.completed != null
+            ? data.overallProgress.completed
+            : Object.keys(data?.scenarios || {}).length) || 0;
+        const total =
+          (data?.overallProgress?.total != null
+            ? data.overallProgress.total
+            : totalScenarios) || 0;
+        const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+        return `
+          <div class="student-progress-card">
+            <div class="spc-header">
+              <div class="avatar">${nickname.charAt(0).toUpperCase()}</div>
+              <div class="meta">
+                <div class="name">${nickname}</div>
+                <div class="progress-text">${completed}/${total} (${percent}%)</div>
+              </div>
+            </div>
+            <div class="spc-bar">
+              <div class="spc-bar-fill" style="width:${percent}%"></div>
+            </div>
+          </div>
+        `;
+      })
+      .join("");
+
+    container.innerHTML = `<div class="spc-grid">${cards}</div>`;
+
+    // Update placeholder in visualization area with a simple aggregate bar
+    if (progressVis) {
+      const totals = entries.reduce(
+        (acc, [, d]) => {
+          const comp =
+            (d?.overallProgress?.completed != null
+              ? d.overallProgress.completed
+              : Object.keys(d?.scenarios || {}).length) || 0;
+          const tot =
+            (d?.overallProgress?.total != null
+              ? d.overallProgress.total
+              : totalScenarios) || 0;
+          acc.completed += comp;
+          acc.total += tot;
+          return acc;
+        },
+        { completed: 0, total: 0 },
+      );
+      const pct =
+        totals.total > 0
+          ? Math.round((totals.completed / totals.total) * 100)
+          : 0;
+      progressVis.innerHTML = `
+        <div class="aggregate-progress">
+          <div class="agg-bar"><div class="agg-fill" style="width:${pct}%"></div></div>
+          <div class="agg-label">Class Average Progress: ${pct}%</div>
+        </div>
+      `;
+    }
+  }
+
+  /**
+   * Render Choices tab grid based on studentChoices
+   * @param {Object} studentChoices
+   */
+  renderChoicesGrid(studentChoices = {}) {
+    const modal = this.liveSessionModal?.element;
+    if (!modal) return;
+    const grid = modal.querySelector("#student-choices-grid");
+    const scenarioFilter = modal.querySelector("#scenario-filter");
+    const choiceFilter = modal.querySelector("#choice-filter");
+    if (!grid) return;
+
+    const selectedScenario = scenarioFilter?.value || "";
+    const selectedStatus = choiceFilter?.value || ""; // completed|pending|""
+
+    const rows = [];
+    Object.entries(studentChoices || {}).forEach(([studentId, data]) => {
+      const nickname = this.lookupNickname(studentId);
+      const scenarios = data?.scenarios || {};
+      // If filtering by scenario, reduce to that one
+      const scenarioEntries = selectedScenario
+        ? Object.entries(scenarios).filter(([sid]) => sid === selectedScenario)
+        : Object.entries(scenarios);
+
+      // Determine pending if needed using selectedScenarios list
+      // Build a set of all scenarioIds to show pending rows when filter demands
+      const allScenarioIds = (
+        this.currentClassroom?.selectedScenarios || []
+      ).map((s) => s.scenarioId);
+
+      const pushRow = (sid, c) => {
+        const status = c?.isComplete ? "completed" : "pending";
+        if (selectedStatus && status !== selectedStatus) return;
+        rows.push({
+          nickname,
+          studentId,
+          scenarioId: sid,
+          choice: c?.choice || "—",
+          status,
+        });
+      };
+
+      if (selectedStatus !== "pending") {
+        scenarioEntries.forEach(([sid, c]) => pushRow(sid, c));
+      }
+
+      if (!selectedStatus || selectedStatus === "pending") {
+        // Add pending rows for scenarios without a record
+        const pendingIds = allScenarioIds.filter((sid) => !(sid in scenarios));
+        const pendingFiltered = selectedScenario
+          ? pendingIds.filter((sid) => sid === selectedScenario)
+          : pendingIds;
+        pendingFiltered.forEach((sid) => pushRow(sid, { isComplete: false }));
+      }
+    });
+
+    if (rows.length === 0) {
+      grid.innerHTML = `
+        <div class="choices-placeholder"><p>No matching records yet.</p></div>
+      `;
+      return;
+    }
+
+    // Render a compact table
+    const header = `
+      <div class="choices-row head">
+        <div class="col student">Student</div>
+        <div class="col scenario">Scenario</div>
+        <div class="col choice">Choice</div>
+        <div class="col status">Status</div>
+      </div>
+    `;
+
+    const scenarioTitleById = new Map(
+      (this.currentClassroom?.selectedScenarios || []).map((s) => [
+        s.scenarioId,
+        s.title,
+      ]),
+    );
+
+    const body = rows
+      .map(
+        (r) => `
+        <div class="choices-row ${r.status}">
+          <div class="col student">${r.nickname}</div>
+          <div class="col scenario">${scenarioTitleById.get(r.scenarioId) || r.scenarioId}</div>
+          <div class="col choice">${r.choice}</div>
+          <div class="col status">${r.status}</div>
+        </div>
+      `,
+      )
+      .join("");
+
+    grid.innerHTML = `<div class="choices-table">${header}${body}</div>`;
+
+    // Attach filter change listeners once
+    const ensureOnce = (el, type, handlerKey, handler) => {
+      const key = `__${handlerKey}`;
+      if (el && !el[key]) {
+        el.addEventListener(type, handler);
+        el[key] = true;
+      }
+    };
+
+    ensureOnce(scenarioFilter, "change", "scenario_filter", () =>
+      this.renderChoicesGrid(studentChoices),
+    );
+    ensureOnce(choiceFilter, "change", "choice_filter", () =>
+      this.renderChoicesGrid(studentChoices),
+    );
+  }
+
+  /**
    * Show success toast message
    */
   showSuccessToast(message) {
@@ -1505,6 +1805,14 @@ export default class TeacherClassroomModals {
   showWarningToast(message) {
     // This would integrate with the existing toast system
     console.log("⚠️ Warning:", message);
+  }
+
+  /**
+   * Show info toast message
+   */
+  showInfoToast(message) {
+    // This would integrate with the existing toast system
+    console.log("ℹ️ Info:", message);
   }
 
   /**

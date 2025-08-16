@@ -40,6 +40,9 @@ export default class StudentClassroomModals {
     // Internal flag to distinguish intentional programmatic closes
     // (e.g., starting session) from user-initiated closes (leaving)
     this._suppressWaitingRoomClose = false;
+
+    // Track latest reflection completion to coordinate final summary
+    this._latestReflectionCompleted = null;
   }
 
   /**
@@ -884,6 +887,25 @@ export default class StudentClassroomModals {
       }
     };
 
+    // Listen for reflection completion events to coordinate final summary timing
+    this._onReflectionCompleted = (event) => {
+      try {
+        const detail = event?.detail || {};
+        const scenarioId = detail.scenarioId;
+        this._latestReflectionCompleted = {
+          scenarioId,
+          ts: Date.now(),
+        };
+        logger.debug(
+          "StudentClassroomModals",
+          `${event.type} received`,
+          this._latestReflectionCompleted,
+        );
+      } catch (_) {
+        // ignore
+      }
+    };
+
     this._onScenarioClosed = async (event) => {
       try {
         const detail = event?.detail || {};
@@ -899,9 +921,12 @@ export default class StudentClassroomModals {
           return;
         }
 
-        // If no next scenario and we have completion, show final summary
+        // If no next scenario and we have completion, wait for reflection to finish, then show final summary
         if (completed && !nextId) {
           try {
+            // Gate on reflection closing or completion event to avoid overlay conflicts
+            await this._waitForReflectionCompletion(scenarioId, 4000);
+
             const refreshed = await this.classroomService.getClassroom(
               this.currentClassroom.classroomCode,
             );
@@ -931,6 +956,40 @@ export default class StudentClassroomModals {
 
     document.addEventListener("scenario-completed", this._onScenarioCompleted);
     document.addEventListener("scenario-modal-closed", this._onScenarioClosed);
+    // Listen to both configured event name and fallback
+    try {
+      import("../utils/scenario-reflection-config-loader.js").then(
+        ({ loadScenarioReflectionConfig }) => {
+          loadScenarioReflectionConfig()
+            .then((cfg) => cfg?.integration?.badgeSystem?.eventName)
+            .then((evtName) => {
+              const name = evtName || "scenarioReflectionCompleted";
+              if (!this._reflectionEvtNames)
+                this._reflectionEvtNames = new Set();
+              const addIfNeeded = (n) => {
+                if (this._reflectionEvtNames.has(n)) return;
+                document.addEventListener(n, this._onReflectionCompleted);
+                this._reflectionEvtNames.add(n);
+              };
+              addIfNeeded(name);
+              if (name !== "scenarioReflectionCompleted") {
+                addIfNeeded("scenarioReflectionCompleted");
+              }
+            })
+            .catch(() => {
+              document.addEventListener(
+                "scenarioReflectionCompleted",
+                this._onReflectionCompleted,
+              );
+            });
+        },
+      );
+    } catch (_) {
+      document.addEventListener(
+        "scenarioReflectionCompleted",
+        this._onReflectionCompleted,
+      );
+    }
     this._scenarioHandlersAttached = true;
   }
 
@@ -948,12 +1007,109 @@ export default class StudentClassroomModals {
         "scenario-modal-closed",
         this._onScenarioClosed,
       );
+      if (this._reflectionEvtNames && this._reflectionEvtNames.size) {
+        this._reflectionEvtNames.forEach((n) =>
+          document.removeEventListener(n, this._onReflectionCompleted),
+        );
+      } else {
+        document.removeEventListener(
+          "scenarioReflectionCompleted",
+          this._onReflectionCompleted,
+        );
+      }
     } catch (_) {
       // ignore
     }
     this._scenarioHandlersAttached = false;
     this._onScenarioCompleted = null;
     this._onScenarioClosed = null;
+    this._onReflectionCompleted = null;
+    this._reflectionEvtNames = null;
+  }
+
+  /**
+   * Wait until the reflection modal fully completes/closes for a given scenario
+   * Resolves early if no reflection is present or a recent completion event exists.
+   * @param {string} scenarioId
+   * @param {number} timeoutMs
+   */
+  async _waitForReflectionCompletion(scenarioId, timeoutMs = 4000) {
+    try {
+      // If no reflection modal is visible, proceed immediately
+      const hasReflectionModal = !!document.querySelector(
+        ".scenario-reflection-modal",
+      );
+
+      // If we already observed completion for this scenario very recently, proceed
+      const recent = this._latestReflectionCompleted;
+      if (
+        !hasReflectionModal ||
+        (recent &&
+          recent.scenarioId === scenarioId &&
+          Date.now() - recent.ts < 5000)
+      ) {
+        return;
+      }
+
+      // Otherwise, wait for either the event or the element to disappear, with timeout
+      await new Promise((resolve) => {
+        let done = false;
+        const onDone = () => {
+          if (done) return;
+          done = true;
+          cleanup();
+          resolve();
+        };
+
+        const observer = new MutationObserver(() => {
+          const stillPresent = document.querySelector(
+            ".scenario-reflection-modal",
+          );
+          if (!stillPresent) onDone();
+        });
+
+        const evtHandler = (e) => {
+          const id = e?.detail?.scenarioId;
+          if (!scenarioId || !id || id === scenarioId) onDone();
+        };
+
+        const cleanup = () => {
+          try {
+            observer.disconnect();
+          } catch (_) {
+            // ignore disconnect errors
+          }
+          try {
+            const names = Array.from(
+              this._reflectionEvtNames ||
+                new Set(["scenarioReflectionCompleted"]),
+            );
+            names.forEach((n) => document.removeEventListener(n, evtHandler));
+          } catch (_) {
+            // ignore
+          }
+          clearTimeout(timer);
+        };
+
+        // Observe DOM removals
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true,
+        });
+
+        // Listen for completion events (configured + fallback)
+        const evtNames = Array.from(
+          this._reflectionEvtNames || new Set(["scenarioReflectionCompleted"]),
+        );
+        evtNames.forEach((n) => document.addEventListener(n, evtHandler));
+
+        // Timeout fallback
+        const timer = setTimeout(onDone, timeoutMs);
+      });
+    } catch (_) {
+      // On any error, don't block the flow
+      return;
+    }
   }
 
   /**

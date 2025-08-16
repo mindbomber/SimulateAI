@@ -1240,6 +1240,17 @@ export default class RealtimeClassroomService {
           JSON.stringify(existingClassrooms),
         );
 
+        // Broadcast a same-profile choice update for immediate teacher UI refresh
+        try {
+          this.broadcastChoiceUpdate(classroomCode, {
+            studentId,
+            scenarioId,
+            choiceData,
+          });
+        } catch (_) {
+          // best-effort only
+        }
+
         logger.info(
           "RealtimeClassroomService",
           "Student choice submitted (fallback)",
@@ -1263,6 +1274,43 @@ export default class RealtimeClassroomService {
 
       // Update overall progress
       await this.updateStudentProgress(classroomCode, studentId, scenarioId);
+
+      // Mirror minimal update to localStorage to speed up same-profile listeners
+      try {
+        const existing = JSON.parse(
+          localStorage.getItem("simulateai_classrooms") || "{}",
+        );
+        const cls = existing[classroomCode] || {};
+        cls.studentChoices = cls.studentChoices || {};
+        const student = cls.studentChoices[studentId] || { scenarios: {} };
+        student.scenarios = {
+          ...(student.scenarios || {}),
+          [scenarioId]: { ...choiceData, timestamp: Date.now() },
+        };
+        cls.studentChoices[studentId] = student;
+        existing[classroomCode] = cls;
+        localStorage.setItem("simulateai_classrooms", JSON.stringify(existing));
+      } catch (_) {
+        // ignore mirror errors
+      }
+
+      // Broadcast for same-profile immediate UI updates
+      try {
+        this.broadcastChoiceUpdate(classroomCode, {
+          studentId,
+          scenarioId,
+          // send a plain object (no serverTimestamp)
+          choiceData: {
+            choice,
+            timestamp: Date.now(),
+            isComplete: true,
+            responseTime: metadata.responseTime || null,
+            confidence: metadata.confidence || null,
+          },
+        });
+      } catch (_) {
+        // best-effort only
+      }
 
       logger.info("RealtimeClassroomService", "Student choice submitted", {
         classroomCode,
@@ -1683,20 +1731,20 @@ export default class RealtimeClassroomService {
    * @returns {Function} Unsubscribe function
    */
   listenToStudentChoices(classroomCode, callback) {
-    const listenerId = `roster_${classroomCode}`;
+    const listenerId = `choices_${classroomCode}`;
 
-    // We'll combine sources: Firebase (if available), localStorage polling, and BroadcastChannel pings.
+    // We'll combine sources: Firebase (if available), localStorage polling, and BroadcastChannel merges.
     let lastJson = "";
 
-    const emit = (roster) => {
+    const emit = (choices) => {
       try {
-        const j = JSON.stringify(roster || {});
+        const j = JSON.stringify(choices || {});
         if (j !== lastJson) {
           lastJson = j;
-          callback(roster || {});
+          callback(choices || {});
         }
       } catch (e) {
-        callback(roster || {});
+        callback(choices || {});
       }
     };
 
@@ -1709,46 +1757,52 @@ export default class RealtimeClassroomService {
           localStorage.getItem("simulateai_classrooms") || "{}",
         );
         const classroom = existingClassrooms[classroomCode] || {};
-        emit(classroom.roster || {});
+        emit(classroom.studentChoices || {});
       } catch (e) {
-        logger.debug("RealtimeClassroomService", "Roster poll failed", e);
+        logger.debug("RealtimeClassroomService", "Choices poll failed", e);
       }
-    }, 1000);
+    }, 1200);
     cleanups.push(() => clearInterval(intervalId));
 
-    // BroadcastChannel nudge: when a student joins via fallback, signal a refresh
+    // BroadcastChannel merge for same-profile immediate updates
     try {
       if (typeof BroadcastChannel !== "undefined") {
         const bc = new BroadcastChannel("simulateai_classrooms");
         const onMsg = (evt) => {
           try {
+            const data = evt?.data;
             if (
-              evt?.data?.type === "roster_updated" &&
-              evt.data.classroomCode === classroomCode
+              data?.type === "student_choice_updated" &&
+              data?.classroomCode === classroomCode
             ) {
-              // Merge payload (if any) into localStorage mirror, then emit
+              // Merge into local mirror and emit
               const existing = JSON.parse(
                 localStorage.getItem("simulateai_classrooms") || "{}",
               );
-              const classroom = existing[classroomCode] || {};
-              const payload = evt.data.payload;
-              if (payload && payload.studentId && payload.studentInfo) {
-                classroom.roster = classroom.roster || {};
-                classroom.roster[payload.studentId] = payload.studentInfo;
-                existing[classroomCode] = classroom;
-                try {
-                  localStorage.setItem(
-                    "simulateai_classrooms",
-                    JSON.stringify(existing),
-                  );
-                } catch (_) {
-                  // ignore
-                }
+              const cls = existing[classroomCode] || {};
+              cls.studentChoices = cls.studentChoices || {};
+              const sid = data.payload?.studentId;
+              const scn = data.payload?.scenarioId;
+              const cdata = data.payload?.choiceData || {};
+              const student = cls.studentChoices[sid] || { scenarios: {} };
+              student.scenarios = {
+                ...(student.scenarios || {}),
+                [scn]: cdata,
+              };
+              cls.studentChoices[sid] = student;
+              existing[classroomCode] = cls;
+              try {
+                localStorage.setItem(
+                  "simulateai_classrooms",
+                  JSON.stringify(existing),
+                );
+              } catch (_) {
+                // ignore
               }
-              emit((existing[classroomCode] || {}).roster || {});
+              emit(cls.studentChoices || {});
             }
           } catch (e) {
-            logger.debug("RealtimeClassroomService", "BC roster msg error", e);
+            logger.debug("RealtimeClassroomService", "BC choices msg error", e);
           }
         };
         bc.addEventListener("message", onMsg);
@@ -1768,18 +1822,72 @@ export default class RealtimeClassroomService {
     // Firebase listener if available
     if (this.database) {
       try {
-        const rosterRef = ref(
+        const choicesRef = ref(
           this.database,
-          `classrooms/${classroomCode}/roster`,
+          `classrooms/${classroomCode}/studentChoices`,
         );
-        const unsubscribe = onValue(rosterRef, (snapshot) => {
-          emit(snapshot.val() || {});
+        const unsubscribe = onValue(choicesRef, (snapshot) => {
+          const data = snapshot.val() || {};
+          // Mirror to localStorage for faster same-profile access
+          try {
+            const existing = JSON.parse(
+              localStorage.getItem("simulateai_classrooms") || "{}",
+            );
+            const cls = existing[classroomCode] || {};
+            cls.studentChoices = data || {};
+            existing[classroomCode] = cls;
+            localStorage.setItem(
+              "simulateai_classrooms",
+              JSON.stringify(existing),
+            );
+          } catch (_) {
+            // ignore
+          }
+          emit(data);
         });
         cleanups.push(() => unsubscribe());
+
+        // Periodic GET as a safety net
+        const fbPollId = setInterval(async () => {
+          try {
+            const snap = await Promise.race([
+              get(choicesRef),
+              new Promise((_, reject) =>
+                setTimeout(
+                  () =>
+                    reject(new Error("Firebase read timeout (choices poll)")),
+                  3500,
+                ),
+              ),
+            ]);
+            const data =
+              typeof snap?.val === "function" ? snap.val() : snap?.val || {};
+            if (data && typeof data === "object") {
+              try {
+                const existing = JSON.parse(
+                  localStorage.getItem("simulateai_classrooms") || "{}",
+                );
+                const cls = existing[classroomCode] || {};
+                cls.studentChoices = data || {};
+                existing[classroomCode] = cls;
+                localStorage.setItem(
+                  "simulateai_classrooms",
+                  JSON.stringify(existing),
+                );
+              } catch (_) {
+                // ignore
+              }
+              emit(data);
+            }
+          } catch (_) {
+            // ignore
+          }
+        }, 4000);
+        cleanups.push(() => clearInterval(fbPollId));
       } catch (e) {
         logger.debug(
           "RealtimeClassroomService",
-          "Firebase roster listen failed",
+          "Firebase choices listen failed",
           e,
         );
       }
@@ -1791,6 +1899,33 @@ export default class RealtimeClassroomService {
       if (unsub) unsub();
       this.listeners.delete(listenerId);
     };
+  }
+
+  /**
+   * Broadcast a student choice update to same-profile tabs
+   * @private
+   * @param {string} classroomCode
+   * @param {{studentId:string,scenarioId:string,choiceData:Object}} payload
+   */
+  broadcastChoiceUpdate(classroomCode, payload) {
+    try {
+      if (typeof BroadcastChannel === "undefined") return;
+      const bc = new BroadcastChannel("simulateai_classrooms");
+      bc.postMessage({
+        type: "student_choice_updated",
+        classroomCode,
+        payload,
+      });
+      setTimeout(() => {
+        try {
+          bc.close();
+        } catch (_) {
+          // ignore
+        }
+      }, 100);
+    } catch (_) {
+      // best-effort only
+    }
   }
 
   /**
