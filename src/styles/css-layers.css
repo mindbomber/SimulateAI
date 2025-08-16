@@ -1170,8 +1170,24 @@
     outline-offset: 2px !important;
   }
 
-  /* Force important overrides for critical accessibility */
-  [aria-hidden="true"] {
+  /* Force important overrides for critical accessibility
+   * Scoped to modals/overlays/dialogs only to avoid hiding core UI (e.g., main nav)
+   */
+  .modal[aria-hidden="true"],
+  .modal-overlay[aria-hidden="true"],
+  .modal-backdrop[aria-hidden="true"],
+  .modal-dialog[aria-hidden="true"],
+  .scenario-modal[aria-hidden="true"],
+  .pre-launch-modal[aria-hidden="true"],
+  .ui-modal[aria-hidden="true"],
+  .ui-modal-content[aria-hidden="true"],
+  .overlay[aria-hidden="true"],
+  .overlay-element[aria-hidden="true"],
+  .backdrop[aria-hidden="true"],
+  .nav-backdrop[aria-hidden="true"],
+  .drawer[aria-hidden="true"],
+  [role="dialog"][aria-hidden="true"],
+  [data-modal][aria-hidden="true"] {
     display: none !important;
   }
 

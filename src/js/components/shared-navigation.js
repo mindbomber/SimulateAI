@@ -617,7 +617,7 @@ class SharedNavigation {
     // Map filenames to page identifiers
     const pageMap = {
       "index.html": "home",
-      "app.html": "scenarios",
+      "app.html": "simulation-hub",
       "about.html": "about",
       "blog.html": "blog",
       "forum.html": "forum",
@@ -987,6 +987,34 @@ class SharedNavigation {
         }
       });
     });
+
+    // Keyboard support for primary dropdown triggers
+    const aboutTrigger = document.getElementById("about-nav");
+    const settingsTrigger = document.getElementById("settings-nav");
+
+    const attachKeyHandler = (triggerEl) => {
+      if (!triggerEl) return;
+      const menu = triggerEl.nextElementSibling;
+      if (!menu || !menu.classList.contains("dropdown-menu")) return;
+      const keyHandler = (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          const isOpen = menu.classList.contains("open");
+          if (isOpen) {
+            this.closeDropdown(triggerEl, menu);
+          } else {
+            this.toggleDropdown(triggerEl, menu);
+          }
+        }
+      };
+      triggerEl.addEventListener("keydown", keyHandler);
+      // Track for cleanup
+      const existing = this.eventListeners.get(triggerEl) || {};
+      this.eventListeners.set(triggerEl, { ...existing, keydown: keyHandler });
+    };
+
+    attachKeyHandler(aboutTrigger);
+    attachKeyHandler(settingsTrigger);
   }
 
   /**
@@ -1611,7 +1639,11 @@ class SharedNavigation {
     mainNav.classList.remove("open");
     mainNav.classList.remove("mobile-force-visible"); // Remove CSS class instead of inline styles
     navToggle.setAttribute("aria-expanded", "false");
-    mainNav.setAttribute("aria-hidden", "true");
+    // Important: Do NOT set aria-hidden="true" on the main navigation.
+    // A global CSS rule ([aria-hidden="true"]) hides elements completely,
+    // which removed the nav on desktop after clicking links.
+    // Ensure the nav remains perceivable to assistive tech and visible.
+    mainNav.setAttribute("aria-hidden", "false");
 
     if (navBackdrop) {
       navBackdrop.classList.remove("open");

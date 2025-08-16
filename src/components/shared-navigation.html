@@ -6,11 +6,15 @@
         src="src/assets/icons/logo.svg"
         alt="SimulateAI Educational Platform"
         class="logo-image logo-full"
+        width="140"
+        height="32"
       />
       <img
         src="src/assets/icons/logo-compact.svg"
         alt="SimulateAI"
         class="logo-image logo-compact"
+        width="32"
+        height="32"
       />
     </a>
 
@@ -82,36 +86,59 @@
               class="nav-link"
               aria-expanded="false"
               aria-haspopup="true"
+              role="button"
+              id="about-nav"
+              aria-controls="about-menu"
             >
               About
               <span class="dropdown-arrow" aria-hidden="true">▼</span>
             </a>
-            <div class="dropdown-menu">
-              <a href="about.html" class="dropdown-item" data-page="about"
+            <div
+              class="dropdown-menu"
+              id="about-menu"
+              role="menu"
+              aria-labelledby="about-nav"
+            >
+              <a
+                href="about.html"
+                class="dropdown-item"
+                data-page="about"
+                role="menuitem"
                 >ℹ️ About SimulateAI</a
               >
-              <a href="help-faq.html" class="dropdown-item" data-page="help-faq"
+              <a
+                href="help-faq.html"
+                class="dropdown-item"
+                data-page="help-faq"
+                role="menuitem"
                 >🆘 Help & FAQ</a
               >
               <a
                 href="privacy-notice.html"
                 class="dropdown-item"
                 data-page="privacy"
+                role="menuitem"
                 >🔒 Privacy Notice</a
               >
               <a
                 href="research-consent.html"
                 class="dropdown-item"
                 data-page="consent"
+                role="menuitem"
                 >📋 Research Consent</a
               >
               <a
                 href="terms-of-use.html"
                 class="dropdown-item"
                 data-page="terms"
+                role="menuitem"
                 >📄 Terms of Use</a
               >
-              <a href="donate.html" class="dropdown-item" data-page="donate"
+              <a
+                href="donate.html"
+                class="dropdown-item"
+                data-page="donate"
+                role="menuitem"
                 >💖 Donate</a
               >
             </div>
@@ -129,11 +156,18 @@
               aria-expanded="false"
               aria-haspopup="true"
               id="settings-nav"
+              role="button"
+              aria-controls="settings-menu"
             >
               Settings
               <span class="dropdown-arrow" aria-hidden="true">▼</span>
             </a>
-            <div class="dropdown-menu settings-menu">
+            <div
+              class="dropdown-menu settings-menu"
+              id="settings-menu"
+              role="menu"
+              aria-labelledby="settings-nav"
+            >
               <div class="settings-section">
                 <h4 class="settings-title">Floating Tabs</h4>
                 <div class="settings-item">
@@ -302,7 +336,7 @@
               id="profile-nav"
               title="Go to Profile"
             >
-              � Profile
+              Profile
             </button>
           </div>
         </div>

@@ -123,7 +123,7 @@
     background: var(--color-white, #ffffff);
     border-radius: var(--radius-lg, 12px);
     padding: var(--spacing-xl, 3rem);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 10%);
     border: 1px solid var(--color-gray-200, #e5e7eb);
     height: fit-content;
     width: 100%;
@@ -171,44 +171,55 @@
     }
   }
 
-  .demo-controls-grid.horizontal .demo-btn {
+  .ethics-demo-section .demo-controls-grid.horizontal .demo-btn {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     text-align: left;
     padding: var(--spacing-lg, 2rem);
     border-radius: var(--radius-md, 8px);
-    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-    color: white;
+    background: linear-gradient(
+      135deg,
+      var(--color-indigo-600, #4f46e5) 0%,
+      var(--color-indigo-500, #6366f1) 100%
+    );
+    color: var(--color-white, #ffffff);
     border: none;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+    box-shadow: 0 2px 4px
+      color-mix(in oklab, var(--color-indigo-700, #4338ca) 30%, transparent);
     position: relative;
     overflow: hidden;
   }
 
-  .demo-controls-grid.horizontal .demo-btn:hover {
+  .ethics-demo-section .demo-controls-grid.horizontal .demo-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    box-shadow: 0 4px 12px
+      color-mix(in oklab, var(--color-indigo-700, #4338ca) 40%, transparent);
   }
 
-  .demo-controls-grid.horizontal .demo-btn:active {
+  .ethics-demo-section .demo-controls-grid.horizontal .demo-btn:active {
     transform: translateY(0);
   }
 
-  .demo-controls-grid.horizontal .demo-btn.active {
-    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+  .ethics-demo-section .demo-controls-grid.horizontal .demo-btn.active {
+    background: linear-gradient(
+      135deg,
+      var(--color-emerald-600, #059669) 0%,
+      var(--color-emerald-500, #10b981) 100%
+    );
+    box-shadow: 0 4px 12px
+      color-mix(in oklab, var(--color-emerald-700, #047857) 40%, transparent);
   }
 
-  .demo-btn .btn-label {
+  .ethics-demo-section .demo-btn .btn-label {
     font-size: 1.125rem;
     font-weight: 600;
     margin-bottom: var(--spacing-xs, 0.5rem);
   }
 
-  .demo-btn .btn-description {
+  .ethics-demo-section .demo-btn .btn-description {
     font-size: 0.875rem;
     opacity: 0.9;
     line-height: 1.4;
@@ -216,31 +227,31 @@
 
   /* Responsive demo button adjustments */
   @media (max-width: 768px) {
-    .demo-controls-grid.horizontal .demo-btn {
+    .ethics-demo-section .demo-controls-grid.horizontal .demo-btn {
       padding: var(--spacing-md, 1.5rem);
       text-align: center;
       align-items: center;
     }
 
-    .demo-btn .btn-label {
+    .ethics-demo-section .demo-btn .btn-label {
       font-size: 1rem;
     }
 
-    .demo-btn .btn-description {
+    .ethics-demo-section .demo-btn .btn-description {
       font-size: 0.8125rem;
     }
   }
 
   @media (max-width: 480px) {
-    .demo-controls-grid.horizontal .demo-btn {
+    .ethics-demo-section .demo-controls-grid.horizontal .demo-btn {
       padding: var(--spacing-sm, 0.75rem) var(--spacing-md, 1.5rem);
     }
 
-    .demo-btn .btn-label {
+    .ethics-demo-section .demo-btn .btn-label {
       font-size: 0.9375rem;
     }
 
-    .demo-btn .btn-description {
+    .ethics-demo-section .demo-btn .btn-description {
       font-size: 0.75rem;
     }
   }
@@ -253,7 +264,7 @@
     background: var(--color-white, #ffffff);
     border-radius: var(--radius-lg, 12px);
     padding: var(--spacing-xl, 3rem);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 10%);
     border: 1px solid var(--color-gray-200, #e5e7eb);
     display: flex;
     align-items: center;
@@ -374,8 +385,8 @@
     border: 1px solid var(--color-gray-200, #e5e7eb);
     border-radius: 0 0 var(--radius-md, 8px) var(--radius-md, 8px);
     box-shadow:
-      0 10px 25px rgba(0, 0, 0, 0.15),
-      0 4px 10px rgba(0, 0, 0, 0.1);
+      0 10px 25px rgb(0 0 0 / 15%),
+      0 4px 10px rgb(0 0 0 / 10%);
 
     /* Visibility and animation */
     max-height: 0;
@@ -437,7 +448,7 @@
   }
 
   /* Orientation Suggestion */
-  .orientation-suggestion {
+  .ethics-demo-section .orientation-suggestion {
     background: var(--color-amber-50, #fffbeb);
     border: 1px solid var(--color-amber-200, #fde68a);
     border-radius: var(--radius-md, 8px);
@@ -448,11 +459,11 @@
     gap: var(--spacing-sm, 0.75rem);
   }
 
-  .rotate-icon {
+  .ethics-demo-section .rotate-icon {
     font-size: 1.25rem;
   }
 
-  .message-text {
+  .ethics-demo-section .message-text {
     font-size: 0.875rem;
     color: var(--color-amber-800, #92400e);
   }
@@ -556,8 +567,8 @@
 
     /* Professional styling */
     box-shadow:
-      0 10px 25px rgba(0, 0, 0, 0.15),
-      0 4px 12px rgba(0, 0, 0, 0.1);
+      0 10px 25px rgb(0 0 0 / 15%),
+      0 4px 12px rgb(0 0 0 / 10%);
     border: 1px solid var(--color-gray-200, #e5e7eb);
 
     /* Text containment and wrapping */
@@ -687,7 +698,7 @@
   body.theme-dark .demo-controls-panel {
     background: var(--theme-bg-secondary, #2a2a2a);
     border-color: var(--theme-border, #333);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 30%);
   }
 
   body.dark-mode .controls-title,
@@ -705,7 +716,7 @@
   body.theme-dark .radar-chart-panel {
     background: var(--theme-bg-secondary, #2a2a2a);
     border-color: var(--theme-border, #333);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 30%);
   }
 
   /* Demo Buttons Dark Mode */
@@ -713,18 +724,18 @@
   body.theme-dark .demo-controls-grid.horizontal .demo-btn {
     background: linear-gradient(135deg, #3730a3 0%, #4338ca 100%);
     color: var(--theme-text-primary, #f1f5f9);
-    box-shadow: 0 2px 4px rgba(55, 48, 163, 0.3);
+    box-shadow: 0 2px 4px rgb(55 48 163 / 30%);
   }
 
   body.dark-mode .demo-controls-grid.horizontal .demo-btn:hover,
   body.theme-dark .demo-controls-grid.horizontal .demo-btn:hover {
-    box-shadow: 0 4px 12px rgba(55, 48, 163, 0.4);
+    box-shadow: 0 4px 12px rgb(55 48 163 / 40%);
   }
 
   body.dark-mode .demo-controls-grid.horizontal .demo-btn.active,
   body.theme-dark .demo-controls-grid.horizontal .demo-btn.active {
     background: linear-gradient(135deg, #047857 0%, #059669 100%);
-    box-shadow: 0 4px 12px rgba(4, 120, 87, 0.4);
+    box-shadow: 0 4px 12px rgb(4 120 87 / 40%);
   }
 
   /* Help Sections Dark Mode */
@@ -757,8 +768,8 @@
     background: var(--theme-bg-secondary, #2a2a2a);
     border-color: var(--theme-border, #333);
     box-shadow:
-      0 10px 25px rgba(0, 0, 0, 0.4),
-      0 4px 10px rgba(0, 0, 0, 0.3);
+      0 10px 25px rgb(0 0 0 / 40%),
+      0 4px 10px rgb(0 0 0 / 30%);
   }
 
   body.dark-mode .accordion-content-inner,
@@ -779,8 +790,8 @@
 
   body.dark-mode .glossary-note,
   body.theme-dark .glossary-note {
-    background: rgba(59, 130, 246, 0.1);
-    border-color: rgba(59, 130, 246, 0.3);
+    background: rgb(59 130 246 / 10%);
+    border-color: rgb(59 130 246 / 30%);
   }
 
   body.dark-mode .glossary-note p,
@@ -791,8 +802,8 @@
   /* Orientation Suggestion Dark Mode */
   body.dark-mode .orientation-suggestion,
   body.theme-dark .orientation-suggestion {
-    background: rgba(245, 158, 11, 0.1);
-    border-color: rgba(245, 158, 11, 0.3);
+    background: rgb(245 158 11 / 10%);
+    border-color: rgb(245 158 11 / 30%);
   }
 
   body.dark-mode .message-text,
@@ -807,8 +818,8 @@
     color: var(--theme-text-primary, #f1f5f9);
     border-color: var(--theme-border, #333);
     box-shadow:
-      0 10px 25px rgba(0, 0, 0, 0.4),
-      0 4px 12px rgba(0, 0, 0, 0.3);
+      0 10px 25px rgb(0 0 0 / 40%),
+      0 4px 12px rgb(0 0 0 / 30%);
   }
 
   body.dark-mode .demo-feedback-popover h5,

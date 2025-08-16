@@ -83,54 +83,68 @@ class NavigationMigration {
    * Add shared navigation CSS link
    */
   addNavigationCSS(content) {
-    // Check if already included
-    if (content.includes("shared-navigation.css")) {
-      return content;
+    // If nav CSS already present, keep as is
+    if (content.includes("shared-navigation.css")) return content;
+
+    // Ensure css-layers.css is loaded first per SimulateAI guidelines
+    const hasLayers = content.includes("css-layers.css");
+    const layersLink = `\n    <link rel="stylesheet" href="src/styles/css-layers.css">`;
+    const navLink = `\n    <link rel="stylesheet" href="src/styles/shared-navigation.css">`;
+
+    // Insert after css-layers.css if present; otherwise add both (layers first)
+    if (hasLayers) {
+      const layersRegex =
+        /<link[^>]*href=["'](?:\.\/)?src\/styles\/css-layers\.css["'][^>]*>/i;
+      const match = content.match(layersRegex);
+      if (match) {
+        const insertionPoint = match.index + match[0].length;
+        return (
+          content.slice(0, insertionPoint) +
+          navLink +
+          content.slice(insertionPoint)
+        );
+      }
     }
 
-    // Find last stylesheet link or add after title
+    // Otherwise, append both after the last stylesheet or title
     const stylesheetRegex = /<link[^>]*rel="stylesheet"[^>]*>/gi;
     const matches = [...content.matchAll(stylesheetRegex)];
-
     if (matches.length > 0) {
       const lastMatch = matches[matches.length - 1];
       const insertionPoint = lastMatch.index + lastMatch[0].length;
-      const navCSS = `\n    <link rel="stylesheet" href="src/styles/shared-navigation.css">`;
+      const links = hasLayers ? navLink : layersLink + navLink;
       return (
-        content.slice(0, insertionPoint) +
-        navCSS +
-        content.slice(insertionPoint)
+        content.slice(0, insertionPoint) + links + content.slice(insertionPoint)
       );
     }
 
-    // Fallback: add after title
     const titleMatch = content.match(/<title[^>]*>.*?<\/title>/i);
     if (titleMatch) {
       const insertionPoint = titleMatch.index + titleMatch[0].length;
-      const navCSS = `\n    <link rel="stylesheet" href="src/styles/shared-navigation.css">`;
+      const links = hasLayers ? navLink : layersLink + navLink;
       return (
-        content.slice(0, insertionPoint) +
-        navCSS +
-        content.slice(insertionPoint)
+        content.slice(0, insertionPoint) + links + content.slice(insertionPoint)
       );
     }
 
-    return content;
+    return content + (hasLayers ? navLink : layersLink + navLink);
   }
 
   /**
    * Remove existing navigation/header
    */
   removeExistingNavigation(content) {
-    // Remove existing header with navigation
-    const headerRegex = /<header\s+class="header"[^>]*>.*?<\/header>/gis;
+    // Remove existing header with navigation (more tolerant to class order/extra classes)
+    const headerRegex =
+      /<header[^>]*class=["'][^"']*\bheader\b[^"']*["'][^>]*>[\s\S]*?<\/header>/gi;
     let result = content.replace(
       headerRegex,
       "<!-- Navigation will be injected here by SharedNavigation -->",
     );
 
-    // Also remove any standalone nav elements
-    const navRegex = /<nav[^>]*class="[^"]*main-nav[^"]*"[^>]*>.*?<\/nav>/gis;
+    // Also remove any standalone nav elements that look like main navigation
+    const navRegex =
+      /<nav[^>]*class=["'][^"']*\bmain-nav\b[^"']*["'][^>]*>[\s\S]*?<\/nav>/gi;
     result = result.replace(navRegex, "");
 
     return result;

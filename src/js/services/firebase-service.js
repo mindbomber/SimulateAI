@@ -73,6 +73,11 @@ import {
   connectStorageEmulator,
 } from "firebase/storage";
 import { getDatabase, connectDatabaseEmulator } from "firebase/database";
+import {
+  getFunctions as getCloudFunctions,
+  httpsCallable,
+  connectFunctionsEmulator,
+} from "firebase/functions";
 import { getAnalytics, logEvent } from "firebase/analytics";
 import { getPerformance } from "firebase/performance";
 
@@ -156,6 +161,7 @@ export class FirebaseService {
     this.storage = null;
     this.analytics = null;
     this.messaging = null;
+    this.functions = null;
     this.hybridData = null;
     this.storageService = null;
     this.analyticsService = null;
@@ -484,6 +490,20 @@ export class FirebaseService {
         this.realtimeDb = getDatabase(this.app);
         this.analytics = getAnalytics(this.app);
         this.performance = getPerformance(this.app);
+        // Initialize Cloud Functions (client)
+        try {
+          // Use explicit regional Functions endpoint (must match deployed region)
+          this.functions = getCloudFunctions(this.app, "us-central1");
+          // Back-compat shim: allow usage like functions.httpsCallable("name")
+          // without breaking emulator connection which expects the Functions instance.
+          if (this.functions && !this.functions.httpsCallable) {
+            this.functions.httpsCallable = (name, options) =>
+              httpsCallable(this.functions, name, options);
+          }
+        } catch (fnInitErr) {
+          console.warn("⚠️ Failed to initialize Functions client:", fnInitErr);
+          this.functions = null;
+        }
 
         // 🔥 Connect to Firebase Emulators if enabled in dev config
         if (
@@ -548,6 +568,22 @@ export class FirebaseService {
               console.log(
                 `✅ Connected to Realtime Database Emulator on port ${devConfig.emulatorPorts.database}`,
               );
+            }
+
+            // Connect to Functions Emulator
+            try {
+              if (this.functions) {
+                connectFunctionsEmulator(
+                  this.functions,
+                  "localhost",
+                  devConfig.emulatorPorts.functions,
+                );
+                console.log(
+                  `✅ Connected to Functions Emulator on port ${devConfig.emulatorPorts.functions}`,
+                );
+              }
+            } catch (fnEmErr) {
+              console.warn("⚠️ Functions Emulator connection failed:", fnEmErr);
             }
           } catch (emulatorError) {
             console.warn(
@@ -641,6 +677,27 @@ export class FirebaseService {
       console.error("❌ Firebase initialization failed:", error);
       return false;
     }
+  }
+
+  /**
+   * Get Functions client; optionally return a callable wrapper
+   * @returns {import('firebase/functions').Functions | null}
+   */
+  getFunctions() {
+    return this.functions;
+  }
+
+  /**
+   * Call a Cloud Function by name via httpsCallable
+   * @param {string} functionName
+   * @param {any} data
+   * @returns {Promise<any>}
+   */
+  async callFunction(functionName, data) {
+    if (!this.functions) throw new Error("Functions client not initialized");
+    const callable = httpsCallable(this.functions, functionName);
+    const res = await callable(data);
+    return res?.data;
   }
 
   /**

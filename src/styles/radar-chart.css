@@ -26,10 +26,10 @@
     --radar-point-color-5: #4caf50; /* Excellent - green */
 
     /* Grid Colors (dynamically set from config.gridColors) */
-    --radar-grid-color-0: rgba(0, 0, 0, 0.1);
-    --radar-grid-color-1: rgba(0, 0, 0, 0.15);
-    --radar-grid-color-2: rgba(0, 0, 0, 0.2);
-    --radar-grid-color-default: rgba(0, 0, 0, 0.1);
+    --radar-grid-color-0: rgb(0 0 0 / 10%);
+    --radar-grid-color-1: rgb(0 0 0 / 15%);
+    --radar-grid-color-2: rgb(0 0 0 / 20%);
+    --radar-grid-color-default: rgb(0 0 0 / 10%);
 
     /* Scoring Thresholds (dynamically set from config.scoring) */
     --radar-max-score: 5;
@@ -145,7 +145,7 @@
     margin: var(--spacing-lg, 2rem) 0;
   }
 
-  .demo-controls-grid {
+  .hero-demo-controls .demo-controls-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: var(--spacing-sm, 1rem);
@@ -225,12 +225,12 @@
   }
 
   /* Demo Feedback Popover - Enhanced from hero-consolidated.css */
-  .demo-feedback-popover {
+  .hero-demo-controls .demo-feedback-popover {
     position: absolute;
     bottom: calc(100% + 15px);
     left: 0;
     right: 0;
-    background: var(--popover-background, rgba(0, 0, 0, 0.9));
+    background: var(--popover-background, rgb(0 0 0 / 90%));
     color: var(--popover-color, #ffffff);
     padding: var(--spacing-sm, 1rem);
     border-radius: var(--border-radius-md, 8px);
@@ -246,26 +246,26 @@
     font-size: var(--font-size-sm, 0.875rem);
   }
 
-  .demo-feedback-popover.visible {
+  .hero-demo-controls .demo-feedback-popover.visible {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
   }
 
-  .demo-feedback-popover .popover-content h5 {
+  .hero-demo-controls .demo-feedback-popover .popover-content h5 {
     margin: 0 0 0.5rem 0;
     font-size: var(--font-size-base, 1rem);
     font-weight: 600;
   }
 
-  .demo-feedback-popover .popover-content p {
+  .hero-demo-controls .demo-feedback-popover .popover-content p {
     margin: 0;
     line-height: 1.5;
   }
 
   /* Responsive demo controls - Salvaged from hero-consolidated.css */
   @media (max-width: 480px) {
-    .demo-controls-grid {
+    .hero-demo-controls .demo-controls-grid {
       grid-template-columns: repeat(2, 1fr);
       gap: 0.75rem;
     }
@@ -277,14 +277,14 @@
   }
 
   @media (min-width: 481px) and (max-width: 767px) {
-    .demo-controls-grid {
+    .hero-demo-controls .demo-controls-grid {
       grid-template-columns: repeat(4, 1fr);
       gap: 0.75rem;
     }
   }
 
   @media (min-width: 768px) {
-    .demo-controls-grid {
+    .hero-demo-controls .demo-controls-grid {
       grid-template-columns: repeat(4, 1fr);
       gap: var(--spacing-sm, 1rem);
     }
@@ -399,13 +399,13 @@
   .scenario-radar-chart.animating {
     transition: all 0.3s ease;
     transform: scale(1.02);
-    box-shadow: 0 0 20px rgba(0, 123, 255, 0.5);
+    box-shadow: 0 0 20px rgb(0 123 255 / 50%);
   }
 
   /* Dark mode blue glow for scenario radar chart */
   body.dark-mode .scenario-radar-chart.animating,
   body.theme-dark .scenario-radar-chart.animating {
-    box-shadow: 0 0 20px rgba(100, 180, 255, 0.4);
+    box-shadow: 0 0 20px rgb(100 180 255 / 40%);
   }
 
   /* High specificity animation overrides for scenario modal context */
@@ -414,8 +414,8 @@
   .scenario-modal .scenario-radar-chart.animating {
     transition: all 0.3s ease !important;
     transform: scale(1.02) !important;
-    box-shadow: 0 0 20px rgba(0, 123, 255, 0.5) !important;
-    background: rgba(0, 123, 255, 0.05) !important;
+    box-shadow: 0 0 20px rgb(0 123 255 / 50%) !important;
+    background: rgb(0 123 255 / 5%) !important;
   }
 
   /* High specificity dark mode animation overrides for scenario modal */
@@ -425,8 +425,8 @@
   body.theme-dark .scenario-modal .radar-chart-container.animating,
   body.theme-dark .scenario-modal #scenario-radar-chart.animating,
   body.theme-dark .scenario-modal .scenario-radar-chart.animating {
-    box-shadow: 0 0 20px rgba(100, 180, 255, 0.4) !important;
-    background: rgba(100, 180, 255, 0.05) !important;
+    box-shadow: 0 0 20px rgb(100 180 255 / 40%) !important;
+    background: rgb(100 180 255 / 5%) !important;
   }
 
   .scenario-radar-chart canvas {
@@ -518,7 +518,7 @@
   .chartjs-tooltip {
     backdrop-filter: blur(8px) !important;
     -webkit-backdrop-filter: blur(8px) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 15%) !important;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important;
   }
 
@@ -1153,7 +1153,7 @@
 
   /* Demo popover dark mode */
   body.dark-mode .demo-feedback-popover {
-    background: var(--popover-background-dark, rgba(17, 24, 39, 0.95));
+    background: var(--popover-background-dark, rgb(17 24 39 / 95%));
     color: var(--popover-color-dark, #f9fafb);
     border: 1px solid rgb(75 85 99 / 50%);
     backdrop-filter: blur(12px);

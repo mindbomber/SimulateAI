@@ -61,7 +61,7 @@
     --theme-bg-secondary: var(--color-surface-secondary);
     --theme-bg-tertiary: var(--color-surface-tertiary);
     --theme-bg-interactive: var(--color-gray-50);
-    --theme-bg-overlay: rgba(0, 0, 0, 0.8);
+    --theme-bg-overlay: rgb(0 0 0 / 80%);
 
     /* Text Colors */
     --theme-text-primary: var(--color-on-surface);
@@ -88,10 +88,10 @@
     --theme-accent-info: var(--color-info);
 
     /* Shadow Colors */
-    --theme-shadow-light: rgba(0, 0, 0, 0.05);
-    --theme-shadow-medium: rgba(0, 0, 0, 0.1);
-    --theme-shadow-heavy: rgba(0, 0, 0, 0.15);
-    --theme-shadow-focus: rgba(26, 115, 232, 0.3);
+    --theme-shadow-light: rgb(0 0 0 / 5%);
+    --theme-shadow-medium: rgb(0 0 0 / 10%);
+    --theme-shadow-heavy: rgb(0 0 0 / 15%);
+    --theme-shadow-focus: rgb(26 115 232 / 30%);
 
     /* Interactive States */
     --theme-hover-opacity: 0.8;
@@ -276,14 +276,14 @@
       --theme-bg-secondary: #161b22;
       --theme-bg-tertiary: #21262d;
       --theme-bg-interactive: #262c36;
-      --theme-bg-overlay: rgba(0, 0, 0, 0.9);
+      --theme-bg-overlay: rgb(0 0 0 / 90%);
 
       --theme-text-primary: #f0f6fc;
       --theme-text-secondary: #e6edf3;
       --theme-text-tertiary: #7d8590;
       --theme-text-muted: #656d76;
       --theme-text-inverse: #0d1117;
-      --theme-text-on-accent: #ffffff;
+      --theme-text-on-accent: #fff;
 
       --theme-border-primary: #30363d;
       --theme-border-secondary: #21262d;
@@ -299,10 +299,10 @@
       --theme-accent-error: #f85149;
       --theme-accent-info: #79c0ff;
 
-      --theme-shadow-light: rgba(0, 0, 0, 0.3);
-      --theme-shadow-medium: rgba(0, 0, 0, 0.4);
-      --theme-shadow-heavy: rgba(0, 0, 0, 0.5);
-      --theme-shadow-focus: rgba(88, 166, 255, 0.4);
+      --theme-shadow-light: rgb(0 0 0 / 30%);
+      --theme-shadow-medium: rgb(0 0 0 / 40%);
+      --theme-shadow-heavy: rgb(0 0 0 / 50%);
+      --theme-shadow-focus: rgb(88 166 255 / 40%);
 
       /* Adjust shadows for dark mode */
       --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 30%);
@@ -327,18 +327,18 @@
     --color-on-surface-tertiary: var(--color-gray-600);
 
     /* Light theme semantic tokens */
-    --theme-bg-primary: #ffffff;
+    --theme-bg-primary: #fff;
     --theme-bg-secondary: #f8f9fa;
     --theme-bg-tertiary: #f3f4f6;
     --theme-bg-interactive: #e5e7eb;
-    --theme-bg-overlay: rgba(0, 0, 0, 0.5);
+    --theme-bg-overlay: rgb(0 0 0 / 50%);
 
     --theme-text-primary: #111827;
     --theme-text-secondary: #374151;
     --theme-text-tertiary: #6b7280;
     --theme-text-muted: #9ca3af;
-    --theme-text-inverse: #ffffff;
-    --theme-text-on-accent: #ffffff;
+    --theme-text-inverse: #fff;
+    --theme-text-on-accent: #fff;
 
     --theme-border-primary: #e5e7eb;
     --theme-border-secondary: #d1d5db;
@@ -354,10 +354,10 @@
     --theme-accent-error: #ef4444;
     --theme-accent-info: #3b82f6;
 
-    --theme-shadow-light: rgba(0, 0, 0, 0.1);
-    --theme-shadow-medium: rgba(0, 0, 0, 0.15);
-    --theme-shadow-heavy: rgba(0, 0, 0, 0.2);
-    --theme-shadow-focus: rgba(59, 130, 246, 0.4);
+    --theme-shadow-light: rgb(0 0 0 / 10%);
+    --theme-shadow-medium: rgb(0 0 0 / 15%);
+    --theme-shadow-heavy: rgb(0 0 0 / 20%);
+    --theme-shadow-focus: rgb(59 130 246 / 40%);
 
     /* Standard light mode shadows */
     --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 5%);
@@ -390,7 +390,7 @@
     --theme-bg-secondary: #161b22;
     --theme-bg-tertiary: #21262d;
     --theme-bg-interactive: #262c36;
-    --theme-bg-overlay: rgba(0, 0, 0, 0.9);
+    --theme-bg-overlay: rgb(0 0 0 / 90%);
 
     /* Text Colors */
     --theme-text-primary: #f0f6fc;
@@ -398,7 +398,7 @@
     --theme-text-tertiary: #7d8590;
     --theme-text-muted: #656d76;
     --theme-text-inverse: #0d1117;
-    --theme-text-on-accent: #ffffff;
+    --theme-text-on-accent: #fff;
 
     /* Border Colors */
     --theme-border-primary: #30363d;
@@ -417,10 +417,10 @@
     --theme-accent-info: #79c0ff;
 
     /* Shadow Colors */
-    --theme-shadow-light: rgba(0, 0, 0, 0.3);
-    --theme-shadow-medium: rgba(0, 0, 0, 0.4);
-    --theme-shadow-heavy: rgba(0, 0, 0, 0.5);
-    --theme-shadow-focus: rgba(88, 166, 255, 0.4);
+    --theme-shadow-light: rgb(0 0 0 / 30%);
+    --theme-shadow-medium: rgb(0 0 0 / 40%);
+    --theme-shadow-heavy: rgb(0 0 0 / 50%);
+    --theme-shadow-focus: rgb(88 166 255 / 40%);
 
     /* Adjust shadows for dark mode */
     --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 30%);
@@ -463,11 +463,11 @@
 
     /* ===== HIGH CONTRAST THEME OVERRIDES ===== */
     /* Background Colors */
-    --theme-bg-primary: #000000;
-    --theme-bg-secondary: #111111;
-    --theme-bg-tertiary: #222222;
+    --theme-bg-primary: #000;
+    --theme-bg-secondary: #111;
+    --theme-bg-tertiary: #222;
     --theme-bg-interactive: #333333;
-    --theme-bg-overlay: rgba(0, 0, 0, 0.95);
+    --theme-bg-overlay: rgb(0 0 0 / 95%);
 
     /* Text Colors */
     --theme-text-primary: #ffffff;
@@ -478,26 +478,26 @@
     --theme-text-on-accent: #000000;
 
     /* Border Colors */
-    --theme-border-primary: #ffffff;
+    --theme-border-primary: #fff;
     --theme-border-secondary: #cccccc;
-    --theme-border-interactive: #ffffff;
-    --theme-border-focus: #ffff00;
+    --theme-border-interactive: #fff;
+    --theme-border-focus: #ff0;
     --theme-border-error: #ff0000;
     --theme-border-success: #00ff00;
 
     /* Accent Colors */
-    --theme-accent-primary: #ffff00;
-    --theme-accent-secondary: #ffffff;
+    --theme-accent-primary: #ff0;
+    --theme-accent-secondary: #fff;
     --theme-accent-success: #00ff00;
     --theme-accent-warning: #ffaa00;
     --theme-accent-error: #ff0000;
     --theme-accent-info: #00aaff;
 
     /* Shadow Colors */
-    --theme-shadow-light: rgba(255, 255, 255, 0.1);
-    --theme-shadow-medium: rgba(255, 255, 255, 0.2);
-    --theme-shadow-heavy: rgba(255, 255, 255, 0.3);
-    --theme-shadow-focus: rgba(255, 255, 0, 0.5);
+    --theme-shadow-light: rgb(255 255 255 / 10%);
+    --theme-shadow-medium: rgb(255 255 255 / 20%);
+    --theme-shadow-heavy: rgb(255 255 255 / 30%);
+    --theme-shadow-focus: rgb(255 255 0 / 50%);
 
     /* Increase contrast ratios */
     --color-gray-400: #6b7280;

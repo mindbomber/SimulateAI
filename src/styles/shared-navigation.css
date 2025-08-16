@@ -259,6 +259,16 @@
     opacity: 1 !important;
   }
 
+  /* Generic dropdown parity with settings menu */
+  .nav-item-dropdown:hover .dropdown-menu,
+  .nav-item-dropdown:focus-within .dropdown-menu {
+    z-index: var(--z-dropdown-hover);
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: translateY(0) scale(1) !important;
+  }
+
   /* Mobile Navigation Force-Visible States */
   .main-nav.force-visible,
   .main-nav.open,
@@ -1309,6 +1319,33 @@
   .nav-group-about .nav-items,
   .nav-group-actions .nav-items {
     gap: calc(0.75rem * var(--font-scale, 1));
+  }
+
+  /* Ensure non-primary groups match primary link colors in light mode */
+  .nav-group-blog .nav-link,
+  .nav-group-community .nav-link,
+  .nav-group-about .nav-link,
+  .nav-group-actions .nav-link {
+    color: var(--nav-text-color, #64748b);
+    text-decoration: none;
+  }
+
+  .nav-group-blog .nav-link:hover,
+  .nav-group-community .nav-link:hover,
+  .nav-group-about .nav-link:hover,
+  .nav-group-actions .nav-link:hover {
+    color: var(--nav-text-hover, #1e293b);
+    background: var(--nav-bg-hover, #f8fafc);
+    transform: translateY(-1px);
+  }
+
+  .nav-group-blog .nav-link.active,
+  .nav-group-community .nav-link.active,
+  .nav-group-about .nav-link.active,
+  .nav-group-actions .nav-link.active {
+    color: var(--nav-text-active, #0f172a);
+    background: var(--nav-bg-active, #e2e8f0);
+    font-weight: 600;
   }
 
   /* Dropdown navigation links - ensure proper alignment for arrows */

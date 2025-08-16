@@ -1,3 +1,4 @@
+/* eslint-env node */
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 
@@ -493,7 +494,11 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
  * Create Stripe Checkout Session
  * Called from frontend when user wants to donate
  */
-exports.createCheckoutSession = functions.https.onCall(
+const region = functions.region(process.env.FUNCTIONS_REGION || "us-central1");
+const enforceAppCheck = process.env.FUNCTIONS_EMULATOR ? false : true;
+
+exports.createCheckoutSession = region.https.onCall(
+  { enforceAppCheck },
   async (data, context) => {
     try {
       // Verify user authentication
@@ -580,83 +585,87 @@ exports.createCheckoutSession = functions.https.onCall(
  * Verify Payment Success
  * Called from frontend after successful Stripe checkout
  */
-exports.verifyPaymentSuccess = functions.https.onCall(async (data, context) => {
-  try {
-    // Verify user authentication
-    if (!context.auth) {
-      throw new functions.https.HttpsError(
-        "unauthenticated",
-        "Must be authenticated",
-      );
-    }
+exports.verifyPaymentSuccess = region.https.onCall(
+  { enforceAppCheck },
+  async (data, context) => {
+    try {
+      // Verify user authentication
+      if (!context.auth) {
+        throw new functions.https.HttpsError(
+          "unauthenticated",
+          "Must be authenticated",
+        );
+      }
 
-    const { sessionId } = data;
-    const userId = context.auth.uid;
+      const { sessionId } = data;
+      const userId = context.auth.uid;
 
-    // Retrieve session from Stripe
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
+      // Retrieve session from Stripe
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
 
-    // Verify the session belongs to this user
-    if (session.metadata.userId !== userId) {
-      throw new functions.https.HttpsError(
-        "permission-denied",
-        "Session does not belong to user",
-      );
-    }
+      // Verify the session belongs to this user
+      if (session.metadata.userId !== userId) {
+        throw new functions.https.HttpsError(
+          "permission-denied",
+          "Session does not belong to user",
+        );
+      }
 
-    if (session.payment_status === "paid") {
-      const tier = parseInt(session.metadata.tier);
-      const tierInfo = getTierInfo(tier);
+      if (session.payment_status === "paid") {
+        const tier = parseInt(session.metadata.tier);
+        const tierInfo = getTierInfo(tier);
 
-      // For one-time payments, get amount from session
-      const amountPaid = session.amount_total / 100; // Convert from cents
+        // For one-time payments, get amount from session
+        const amountPaid = session.amount_total / 100; // Convert from cents
 
-      // Update user profile for one-time payment
-      await admin
-        .firestore()
-        .collection("users")
-        .doc(userId)
-        .update({
+        // Update user profile for one-time payment
+        await admin
+          .firestore()
+          .collection("users")
+          .doc(userId)
+          .update({
+            tier,
+            flair: tierInfo.flair,
+            stripeCustomerId: session.customer,
+            paymentType: "one-time",
+            totalDonated: admin.firestore.FieldValue.increment(amountPaid),
+            lastPaymentDate: admin.firestore.FieldValue.serverTimestamp(),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+
+        console.log(
+          `✅ One-time payment verified for user ${userId}, tier ${tier}, amount: $${amountPaid}`,
+        );
+
+        return {
+          success: true,
           tier,
           flair: tierInfo.flair,
+          tierName: tierInfo.name,
           stripeCustomerId: session.customer,
+          totalDonated: amountPaid,
           paymentType: "one-time",
-          totalDonated: admin.firestore.FieldValue.increment(amountPaid),
-          lastPaymentDate: admin.firestore.FieldValue.serverTimestamp(),
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-
-      console.log(
-        `✅ One-time payment verified for user ${userId}, tier ${tier}, amount: $${amountPaid}`,
-      );
-
-      return {
-        success: true,
-        tier,
-        flair: tierInfo.flair,
-        tierName: tierInfo.name,
-        stripeCustomerId: session.customer,
-        totalDonated: amountPaid,
-        paymentType: "one-time",
-      };
-    } else {
-      throw new functions.https.HttpsError(
-        "failed-precondition",
-        "Payment not completed",
-      );
+        };
+      } else {
+        throw new functions.https.HttpsError(
+          "failed-precondition",
+          "Payment not completed",
+        );
+      }
+    } catch (error) {
+      console.error("❌ Error verifying payment:", error);
+      throw new functions.https.HttpsError("internal", error.message);
     }
-  } catch (error) {
-    console.error("❌ Error verifying payment:", error);
-    throw new functions.https.HttpsError("internal", error.message);
-  }
-});
+  },
+);
 
 /**
  * Create Anonymous Stripe Checkout Session
  * Allows donations without user authentication
  */
-exports.createAnonymousCheckout = functions.https.onCall(
-  async (data, context) => {
+exports.createAnonymousCheckout = region.https.onCall(
+  { enforceAppCheck },
+  async (data, _context) => {
     try {
       const { priceId, tier, donorEmail } = data;
 
@@ -715,7 +724,7 @@ exports.createAnonymousCheckout = functions.https.onCall(
  * Stripe Webhook Handler
  * Handles all Stripe events securely
  */
-exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
+exports.stripeWebhook = region.https.onRequest(async (req, res) => {
   const sig = req.headers["stripe-signature"];
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
