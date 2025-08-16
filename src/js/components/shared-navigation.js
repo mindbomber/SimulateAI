@@ -679,7 +679,7 @@ class SharedNavigation {
     // General navigation link handlers
     this.setupNavigationLinkHandlers();
 
-    // Simulation Hub navigation
+    // Simulation Library navigation
     this.setupSimulationHubNavigation();
 
     // Mega menu toggle
@@ -773,7 +773,7 @@ class SharedNavigation {
   }
 
   /**
-   * Setup Simulation Hub navigation functionality
+   * Setup Simulation Library navigation functionality
    */
   setupSimulationHubNavigation() {
     const mainNavigation = this.getCachedElement(
@@ -800,7 +800,7 @@ class SharedNavigation {
         this.isUserNavigation = false;
       }, 200);
 
-      // Close mobile navigation when simulation hub is clicked
+      // Close mobile navigation when Simulation Library is clicked
       this.closeMobileNav();
     };
 
@@ -810,7 +810,7 @@ class SharedNavigation {
   }
 
   /**
-   * Navigate to the Simulation Hub section
+   * Navigate to the Simulation Library section
    */
   navigateToSimulationHub() {
     const currentPage =

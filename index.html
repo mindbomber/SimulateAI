@@ -123,13 +123,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <!-- Favicon Configuration for Google Search Results -->
-    <link rel="icon" href="/favicon.ico" sizes="32x32" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/src/assets/icons/favicon.svg" />
+    <!-- Icons and Favicons -->
+    <link rel="icon" type="image/svg+xml" href="src/assets/icons/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" href="src/assets/icons/favicon.png" />
+    <link rel="apple-touch-icon" href="src/assets/icons/apple-touch-icon.png" />
     <meta
       name="msapplication-TileImage"
-      content="/src/assets/icons/favicon.svg"
+      content="src/assets/icons/favicon.svg"
     />
 
     <link rel="manifest" href="/manifest.json" />
@@ -141,7 +142,7 @@
         "@type": "Organization",
         "name": "SimulateAI",
         "url": "https://simulateai.io/",
-        "logo": "https://simulateai.io/favicon.svg",
+        "logo": "https://simulateai.io/src/assets/icons/favicon.svg",
         "description": "Educational platform providing AI ethics education through interactive simulations",
         "foundingDate": "2024",
         "sameAs": ["https://github.com/mindbomber/SimulateAI"],
@@ -1280,8 +1281,8 @@
       content="./src/assets/icons/Square Icon_512_x_512.png"
     />
 
-    <!-- Preload critical resources -->
-    <link rel="preload" href="./src/js/app.js" as="script" crossorigin />
+    <!-- Preload critical module -->
+    <link rel="modulepreload" href="./src/js/app.js" crossorigin />
 
     <!-- Load CSS Files -->
     <link rel="stylesheet" href="./src/styles/css-layers.css" />
@@ -1291,6 +1292,7 @@
     <link rel="stylesheet" href="./src/styles/settings-menu.css" />
     <link rel="stylesheet" href="./src/styles/badge-modal.css" />
     <link rel="stylesheet" href="./src/styles/pwa-notifications.css" />
+    <link rel="stylesheet" href="./src/styles/footer.css" />
     <link
       rel="stylesheet"
       href="./src/styles/components/gdpr-cookie-notice-fallback.css"
@@ -1299,8 +1301,8 @@
     <!-- Early theme initialization - Apply theme immediately to prevent FOUC -->
     <script src="./src/js/utils/early-theme-init.js"></script>
 
-    <!-- Google reCAPTCHA v3 -->
-    <script src="https://www.google.com/recaptcha/api.js"></script>
+    <!-- Google reCAPTCHA v3 (non-blocking) -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   </head>
   <body>
     <!-- Hero Section -->
@@ -1543,16 +1545,6 @@
             To explore cutting-edge AI ethics discussions, engage with the
             latest research, and participate in shaping responsible AI
             development.
-          </p>
-        </div>
-
-        <div class="audience-card">
-          <div class="icon">📜</div>
-          <h3>Philosophy Enthusiasts</h3>
-          <p>
-            To engage with fundamental questions about consciousness, moral
-            reasoning, and the nature of intelligence through practical
-            scenarios.
           </p>
         </div>
 

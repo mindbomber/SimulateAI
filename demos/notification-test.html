@@ -10,7 +10,7 @@
     <style>
       body {
         font-family:
-          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         padding: 20px;
         background: #f5f5f5;
         line-height: 1.6;
@@ -346,24 +346,24 @@
     <!-- Load shared navigation for settings -->
     <script>
       // Load the shared navigation HTML
-      fetch('src/components/shared-navigation.html')
-        .then(response => response.text())
-        .then(html => {
+      fetch("src/components/shared-navigation.html")
+        .then((response) => response.text())
+        .then((html) => {
           // Extract just the settings menu
           const parser = new DOMParser();
-          const doc = parser.parseFromString(html, 'text/html');
-          const settingsMenu = doc.querySelector('.settings-menu');
+          const doc = parser.parseFromString(html, "text/html");
+          const settingsMenu = doc.querySelector(".settings-menu");
 
           if (settingsMenu) {
             // Find the settings nav and append the menu
-            const settingsNav = document.getElementById('settings-nav');
+            const settingsNav = document.getElementById("settings-nav");
             if (settingsNav) {
               settingsNav.parentElement.appendChild(settingsMenu);
             }
           }
         })
-        .catch(error => {
-          console.error('Failed to load settings menu:', error);
+        .catch((error) => {
+          console.error("Failed to load settings menu:", error);
         });
     </script>
 
@@ -374,7 +374,7 @@
       let fcmApp = null;
 
       // Initialize when services are ready
-      window.addEventListener('load', async () => {
+      window.addEventListener("load", async () => {
         // Wait for services to initialize
         setTimeout(async () => {
           notificationService = window.notificationService;
@@ -389,14 +389,14 @@
       });
 
       // Listen for settings manager ready
-      window.addEventListener('settingsManagerReady', () => {
+      window.addEventListener("settingsManagerReady", () => {
         settingsManager = window.settingsManager;
         updateSettingsDisplay();
       });
 
       async function requestNotificationPermission() {
-        if (!('Notification' in window)) {
-          updatePermissionDisplay('unsupported');
+        if (!("Notification" in window)) {
+          updatePermissionDisplay("unsupported");
           return;
         }
 
@@ -405,13 +405,13 @@
           updatePermissionDisplay(permission);
           updateSettingsDisplay();
         } catch (error) {
-          updatePermissionDisplay('error');
+          updatePermissionDisplay("error");
         }
       }
 
       function checkPermissionStatus() {
-        if (!('Notification' in window)) {
-          updatePermissionDisplay('unsupported');
+        if (!("Notification" in window)) {
+          updatePermissionDisplay("unsupported");
           return;
         }
 
@@ -419,36 +419,36 @@
       }
 
       function updatePermissionDisplay(permission) {
-        const display = document.getElementById('permission-status-display');
+        const display = document.getElementById("permission-status-display");
         const statusMessages = {
           granted: {
-            class: 'permission-granted',
-            indicator: 'green',
-            text: '✅ Notifications are enabled and working',
+            class: "permission-granted",
+            indicator: "green",
+            text: "✅ Notifications are enabled and working",
           },
           denied: {
-            class: 'permission-denied',
-            indicator: 'red',
-            text: '❌ Notifications are blocked by the browser',
+            class: "permission-denied",
+            indicator: "red",
+            text: "❌ Notifications are blocked by the browser",
           },
           default: {
-            class: 'permission-default',
-            indicator: 'yellow',
-            text: '⚠️ Notification permission not yet granted',
+            class: "permission-default",
+            indicator: "yellow",
+            text: "⚠️ Notification permission not yet granted",
           },
           unsupported: {
-            class: 'permission-denied',
-            indicator: 'red',
-            text: '❌ Notifications are not supported in this browser',
+            class: "permission-denied",
+            indicator: "red",
+            text: "❌ Notifications are not supported in this browser",
           },
           error: {
-            class: 'permission-denied',
-            indicator: 'red',
-            text: '❌ Error occurred while checking permissions',
+            class: "permission-denied",
+            indicator: "red",
+            text: "❌ Error occurred while checking permissions",
           },
         };
 
-        const status = statusMessages[permission] || statusMessages['error'];
+        const status = statusMessages[permission] || statusMessages["error"];
         display.innerHTML = `
           <div class="permission-status ${status.class}">
             <span class="status-indicator ${status.indicator}"></span>
@@ -458,112 +458,112 @@
       }
 
       function updateSettingsDisplay() {
-        const display = document.getElementById('settings-display');
+        const display = document.getElementById("settings-display");
 
         if (!settingsManager) {
-          display.innerHTML = 'Settings manager not available';
+          display.innerHTML = "Settings manager not available";
           return;
         }
 
         const settings = settingsManager.getNotificationSettings
           ? settingsManager.getNotificationSettings()
-          : { enabled: false, permission: 'unknown' };
+          : { enabled: false, permission: "unknown" };
 
         display.innerHTML = `
           <ul style="margin: 0; padding-left: 20px;">
-            <li><strong>Notifications Enabled:</strong> ${settings.enabled ? '✅ Yes' : '❌ No'}</li>
-            <li><strong>Achievement Notifications:</strong> ${settings.achievements ? '✅ Enabled' : '❌ Disabled'}</li>
-            <li><strong>Badge Notifications:</strong> ${settings.badges ? '✅ Enabled' : '❌ Disabled'}</li>
-            <li><strong>Progress Notifications:</strong> ${settings.progress ? '✅ Enabled' : '❌ Disabled'}</li>
+            <li><strong>Notifications Enabled:</strong> ${settings.enabled ? "✅ Yes" : "❌ No"}</li>
+            <li><strong>Achievement Notifications:</strong> ${settings.achievements ? "✅ Enabled" : "❌ Disabled"}</li>
+            <li><strong>Badge Notifications:</strong> ${settings.badges ? "✅ Enabled" : "❌ Disabled"}</li>
+            <li><strong>Progress Notifications:</strong> ${settings.progress ? "✅ Enabled" : "❌ Disabled"}</li>
             <li><strong>Browser Permission:</strong> ${settings.permission}</li>
           </ul>
         `;
       }
 
       function testBrowserNotification() {
-        if (Notification.permission !== 'granted') {
-          alert('Please grant notification permission first');
+        if (Notification.permission !== "granted") {
+          alert("Please grant notification permission first");
           return;
         }
 
-        const notification = new Notification('SimulateAI Test', {
-          body: 'This is a test browser notification',
-          icon: '/favicon.ico',
-          badge: '/favicon.ico',
+        const notification = new Notification("SimulateAI Test", {
+          body: "This is a test browser notification",
+          icon: "/src/assets/icons/favicon.svg",
+          badge: "/src/assets/icons/favicon.svg",
         });
 
         setTimeout(() => notification.close(), 3000);
-        updateNotificationPreview('Browser notification sent!');
+        updateNotificationPreview("Browser notification sent!");
       }
 
       function testAchievementNotification() {
         if (!notificationService) {
-          alert('Notification service not available');
+          alert("Notification service not available");
           return;
         }
 
         notificationService.sendAchievementNotification(
-          'Achievement Unlocked!',
-          'You completed your first scenario!',
+          "Achievement Unlocked!",
+          "You completed your first scenario!",
           {
-            data: { achievementId: 'first-scenario' },
-          }
+            data: { achievementId: "first-scenario" },
+          },
         );
-        updateNotificationPreview('Achievement notification sent!');
+        updateNotificationPreview("Achievement notification sent!");
       }
 
       function testBadgeNotification() {
         if (!notificationService) {
-          alert('Notification service not available');
+          alert("Notification service not available");
           return;
         }
 
         const mockBadge = {
-          title: 'Ethical Explorer',
-          description: 'Complete 5 scenarios in any category',
-          icon: '🧭',
+          title: "Ethical Explorer",
+          description: "Complete 5 scenarios in any category",
+          icon: "🧭",
         };
 
         notificationService.sendBadgeNotification(mockBadge, {
-          data: { badgeId: 'ethical-explorer' },
+          data: { badgeId: "ethical-explorer" },
         });
-        updateNotificationPreview('Badge notification sent!');
+        updateNotificationPreview("Badge notification sent!");
       }
 
       function testProgressNotification() {
         if (!notificationService) {
-          alert('Notification service not available');
+          alert("Notification service not available");
           return;
         }
 
         notificationService.sendProgressNotification(
-          'Progress Update',
+          "Progress Update",
           "You're 80% complete with the AI Ethics category!",
           {
-            data: { categoryId: 'ai-ethics' },
-          }
+            data: { categoryId: "ai-ethics" },
+          },
         );
-        updateNotificationPreview('Progress notification sent!');
+        updateNotificationPreview("Progress notification sent!");
       }
 
       function testToastFallback() {
         if (!window.NotificationToast) {
-          alert('Toast service not available');
+          alert("Toast service not available");
           return;
         }
 
         window.NotificationToast.show({
-          type: 'success',
-          title: 'Toast Test',
-          message: 'This is a toast notification fallback',
+          type: "success",
+          title: "Toast Test",
+          message: "This is a toast notification fallback",
           duration: 5000,
           closable: true,
         });
-        updateNotificationPreview('Toast notification shown!');
+        updateNotificationPreview("Toast notification shown!");
       }
 
       function updateNotificationPreview(message) {
-        const preview = document.getElementById('notification-preview');
+        const preview = document.getElementById("notification-preview");
         preview.innerHTML = `
           <div style="color: #27ae60; font-weight: 500;">
             ✅ ${message}
@@ -574,8 +574,8 @@
 
       async function initializeFCM() {
         if (!fcmApp) {
-          document.getElementById('fcm-token-status').innerHTML =
-            'FCM not available';
+          document.getElementById("fcm-token-status").innerHTML =
+            "FCM not available";
           return;
         }
 
@@ -583,65 +583,65 @@
           await fcmApp.initialize();
           checkFCMStatus();
         } catch (error) {
-          document.getElementById('fcm-token-status').innerHTML =
+          document.getElementById("fcm-token-status").innerHTML =
             `Error: ${error.message}`;
         }
       }
 
       async function checkFCMStatus() {
         // Service Worker Status
-        if ('serviceWorker' in navigator) {
+        if ("serviceWorker" in navigator) {
           try {
             const registration = await navigator.serviceWorker.getRegistration(
-              '/firebase-messaging-sw.js'
+              "/firebase-messaging-sw.js",
             );
-            document.getElementById('sw-status').innerHTML = registration
-              ? '✅ Registered'
-              : '❌ Not registered';
+            document.getElementById("sw-status").innerHTML = registration
+              ? "✅ Registered"
+              : "❌ Not registered";
           } catch (error) {
-            document.getElementById('sw-status').innerHTML =
-              '❌ Error checking';
+            document.getElementById("sw-status").innerHTML =
+              "❌ Error checking";
           }
         } else {
-          document.getElementById('sw-status').innerHTML = '❌ Not supported';
+          document.getElementById("sw-status").innerHTML = "❌ Not supported";
         }
 
         // FCM Token Status
         if (fcmApp && fcmApp.isReady()) {
           try {
             const token = await fcmApp.getCurrentToken();
-            document.getElementById('fcm-token-status').innerHTML = token
+            document.getElementById("fcm-token-status").innerHTML = token
               ? `✅ Token available (${token.substring(0, 20)}...)`
-              : '❌ No token';
+              : "❌ No token";
           } catch (error) {
-            document.getElementById('fcm-token-status').innerHTML =
-              '❌ Error getting token';
+            document.getElementById("fcm-token-status").innerHTML =
+              "❌ Error getting token";
           }
         } else {
-          document.getElementById('fcm-token-status').innerHTML =
-            '❌ FCM not initialized';
+          document.getElementById("fcm-token-status").innerHTML =
+            "❌ FCM not initialized";
         }
 
         // Message Handler Status
-        document.getElementById('message-handler-status').innerHTML =
-          fcmApp && fcmApp.isReady() ? '✅ Ready' : '❌ Not ready';
+        document.getElementById("message-handler-status").innerHTML =
+          fcmApp && fcmApp.isReady() ? "✅ Ready" : "❌ Not ready";
 
         // Database Save Status
-        const token = localStorage.getItem('fcm_token');
-        document.getElementById('db-save-status').innerHTML = token
-          ? '✅ Token saved locally'
-          : '❌ No token saved';
+        const token = localStorage.getItem("fcm_token");
+        document.getElementById("db-save-status").innerHTML = token
+          ? "✅ Token saved locally"
+          : "❌ No token saved";
       }
 
       function sendTestFCMMessage() {
         alert(
-          'FCM message testing requires server-side implementation. This would typically send a test message from your Firebase project.'
+          "FCM message testing requires server-side implementation. This would typically send a test message from your Firebase project.",
         );
       }
 
       async function generateRobustnessReport() {
-        const reportElement = document.getElementById('robustness-report');
-        reportElement.innerHTML = 'Generating report...';
+        const reportElement = document.getElementById("robustness-report");
+        reportElement.innerHTML = "Generating report...";
 
         let report = {};
 
@@ -654,28 +654,28 @@
           } else {
             // Manual robustness check
             report = {
-              browserSupport: 'Notification' in window,
+              browserSupport: "Notification" in window,
               permission: Notification.permission,
               settings: settingsManager
                 ? settingsManager.getNotificationSettings()
                 : null,
               fcmInitialized: fcmApp ? fcmApp.isReady() : false,
               toastFallback: !!window.NotificationToast,
-              serviceWorker: 'serviceWorker' in navigator,
+              serviceWorker: "serviceWorker" in navigator,
               timestamp: new Date().toISOString(),
             };
 
             // Test browser notification if permission granted
-            if (report.permission === 'granted') {
+            if (report.permission === "granted") {
               try {
-                const testNotification = new Notification('Robustness Test', {
-                  body: 'Testing notification system',
-                  tag: 'robustness-test',
+                const testNotification = new Notification("Robustness Test", {
+                  body: "Testing notification system",
+                  tag: "robustness-test",
                 });
                 setTimeout(() => testNotification.close(), 1000);
-                report.browserNotificationTest = 'passed';
+                report.browserNotificationTest = "passed";
               } catch (error) {
-                report.browserNotificationTest = 'failed';
+                report.browserNotificationTest = "failed";
                 report.browserNotificationError = error.message;
               }
             }
@@ -686,12 +686,12 @@
           const maxScore = 10;
 
           if (report.browserSupport) score += 2;
-          if (report.permission === 'granted') score += 2;
+          if (report.permission === "granted") score += 2;
           if (report.settings && report.settings.enabled) score += 1;
           if (report.fcmInitialized) score += 2;
           if (report.toastFallback) score += 1;
           if (report.serviceWorker) score += 1;
-          if (report.browserNotificationTest === 'passed') score += 1;
+          if (report.browserNotificationTest === "passed") score += 1;
 
           report.robustnessScore = score;
           report.robustnessPercentage = Math.round((score / maxScore) * 100);
@@ -710,7 +710,7 @@
       }
 
       async function runAllTests() {
-        updateNotificationPreview('Running all tests...');
+        updateNotificationPreview("Running all tests...");
 
         // Check permission
         checkPermissionStatus();
@@ -725,7 +725,7 @@
         await generateRobustnessReport();
 
         // Test notifications if permission granted
-        if (Notification.permission === 'granted') {
+        if (Notification.permission === "granted") {
           setTimeout(() => {
             testBrowserNotification();
             setTimeout(() => testAchievementNotification(), 1000);
@@ -735,7 +735,7 @@
         }
 
         updateNotificationPreview(
-          'All tests completed! Check the robustness report below.'
+          "All tests completed! Check the robustness report below.",
         );
       }
     </script>

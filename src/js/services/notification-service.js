@@ -129,7 +129,7 @@ class NotificationService {
       type: "badge",
       title: `🏆 Badge Earned: ${badge.title}`,
       message: badge.description || `You've earned the ${badge.title} badge!`,
-      icon: badge.icon || "/favicon.ico",
+      icon: badge.icon || "/src/assets/icons/favicon.svg",
       ...options,
     });
   }
@@ -168,8 +168,8 @@ class NotificationService {
       type = "info",
       title,
       message,
-      icon = "/favicon.ico",
-      badge = "/favicon.ico",
+      icon = "/src/assets/icons/favicon.svg",
+      badge = "/src/assets/icons/favicon.svg",
       tag,
       data = {},
     } = notificationData;

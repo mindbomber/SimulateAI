@@ -2236,8 +2236,8 @@ class SettingsManager {
 
     new Notification("SimulateAI Test", {
       body: "Notifications are working correctly!",
-      icon: "/favicon.ico",
-      badge: "/favicon.ico",
+      icon: "/src/assets/icons/favicon.svg",
+      badge: "/src/assets/icons/favicon.svg",
     });
   }
 
