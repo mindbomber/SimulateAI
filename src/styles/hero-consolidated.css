@@ -93,6 +93,101 @@
 /* NOTE: All loaded state animations now consolidated within @layer utilities */
 
 @layer components {
+  /* Uniform CTA sizing (desktop) */
+  @media (min-width: 1024px) {
+    .hero-actions .primary-actions-row .btn,
+    .hero-actions #test-scenario-modal {
+      min-width: 210px;
+      min-height: 44px;
+      padding: var(--spacing-3) var(--spacing-6);
+      border-radius: var(--radius-pill, 9999px);
+      font-weight: 600;
+      letter-spacing: 0.025em;
+    }
+    /* Ensure hero-local test button sizing beats earlier !important rules */
+    .hero-actions #test-scenario-modal {
+      padding: var(--spacing-3) var(--spacing-6) !important;
+      border-radius: var(--radius-pill, 9999px) !important;
+    }
+  }
+
+  /* Test Scenario as outline/ghost to de-emphasize */
+  #test-scenario-modal {
+    border: 2px solid color-mix(in oklab, var(--color-primary) 40%, transparent);
+    background: transparent;
+    color: var(--color-primary);
+    transition:
+      transform 160ms ease,
+      box-shadow 160ms ease,
+      background-color 160ms ease,
+      border-color 160ms ease;
+  }
+  #test-scenario-modal:hover {
+    background: color-mix(in oklab, var(--color-primary) 10%, transparent);
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgb(0 0 0 / 12%);
+  }
+  #test-scenario-modal:active {
+    transform: translateY(0);
+  }
+
+  /* Hero-local overrides so outline wins over prior !important */
+  .hero-actions #test-scenario-modal {
+    background: transparent !important;
+    color: var(--color-primary) !important;
+    border: 2px solid color-mix(in oklab, var(--color-primary) 40%, transparent) !important;
+  }
+  .hero-actions #test-scenario-modal:hover {
+    background: color-mix(
+      in oklab,
+      var(--color-primary) 10%,
+      transparent
+    ) !important;
+    border-color: var(--color-primary) !important;
+  }
+
+  /* Primary elevation */
+  .hero-actions .btn.btn-primary {
+    box-shadow: 0 10px 24px rgb(0 0 0 / 18%);
+    transition:
+      transform 160ms ease,
+      box-shadow 160ms ease,
+      background-color 160ms ease;
+  }
+  .hero-actions .btn.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px rgb(0 0 0 / 22%);
+  }
+  .hero-actions .btn.btn-primary:active {
+    transform: translateY(0);
+  }
+
+  /* Focus visibility for all hero buttons */
+  .hero-actions .btn:focus-visible,
+  #test-scenario-modal:focus-visible {
+    outline: 0;
+    box-shadow:
+      0 0 0 2px var(--color-white),
+      0 0 0 4px var(--color-primary);
+  }
+
+  /* Emoji alignment and spacing in classroom row */
+  .classroom-actions-group .btn {
+    min-height: 44px;
+    gap: 0.5rem;
+    line-height: 1.1;
+  }
+
+  /* Dark-mode overrides for hero buttons live in css-layers.css @layer overrides */
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-actions .btn,
+    #test-scenario-modal {
+      transition: none;
+      transform: none !important;
+    }
+  }
   /* ===== BASE HERO COMPONENT ===== */
   /* Enhanced full-width hero with subtle gradient and perfect centering */
   .hero {
@@ -824,6 +919,71 @@
   }
 
   /* Enhanced hero radar demo sizing for desktop full HD */
+}
+
+/* ================================
+   HERO ACTIONS LAYOUT STABILITY (Desktop)
+   ================================ */
+/*
+  Goal: Prevent hero action buttons from unpredictably wrapping between rows on reload.
+  Approach:
+  - Disable wrapping and max-width constraints on desktop breakpoints
+  - Ensure group of classroom buttons is a flex row with consistent gap
+  - Give the debug test button a consistent min-width to match other buttons
+  - Prevent flex items from shrinking (avoids jitter when fonts load)
+*/
+@layer components {
+  @media only screen and (min-width: 1024px) {
+    .hero-actions {
+      flex-wrap: nowrap;
+      max-width: none;
+    }
+
+    .hero-actions > * {
+      flex-shrink: 0;
+    }
+
+    /* Keep the two classroom buttons together with proper spacing */
+    .hero-actions .classroom-actions-group {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md, 1.5rem);
+      white-space: nowrap;
+    }
+
+    /* Align test button sizing with other hero buttons */
+    .hero-actions #test-scenario-modal {
+      min-width: var(--btn-min-width, 180px);
+    }
+  }
+}
+
+/* New: structured two-row layout inside .hero-actions */
+@layer components {
+  .hero-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero-actions .primary-actions-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-lg, 2rem);
+  }
+
+  .hero-actions .classroom-actions-group {
+    margin-top: var(--spacing-md, 1.5rem);
+  }
+}
+
+@layer components {
+  @media (max-width: 768px) {
+    .hero-actions .primary-actions-row {
+      flex-wrap: wrap;
+      gap: var(--spacing-md, 1.5rem);
+    }
+  }
 }
 
 /* ================================

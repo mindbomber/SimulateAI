@@ -17,8 +17,7 @@
 
 /* Import required component styles - moved outside @layer for proper loading */
 @import url("./media.css"); /* Import first for responsive variables */
-@import url("./settings-menu.css");
-@import url("./footer.css");
+/* Note: settings-menu.css and footer.css should be loaded by their owning components, not via navigation */
 
 @layer components {
   /* ===== MODERN NAVIGATION DESIGN SYSTEM ===== */
@@ -349,13 +348,19 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgb(0 0 0 / 50%);
     z-index: var(--z-backdrop);
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
+  }
+
+  /* Explicit open state for JS-controlled backdrop */
+  .nav-backdrop.open {
+    opacity: 1;
+    visibility: visible;
   }
 
   /* Show backdrop when mobile nav is open */
@@ -505,13 +510,13 @@
     z-index: var(--z-header);
 
     /* Visual styling - Modern glass morphism effect */
-    background: rgba(255, 255, 255, 0.85);
+    background: rgb(255 255 255 / 85%);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    border-bottom: 1px solid rgb(226 232 240 / 80%);
     box-shadow:
-      0 1px 3px rgba(0, 0, 0, 0.05),
-      0 1px 2px rgba(0, 0, 0, 0.1);
+      0 1px 3px rgb(0 0 0 / 5%),
+      0 1px 2px rgb(0 0 0 / 10%);
 
     /* Animations and effects */
     transform: translateY(0);
@@ -1568,16 +1573,12 @@
 
   /* Responsive Navigation - Using media.css breakpoints */
   @media (width <= 480px) {
-    .nav-group-community,
-    .nav-group-actions {
+    /* Hide inline nav groups only when the mobile menu is closed */
+    .main-nav:not(.open) .nav-group {
       display: none;
     }
 
-    /* Keep About navigation visible on tablet/desktop */
-    .nav-group-about {
-      display: flex;
-    }
-
+    /* Auth group spacing adjustments remain */
     .nav-group-auth {
       margin-left: auto;
       border-left: none;
@@ -2252,41 +2253,7 @@
     }
   }
 
-  /* Navigation Backdrop (Mobile) */
-  .nav-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgb(0 0 0 / 50%);
-    z-index: 9998; /* Below navigation but above content */
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-  }
-
-  .nav-backdrop.open {
-    opacity: 1;
-    visibility: visible;
-  }
-
-  /* Responsive backdrop for smaller screens */
-  @media only screen and (width <= 480px) {
-    .nav-backdrop {
-      background: rgb(0 0 0 / 40%); /* Slightly lighter on mobile */
-    }
-  }
-
-  @media only screen and (width <= 375px) {
-    .nav-backdrop {
-      background: rgb(0 0 0 / 35%); /* Even lighter on small screens */
-      backdrop-filter: blur(2px);
-      -webkit-backdrop-filter: blur(2px);
-    }
-  }
+  /* (Removed duplicate Navigation Backdrop block — consolidated earlier in file) */
 
   /* Mega Menu Enhanced Styles */
   .mega-menu {

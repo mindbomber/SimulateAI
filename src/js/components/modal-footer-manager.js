@@ -281,7 +281,4 @@ class ModalFooterManager {
 // Export for ES6 modules (default export)
 export default ModalFooterManager;
 
-// Export for CommonJS (backward compatibility)
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = ModalFooterManager;
-}
+// Note: CommonJS export removed to avoid browser lint errors; use ES module default export.

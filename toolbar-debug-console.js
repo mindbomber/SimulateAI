@@ -46,14 +46,16 @@
     }
   };
 
-  // Test 2: Check for existing event listeners
+  // Test 2: Check for existing event listeners (DevTools-only API)
   console.log("🧪 Test 2: Checking existing event listeners");
-  const filterListeners = getEventListeners
-    ? getEventListeners(filterBtn)
-    : "Cannot detect";
-  const sortListeners = getEventListeners
-    ? getEventListeners(sortBtn)
-    : "Cannot detect";
+  const filterListeners =
+    typeof window.getEventListeners === "function"
+      ? window.getEventListeners(filterBtn)
+      : "Cannot detect";
+  const sortListeners =
+    typeof window.getEventListeners === "function"
+      ? window.getEventListeners(sortBtn)
+      : "Cannot detect";
   console.log("Filter button listeners:", filterListeners);
   console.log("Sort button listeners:", sortListeners);
 

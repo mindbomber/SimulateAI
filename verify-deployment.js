@@ -5,8 +5,9 @@
  * Checks if all critical files are accessible on the deployed domain
  */
 
-const https = require("https");
-const http = require("http");
+/* eslint-env node */
+import https from "https";
+import http from "http";
 
 const DOMAIN = "simulateai.io";
 const PROTOCOL = "https"; // Change to 'http' if not using HTTPS

@@ -12,7 +12,6 @@
  */
 
 import logger from "../utils/logger.js";
-import focusManager from "../utils/focus-manager.js";
 
 // Enhanced modal constants
 const MODAL_CONSTANTS = {
@@ -974,7 +973,7 @@ export class ModalUtility {
 
 // Export enhanced components
 export default EnhancedModal;
-export { ModalUtility, modalStackManager, MODAL_EVENTS, MODAL_CONSTANTS };
+export { modalStackManager, MODAL_EVENTS, MODAL_CONSTANTS };
 
 // Global availability for backward compatibility
 if (typeof window !== "undefined") {

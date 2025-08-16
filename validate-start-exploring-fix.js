@@ -1,12 +1,17 @@
 // Start Exploring Button Fix Validation
 // This script validates that the handleStartLearning fix is properly implemented
 
+/* eslint-env node */
 console.log("🔍 Start Exploring Button Fix Validation");
 console.log("=".repeat(50));
 
 // Check if the app.js file has the correct handleStartLearning implementation
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const appJsPath = path.join(__dirname, "src/js/app.js");
 

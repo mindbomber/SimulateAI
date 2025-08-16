@@ -262,11 +262,8 @@ class EthicsSimulation {
   setupScenarioComponents(scenario) {
     // Override in specific simulations
     // Log scenario setup in development only
-    if (
-      typeof process !== "undefined" &&
-      process.env?.NODE_ENV === "development"
-    ) {
-      // eslint-disable-next-line no-console
+    if (typeof window !== "undefined" && window.location?.hostname) {
+      // Dev-only logging removed (no-op)
     }
   }
 
@@ -612,13 +609,7 @@ class EthicsSimulation {
     this.emit("error", errorData);
 
     // Store error for debugging in development
-    if (
-      typeof process !== "undefined" &&
-      process.env?.NODE_ENV === "development"
-    ) {
-      // eslint-disable-next-line no-console
-      console.error(`Simulation Error [${this.id}]:`, message, error);
-    }
+    // Dev-only console removed to avoid process.env reference
   }
 
   // Cleanup and resource management
@@ -653,11 +644,8 @@ class EthicsSimulation {
       this.components = [];
 
       // Log destruction in development only
-      if (
-        typeof process !== "undefined" &&
-        process.env?.NODE_ENV === "development"
-      ) {
-        // eslint-disable-next-line no-console
+      if (typeof window !== "undefined" && window.location?.hostname) {
+        // Dev-only logging removed (no-op)
       }
     } catch (error) {
       this.handleError("Error during simulation cleanup", error);

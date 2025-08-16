@@ -1304,7 +1304,4 @@ document.addEventListener("DOMContentLoaded", () => {
   window.enhancedBlog = new EnhancedBlogManager();
 });
 
-// Export for potential module use
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = EnhancedBlogManager;
-}
+// ESM build: no CommonJS export

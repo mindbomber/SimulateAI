@@ -240,7 +240,7 @@ async function processModalDonation(tier, donorEmail = "") {
     3: "price_1RkyADJDA3nPZHAFoyRLGmpQ", // $20 Gold
   };
 
-  const createAnonymousCheckout = firebase
+  const createAnonymousCheckout = window.firebase
     .functions()
     .httpsCallable("createAnonymousCheckout");
 

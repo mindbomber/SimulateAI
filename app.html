@@ -43,6 +43,74 @@ limitations under the License.
     <meta name="color-scheme" content="light dark" />
     <meta name="page-id" content="home" />
 
+    <!-- Early theme-preload shim: apply correct theme before CSS to prevent FOUC -->
+    <style id="theme-preload-style">
+      html.theme-preload,
+      html.theme-preload * {
+        transition: none !important;
+      }
+    </style>
+    <script>
+      (function () {
+        try {
+          var keys = ["simulateai_theme", "theme"]; // compatibility
+          var val = null;
+          for (var i = 0; i < keys.length && !val; i++) {
+            try {
+              val = localStorage.getItem(keys[i]);
+            } catch (_) {}
+          }
+          var prefersDark = false;
+          try {
+            prefersDark =
+              window.matchMedia &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches;
+          } catch (_) {}
+          var theme =
+            val === "dark" || val === "light"
+              ? val
+              : prefersDark
+                ? "dark"
+                : "light";
+
+          // Disable transitions during first paint and align UA widgets
+          document.documentElement.classList.add("theme-preload");
+          document.documentElement.style.colorScheme = theme;
+
+          var apply = function () {
+            var b = document.body;
+            if (!b) return;
+            // Normalize classes
+            b.classList.remove("theme-dark", "theme-light", "dark-mode");
+            if (theme === "dark") {
+              b.classList.add("theme-dark", "dark-mode");
+            } else {
+              b.classList.add("theme-light");
+            }
+          };
+
+          if (document.body) {
+            apply();
+          } else {
+            document.addEventListener("DOMContentLoaded", apply, {
+              once: true,
+            });
+          }
+
+          // Remove preload class after load to re-enable transitions
+          window.addEventListener(
+            "load",
+            function () {
+              document.documentElement.classList.remove("theme-preload");
+            },
+            { once: true },
+          );
+        } catch (e) {
+          /* no-op */
+        }
+      })();
+    </script>
+
     <!-- Base URL for custom domain - will be removed for localhost -->
     <base href="/" id="custom-domain-base" />
 
@@ -356,6 +424,8 @@ limitations under the License.
 
     <!-- Settings Menu Component -->
     <link rel="stylesheet" href="src/styles/settings-menu.css" />
+    <!-- Footer Component Styles -->
+    <link rel="stylesheet" href="src/styles/footer.css" />
     <link rel="stylesheet" href="src/styles/appearance-settings.css" />
 
     <!-- Icons and Favicons for Google Search Results -->
@@ -484,20 +554,31 @@ limitations under the License.
         <div class="hero-content">
           <h2 class="hero-title">Welcome to SimulateAI</h2>
           <div class="hero-actions">
-            <button
-              class="btn btn-primary touch-target"
-              id="start-learning"
-              aria-describedby="start-learning-description"
-              title="Navigate to Ethics Categories section"
-            >
-              Start Exploring
-            </button>
-            <span id="start-learning-description" class="sr-only">
-              Navigate to the Ethics Categories section to explore thematic
-              categories of ethical dilemmas
-            </span>
+            <!-- Primary actions row: Start Exploring + Test Scenario -->
+            <div class="primary-actions-row">
+              <button
+                class="btn btn-primary touch-target"
+                id="start-learning"
+                aria-describedby="start-learning-description"
+                title="Navigate to Ethics Categories section"
+              >
+                Start Exploring
+              </button>
+              <span id="start-learning-description" class="sr-only">
+                Navigate to the Ethics Categories section to explore thematic
+                categories of ethical dilemmas
+              </span>
 
-            <!-- Classroom Collaboration Buttons -->
+              <!-- Debug: Test scenario modal button -->
+              <button
+                id="test-scenario-modal"
+                class="btn btn-outline touch-target"
+              >
+                Test Scenario
+              </button>
+            </div>
+
+            <!-- Classroom Collaboration Buttons (second row) -->
             <div class="classroom-actions-group">
               <button
                 class="btn btn-secondary touch-target"
@@ -524,15 +605,9 @@ limitations under the License.
                 Join an existing classroom session using a classroom code
               </span>
             </div>
-
-            <!-- Debug: Test scenario modal button -->
-            <button id="test-scenario-modal">Test Scenario</button>
           </div>
 
-          <!-- Support Research Donation Button -->
-          <div class="support-research-section">
-            <div id="homepage-donation-button"></div>
-          </div>
+          <!-- Support Research Donation Button removed -->
         </div>
       </section>
 
@@ -1430,7 +1505,10 @@ limitations under the License.
           });
         }
 
-        if (window.EnhancedDonationWidget) {
+        if (
+          window.EnhancedDonationWidget &&
+          document.getElementById("homepage-donation-button")
+        ) {
           window.EnhancedDonationWidget.init("homepage-donation-button", {
             title: "💖 Support SimulateAI Research",
             subtitle:

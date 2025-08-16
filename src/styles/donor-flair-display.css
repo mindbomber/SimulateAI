@@ -1,4 +1,9 @@
-/* Donor Flair Display Styles */
+/* Donor Flair Display Styles
+ * Notes:
+ * - Base styles live in @layer components
+ * - Dark mode lives in @layer overrides (see bottom of file)
+ * - Prefer design tokens and :focus-visible per SimulateAI CSS guidelines
+ */
 
 @layer components {
   /* Flair Badge Styles */
@@ -24,7 +29,7 @@
     top: -8px;
     right: -8px;
     font-size: 0.7em;
-    background: white;
+    background: var(--color-background, #fff);
     border-radius: 50%;
     padding: 2px;
     box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
@@ -64,8 +69,8 @@
     opacity: 0.3;
   }
 
-  /* Donor Appreciation Section - Basic fallback styles only */
-  /* Main styles are defined in donor-wall.css with CSS layers */
+  /* Donor Appreciation Section - Basic fallback styles only.
+     Main styles are defined in donor-wall.css with CSS layers. */
 
   .appreciation-title {
     color: #2c3e50;
@@ -100,20 +105,20 @@
 
   .donor-placeholder {
     padding: 20px;
-    color: #6c757d;
+    color: var(--color-text-secondary, #6c757d);
     font-style: italic;
   }
 
   .donor-tier-group {
     margin-bottom: 24px;
-    background: white;
+    background: var(--color-background, #fff);
     border-radius: 8px;
     padding: 16px;
     box-shadow: 0 2px 8px rgb(0 0 0 / 5%);
   }
 
   .tier-title {
-    color: #2c3e50;
+    color: var(--color-text-primary, #2c3e50);
     margin: 0 0 12px;
     font-size: 1.1rem;
     display: flex;
@@ -133,7 +138,7 @@
 
   /* Donor Card */
   .donor-card {
-    background: #f8f9fa;
+    background: var(--color-background-elevation-1, #f8f9fa);
     border-radius: 6px;
     padding: 12px;
     border-left: 3px solid var(--flair-color, #007bff);
@@ -148,7 +153,7 @@
 
   .donor-name {
     font-weight: 500;
-    color: #2c3e50;
+    color: var(--color-text-primary, #2c3e50);
   }
 
   .donor-flair {
@@ -162,7 +167,7 @@
 
   /* Become Supporter Section */
   .become-supporter {
-    background: white;
+    background: var(--color-background, #fff);
     border-radius: 8px;
     padding: 16px;
     margin-top: 16px;
@@ -170,11 +175,15 @@
 
   .become-supporter p {
     margin: 0 0 12px;
-    color: #495057;
+    color: var(--color-text-secondary, #495057);
   }
 
   .become-supporter-btn {
-    background: linear-gradient(135deg, #007bff, #0056b3);
+    background: linear-gradient(
+      135deg,
+      var(--color-primary, #007bff),
+      var(--color-primary-dark, #0056b3)
+    );
     color: white;
     border: none;
     border-radius: 6px;
@@ -185,7 +194,11 @@
   }
 
   .become-supporter-btn:hover {
-    background: linear-gradient(135deg, #0056b3, #004085);
+    background: linear-gradient(
+      135deg,
+      var(--color-primary-dark, #0056b3),
+      var(--color-primary-darker, #004085)
+    );
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgb(0 123 255 / 30%);
   }
@@ -204,7 +217,7 @@
     height: 8px;
     background: var(--flair-color, #007bff);
     border-radius: 50%;
-    border: 2px solid white;
+    border: 2px solid var(--color-background, #fff);
     animation: pulse-flair 2s ease-in-out infinite;
   }
 
@@ -221,10 +234,22 @@
     }
   }
 
+  /* Reduced motion accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    .appreciation-icon,
+    .nav-link.has-donor-flair::before {
+      animation: none !important;
+    }
+  }
+
   /* Profile Page Flair Enhancement */
   .profile-header .has-donor-flair {
     font-size: 1.2em;
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    background: linear-gradient(
+      135deg,
+      var(--color-background-elevation-1, #f8f9fa),
+      var(--color-background-elevation-2, #e9ecef)
+    );
     padding: 8px 16px;
     border-radius: 20px;
     display: inline-block;
@@ -294,19 +319,21 @@
   }
 
   /* Accessibility */
-  .donor-flair-badge:focus {
-    outline: 2px solid #007bff;
+  .donor-flair-badge:focus-visible {
+    outline: 2px solid var(--color-primary, #007bff);
     outline-offset: 2px;
   }
 
   .has-donor-flair:focus-within {
-    outline: 2px solid var(--flair-color, #007bff);
+    outline: 2px solid var(--flair-color, var(--color-primary, #007bff));
     outline-offset: 2px;
     border-radius: 2px;
   }
 
   /* High Contrast Mode */
-  @media (prefers-contrast: high) {
+
+  /* Using prefers-contrast: more for broader support */
+  @media (prefers-contrast: more) {
     .donor-flair-badge {
       background: white;
       border: 1px solid currentcolor;
@@ -324,107 +351,7 @@
     }
   }
 
-  /* Dark Mode Support */
-  body.dark-mode .donor-flair-badge.floating {
-    background: var(--theme-bg-secondary, #2d3748);
-    box-shadow: 0 2px 4px var(--theme-shadow, rgb(0 0 0 / 30%));
-  }
-
-  body.dark-mode .has-donor-flair::after {
-    background: linear-gradient(
-      90deg,
-      transparent,
-      var(--flair-color, var(--theme-accent, #007bff)),
-      transparent
-    );
-  }
-
-  body.dark-mode .donor-appreciation-section {
-    background: linear-gradient(
-      135deg,
-      var(--theme-bg-primary, #1a202c),
-      var(--theme-bg-secondary, #2d3748)
-    );
-    color: var(--theme-text-primary, #f7fafc);
-  }
-
-  body.dark-mode .appreciation-title {
-    color: var(--theme-text-primary, #f7fafc);
-  }
-
-  body.dark-mode .donor-placeholder {
-    color: var(--theme-text-secondary, #a0aec0);
-  }
-
-  body.dark-mode .donor-tier-group {
-    background: var(--theme-bg-secondary, #2d3748);
-    box-shadow: 0 2px 8px var(--theme-shadow, rgb(0 0 0 / 20%));
-  }
-
-  body.dark-mode .tier-title {
-    color: var(--theme-text-primary, #f7fafc);
-  }
-
-  body.dark-mode .donor-card {
-    background: var(--theme-bg-secondary, #2d3748);
-    border-left-color: var(--flair-color, var(--theme-accent, #007bff));
-  }
-
-  body.dark-mode .donor-name {
-    color: var(--theme-text-primary, #f7fafc);
-  }
-
-  body.dark-mode .donor-date {
-    color: var(--theme-text-secondary, #a0aec0);
-  }
-
-  body.dark-mode .become-supporter {
-    background: var(--theme-bg-secondary, #2d3748);
-  }
-
-  body.dark-mode .become-supporter p {
-    color: var(--theme-text-secondary, #a0aec0);
-  }
-
-  body.dark-mode .become-supporter-btn {
-    background: linear-gradient(
-      135deg,
-      var(--theme-accent, #007bff),
-      var(--theme-accent-dark, #0056b3)
-    );
-  }
-
-  body.dark-mode .become-supporter-btn:hover {
-    background: linear-gradient(
-      135deg,
-      var(--theme-accent-dark, #0056b3),
-      var(--theme-accent-darker, #004085)
-    );
-    box-shadow: 0 4px 12px var(--theme-shadow-accent, rgb(0 123 255 / 40%));
-  }
-
-  body.dark-mode .nav-link.has-donor-flair::before {
-    border-color: var(--theme-bg-secondary, #2d3748);
-  }
-
-  body.dark-mode .profile-header .has-donor-flair {
-    background: linear-gradient(
-      135deg,
-      var(--theme-bg-secondary, #2d3748),
-      var(--theme-bg-tertiary, #4a5568)
-    );
-    color: var(--theme-text-primary, #f7fafc);
-  }
-
-  body.dark-mode .comment-author.has-donor-flair,
-  body.dark-mode .forum-post-author.has-donor-flair {
-    background: linear-gradient(
-      135deg,
-      rgb(var(--theme-accent-rgb, 0 123 255) / 15%),
-      rgb(var(--theme-accent-dark-rgb, 0 86 179) / 15%)
-    );
-    color: var(--theme-text-primary, #f7fafc);
-  }
+  /* Dark Mode moved to @layer overrides below */
 
   /* Print Styles */
   @media print {

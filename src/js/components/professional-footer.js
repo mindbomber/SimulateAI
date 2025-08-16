@@ -174,6 +174,7 @@ const FOOTER_CONFIG = {
           href: "educator-tools.html",
           icon: "🎓",
         },
+        { text: "Donate", href: "donate.html", icon: "💖" },
       ],
     },
 

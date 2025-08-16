@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Support AI Ethics Research - Anonymous Donation</title>
+    <link rel="stylesheet" href="src/styles/enhanced-donation-widget.css" />
     <style>
       body {
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -149,7 +150,10 @@
       </div>
 
       <!-- Donation Widget Container -->
-      <div class="donation-widget-container"></div>
+      <div
+        class="donation-widget-container"
+        id="donation-widget-container"
+      ></div>
 
       <!-- Thank you message -->
       <div class="thank-you" id="thank-you-message">
@@ -210,6 +214,24 @@
           .getElementById("thank-you-message")
           .scrollIntoView({ behavior: "smooth" });
       }
+    </script>
+
+    <!-- Initialize Enhanced Donation Widget (visible, no accordion) -->
+    <script type="module">
+      // Ensure environment config is available for Stripe key resolution
+      import "./src/js/utils/env-config.js";
+      import "./src/js/components/enhanced-donation-widget.js";
+
+      window.addEventListener("DOMContentLoaded", () => {
+        const container = document.getElementById("donation-widget-container");
+        if (container && window.EnhancedDonationWidget) {
+          // Render card style so tiers are immediately visible (no extra click)
+          window.EnhancedDonationWidget.init("donation-widget-container", {
+            style: "card",
+            showBenefits: true,
+          });
+        }
+      });
     </script>
 
     <!-- Basic back to top functionality -->

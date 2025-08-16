@@ -1048,47 +1048,15 @@
   }
 
   /* ===== SCENARIO MODAL TRIGGER BUTTON ===== */
-  /* Consolidated from main.css for component ownership */
 
-  /* Override styles for test scenario modal button to match primary button */
-  #test-scenario-modal {
-    /* Base button styles (since we removed .btn class) */
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-decoration: none !important;
-    cursor: pointer !important;
-    white-space: nowrap !important;
-    font-family: var(--font-family-primary) !important;
-
-    /* Match start-learning button exactly (.btn-primary styles) */
-    background-color: var(--color-primary) !important;
-    color: var(--color-white) !important;
-    border: 2px solid var(--color-primary) !important;
-    padding: var(--spacing-3) var(--spacing-6) !important;
-    border-radius: var(--radius-lg) !important;
-    font-weight: var(--font-weight-medium) !important;
-    font-size: var(--font-size-base) !important;
-    min-height: 44px !important;
-    transition: all var(--transition-fast) !important;
-
-    /* Ensure no outline on focus */
-    outline: none !important;
-  }
-
-  #test-scenario-modal:hover,
-  #test-scenario-modal:focus {
-    background-color: var(--color-primary-dark) !important;
-    color: var(--color-white) !important;
-    border-color: var(--color-primary-dark) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: var(--shadow-md) !important;
-  }
+  /* Use shared .btn variants; hero-specific look handled in hero-consolidated.css */
 
   /* ===== ENHANCED SCENARIO COMPONENT STYLES ===== */
+
   /* Scenario card styles moved to scenario-card.css for centralized component management */
 
   /* ===== ENHANCED DARK MODE SUPPORT ===== */
+
   /* Scenario card dark mode styles moved to scenario-card.css for centralized component management */
 
   /* Scenario modal dark mode enhancements */
@@ -1102,6 +1070,7 @@
   }
 
   /* ===== CHART.JS TOOLTIP FIX ===== */
+
   /* Chart.js tooltip styles consolidated into radar-chart.css for centralized component management */
 
   /* ===============================================

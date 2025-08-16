@@ -1479,7 +1479,4 @@ const notificationStyles = `
 
 document.head.insertAdjacentHTML("beforeend", notificationStyles);
 
-// Export for module usage
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = EnhancedProfile;
-}
+// ESM build: no CommonJS export

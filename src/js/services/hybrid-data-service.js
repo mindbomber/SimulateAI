@@ -33,7 +33,7 @@ import {
   getDoc,
   setDoc,
   updateDoc,
-  collection,
+  collection as fsCollection,
   query,
   where,
   orderBy,
@@ -41,7 +41,6 @@ import {
   getDocs,
   onSnapshot,
   addDoc,
-  deleteDoc,
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -105,16 +104,17 @@ export class HybridDataService {
    * Initialize Data Connect (when available)
    */
   async initializeDataConnect() {
+    let initialized = false;
     try {
       // Data Connect initialization will be available soon
       // const { getDataConnect } = await import('firebase/data-connect');
       // this.dataConnect = getDataConnect(this.app);
-
-      return false;
+      // initialized = !!this.dataConnect;
     } catch (error) {
       console.warn("⚠️ Data Connect not available yet:", error.message);
-      return false;
+      initialized = false;
     }
+    return initialized && !!this.dataConnect;
   }
 
   /**
@@ -437,24 +437,24 @@ export class HybridDataService {
   /**
    * Generic Firestore Operations
    */
-  async createFirestoreDocument(collection, docId, data) {
+  async createFirestoreDocument(collectionName, docId, data) {
     if (docId) {
-      await setDoc(doc(this.db, collection, docId), data);
+      await setDoc(doc(this.db, collectionName, docId), data);
     } else {
-      const docRef = await addDoc(collection(this.db, collection), data);
+      const docRef = await addDoc(fsCollection(this.db, collectionName), data);
       return docRef.id;
     }
     return true;
   }
 
-  async getFirestoreDocument(collection, docId) {
-    const docRef = doc(this.db, collection, docId);
+  async getFirestoreDocument(collectionName, docId) {
+    const docRef = doc(this.db, collectionName, docId);
     const docSnap = await getDoc(docRef);
     return docSnap.exists() ? { id: docSnap.id, ...docSnap.data() } : null;
   }
 
-  async queryFirestoreCollection(collection, queryOptions = {}) {
-    let q = collection(this.db, collection);
+  async queryFirestoreCollection(collectionName, queryOptions = {}) {
+    let q = fsCollection(this.db, collectionName);
 
     if (queryOptions.where) {
       queryOptions.where.forEach(([field, operator, value]) => {
@@ -479,20 +479,25 @@ export class HybridDataService {
   /**
    * Real-time Data Operations
    */
-  subscribeToRealtimeUpdates(collection, docId, callback, queryOptions = {}) {
-    const listenerId = `${collection}_${docId}_${Date.now()}`;
+  subscribeToRealtimeUpdates(
+    collectionName,
+    docId,
+    callback,
+    queryOptions = {},
+  ) {
+    const listenerId = `${collectionName}_${docId}_${Date.now()}`;
 
     let unsubscribe;
 
     if (docId) {
       // Document listener
-      const docRef = doc(this.db, collection, docId);
+      const docRef = doc(this.db, collectionName, docId);
       unsubscribe = onSnapshot(docRef, (doc) => {
         callback(doc.exists() ? { id: doc.id, ...doc.data() } : null);
       });
     } else {
       // Collection listener
-      let q = collection(this.db, collection);
+      let q = fsCollection(this.db, collectionName);
 
       if (queryOptions.where) {
         queryOptions.where.forEach(([field, operator, value]) => {

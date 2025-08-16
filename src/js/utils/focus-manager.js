@@ -171,9 +171,7 @@ class FocusManager {
         return true;
       } catch (error) {
         // Silent fail for focus restoration - avoid console.warn for linting
-        if (process?.env?.NODE_ENV === "development") {
-          // Only log in development
-        }
+        // Dev-only logging removed to avoid process reference in browser context
       }
     }
 
@@ -341,7 +339,7 @@ class FocusManager {
    * Handle Escape key for focus traps
    * @param {KeyboardEvent} _event - Escape keyboard event (unused in base implementation)
    */
-  handleEscapeKey(_event) {
+  handleEscapeKey() {
     // Override this in specific implementations
     // Base implementation does nothing to avoid conflicts
   }

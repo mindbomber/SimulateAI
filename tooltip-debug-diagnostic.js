@@ -72,12 +72,13 @@
     });
   }
 
-  // 5. Check for event listeners
+  // 5. Check for event listeners (DevTools-only API)
   console.log(`🎧 Event Listener Analysis:`);
   visibleRings.forEach((ring, index) => {
-    const events = getEventListeners
-      ? getEventListeners(ring)
-      : "DevTools required";
+    const events =
+      typeof window.getEventListeners === "function"
+        ? window.getEventListeners(ring)
+        : "DevTools required";
     console.log(`   Ring ${index + 1} events:`, events);
   });
 

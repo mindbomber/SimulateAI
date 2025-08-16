@@ -54,7 +54,10 @@ class ComponentError extends Error {
 const ComponentDebug = {
   isEnabled: true,
   error: (message, ...args) => {
-    if (ComponentDebug.isEnabled && process.env.NODE_ENV === "development") {
+    const isDev =
+      (window && window.__DEV__) ||
+      (import.meta && import.meta.env && import.meta.env.DEV);
+    if (ComponentDebug.isEnabled && isDev) {
       // In development, log to console; in production, this could send to logging service
       // eslint-disable-next-line no-console
       console.error(`[ComponentDebug] ${message}`, ...args);

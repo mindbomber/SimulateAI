@@ -713,56 +713,6 @@ export class PWAService {
       "📱 PWA install prompt disabled in service - using index.html version",
     );
     return;
-
-    // Recheck installation status first
-    this.checkInstallationStatus();
-
-    // Check if prompt should be shown (respects dismissal and installation status)
-    if (!this.shouldShowInstallPrompt()) {
-      console.log("📱 PWA install prompt skipped", {
-        isInstalled: this.isInstalled,
-        promptDismissed: this.promptDismissed,
-        cooldownActive:
-          this.promptDismissed &&
-          this.promptDismissedAt &&
-          (Date.now() - this.promptDismissedAt) / (1000 * 60 * 60) <
-            this.promptCooldownHours,
-      });
-      return;
-    }
-
-    // Check for existing install prompts
-    const existingInstallPrompt = document.getElementById(
-      "pwa-install-simulateai",
-    );
-    if (existingInstallPrompt) {
-      console.log("📱 Install prompt already showing - skipping duplicate");
-      return;
-    }
-
-    const prompt = {
-      id: "pwa-install-simulateai",
-      title: "📱 Install SimulateAI",
-      message:
-        "Get the full app experience with offline access and faster loading!",
-      actions: [
-        {
-          text: "Install App",
-          action: () => this.triggerInstall(),
-        },
-        {
-          text: "Not Now",
-          action: () => this.dismissInstallPrompt(),
-        },
-      ],
-    };
-
-    this.showNotification(prompt);
-
-    this.trackPWAEvent("install_prompt_shown", {
-      prompt_available: !!this.installPromptEvent,
-      installation_status: this.isInstalled,
-    });
   }
 
   /**

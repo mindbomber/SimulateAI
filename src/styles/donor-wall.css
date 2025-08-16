@@ -27,6 +27,7 @@
     max-width: 1400px;
     margin: 24px auto; /* Consolidated margin */
     width: 100%;
+
     /* Enhanced responsive scaling */
     font-size: calc(1rem * var(--font-scale, 1));
     border-radius: 12px;
@@ -159,9 +160,14 @@
     box-shadow: 0 6px 20px rgb(26 115 232 / 30%);
   }
 
-  .donor-wall-filters .filter-btn:focus {
+  .donor-wall-filters .filter-btn:focus-visible {
     outline: none;
     box-shadow: 0 0 0 3px rgb(26 115 232 / 30%);
+  }
+
+  /* Prevent focus ring on mouse click while keeping keyboard focus visible */
+  .donor-wall-filters .filter-btn:focus:not(:focus-visible) {
+    box-shadow: none;
   }
 
   /* Donor Carousel Container - Organic Modern Design */
@@ -272,6 +278,16 @@
     transition: opacity 0.3s ease;
   }
 
+  /* Disabled state before hover to avoid descending-specificity lint */
+  .carousel-nav:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+    background: rgb(248 249 250 / 50%);
+    border-color: rgb(229 231 235 / 30%);
+    pointer-events: none;
+  }
+
   .carousel-nav:hover:not(:disabled) {
     background: linear-gradient(
       145deg,
@@ -291,13 +307,7 @@
     opacity: 1;
   }
 
-  .carousel-nav:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-    transform: none;
-    background: rgb(248 249 250 / 50%);
-    border-color: rgb(229 231 235 / 30%);
-  }
+  /* disabled state moved above */
 
   .carousel-nav svg {
     width: 20px;
@@ -324,11 +334,12 @@
     gap: 1.5rem;
     transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     padding: 1.5rem 1rem;
+    will-change: transform;
   }
 
   /* Individual Donor Card - Square Layout */
   .donor-card {
-    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    background: linear-gradient(145deg, #fff 0%, #f8fafc 100%);
     border-radius: 20px;
     padding: 2rem;
     min-width: 320px;
@@ -363,19 +374,14 @@
       #f59e0b 100%
     );
     border-radius: 20px;
-    mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    mask-composite: subtract;
-    mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    mask-composite: xor;
+
+    /* Simplified: remove complex mask for broader compatibility */
     opacity: 0;
     transition: opacity 0.4s ease;
   }
 
   .donor-card::after {
+    /* ensure non-interactive overlay */
     content: "";
     position: absolute;
     inset: 12px;
@@ -422,7 +428,7 @@
       0 4px 20px rgb(99 102 241 / 12%),
       0 1px 3px rgb(0 0 0 / 8%);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    background: linear-gradient(145deg, #f8fafc 0%, #ffffff 100%);
+    background: linear-gradient(145deg, #f8fafc 0%, #fff 100%);
     flex-shrink: 0;
   }
 
@@ -646,16 +652,6 @@
   }
 
   .donor-reflection::after {
-    content: "💭";
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    font-size: 1.5rem;
-    opacity: 0.3;
-    z-index: 1;
-  }
-
-  .donor-reflection::after {
     content: "";
     position: absolute;
     top: 0;
@@ -784,7 +780,6 @@
       var(--color-primary),
       var(--color-secondary)
     );
-    background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
@@ -921,7 +916,7 @@
   /* Large Desktop Layout - Wide Screens */
   @media (width >= 1440px) {
     .donor-appreciation-section {
-      padding: 3rem 3rem;
+      padding: 3rem;
       max-width: 1600px;
     }
 
@@ -958,6 +953,7 @@
     #donor-appreciation {
       margin-left: auto;
       margin-right: auto;
+
       /* Ensure responsive width on mobile while maintaining centering */
       width: 100%;
       max-width: calc(
@@ -1173,7 +1169,7 @@
 /* Responsive and accessibility utilities */
 @layer utilities {
   /* Animation Classes */
-  @keyframes slideInFromRight {
+  @keyframes slide-in-from-right {
     from {
       opacity: 0;
       transform: translateX(30px);
@@ -1186,7 +1182,7 @@
   }
 
   .donor-card.animate-in {
-    animation: slideInFromRight 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: slide-in-from-right 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
 
   /* Accessibility Enhancements */
@@ -1210,7 +1206,7 @@
     border-width: 4px;
   }
 
-  @media (prefers-contrast: high) {
+  @media (prefers-contrast: more) {
     .filter-btn.active {
       outline: 3px solid var(--color-primary);
     }
@@ -1230,374 +1226,4 @@
   }
 }
 
-/* Dark mode and theme overrides */
-@layer overrides {
-  /* Dark mode support for donor wall */
-  body.dark-mode .donor-appreciation-section {
-    background: linear-gradient(
-      135deg,
-      var(--theme-bg-primary) 0%,
-      var(--theme-bg-secondary) 50%,
-      var(--theme-bg-primary) 100%
-    );
-  }
-
-  /* Dark mode centering for ID selector */
-  body.dark-mode #donor-appreciation {
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  body.dark-mode .donor-appreciation-section::before {
-    background: radial-gradient(
-      circle at 20% 20%,
-      rgb(var(--theme-accent-rgb), 0.08) 0%,
-      transparent 50%
-    );
-  }
-
-  body.dark-mode .donor-appreciation-section .main-section-title {
-    color: var(--color-gray-900);
-  }
-
-  body.dark-mode .donor-appreciation-section .main-section-description {
-    color: var(--theme-text-secondary);
-  }
-
-  body.dark-mode .donor-wall-title {
-    color: var(--theme-text-primary);
-  }
-
-  body.dark-mode .donor-wall-subtitle {
-    color: var(--theme-text-secondary);
-  }
-
-  body.dark-mode .donor-wall-filters .filter-btn {
-    background: var(--theme-bg-secondary);
-    border-color: var(--theme-border);
-    color: var(--theme-text-secondary);
-  }
-
-  body.dark-mode .donor-wall-filters .filter-btn::before {
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgb(255 255 255 / 10%),
-      transparent
-    );
-  }
-
-  body.dark-mode .donor-wall-filters .filter-btn:hover {
-    border-color: var(--theme-accent);
-    color: var(--theme-text-primary);
-    box-shadow: 0 8px 25px var(--theme-shadow);
-  }
-
-  body.dark-mode .donor-wall-filters .filter-btn.active {
-    background: var(--theme-accent);
-    border-color: var(--theme-accent);
-    color: var(--theme-text-on-accent);
-    box-shadow: 0 6px 20px var(--theme-shadow);
-  }
-
-  body.dark-mode .donor-wall-filters .filter-btn:focus {
-    box-shadow: 0 0 0 3px rgb(var(--theme-accent-rgb), 0.3);
-  }
-
-  body.dark-mode .donor-carousel-container {
-    background: linear-gradient(
-      145deg,
-      var(--theme-bg-secondary) 0%,
-      var(--theme-bg-tertiary) 50%,
-      var(--theme-bg-secondary) 100%
-    );
-    border-color: var(--theme-border);
-    box-shadow:
-      0 8px 32px var(--theme-shadow),
-      0 2px 8px var(--theme-shadow-light),
-      inset 0 1px 0 rgb(255 255 255 / 10%);
-  }
-
-  body.dark-mode .donor-carousel-container::before {
-    background:
-      radial-gradient(
-        circle at 20% 20%,
-        rgb(var(--theme-success-rgb), 0.05) 0%,
-        transparent 50%
-      ),
-      radial-gradient(
-        circle at 80% 80%,
-        rgb(var(--theme-warning-rgb), 0.05) 0%,
-        transparent 50%
-      ),
-      linear-gradient(135deg, rgb(255 255 255 / 5%) 0%, transparent 100%);
-  }
-
-  body.dark-mode .donor-carousel-container::after {
-    background: linear-gradient(
-      90deg,
-      var(--theme-accent) 0%,
-      var(--theme-accent-light) 50%,
-      var(--theme-accent) 100%
-    );
-  }
-
-  body.dark-mode .carousel-nav {
-    background: linear-gradient(
-      145deg,
-      var(--theme-bg-tertiary) 0%,
-      var(--theme-bg-secondary) 100%
-    );
-    border-color: var(--theme-border);
-    color: var(--theme-text-secondary);
-    box-shadow:
-      0 4px 16px var(--theme-shadow),
-      0 1px 4px var(--theme-shadow-light),
-      inset 0 1px 0 rgb(255 255 255 / 10%);
-  }
-
-  body.dark-mode .carousel-nav::before {
-    background: linear-gradient(
-      135deg,
-      rgb(var(--theme-accent-rgb), 0.1) 0%,
-      transparent 50%,
-      rgb(var(--theme-accent-light-rgb), 0.1) 100%
-    );
-  }
-
-  body.dark-mode .carousel-nav:hover:not(:disabled) {
-    background: linear-gradient(
-      145deg,
-      rgb(var(--theme-accent-rgb), 0.15) 0%,
-      rgb(var(--theme-accent-light-rgb), 0.15) 100%
-    );
-    border-color: var(--theme-accent);
-    color: var(--theme-text-primary);
-    box-shadow:
-      0 8px 24px var(--theme-shadow),
-      0 4px 8px var(--theme-shadow-light),
-      inset 0 1px 0 rgb(255 255 255 / 20%);
-  }
-
-  body.dark-mode .carousel-nav:disabled {
-    background: var(--theme-bg-muted);
-    border-color: var(--theme-border-light);
-    color: var(--theme-text-muted);
-  }
-
-  body.dark-mode .donor-cards-track {
-    background: linear-gradient(
-      135deg,
-      rgb(255 255 255 / 5%) 0%,
-      rgb(255 255 255 / 2%) 100%
-    );
-    border-color: var(--theme-border);
-  }
-
-  body.dark-mode .donor-card {
-    background: var(--theme-bg-secondary);
-    border-color: var(--theme-border);
-    box-shadow: 0 2px 8px var(--theme-shadow);
-  }
-
-  body.dark-mode .donor-card::before {
-    background: linear-gradient(
-      135deg,
-      var(--theme-accent) 0%,
-      var(--theme-accent-light) 50%,
-      var(--theme-accent-dark) 100%
-    );
-  }
-
-  body.dark-mode .donor-card::after {
-    background: linear-gradient(
-      45deg,
-      rgb(var(--theme-accent-rgb), 0.08) 0%,
-      rgb(var(--theme-accent-light-rgb), 0.08) 50%,
-      rgb(var(--theme-accent-dark-rgb), 0.08) 100%
-    );
-  }
-
-  body.dark-mode .donor-card:hover {
-    box-shadow: 0 4px 16px var(--theme-shadow);
-    border-color: var(--theme-border-hover);
-  }
-
-  body.dark-mode .donor-avatar {
-    border-color: var(--theme-border);
-    background: var(--theme-bg-tertiary);
-    box-shadow: 0 2px 8px var(--theme-shadow);
-  }
-
-  body.dark-mode .donor-avatar:hover {
-    box-shadow: 0 4px 12px var(--theme-shadow);
-  }
-
-  body.dark-mode .anonymous-avatar {
-    background: linear-gradient(
-      135deg,
-      var(--theme-accent) 0%,
-      var(--theme-accent-dark) 100%
-    );
-  }
-
-  body.dark-mode .donor-badge {
-    border-color: var(--theme-bg-secondary);
-    box-shadow:
-      0 2px 8px var(--theme-shadow),
-      0 0 0 1px var(--theme-border);
-  }
-
-  body.dark-mode .donor-badge:hover {
-    box-shadow:
-      0 4px 12px var(--theme-shadow),
-      0 0 0 1px var(--theme-border-hover);
-  }
-
-  body.dark-mode .donor-name {
-    color: var(--theme-text-primary);
-  }
-
-  body.dark-mode .donor-since {
-    color: var(--theme-text-secondary);
-    background: var(--theme-bg-tertiary);
-    border-color: var(--theme-border);
-  }
-
-  body.dark-mode .donor-reflection {
-    background: var(--theme-bg-tertiary);
-    border-color: var(--theme-border);
-    box-shadow: 0 1px 3px var(--theme-shadow);
-  }
-
-  body.dark-mode .donor-reflection::before {
-    background: linear-gradient(
-      90deg,
-      var(--theme-accent) 0%,
-      var(--theme-accent-light) 50%,
-      var(--theme-accent-dark) 100%
-    );
-  }
-
-  body.dark-mode .donor-reflection:hover {
-    border-color: var(--theme-accent);
-    box-shadow:
-      0 16px 48px rgb(var(--theme-accent-rgb), 0.15),
-      0 8px 24px var(--theme-shadow);
-  }
-
-  body.dark-mode .donor-reflection p {
-    color: var(--theme-text-secondary);
-  }
-
-  body.dark-mode .indicator {
-    background: var(--theme-bg-tertiary);
-    border-color: var(--theme-border);
-  }
-
-  body.dark-mode .indicator:hover {
-    background: var(--theme-bg-quaternary);
-    border-color: var(--theme-accent);
-  }
-
-  body.dark-mode .indicator.active {
-    background: var(--theme-accent);
-    border-color: var(--theme-accent);
-  }
-
-  body.dark-mode .donor-stats-summary {
-    background: linear-gradient(
-      135deg,
-      var(--theme-bg-secondary) 0%,
-      var(--theme-bg-tertiary) 100%
-    );
-    border-color: var(--theme-border);
-    box-shadow: 0 8px 25px var(--theme-shadow);
-  }
-
-  body.dark-mode .stat-item {
-    color: var(--theme-text-primary);
-  }
-
-  body.dark-mode .stat-number {
-    color: var(--theme-accent);
-  }
-
-  body.dark-mode .stat-label {
-    color: var(--theme-text-secondary);
-  }
-
-  body.dark-mode .stat-item:not(:last-child)::after {
-    background: var(--theme-border);
-  }
-
-  body.dark-mode .support-cta {
-    background: var(--theme-bg-secondary);
-    border-color: var(--theme-border);
-  }
-
-  body.dark-mode .support-cta::before {
-    background: radial-gradient(
-      circle at center,
-      rgb(var(--theme-accent-rgb), 0.05) 0%,
-      transparent 70%
-    );
-  }
-
-  body.dark-mode .support-cta h3 {
-    color: var(--theme-text-primary);
-  }
-
-  body.dark-mode .support-cta p {
-    color: var(--theme-text-secondary);
-  }
-
-  body.dark-mode .cta-section {
-    background: var(--theme-bg-secondary);
-    border-color: var(--theme-border);
-  }
-
-  body.dark-mode .cta-title {
-    color: var(--theme-text-primary);
-  }
-
-  body.dark-mode .cta-description {
-    color: var(--theme-text-secondary);
-  }
-
-  body.dark-mode .cta-buttons .btn-primary {
-    background: linear-gradient(
-      135deg,
-      var(--theme-accent),
-      var(--theme-accent-dark)
-    );
-    box-shadow: 0 8px 25px var(--theme-shadow);
-    color: var(--theme-text-on-accent);
-  }
-
-  body.dark-mode .cta-buttons .btn-primary:hover {
-    box-shadow: 0 12px 35px var(--theme-shadow-heavy);
-  }
-
-  body.dark-mode .cta-buttons .btn-outline {
-    border-color: var(--theme-border);
-    color: var(--theme-text-primary);
-  }
-
-  body.dark-mode .cta-buttons .btn-outline:hover {
-    background: var(--theme-accent);
-    border-color: var(--theme-accent);
-    color: var(--theme-text-on-accent);
-    box-shadow: 0 8px 25px var(--theme-shadow);
-  }
-
-  body.dark-mode .donor-card:focus-within {
-    outline-color: var(--theme-accent);
-  }
-
-  body.dark-mode .carousel-nav:focus,
-  body.dark-mode .filter-btn:focus,
-  body.dark-mode .indicator:focus {
-    outline-color: var(--theme-accent);
-  }
-}
+/* Dark mode overrides moved to css-layers.css @layer overrides for centralization */

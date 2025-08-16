@@ -1,3 +1,4 @@
+/* eslint-env node */
 /**
  * Scenario Validation Test Script
  * Run this to validate all 60 scenario simulations and check for unique IDs
@@ -8,16 +9,9 @@
 // Simple Node.js compatible version for testing
 import fs from "fs";
 import path from "path";
+import process from "node:process";
 
-// Mock logger for Node.js environment
-const logger = {
-  info: (component, message, data) =>
-    console.log(`[INFO] ${component}: ${message}`, data || ""),
-  error: (component, message, error) =>
-    console.error(`[ERROR] ${component}: ${message}`, error || ""),
-  warn: (component, message, data) =>
-    console.warn(`[WARN] ${component}: ${message}`, data || ""),
-};
+// Minimal logger shim (unused removed to satisfy lint)
 
 class ScenarioValidatorTest {
   constructor() {
@@ -87,10 +81,10 @@ class ScenarioValidatorTest {
         const content = fs.readFileSync(filePath, "utf8");
 
         // Count export default objects (scenarios)
-        const exportMatches = content.match(/export\s+default\s+{[^}]*}/gs);
-        const objectMatches = content.match(
-          /{[\s\S]*?title:\s*['"][^'"]*['"][\s\S]*?}/g,
-        );
+        // const exportMatches = content.match(/export\s+default\s+{[^}]*}/gs);
+        // const objectMatches = content.match(
+        //   /{[\s\S]*?title:\s*['"][^'"]*['"][\s\S]*?}/g,
+        // );
 
         // More accurate: count scenario objects by looking for title fields
         const titleMatches = content.match(
@@ -151,12 +145,12 @@ class ScenarioValidatorTest {
 
     // Check for duplicates
     const idCounts = {};
-    allIds.forEach((id) => {
-      idCounts[id] = (idCounts[id] || 0) + 1;
+    allIds.forEach((value) => {
+      idCounts[value] = (idCounts[value] || 0) + 1;
     });
 
     const duplicates = Object.entries(idCounts)
-      .filter(([id, count]) => count > 1)
+      .filter(([, count]) => count > 1)
       .map(([id, count]) => ({ id, count }));
 
     return {
@@ -179,7 +173,7 @@ class ScenarioValidatorTest {
 
     // Count scenarios
     console.log("\n📊 SCENARIO COUNT:");
-    const { totalCount, counts } = await this.countScenariosInFiles();
+    const { totalCount } = await this.countScenariosInFiles();
     console.log(`Total scenarios found: ${totalCount}`);
     console.log(`Expected: 60 scenarios`);
     console.log(`Status: ${totalCount === 60 ? "✅ CORRECT" : "❌ INCORRECT"}`);
@@ -217,7 +211,7 @@ class ScenarioValidatorTest {
     console.log(`Overall status: ${isValid ? "✅ VALID" : "❌ INVALID"}`);
 
     // Detailed ID mapping
-    if (process.argv.includes("--detailed")) {
+    if (typeof process !== "undefined" && process.argv.includes("--detailed")) {
       console.log("\n📄 DETAILED ID MAPPING:");
       Object.entries(idValidation.idsByFile).forEach(([file, ids]) => {
         console.log(`\n${file} (${ids.length} scenarios):`);
@@ -236,7 +230,10 @@ class ScenarioValidatorTest {
 }
 
 // Run validation if called directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (
+  typeof process !== "undefined" &&
+  import.meta.url === `file://${process.argv[1]}`
+) {
   const validator = new ScenarioValidatorTest();
   validator
     .runFullValidation()

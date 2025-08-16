@@ -28,6 +28,10 @@ import PWAService from "./pwa-service.js";
 import FirebaseAnalyticsService from "./firebase-analytics-service.js";
 import {
   getAuth,
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence,
+  inMemoryPersistence,
   signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
@@ -40,16 +44,10 @@ import {
   GithubAuthProvider,
   signOut,
   onAuthStateChanged,
+  connectAuthEmulator,
   linkWithPopup,
   linkWithRedirect,
   fetchSignInMethodsForEmail,
-  EmailAuthProvider,
-  linkWithCredential,
-  setPersistence,
-  browserSessionPersistence,
-  browserLocalPersistence,
-  inMemoryPersistence,
-  connectAuthEmulator,
 } from "firebase/auth";
 import {
   getFirestore,
@@ -63,7 +61,6 @@ import {
   orderBy,
   getDocs,
   updateDoc,
-  deleteDoc,
   onSnapshot,
   connectFirestoreEmulator,
 } from "firebase/firestore";
@@ -792,7 +789,6 @@ export class FirebaseService {
 
       if (user) {
         this.trackEvent("user_sign_in", { method: "google" });
-      } else {
       }
     });
   }
@@ -2539,60 +2535,56 @@ export class FirebaseService {
       throw new Error("Firestore not initialized");
     }
 
-    try {
-      const {
-        metricType = "scenario_performance",
-        startDate = null,
-        endDate = null,
-        limit = 100,
-        scenarioId = null,
-        categoryId = null,
-      } = options;
+    const {
+      metricType = "scenario_performance",
+      startDate = null,
+      endDate = null,
+      limit = 100,
+      scenarioId = null,
+      categoryId = null,
+    } = options;
 
-      const collectionName = this.getCollectionNameForMetric(metricType);
-      let q = collection(this.db, collectionName);
+    const collectionName = this.getCollectionNameForMetric(metricType);
+    let q = collection(this.db, collectionName);
 
-      // Apply filters
-      const constraints = [];
+    // Apply filters
+    const constraints = [];
 
-      if (startDate) {
-        constraints.push(where("timestamp", ">=", new Date(startDate)));
-      }
-
-      if (endDate) {
-        constraints.push(where("timestamp", "<=", new Date(endDate)));
-      }
-
-      if (scenarioId) {
-        constraints.push(where("scenarioId", "==", scenarioId));
-      }
-
-      if (categoryId) {
-        constraints.push(where("categoryId", "==", categoryId));
-      }
-
-      // Add ordering and limit
-      constraints.push(orderBy("timestamp", "desc"));
-
-      if (limit && limit > 0) {
-        constraints.push(limit(limit));
-      }
-
-      q = query(q, ...constraints);
-      const querySnapshot = await getDocs(q);
-
-      const metrics = [];
-      querySnapshot.forEach((doc) => {
-        metrics.push({
-          id: doc.id,
-          ...doc.data(),
-        });
-      });
-
-      return metrics;
-    } catch (error) {
-      throw error;
+    if (startDate) {
+      constraints.push(where("timestamp", ">=", new Date(startDate)));
     }
+
+    if (endDate) {
+      constraints.push(where("timestamp", "<=", new Date(endDate)));
+    }
+
+    if (scenarioId) {
+      constraints.push(where("scenarioId", "==", scenarioId));
+    }
+
+    if (categoryId) {
+      constraints.push(where("categoryId", "==", categoryId));
+    }
+
+    // Add ordering and limit
+    constraints.push(orderBy("timestamp", "desc"));
+
+    if (limit && limit > 0) {
+      constraints.push(limit(limit));
+    }
+
+    q = query(q, ...constraints);
+    const querySnapshot = await getDocs(q);
+
+    const metrics = [];
+    querySnapshot.forEach((doc) => {
+      metrics.push({
+        id: doc.id,
+        ...doc.data(),
+      });
+    });
+
+    return metrics;
   }
 
   /**
@@ -2780,7 +2772,7 @@ export class FirebaseService {
 
     // Convert timestamp to Firestore timestamp
     if (sanitized.timestamp instanceof Date) {
-      sanitized.timestamp = sanitized.timestamp;
+      // Keep as Date; conversion handled by Firestore SDK if needed
     }
 
     // Limit string lengths to prevent storage abuse
