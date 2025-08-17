@@ -178,6 +178,17 @@
 				"$eslint-stylish"
 			],
 			"group": "build"
+		},
+		{
+			"label": "Preview Production Build",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"preview"
+			],
+			"isBackground": true,
+			"group": "build"
 		}
 	]
 }

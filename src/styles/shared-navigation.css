@@ -61,8 +61,7 @@
     --nav-border-hover: rgb(99 102 241 / 30%);
 
     /* Shadows & Effects */
-    --nav-shadow-sm:
-      0 1px 3px rgb(0 0 0 / 5%), 0 1px 2px rgb(0 0 0 / 10%);
+    --nav-shadow-sm: 0 1px 3px rgb(0 0 0 / 5%), 0 1px 2px rgb(0 0 0 / 10%);
     --nav-shadow-md:
       0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -1px rgb(0 0 0 / 6%);
     --nav-shadow-lg:
@@ -1530,10 +1529,7 @@
   body.dark-mode .nav-auth-btn.nav-btn-outline:hover {
     color: var(--theme-text-primary, #f0f6fc) !important;
     background: var(--theme-bg-secondary, rgb(255 255 255 / 10%)) !important;
-    border-color: var(
-      --theme-border-hover,
-      rgb(255 255 255 / 30%)
-    ) !important;
+    border-color: var(--theme-border-hover, rgb(255 255 255 / 30%)) !important;
   }
 
   body.dark-mode .nav-group-auth .nav-auth-btn.nav-btn-primary,

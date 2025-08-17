@@ -989,8 +989,8 @@
 
   /* Radar explanation dark mode */
   body.dark-mode .radar-explanation {
-    background: rgba(102, 126, 234, 0.1);
-    border: 1px solid rgba(102, 126, 234, 0.3);
+    background: rgb(102 126 234 / 10%);
+    border: 1px solid rgb(102 126 234 / 30%);
     color: var(--theme-text-primary);
   }
 
@@ -1010,8 +1010,8 @@
 
   /* Interpretation guide dark mode */
   body.dark-mode .interpretation-guide {
-    background: rgba(245, 158, 11, 0.1);
-    border: 1px solid rgba(245, 158, 11, 0.3);
+    background: rgb(245 158 11 / 10%);
+    border: 1px solid rgb(245 158 11 / 30%);
   }
 
   body.dark-mode .interpretation-guide h5 {
@@ -1038,8 +1038,8 @@
 
   /* Ethics reminder dark mode */
   body.dark-mode .ethics-reminder {
-    background: rgba(34, 197, 94, 0.1);
-    border: 1px solid rgba(34, 197, 94, 0.3);
+    background: rgb(34 197 94 / 10%);
+    border: 1px solid rgb(34 197 94 / 30%);
   }
 
   body.dark-mode .ethics-reminder p {
@@ -1458,7 +1458,7 @@
     background: linear-gradient(135deg, #f8f9ff 0%, #f1f3ff 100%);
     border-radius: 16px;
     border: 1px solid #e1e7ff;
-    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 8px 32px rgb(102 126 234 / 10%);
     position: relative;
     overflow: hidden;
     max-width: 1200px;
@@ -1536,7 +1536,7 @@
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid #e9ecef;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 20px rgb(0 0 0 / 8%);
   }
 
   .educator-overview-card::before {
@@ -1551,7 +1551,7 @@
 
   .educator-overview-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.15);
+    box-shadow: 0 20px 40px rgb(102 126 234 / 15%);
     border-color: #667eea;
   }
 
@@ -1563,7 +1563,7 @@
     font-size: 3.5rem;
     margin-bottom: 1.5rem;
     display: block;
-    filter: drop-shadow(0 4px 8px rgba(102, 126, 234, 0.3));
+    filter: drop-shadow(0 4px 8px rgb(102 126 234 / 30%));
   }
 
   .educator-card-title {
@@ -1656,13 +1656,13 @@
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 2px 10px rgb(102 126 234 / 30%);
     transition: all 0.3s ease;
   }
 
   .section-badge:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 15px rgb(102 126 234 / 40%);
   }
 
   .modal-section-description {
@@ -1713,7 +1713,7 @@
     background: white;
     border-radius: 16px;
     padding: 1.5rem;
-    box-shadow: 0 4px 20px rgba(33, 150, 243, 0.1);
+    box-shadow: 0 4px 20px rgb(33 150 243 / 10%);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid #e3f2fd;
     position: relative;
@@ -1733,7 +1733,7 @@
 
   .lab-station-preview:hover {
     transform: translateY(-8px);
-    box-shadow: 0 12px 40px rgba(33, 150, 243, 0.2);
+    box-shadow: 0 12px 40px rgb(33 150 243 / 20%);
     border-color: #2196f3;
   }
 
@@ -1750,7 +1750,7 @@
 
   .station-icon {
     font-size: 2.5rem;
-    filter: drop-shadow(0 2px 8px rgba(33, 150, 243, 0.3));
+    filter: drop-shadow(0 2px 8px rgb(33 150 243 / 30%));
   }
 
   .station-meta {
@@ -1888,7 +1888,7 @@
     border-radius: 12px;
     padding: 1.5rem;
     text-align: center;
-    box-shadow: 0 4px 20px rgba(255, 152, 0, 0.1);
+    box-shadow: 0 4px 20px rgb(255 152 0 / 10%);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid #ffe0b2;
     position: relative;
@@ -1909,7 +1909,7 @@
 
   .metric-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 30px rgba(255, 152, 0, 0.2);
+    box-shadow: 0 8px 30px rgb(255 152 0 / 20%);
     border-color: #ff9800;
   }
 
@@ -2019,7 +2019,7 @@
     background: white;
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 4px 20px rgba(156, 39, 176, 0.1);
+    box-shadow: 0 4px 20px rgb(156 39 176 / 10%);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid #e1bee7;
     position: relative;
@@ -2039,7 +2039,7 @@
 
   .assessment-category:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 30px rgba(156, 39, 176, 0.2);
+    box-shadow: 0 8px 30px rgb(156 39 176 / 20%);
     border-color: #9c27b0;
   }
 
@@ -2056,7 +2056,7 @@
 
   .assessment-category-icon {
     font-size: 1.5rem;
-    filter: drop-shadow(0 2px 4px rgba(156, 39, 176, 0.3));
+    filter: drop-shadow(0 2px 4px rgb(156 39 176 / 30%));
   }
 
   .assessment-category-title {
@@ -2137,7 +2137,7 @@
     background: white;
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 4px 20px rgba(76, 175, 80, 0.1);
+    box-shadow: 0 4px 20px rgb(76 175 80 / 10%);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid #c8e6c9;
     position: relative;
@@ -2146,7 +2146,7 @@
 
   .standard-preview:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 30px rgba(76, 175, 80, 0.2);
+    box-shadow: 0 8px 30px rgb(76 175 80 / 20%);
     border-color: #4caf50;
   }
 
@@ -2176,7 +2176,7 @@
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 500;
-    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+    box-shadow: 0 2px 8px rgb(76 175 80 / 30%);
   }
 
   .standard-title {
@@ -2264,7 +2264,7 @@
     background: white;
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 4px 20px rgba(233, 30, 99, 0.1);
+    box-shadow: 0 4px 20px rgb(233 30 99 / 10%);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid #f8bbd9;
     position: relative;
@@ -2273,7 +2273,7 @@
 
   .development-feature:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 30px rgba(233, 30, 99, 0.2);
+    box-shadow: 0 8px 30px rgb(233 30 99 / 20%);
     border-color: #e91e63;
   }
 
@@ -2286,7 +2286,7 @@
 
   .feature-icon {
     font-size: 1.5rem;
-    filter: drop-shadow(0 2px 4px rgba(233, 30, 99, 0.3));
+    filter: drop-shadow(0 2px 4px rgb(233 30 99 / 30%));
   }
 
   .feature-title {
@@ -2393,18 +2393,18 @@
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+    box-shadow: 0 2px 8px rgb(40 167 69 / 30%);
     animation: glow 3s ease-in-out infinite alternate;
   }
 
   @keyframes glow {
     from {
-      box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+      box-shadow: 0 2px 8px rgb(40 167 69 / 30%);
     }
     to {
       box-shadow:
-        0 4px 15px rgba(40, 167, 69, 0.5),
-        0 0 20px rgba(40, 167, 69, 0.2);
+        0 4px 15px rgb(40 167 69 / 50%),
+        0 0 20px rgb(40 167 69 / 20%);
     }
   }
 
@@ -2446,7 +2446,7 @@
     bottom: 100%;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.9);
+    background: rgb(0 0 0 / 90%);
     color: white;
     padding: 0.5rem 0.75rem;
     border-radius: 6px;
@@ -2464,7 +2464,7 @@
     left: 50%;
     transform: translateX(-50%);
     border: 5px solid transparent;
-    border-top-color: rgba(0, 0, 0, 0.9);
+    border-top-color: rgb(0 0 0 / 90%);
     z-index: 16000 !important; /* Highest priority - above all navigation and floating elements */
   }
 
@@ -2611,7 +2611,7 @@
 
   .metric-card:hover {
     border-color: #8e24aa;
-    box-shadow: 0 4px 12px rgba(142, 36, 170, 0.15);
+    box-shadow: 0 4px 12px rgb(142 36 170 / 15%);
   }
 
   .metric-value {
@@ -2713,7 +2713,7 @@
 
   .assessment-category:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(67, 160, 71, 0.15);
+    box-shadow: 0 6px 20px rgb(67 160 71 / 15%);
     border-color: #43a047;
   }
 
@@ -2806,7 +2806,7 @@
 
   .standard-preview:hover {
     border-color: #ff9800;
-    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.15);
+    box-shadow: 0 4px 12px rgb(255 152 0 / 15%);
     transform: translateY(-1px);
   }
 
@@ -2909,7 +2909,7 @@
 
   .development-feature:hover {
     border-color: #689f38;
-    box-shadow: 0 4px 12px rgba(104, 159, 56, 0.15);
+    box-shadow: 0 4px 12px rgb(104 159 56 / 15%);
     transform: translateY(-1px);
   }
 
@@ -3047,7 +3047,7 @@
     border-radius: 8px;
     padding: 1rem;
     transition: all 0.3s ease;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
   }
 
   .curriculum-card:hover,
@@ -3055,7 +3055,7 @@
   .lab-station-card:hover,
   .template-card:hover {
     border-color: #667eea;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+    box-shadow: 0 4px 12px rgb(102 126 234 / 15%);
     transform: translateY(-2px);
   }
 
@@ -3337,7 +3337,7 @@
   body.dark-mode .lab-station-card:hover,
   body.dark-mode .template-card:hover {
     border-color: #60a5fa;
-    box-shadow: 0 4px 12px rgba(96, 165, 250, 0.15);
+    box-shadow: 0 4px 12px rgb(96 165 250 / 15%);
   }
 
   body.dark-mode .standard-name,
@@ -3414,7 +3414,7 @@
 
   body.dark-mode .lab-station-preview:hover {
     border-color: #60a5fa;
-    box-shadow: 0 6px 20px rgba(96, 165, 250, 0.15);
+    box-shadow: 0 6px 20px rgb(96 165 250 / 15%);
   }
 
   body.dark-mode .station-icon {
@@ -3465,7 +3465,7 @@
 
   body.dark-mode .metric-card:hover {
     border-color: #a855f7;
-    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.15);
+    box-shadow: 0 4px 12px rgb(168 85 247 / 15%);
   }
 
   body.dark-mode .metric-value {
@@ -3511,7 +3511,7 @@
 
   body.dark-mode .assessment-category:hover {
     border-color: #22c55e;
-    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.15);
+    box-shadow: 0 6px 20px rgb(34 197 94 / 15%);
   }
 
   body.dark-mode .assessment-category-icon {
@@ -3548,7 +3548,7 @@
 
   body.dark-mode .standard-preview:hover {
     border-color: #f97316;
-    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+    box-shadow: 0 4px 12px rgb(249 115 22 / 15%);
   }
 
   body.dark-mode .standard-code {
@@ -3604,7 +3604,7 @@
 
   body.dark-mode .development-feature:hover {
     border-color: #84cc16;
-    box-shadow: 0 4px 12px rgba(132, 204, 22, 0.15);
+    box-shadow: 0 4px 12px rgb(132 204 22 / 15%);
   }
 
   body.dark-mode .feature-icon {
@@ -3877,7 +3877,7 @@
   .development-feature:focus-visible {
     outline: 2px solid #667eea;
     outline-offset: 2px;
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 0 0 4px rgb(102 126 234 / 20%);
   }
 
   /* Ensure proper tab order and keyboard interaction */

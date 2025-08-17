@@ -37,7 +37,7 @@
 .pwa-notification button:hover {
   background: #5568d4 !important;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgb(102 126 234 / 30%);
 }
 
 .pwa-notification button:active {
