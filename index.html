@@ -32,20 +32,7 @@
       content="AI ethics education, interactive simulations, ethical AI, AI researchers, AI enthusiasts, artificial intelligence ethics, moral philosophy, AI safety, machine learning ethics, research study, ISTE standards, digital citizenship, AI governance, philosophy of AI, computational ethics"
     />
 
-    <!-- Google tag (gtag.js) -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-4SVB78MBHN"
-    ></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-
-      gtag("config", "G-4SVB78MBHN");
-    </script>
+    <!-- Google Analytics is initialized via centralized service (no inline gtag to avoid double-init) -->
     <meta name="author" content="SimulateAI Educational Platform" />
 
     <!-- Preserve query params like ?join=CODE when navigating from root to app.html -->
@@ -134,6 +121,77 @@
     />
 
     <link rel="manifest" href="/manifest.json" />
+
+    <!-- Early theme-preload shim: apply correct theme before CSS to prevent FOUC -->
+    <style id="theme-preload-style">
+      html.theme-preload,
+      html.theme-preload * {
+        transition: none !important;
+      }
+    </style>
+    <script>
+      (function () {
+        try {
+          var val = null;
+          try {
+            val = localStorage.getItem("simulateai_theme_preference");
+          } catch (_) {}
+          if (!val) {
+            try {
+              val =
+                localStorage.getItem("simulateai_theme") ||
+                localStorage.getItem("theme");
+            } catch (_) {}
+          }
+          var prefersDark = false;
+          try {
+            prefersDark =
+              window.matchMedia &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches;
+          } catch (_) {}
+          var theme =
+            val === "dark" || val === "light" || val === "system"
+              ? val === "system"
+                ? prefersDark
+                  ? "dark"
+                  : "light"
+                : val
+              : prefersDark
+                ? "dark"
+                : "light";
+
+          document.documentElement.classList.add("theme-preload");
+          document.documentElement.style.colorScheme = theme;
+
+          var apply = function () {
+            var b = document.body;
+            if (!b) return;
+            b.classList.remove("theme-dark", "theme-light", "dark-mode");
+            if (theme === "dark") {
+              b.classList.add("theme-dark", "dark-mode");
+            } else {
+              b.classList.add("theme-light");
+            }
+          };
+
+          if (document.body) {
+            apply();
+          } else {
+            document.addEventListener("DOMContentLoaded", apply, {
+              once: true,
+            });
+          }
+
+          window.addEventListener(
+            "load",
+            function () {
+              document.documentElement.classList.remove("theme-preload");
+            },
+            { once: true },
+          );
+        } catch (e) {}
+      })();
+    </script>
 
     <!-- Structured Data - Organization -->
     <script type="application/ld+json">
@@ -1298,8 +1356,7 @@
       href="./src/styles/components/gdpr-cookie-notice-fallback.css"
     />
 
-    <!-- Early theme initialization - Apply theme immediately to prevent FOUC -->
-    <script src="./src/js/utils/early-theme-init.js"></script>
+    <!-- early-theme-init.js removed; using inline theme-preload shim above -->
 
     <!-- Google reCAPTCHA v3 (non-blocking) -->
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
@@ -2082,15 +2139,27 @@
       });
     </script>
 
+    <!-- Centralized analytics initializer -->
+    <script type="module" src="src/js/user-tracking-init.js"></script>
+
     <!-- PWA Service Worker Registration -->
     <script>
-      // Remove base URL for localhost development
-      if (window.location.hostname === "localhost") {
-        const baseTag = document.getElementById("custom-domain-base");
-        if (baseTag) {
-          baseTag.remove();
-        }
-      }
+      // Remove base URL for localhost development and other typical local hosts
+      (function () {
+        try {
+          var h = window.location.hostname;
+          var isLocal =
+            h === "localhost" ||
+            h === "127.0.0.1" ||
+            h === "::1" ||
+            /(^|\.)local$/.test(h) ||
+            /^192\.168\./.test(h);
+          if (isLocal) {
+            var baseTag = document.getElementById("custom-domain-base");
+            if (baseTag) baseTag.remove();
+          }
+        } catch (e) {}
+      })();
 
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", async () => {
@@ -2232,12 +2301,7 @@
       // Track PWA usage
       window.addEventListener("appinstalled", () => {
         console.log("🎉 PWA was installed");
-        if (window.gtag) {
-          gtag("event", "pwa_installed", {
-            event_category: "PWA",
-            event_label: "app_installed",
-          });
-        }
+        // Tracking handled by centralized analytics service if needed
       });
 
       // Detect PWA launch
@@ -2248,12 +2312,7 @@
         console.log("📱 Running as PWA");
         document.body.classList.add("pwa-mode");
 
-        if (window.gtag) {
-          gtag("event", "pwa_launch", {
-            event_category: "PWA",
-            event_label: "standalone_launch",
-          });
-        }
+        // Tracking handled by centralized analytics service if needed
       }
 
       // Handle offline/online status

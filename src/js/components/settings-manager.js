@@ -104,6 +104,10 @@ class SettingsManager {
     this.isDonor = false; // Will be loaded async
     this.isInitialized = false;
 
+    // Theme state tracking to avoid duplicate work
+    this.lastResolvedTheme = null; // 'dark' | 'light'
+    this.lastThemeChoiceNormalized = null; // 'dark' | 'light' | 'system'
+
     // Performance optimizations: Cache DOM elements
     this.domCache = new Map();
     this.mutationObserver = null;
@@ -284,6 +288,14 @@ class SettingsManager {
    * Handle theme changes - update dependent components
    */
   onThemeChange(themeName) {
+    // Skip if this theme was already applied (prevents duplicate styling)
+    if (this.lastResolvedTheme === themeName) {
+      return;
+    }
+
+    // Update last resolved theme immediately so listeners see consistent state
+    this.lastResolvedTheme = themeName;
+
     // Update dark mode dependent components based on current theme
     if (this.isInitialized) {
       setTimeout(() => {
@@ -1644,13 +1656,6 @@ class SettingsManager {
       html.classList.add(`font-size-${fontSize}`);
     }
 
-    // Apply or clear dark mode styles based on current theme
-    if (body.classList.contains("dark-mode")) {
-      this.forceDarkModeComponents();
-    } else {
-      this.clearDarkModeInlineStyles();
-    }
-
     // Update theme-color meta tag
     this.updateMetaTags();
   }
@@ -1663,20 +1668,27 @@ class SettingsManager {
     const themeValue =
       this.settings.theme || this.settings.appearance_theme || "system";
 
-    // Update stored preference to match settings
-    // Use 'system' instead of 'auto' for consistency
+    // Normalize to one of: 'light' | 'dark' | 'system'
     const normalizedTheme = themeValue === "auto" ? "system" : themeValue;
 
-    this.applyThemeChoice(normalizedTheme);
+    // Persist/class update if the normalized choice changed (even if resolved stays same)
+    if (this.lastThemeChoiceNormalized !== normalizedTheme) {
+      this.applyThemeChoice(normalizedTheme);
+      this.lastThemeChoiceNormalized = normalizedTheme;
+    }
 
-    // Trigger theme change events
-    this.onThemeChange(
+    // Resolve to the concrete theme that affects styling
+    const resolvedTheme =
       normalizedTheme === "system"
         ? this.systemPrefersDark.matches
           ? "dark"
           : "light"
-        : normalizedTheme,
-    );
+        : normalizedTheme;
+
+    // Only notify/apply downstream changes when the resolved theme actually changes
+    if (this.lastResolvedTheme !== resolvedTheme) {
+      this.onThemeChange(resolvedTheme);
+    }
   }
 
   /**

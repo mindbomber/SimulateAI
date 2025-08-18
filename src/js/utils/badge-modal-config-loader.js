@@ -392,7 +392,7 @@ export function applyBadgeModalFallbacks(badgeConfig, config = null) {
  * @param {Object} config - Badge modal configuration (optional)
  * @returns {Object} Validation result with isValid boolean and errors array
  */
-export function validateBadgeModalConfig(badgeConfig, config = null) {
+export function validateBadgeModalConfig(badgeConfig) {
   const errors = [];
 
   // Required fields

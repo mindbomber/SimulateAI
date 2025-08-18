@@ -29,19 +29,77 @@ limitations under the License.
       content="Privacy Notice for SimulateAI Educational Platform - Learn how we protect your data and respect your privacy"
     />
 
-    <!-- Google tag (gtag.js) -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-4SVB78MBHN"
-    ></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
+    <!-- Google Analytics is initialized via centralized service (no inline gtag to avoid double-init) -->
 
-      gtag("config", "G-4SVB78MBHN");
+    <!-- Early theme-preload shim: apply correct theme before CSS to prevent FOUC -->
+    <style id="theme-preload-style">
+      html.theme-preload,
+      html.theme-preload * {
+        transition: none !important;
+      }
+    </style>
+    <script>
+      (function () {
+        try {
+          var val = null;
+          try {
+            val = localStorage.getItem("simulateai_theme_preference");
+          } catch (_) {}
+          if (!val) {
+            try {
+              val =
+                localStorage.getItem("simulateai_theme") ||
+                localStorage.getItem("theme");
+            } catch (_) {}
+          }
+          var prefersDark = false;
+          try {
+            prefersDark =
+              window.matchMedia &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches;
+          } catch (_) {}
+          var theme =
+            val === "dark" || val === "light" || val === "system"
+              ? val === "system"
+                ? prefersDark
+                  ? "dark"
+                  : "light"
+                : val
+              : prefersDark
+                ? "dark"
+                : "light";
+
+          document.documentElement.classList.add("theme-preload");
+          document.documentElement.style.colorScheme = theme;
+
+          var apply = function () {
+            var b = document.body;
+            if (!b) return;
+            b.classList.remove("theme-dark", "theme-light", "dark-mode");
+            if (theme === "dark") {
+              b.classList.add("theme-dark", "dark-mode");
+            } else {
+              b.classList.add("theme-light");
+            }
+          };
+
+          if (document.body) {
+            apply();
+          } else {
+            document.addEventListener("DOMContentLoaded", apply, {
+              once: true,
+            });
+          }
+
+          window.addEventListener(
+            "load",
+            function () {
+              document.documentElement.classList.remove("theme-preload");
+            },
+            { once: true },
+          );
+        } catch (e) {}
+      })();
     </script>
     <meta
       name="keywords"
@@ -78,6 +136,9 @@ limitations under the License.
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="src/assets/icons/favicon.svg" />
     <link rel="icon" type="image/png" href="src/assets/icons/favicon.png" />
+
+    <!-- Centralized analytics initializer -->
+    <script type="module" src="src/js/user-tracking-init.js"></script>
   </head>
 
   <body data-page-id="privacy-notice">
@@ -1019,28 +1080,7 @@ limitations under the License.
     </style>
 
     <!-- Shared Navigation Component -->
-    <script src="src/js/components/shared-navigation.js"></script>
-    <script src="src/js/components/settings-manager.js"></script>
-
-    <script>
-      // Initialize shared navigation
-      document.addEventListener("DOMContentLoaded", function () {
-        if (typeof SharedNavigation !== "undefined") {
-          const navigation = new SharedNavigation();
-          navigation.init({
-            currentPage: "privacy-notice",
-            navPath: "src/components/shared-navigation.html",
-          });
-        }
-
-        // Initialize settings manager after navigation loads
-        setTimeout(() => {
-          if (typeof SettingsManager !== "undefined") {
-            const settingsManager = new SettingsManager();
-            settingsManager.init();
-          }
-        }, 500);
-      });
-    </script>
+    <script type="module" src="src/js/components/shared-navigation.js"></script>
+    <script type="module" src="src/js/components/settings-manager.js"></script>
   </body>
 </html>

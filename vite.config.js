@@ -17,9 +17,10 @@
 import { defineConfig } from "vite";
 import fs from "fs";
 
-export default defineConfig(() => {
+export default defineConfig(({ mode }) => {
   // For custom domain (simulateai.io), always use root path
   const base = "/";
+  const isProd = (mode || import.meta?.env?.MODE) === "production";
 
   return {
     root: ".",
@@ -30,25 +31,33 @@ export default defineConfig(() => {
       sourcemap: false, // Disable sourcemaps for production
       target: "es2020",
       rollupOptions: {
-        input: {
-          main: "app.html",
-          index: "index.html",
-          about: "about.html",
-          blog: "blog.html",
-          dataDelete: "data-deletion.html",
-          donate: "donate.html",
-          educator: "educator-tools.html",
-          ethics: "ethics-guide.html",
-          help: "help-faq.html",
-          moderation: "moderation.html",
-          privacy: "privacy-notice.html",
-          profile: "profile.html",
-          research: "research-consent.html",
-          terms: "terms-of-use.html",
-          welcome: "welcome.html",
-          sw: "sw.js", // Include service worker
-          earlyThemeInit: "src/js/utils/early-theme-init.js", // Critical for FOUC prevention
-        },
+        input: (() => {
+          const pages = {
+            main: "app.html",
+            index: "index.html",
+            about: "about.html",
+            blog: "blog.html",
+            dataDelete: "data-deletion.html",
+            donate: "donate.html",
+            educator: "educator-tools.html",
+            ethics: "ethics-guide.html",
+            help: "help-faq.html",
+            moderation: "moderation.html",
+            privacy: "privacy-notice.html",
+            profile: "profile.html",
+            research: "research-consent.html",
+            terms: "terms-of-use.html",
+            // Intentionally omit scenarios.html and any *-test.html from production builds
+            // Include welcome.html only in non-production builds
+          };
+          if (!isProd) {
+            pages.welcome = "welcome.html";
+          }
+          // Always include service worker and legacy earlyThemeInit mapping
+          pages.sw = "sw.js";
+          pages.earlyThemeInit = "src/js/utils/early-theme-init.js";
+          return pages;
+        })(),
         // Ensure all JS modules are included in build
         plugins: [
           // Custom plugin to copy config files
@@ -62,22 +71,24 @@ export default defineConfig(() => {
           {
             name: "copy-additional-files",
             generateBundle() {
-              // Copy firebase-emergency-fix.js to root of dist
-              try {
-                const firebaseFixContent = fs.readFileSync(
-                  "firebase-emergency-fix.js",
-                  "utf8",
-                );
-                this.emitFile({
-                  type: "asset",
-                  fileName: "firebase-emergency-fix.js",
-                  source: firebaseFixContent,
-                });
-              } catch (e) {
-                console.warn(
-                  "Could not copy firebase-emergency-fix.js:",
-                  e.message,
-                );
+              // Copy firebase-emergency-fix.js to root of dist (non-production only)
+              if (!isProd) {
+                try {
+                  const firebaseFixContent = fs.readFileSync(
+                    "firebase-emergency-fix.js",
+                    "utf8",
+                  );
+                  this.emitFile({
+                    type: "asset",
+                    fileName: "firebase-emergency-fix.js",
+                    source: firebaseFixContent,
+                  });
+                } catch (e) {
+                  console.warn(
+                    "Could not copy firebase-emergency-fix.js:",
+                    e.message,
+                  );
+                }
               }
 
               // Copy media.css to src/styles/

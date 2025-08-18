@@ -16,23 +16,32 @@ limitations under the License.
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Google tag (gtag.js) -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-4SVB78MBHN"
-    ></script>
+    <!-- Google Analytics is initialized via centralized service (no inline gtag to avoid double-init) -->
+
+    <!-- Optional emergency Firebase fix: load only when explicitly enabled -->
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-
-      gtag("config", "G-4SVB78MBHN");
+      (function () {
+        try {
+          var enabled =
+            /[?&]emergencyFix=1\b/.test(location.search) ||
+            (function () {
+              try {
+                return (
+                  localStorage.getItem("emergency_firebase_fix") === "true"
+                );
+              } catch (_) {
+                return false;
+              }
+            })();
+          if (enabled) {
+            var s = document.createElement("script");
+            s.src = "./firebase-emergency-fix.js";
+            s.async = true;
+            document.head.appendChild(s);
+          }
+        } catch (_) {}
+      })();
     </script>
-
-    <!-- EMERGENCY FIREBASE 400 ERROR FIX -->
-    <script src="./firebase-emergency-fix.js" async></script>
 
     <meta charset="UTF-8" />
     <meta
@@ -48,16 +57,23 @@ limitations under the License.
       html.theme-preload,
       html.theme-preload * {
         transition: none !important;
+        animation: none !important;
       }
     </style>
     <script>
       (function () {
         try {
-          var keys = ["simulateai_theme", "theme"]; // compatibility
+          // Unified storage key with backward-compatible fallback
           var val = null;
-          for (var i = 0; i < keys.length && !val; i++) {
+          try {
+            val = localStorage.getItem("simulateai_theme_preference");
+          } catch (_) {}
+          if (!val) {
             try {
-              val = localStorage.getItem(keys[i]);
+              // legacy keys fallback
+              val =
+                localStorage.getItem("simulateai_theme") ||
+                localStorage.getItem("theme");
             } catch (_) {}
           }
           var prefersDark = false;
@@ -67,20 +83,36 @@ limitations under the License.
               window.matchMedia("(prefers-color-scheme: dark)").matches;
           } catch (_) {}
           var theme =
-            val === "dark" || val === "light"
-              ? val
+            val === "dark" || val === "light" || val === "system"
+              ? val === "system"
+                ? prefersDark
+                  ? "dark"
+                  : "light"
+                : val
               : prefersDark
                 ? "dark"
                 : "light";
 
           // Disable transitions during first paint and align UA widgets
-          document.documentElement.classList.add("theme-preload");
-          document.documentElement.style.colorScheme = theme;
+          var root = document.documentElement;
+          root.classList.add("theme-preload");
+          root.style.colorScheme = theme;
 
-          var apply = function () {
+          // Apply theme classes to <html> immediately (body may not exist yet)
+          root.classList.remove("theme-dark", "theme-light", "dark-mode");
+          if (theme === "dark") {
+            root.classList.add("theme-dark", "dark-mode");
+            // Temporary dark background/text to avoid white flash before CSS loads
+            root.style.backgroundColor = "#0d1117";
+            root.style.color = "#f0f6fc";
+          } else {
+            root.classList.add("theme-light");
+          }
+
+          // When body becomes available, mirror classes onto it
+          var syncBody = function () {
             var b = document.body;
             if (!b) return;
-            // Normalize classes
             b.classList.remove("theme-dark", "theme-light", "dark-mode");
             if (theme === "dark") {
               b.classList.add("theme-dark", "dark-mode");
@@ -90,18 +122,34 @@ limitations under the License.
           };
 
           if (document.body) {
-            apply();
+            syncBody();
           } else {
-            document.addEventListener("DOMContentLoaded", apply, {
+            // Use a micro task to catch early body creation without waiting for full DOMContentLoaded
+            var mo = new MutationObserver(function () {
+              if (document.body) {
+                try {
+                  syncBody();
+                } catch (_) {}
+                try {
+                  mo.disconnect();
+                } catch (_) {}
+              }
+            });
+            mo.observe(root, { childList: true, subtree: true });
+            // Fallback to DOMContentLoaded if needed
+            document.addEventListener("DOMContentLoaded", syncBody, {
               once: true,
             });
           }
 
-          // Remove preload class after load to re-enable transitions
+          // Remove preload class and temporary inline styles after load to re-enable transitions
           window.addEventListener(
             "load",
             function () {
-              document.documentElement.classList.remove("theme-preload");
+              root.classList.remove("theme-preload");
+              // Clean up temporary inline styles set for dark preload
+              root.style.removeProperty("background-color");
+              root.style.removeProperty("color");
             },
             { once: true },
           );
@@ -114,22 +162,7 @@ limitations under the License.
     <!-- Base URL for custom domain - will be removed for localhost -->
     <base href="/" id="custom-domain-base" />
 
-    <!-- Import map for Firebase ES modules -->
-    <script type="importmap">
-      {
-        "imports": {
-          "firebase/app": "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js",
-          "firebase/auth": "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js",
-          "firebase/firestore": "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js",
-          "firebase/analytics": "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js",
-          "firebase/performance": "https://www.gstatic.com/firebasejs/12.0.0/firebase-performance.js",
-          "firebase/app-check": "https://www.gstatic.com/firebasejs/12.0.0/firebase-app-check.js",
-          "firebase/messaging": "https://www.gstatic.com/firebasejs/12.0.0/firebase-messaging.js",
-          "firebase/storage": "https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js",
-          "firebase/functions": "https://www.gstatic.com/firebasejs/12.0.0/firebase-functions.js"
-        }
-      }
-    </script>
+    <!-- Firebase ESM import map removed; bundler/npm resolves Firebase modules -->
 
     <title>SimulateAI App - Interactive AI Ethics Simulations Platform</title>
     <meta
@@ -237,8 +270,9 @@ limitations under the License.
       /* Universal selector moved to main.css for complete reset */
       body {
         font-family: var(--font);
-        color: var(--text);
-        background: var(--bg);
+        /* Inherit theme colors from html to avoid white flash before CSS loads */
+        color: inherit;
+        background: transparent;
         margin: 0;
         line-height: 1.6;
         font-size: 16px;
@@ -318,21 +352,19 @@ limitations under the License.
         opacity: 0.7;
         pointer-events: none;
       }
-      body.dark-mode {
-        --bg: #0d1117;
-        --text: #f0f6fc;
-      }
+      /* Dark mode variables are applied via @layer overrides in css-layers.css */
     </style>
 
     <!-- Styles - Optimized load order for CSS architecture -->
     <!-- 0. CSS Layers definition - MUST LOAD FIRST -->
+    <link rel="preload" href="src/styles/css-layers.css" as="style" />
     <link rel="stylesheet" href="src/styles/css-layers.css" />
 
     <!-- 1. Design tokens foundation - MUST LOAD FIRST -->
+    <link rel="preload" href="src/styles/design-tokens.css" as="style" />
     <link rel="stylesheet" href="src/styles/design-tokens.css" />
 
-    <!-- 1.1. Early theme initialization - Apply theme immediately to prevent FOUC -->
-    <script type="module" src="src/js/utils/early-theme-init.js"></script>
+    <!-- 1.1. Early theme is handled by the inline theme-preload shim -->
 
     <!-- 2. Media queries foundation -->
     <link rel="stylesheet" href="src/styles/media.css" />
@@ -446,10 +478,19 @@ limitations under the License.
     <!-- Preload critical resources -->
     <link rel="preload" href="src/styles/main.css" as="style" />
     <link rel="preload" href="src/styles/accessibility.css" as="style" />
-    <link rel="preload" href="src/js/app.js" as="script" crossorigin />
+    <link rel="modulepreload" href="src/js/app.js" />
+    <link rel="modulepreload" href="src/js/app-startup.js" />
 
-    <!-- DNS prefetch for external resources -->
+    <!-- DNS prefetch / preconnect for external resources -->
     <link rel="dns-prefetch" href="//unpkg.com" />
+    <link
+      rel="preconnect"
+      href="https://www.googletagmanager.com"
+      crossorigin
+    />
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
     <!-- Resource hints -->
     <link rel="prefetch" href="src/js/core/engine.js" />
@@ -500,10 +541,15 @@ limitations under the License.
     <script>
       // Check if inert is supported, if not defer polyfill loading
       if (!("inert" in HTMLElement.prototype)) {
-        // Use dynamic import instead of DOM manipulation
+        // Use dynamic import with safe fallback for older browsers
         import("https://unpkg.com/wicg-inert@3.1.2/dist/inert.min.js").catch(
           () => {
-            // Fallback: add script tag conditionally if dynamic import fails
+            try {
+              var s = document.createElement("script");
+              s.src = "https://unpkg.com/wicg-inert@3.1.2/dist/inert.min.js";
+              s.defer = true;
+              document.head.appendChild(s);
+            } catch (_) {}
           },
         );
       }
@@ -511,12 +557,21 @@ limitations under the License.
 
     <!-- Remove base URL for localhost development -->
     <script>
-      if (window.location.hostname === "localhost") {
-        const baseTag = document.getElementById("custom-domain-base");
-        if (baseTag) {
-          baseTag.remove();
+      (function () {
+        var h = window.location.hostname;
+        var isLocal =
+          h === "localhost" ||
+          h === "127.0.0.1" ||
+          h === "::1" ||
+          h.startsWith("192.168.") ||
+          h.endsWith(".local");
+        if (isLocal) {
+          const baseTag = document.getElementById("custom-domain-base");
+          if (baseTag) {
+            baseTag.remove();
+          }
         }
-      }
+      })();
     </script>
   </head>
   <body>
@@ -1466,20 +1521,48 @@ limitations under the License.
 
     <!-- Scripts -->
     <script type="module" src="src/js/services/firebase-service.js"></script>
+    <!-- Core event system and environment config should load early to avoid race conditions -->
+    <!-- Event Manager - Must load BEFORE other modules to prevent race conditions -->
+    <script type="module" src="src/js/utils/event-manager.js"></script>
+    <!-- Event Dispatcher for Component Communication -->
+    <script type="module" src="src/js/utils/event-dispatcher.js"></script>
+    <!-- Environment configuration (consumers should also import explicitly) -->
+    <script type="module" src="src/js/utils/env-config.js"></script>
+
+    <!-- Early components -->
     <script
       type="module"
       src="src/js/components/notification-toast.js"
     ></script>
     <script type="module" src="src/js/components/modal-utility.js"></script>
 
-    <!-- CSS Layers Diagnostic Tool -->
-    <script type="module" src="src/utils/css-layers-diagnostic.js"></script>
+    <!-- CSS Layers Diagnostic Tool (development only) -->
+    <script type="module">
+      window.__simulateaiDevFlags =
+        window.__simulateaiDevFlags ||
+        (() => {
+          const h = location.hostname;
+          const isDevHost =
+            ["localhost", "127.0.0.1", "::1"].includes(h) ||
+            h.startsWith("192.168.") ||
+            h.endsWith(".local");
+          const debugFlag =
+            localStorage.getItem("debug") === "true" ||
+            sessionStorage.getItem("debug") === "true";
+          return { isDevHost, debugFlag };
+        })();
+      if (
+        window.__simulateaiDevFlags.isDevHost ||
+        window.__simulateaiDevFlags.debugFlag
+      ) {
+        import("/src/utils/css-layers-diagnostic.js");
+      }
+    </script>
 
     <!-- JSON SSOT Configuration System - Initialize before app.js -->
     <script type="module" src="src/js/app-startup.js"></script>
 
     <script type="module" src="src/js/app.js"></script>
-    <script type="module" src="src/js/utils/env-config.js"></script>
     <script
       type="module"
       src="src/js/components/enhanced-donation-widget.js"
@@ -1489,7 +1572,6 @@ limitations under the License.
       src="src/js/components/donor-flair-display.js"
     ></script>
     <link rel="stylesheet" href="src/styles/enhanced-donation-widget.css" />
-    <link rel="stylesheet" href="src/styles/donor-flair-display.css" />
 
     <!-- Professional Donor Wall -->
     <link rel="stylesheet" href="src/styles/donor-wall.css" />
@@ -1644,11 +1726,7 @@ limitations under the License.
     <!-- Settings Manager Component -->
     <script type="module" src="src/js/components/settings-manager.js"></script>
 
-    <!-- Event Manager - Must load BEFORE other modules to prevent race conditions -->
-    <script type="module" src="src/js/utils/event-manager.js"></script>
-
-    <!-- Event Dispatcher for Component Communication -->
-    <script type="module" src="src/js/utils/event-dispatcher.js"></script>
+    <!-- Event system loaded earlier to prevent race conditions -->
 
     <!-- Intentional Logout System -->
     <script
@@ -1701,19 +1779,18 @@ limitations under the License.
     ></script>
     <script type="module" src="src/js/utils/gdpr-init.js"></script>
 
-    <!-- Theme Validation Utility (Development) -->
-    <script type="module" src="src/utils/theme-validator.js"></script>
-
-    <!-- CSS Performance Analyzer (Development) -->
-    <script type="module" src="src/utils/css-performance-analyzer.js"></script>
-
-    <!-- State Management Performance Analyzer (Development) -->
-    <script type="module" src="src/utils/state-management-analyzer.js"></script>
-
-    <!-- CSS Layers Migration Analyzer (Development) -->
-    <script
-      type="module"
-      src="src/utils/css-layers-migration-analyzer.js"
-    ></script>
+    <!-- Development analyzers: load only on local/dev or when debug flag is enabled -->
+    <script type="module">
+      const flags = window.__simulateaiDevFlags || {
+        isDevHost: false,
+        debugFlag: false,
+      };
+      if (flags.isDevHost || flags.debugFlag) {
+        import("/src/utils/theme-validator.js");
+        import("/src/utils/css-performance-analyzer.js");
+        import("/src/utils/state-management-analyzer.js");
+        import("/src/utils/css-layers-migration-analyzer.js");
+      }
+    </script>
   </body>
 </html>

@@ -10,28 +10,27 @@
  * 3. main.css - Base styles
  * 4. All other component CSS files
  */
-
 @layer tokens {
   :root {
-    /* ===== BRAND COLORS ===== */
+    /* Base brand and semantic colors */
     --color-brand-primary: #1a73e8;
     --color-brand-secondary: #4285f4;
     --color-brand-tertiary: #34a853;
 
-    /* ===== PRIMARY COLOR SYSTEM ===== */
+    /* Primary color system */
     --color-primary: #1a73e8;
     --color-primary-dark: #1565c0;
     --color-primary-light: #42a5f5;
     --color-secondary: #6b7280;
     --color-secondary-dark: #4b5563;
 
-    /* ===== SEMANTIC COLORS ===== */
+    /* Semantic colors */
     --color-success: #34a853;
     --color-warning: #fbbc04;
     --color-error: #ea4335;
     --color-info: #4285f4;
 
-    /* ===== NEUTRAL SCALE ===== */
+    /* Neutral scale */
     --color-white: #fff;
     --color-black: #000;
     --color-gray-50: #f8f9fa;
@@ -45,7 +44,7 @@
     --color-gray-800: #1f2937;
     --color-gray-900: #111827;
 
-    /* ===== SURFACE COLORS (Semantic Usage) ===== */
+    /* Surface colors (light base) */
     --color-surface: var(--color-white);
     --color-surface-secondary: var(--color-gray-50);
     --color-surface-tertiary: var(--color-gray-100);
@@ -53,17 +52,13 @@
     --color-on-surface-secondary: var(--color-gray-700);
     --color-on-surface-tertiary: var(--color-gray-500);
 
-    /* ===== SEMANTIC THEME TOKENS ===== */
-    /* These tokens provide consistent theming across all components */
-
-    /* Background Colors */
+    /* Semantic theme tokens */
     --theme-bg-primary: var(--color-surface);
     --theme-bg-secondary: var(--color-surface-secondary);
     --theme-bg-tertiary: var(--color-surface-tertiary);
     --theme-bg-interactive: var(--color-gray-50);
-    --theme-bg-overlay: rgb(0 0 0 / 80%);
+    --theme-bg-overlay: rgb(0 0 0 / 50%);
 
-    /* Text Colors */
     --theme-text-primary: var(--color-on-surface);
     --theme-text-secondary: var(--color-on-surface-secondary);
     --theme-text-tertiary: var(--color-on-surface-tertiary);
@@ -71,7 +66,6 @@
     --theme-text-inverse: var(--color-white);
     --theme-text-on-accent: var(--color-white);
 
-    /* Border Colors */
     --theme-border-primary: var(--color-gray-200);
     --theme-border-secondary: var(--color-gray-300);
     --theme-border-interactive: var(--color-gray-400);
@@ -79,7 +73,6 @@
     --theme-border-error: var(--color-error);
     --theme-border-success: var(--color-success);
 
-    /* Accent Colors */
     --theme-accent-primary: var(--color-primary);
     --theme-accent-secondary: var(--color-secondary);
     --theme-accent-success: var(--color-success);
@@ -87,98 +80,10 @@
     --theme-accent-error: var(--color-error);
     --theme-accent-info: var(--color-info);
 
-    /* Shadow Colors */
-    --theme-shadow-light: rgb(0 0 0 / 5%);
-    --theme-shadow-medium: rgb(0 0 0 / 10%);
-    --theme-shadow-heavy: rgb(0 0 0 / 15%);
-    --theme-shadow-focus: rgb(26 115 232 / 30%);
-
-    /* Interactive States */
-    --theme-hover-opacity: 0.8;
-    --theme-active-opacity: 0.9;
-    --theme-disabled-opacity: 0.5;
-
-    /* ===== TYPOGRAPHY SCALE ===== */
-    --font-size-xs: 0.75rem; /* 12px */
-    --font-size-sm: 0.875rem; /* 14px */
-    --font-size-base: 1rem; /* 16px */
-    --font-size-lg: 1.125rem; /* 18px */
-    --font-size-xl: 1.25rem; /* 20px */
-    --font-size-2xl: 1.5rem; /* 24px */
-    --font-size-3xl: 1.875rem; /* 30px */
-    --font-size-4xl: 2.25rem; /* 36px */
-    --font-size-5xl: 3rem; /* 48px */
-    --font-size-6xl: 3.75rem; /* 60px */
-
-    /* ===== FONT WEIGHTS ===== */
-    --font-weight-thin: 100;
-    --font-weight-light: 300;
-    --font-weight-normal: 400;
-    --font-weight-medium: 500;
-    --font-weight-semibold: 600;
-    --font-weight-bold: 700;
-    --font-weight-extrabold: 800;
-    --font-weight-black: 900;
-
-    /* ===== FONT FAMILIES ===== */
-    --font-family-sans:
-      "Inter", -apple-system, blinkmacsystemfont, "Segoe UI", "Roboto",
-      "Oxygen", "Ubuntu", "Cantarell", sans-serif;
-    --font-family-serif: "Georgia", "Times New Roman", serif;
-    --font-family-mono:
-      "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", "Courier New",
-      monospace;
-
-    /* ===== LINE HEIGHTS ===== */
-    --line-height-none: 1;
-    --line-height-tight: 1.25;
-    --line-height-snug: 1.375;
-    --line-height-normal: 1.5;
-    --line-height-relaxed: 1.625;
-    --line-height-loose: 2;
-
-    /* ===== SPACING SCALE ===== */
-    --space-px: 1px;
-    --space-0: 0;
-    --space-1: 0.25rem; /* 4px */
-    --space-2: 0.5rem; /* 8px */
-    --space-3: 0.75rem; /* 12px */
-    --space-4: 1rem; /* 16px */
-    --space-5: 1.25rem; /* 20px */
-    --space-6: 1.5rem; /* 24px */
-    --space-7: 1.75rem; /* 28px */
-    --space-8: 2rem; /* 32px */
-    --space-9: 2.25rem; /* 36px */
-    --space-10: 2.5rem; /* 40px */
-    --space-11: 2.75rem; /* 44px */
-    --space-12: 3rem; /* 48px */
-    --space-14: 3.5rem; /* 56px */
-    --space-16: 4rem; /* 64px */
-    --space-20: 5rem; /* 80px */
-    --space-24: 6rem; /* 96px */
-    --space-28: 7rem; /* 112px */
-    --space-32: 8rem; /* 128px */
-
-    /* ===== BORDER RADIUS ===== */
-    --radius-none: 0;
-    --radius-sm: 0.125rem; /* 2px */
-    --radius-base: 0.25rem; /* 4px */
-    --radius-md: 0.375rem; /* 6px */
-    --radius-lg: 0.5rem; /* 8px */
-    --radius-xl: 0.75rem; /* 12px */
-    --radius-2xl: 1rem; /* 16px */
-    --radius-3xl: 1.5rem; /* 24px */
-    --radius-full: 9999px; /* Fully rounded */
-
-    /* ===== BORDER WIDTHS ===== */
-    --border-width-0: 0;
-    --border-width-1: 1px;
-    --border-width-2: 2px;
-    --border-width-4: 4px;
-    --border-width-8: 8px;
-
-    /* ===== SHADOWS ===== */
-    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 5%);
+    --theme-shadow-light: rgb(0 0 0 / 10%);
+    --theme-shadow-medium: rgb(0 0 0 / 15%);
+    --theme-shadow-heavy: rgb(0 0 0 / 20%);
+    --theme-shadow-focus: rgb(59 130 246 / 40%);
     --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 10%), 0 1px 2px 0 rgb(0 0 0 / 6%);
     --shadow-base:
       0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -1px rgb(0 0 0 / 6%);

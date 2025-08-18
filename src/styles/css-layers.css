@@ -69,8 +69,10 @@
       )
     );
     line-height: var(--line-height-base, 1.6);
-    color: var(--color-text, var(--color-text-primary, #2d3748));
-    background-color: var(--color-background, #fff);
+
+    /* Use semantic theme tokens to prevent light flash during theme swap */
+    color: var(--theme-text-primary, #2d3748);
+    background-color: var(--theme-bg-primary, #fff);
     font-size: var(--font-size-base, 1rem);
   }
 
@@ -81,7 +83,7 @@
   h4,
   h5,
   h6 {
-    color: var(--color-text, var(--color-text-primary, #2d3748));
+    color: var(--theme-text-primary, #2d3748);
     font-family: inherit;
     margin: 0;
   }
@@ -474,6 +476,69 @@
     font-weight: var(--font-weight-semibold, 600);
   }
   /* stylelint-enable rule-empty-line-before */
+}
+
+/* Overrides Layer - Theme overrides and state-specific styles */
+@layer overrides {
+  /*
+   * Dark Mode Theme Overrides
+   * Apply semantic tokens when dark mode is active.
+   * We target both html and body to ensure early paint correctness
+   * (html gets classes during the inline theme-preload shim).
+   */
+  html.dark-mode,
+  body.dark-mode,
+  html.theme-dark,
+  body.theme-dark {
+    color-scheme: dark;
+
+    /* Core surface and text colors */
+    --color-surface: #0d1117;
+    --color-surface-secondary: #161b22;
+    --color-surface-tertiary: #21262d;
+    --color-on-surface: #f0f6fc;
+    --color-on-surface-secondary: #e6edf3;
+    --color-on-surface-tertiary: #7d8590;
+
+    /* Semantic theme tokens */
+    --theme-bg-primary: #0d1117;
+    --theme-bg-secondary: #161b22;
+    --theme-bg-tertiary: #21262d;
+    --theme-bg-interactive: #262c36;
+    --theme-bg-overlay: rgb(0 0 0 / 90%);
+    --theme-text-primary: #f0f6fc;
+    --theme-text-secondary: #e6edf3;
+    --theme-text-tertiary: #7d8590;
+    --theme-text-muted: #656d76;
+    --theme-text-inverse: #0d1117;
+    --theme-text-on-accent: #fff;
+    --theme-border-primary: #30363d;
+    --theme-border-secondary: #21262d;
+    --theme-border-interactive: #656d76;
+    --theme-border-focus: #58a6ff;
+    --theme-border-error: #f85149;
+    --theme-border-success: #56d364;
+    --theme-accent-primary: #58a6ff;
+    --theme-accent-secondary: #8b949e;
+    --theme-accent-success: #56d364;
+    --theme-accent-warning: #e3b341;
+    --theme-accent-error: #f85149;
+    --theme-accent-info: #79c0ff;
+    --theme-shadow-light: rgb(0 0 0 / 30%);
+    --theme-shadow-medium: rgb(0 0 0 / 40%);
+    --theme-shadow-heavy: rgb(0 0 0 / 50%);
+    --theme-shadow-focus: rgb(88 166 255 / 40%);
+
+    /* Adjust standard shadows for dark mode */
+    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 30%);
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 40%), 0 1px 2px 0 rgb(0 0 0 / 30%);
+    --shadow-base:
+      0 4px 6px -1px rgb(0 0 0 / 40%), 0 2px 4px -1px rgb(0 0 0 / 30%);
+    --shadow-md:
+      0 10px 15px -3px rgb(0 0 0 / 40%), 0 4px 6px -2px rgb(0 0 0 / 30%);
+    --shadow-lg:
+      0 20px 25px -5px rgb(0 0 0 / 40%), 0 10px 10px -5px rgb(0 0 0 / 20%);
+  }
 }
 
 /* Overrides Layer - Theme and state overrides */

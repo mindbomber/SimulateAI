@@ -89,6 +89,7 @@ class CanvasManagerCompat {
    * @returns {CanvasRenderer} The canvas renderer as visual engine
    */
   async createVisualEngine(canvasId, engineOptions = {}) {
+    // eslint-disable-line no-unused-vars
     try {
       const renderer = this.renderers.get(canvasId);
 

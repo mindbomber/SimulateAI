@@ -72,7 +72,8 @@ self.addEventListener("install", (event) => {
         // Try to cache offline files, but don't fail if they don't exist
         const offlineFiles = [
           "/offline.html",
-          "/src/assets/icons/favicon.svg", // Use a file we know exists
+          // Use stable icon from public/ copied without hashing
+          "/favicon.ico",
         ];
 
         for (const file of offlineFiles) {
@@ -409,9 +410,7 @@ async function handleOfflineFallback(request) {
   // For images, return cached fallback icon
   if (request.headers.get("accept")?.includes("image/")) {
     const offlineCache = await caches.open(OFFLINE_CACHE);
-    const fallbackImage = await offlineCache.match(
-      "/src/assets/icons/Square Icon_192_x_192.png",
-    );
+    const fallbackImage = await offlineCache.match("/favicon.ico");
     if (fallbackImage) {
       return fallbackImage;
     }
