@@ -5,7 +5,7 @@
     "classrooms": {
       "$classroomId": {
         ".read": "auth != null",
-        ".write": "auth != null && (data.child('instructorId').val() == auth.uid || root.child('classrooms').child($classroomId).child('roster').child(auth.uid).exists())",
+        ".write": "auth != null && (newData.child('instructorId').val() == auth.uid || root.child('classrooms').child($classroomId).child('roster').child(auth.uid).exists())",
         "roster": {
           "$studentId": {
             ".read": "auth != null",

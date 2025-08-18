@@ -88,23 +88,41 @@ class ConsoleCleanup {
     };
 
     this.isInitialized = true;
-    console.log(
-      "🧹 Console Cleanup initialized. Use window.consoleCleanup.enableQuietMode() to reduce noise.",
-    );
+    try {
+      const debugOn =
+        (typeof localStorage !== "undefined" &&
+          (localStorage.getItem("debug") === "true" ||
+            localStorage.getItem("verbose-logs") === "true")) ||
+        false;
+
+      // Auto-enable quiet mode by default unless debug/verbose explicitly enabled
+      if (!debugOn) {
+        // Persist preference so users can opt-out by calling verboseLogs()
+        if (typeof localStorage !== "undefined") {
+          localStorage.setItem("quiet-logs", "true");
+        }
+        this.enableQuietMode({ silent: true });
+      }
+    } catch (_) {
+      // no-op
+    }
   }
 
   /**
    * Enable quiet mode - reduces console noise significantly
    */
-  enableQuietMode() {
-    localStorage.setItem("quiet-logs", "true");
+  enableQuietMode(options = {}) {
+    const { silent = false } = options;
+    try {
+      localStorage.setItem("quiet-logs", "true");
+    } catch (_) {
+      // no-op
+    }
 
     // Override console methods to filter noise
-    console.info = (...args) => {
-      if (!this._shouldFilterMessage(args[0])) {
-        this.logCounts.info++;
-        this.originalMethods.info(...args);
-      }
+    console.info = () => {
+      // fully suppress info in quiet mode
+      this.logCounts.info++;
     };
 
     console.warn = (...args) => {
@@ -119,37 +137,41 @@ class ConsoleCleanup {
       this.originalMethods.error(...args);
     };
 
-    console.log = (...args) => {
-      if (!this._shouldFilterMessage(args[0])) {
-        this.originalMethods.log(...args);
-      }
+    console.log = () => {
+      // fully suppress generic logs in quiet mode
     };
 
-    console.group = (...args) => {
-      if (!this._shouldFilterMessage(args[0])) {
-        this.originalMethods.log(...args);
-      }
+    console.group = () => {
+      // suppress groups in quiet mode
     };
 
     console.groupEnd = () => {
       // Usually called after filtered content, so suppress
     };
 
-    console.info(
-      "🔇 Quiet mode enabled - reduced console noise. Use window.consoleCleanup.stats() to see filtering stats.",
-    );
+    if (!silent) {
+      this.originalMethods.info(
+        "🔇 Quiet mode enabled - reduced console noise. Use window.consoleCleanup.stats() to see filtering stats.",
+      );
+    }
   }
 
   /**
    * Disable quiet mode - restore full logging
    */
   disableQuietMode() {
-    localStorage.removeItem("quiet-logs");
+    try {
+      localStorage.removeItem("quiet-logs");
+    } catch (_) {
+      // no-op
+    }
 
     // Restore original console methods
     Object.assign(console, this.originalMethods);
 
-    console.info("🔊 Quiet mode disabled - full logging restored.");
+    this.originalMethods.info(
+      "🔊 Quiet mode disabled - full logging restored.",
+    );
   }
 
   /**

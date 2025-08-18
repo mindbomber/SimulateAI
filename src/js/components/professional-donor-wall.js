@@ -838,9 +838,20 @@ class ProfessionalDonorWall {
     this.updateCarouselState();
 
     const endTime = performance.now();
-    console.debug(
-      `[DonorWall] Batched card rendering took ${endTime - startTime}ms`,
-    );
+    try {
+      const __verbose =
+        (typeof localStorage !== "undefined" &&
+          (localStorage.getItem("debug") === "true" ||
+            localStorage.getItem("verbose-logs") === "true")) ||
+        false;
+      if (__verbose) {
+        console.debug(
+          `[DonorWall] Batched card rendering took ${endTime - startTime}ms`,
+        );
+      }
+    } catch (_) {
+      // no-op
+    }
   }
 
   /**

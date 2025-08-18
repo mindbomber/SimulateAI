@@ -59,6 +59,9 @@ export const securityConfig = {
 export const devConfig = {
   enableDebugLogging: true,
   useEmulators: true, // 🔥 ENABLED for emulator development
+  // Force popup auth in dev to avoid redirect handler issues on small windows
+  forcePopupAuth: true,
+  emulatorHost: "127.0.0.1",
   emulatorPorts: {
     auth: 9099,
     firestore: 8081,
@@ -68,12 +71,7 @@ export const devConfig = {
   },
 };
 
-// Development note
-console.log("🔧 Using development Firebase configuration");
-console.log("⚠️ This config contains placeholder values for localhost only");
-console.log(
-  "🚀 Production will use secure config injection from Firebase Hosting",
-);
+// Development note (logs removed to reduce console noise)
 
 // Export default config
 export default {

@@ -66,19 +66,27 @@ class FloatingActionTab {
       if (this.dataHandler) {
         await this.loadAnalyticsData();
         await this.loadUserPreferences();
-        console.log("FloatingActionTab: DataHandler initialized successfully");
+        if (localStorage.getItem("verbose-css-logs") === "true") {
+          console.log(
+            "FloatingActionTab: DataHandler initialized successfully",
+          );
+        }
       } else {
-        console.warn(
-          "[FloatingActionTab] DataHandler not available, using fallback mode",
-        );
+        if (localStorage.getItem("verbose-css-logs") === "true") {
+          console.warn(
+            "[FloatingActionTab] DataHandler not available, using fallback mode",
+          );
+        }
         this.loadAnalyticsFromLocalStorage();
         this.loadPreferencesFromLocalStorage();
       }
     } catch (error) {
-      console.warn(
-        "[FloatingActionTab] DataHandler initialization failed, using fallback mode:",
-        error,
-      );
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.warn(
+          "[FloatingActionTab] DataHandler initialization failed, using fallback mode:",
+          error,
+        );
+      }
       // Continue without DataHandler - use localStorage fallback
       this.dataHandler = null;
       this.loadAnalyticsFromLocalStorage();
@@ -107,10 +115,12 @@ class FloatingActionTab {
         };
       }
     } catch (error) {
-      console.warn(
-        "[FloatingActionTab] Failed to load analytics from DataHandler, using localStorage:",
-        error,
-      );
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.warn(
+          "[FloatingActionTab] Failed to load analytics from DataHandler, using localStorage:",
+          error,
+        );
+      }
       this.loadAnalyticsFromLocalStorage();
     }
   }
@@ -130,10 +140,12 @@ class FloatingActionTab {
         };
       }
     } catch (error) {
-      console.warn(
-        "[FloatingActionTab] Error loading from localStorage:",
-        error,
-      );
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.warn(
+          "[FloatingActionTab] Error loading from localStorage:",
+          error,
+        );
+      }
     }
   }
 
@@ -154,10 +166,12 @@ class FloatingActionTab {
         this.userPreferences = preferences;
       }
     } catch (error) {
-      console.warn(
-        "[FloatingActionTab] Failed to load user preferences from DataHandler, using localStorage:",
-        error,
-      );
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.warn(
+          "[FloatingActionTab] Failed to load user preferences from DataHandler, using localStorage:",
+          error,
+        );
+      }
       this.loadPreferencesFromLocalStorage();
     }
   }
@@ -172,10 +186,12 @@ class FloatingActionTab {
         this.userPreferences = JSON.parse(saved);
       }
     } catch (error) {
-      console.warn(
-        "[FloatingActionTab] Error loading preferences from localStorage:",
-        error,
-      );
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.warn(
+          "[FloatingActionTab] Error loading preferences from localStorage:",
+          error,
+        );
+      }
     }
   }
 
@@ -197,10 +213,12 @@ class FloatingActionTab {
         );
         return;
       } catch (error) {
-        console.warn(
-          "[FloatingActionTab] Failed to save analytics to DataHandler, using localStorage fallback:",
-          error,
-        );
+        if (localStorage.getItem("verbose-css-logs") === "true") {
+          console.warn(
+            "[FloatingActionTab] Failed to save analytics to DataHandler, using localStorage fallback:",
+            error,
+          );
+        }
       }
     }
 
@@ -247,28 +265,36 @@ class FloatingActionTab {
   }
 
   init() {
-    console.log(
-      "FloatingActionTab: init() called, isInitialized =",
-      this.isInitialized,
-    );
+    if (localStorage.getItem("verbose-css-logs") === "true") {
+      console.log(
+        "FloatingActionTab: init() called, isInitialized =",
+        this.isInitialized,
+      );
+    }
     if (this.isInitialized) return;
 
     this.createElement();
     this.attachToDOM();
     this.applyInitialSettings();
     this.isInitialized = true;
-    console.log("FloatingActionTab: Initialization complete");
+    if (localStorage.getItem("verbose-css-logs") === "true") {
+      console.log("FloatingActionTab: Initialization complete");
+    }
   }
 
   listenToSettings() {
-    console.log("FloatingActionTab: Setting up settings listeners");
+    if (localStorage.getItem("verbose-css-logs") === "true") {
+      console.log("FloatingActionTab: Setting up settings listeners");
+    }
 
     // Listen for settings changes
     window.addEventListener("settingsChanged", (e) => {
-      console.log(
-        "FloatingActionTab: settingsChanged event received",
-        e.detail,
-      );
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.log(
+          "FloatingActionTab: settingsChanged event received",
+          e.detail,
+        );
+      }
       const { settings } = e.detail;
       // Use the getSetting method to ensure we get the default if undefined
       const enabled =
@@ -280,10 +306,12 @@ class FloatingActionTab {
 
     // Listen for settings manager ready
     window.addEventListener("settingsManagerReady", (e) => {
-      console.log(
-        "FloatingActionTab: settingsManagerReady event received",
-        e.detail,
-      );
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.log(
+          "FloatingActionTab: settingsManagerReady event received",
+          e.detail,
+        );
+      }
       const { settings } = e.detail;
       // Use the getSetting method to ensure we get the default if undefined
       const enabled =
@@ -299,15 +327,19 @@ class FloatingActionTab {
     const applySettings = () => {
       if (window.settingsManager) {
         const enabled = window.settingsManager.getSetting("donateTabEnabled");
-        console.log(
-          "FloatingActionTab: Settings found, donateTabEnabled =",
-          enabled,
-        );
+        if (localStorage.getItem("verbose-css-logs") === "true") {
+          console.log(
+            "FloatingActionTab: Settings found, donateTabEnabled =",
+            enabled,
+          );
+        }
         this.updateVisibility(enabled);
       } else {
-        console.log(
-          "FloatingActionTab: Settings manager not ready, using default (true)",
-        );
+        if (localStorage.getItem("verbose-css-logs") === "true") {
+          console.log(
+            "FloatingActionTab: Settings manager not ready, using default (true)",
+          );
+        }
         // Default to true (ON) when settings manager is not ready
         // This ensures fresh browser sessions show the tab initially
         this.updateVisibility(true);
@@ -324,19 +356,23 @@ class FloatingActionTab {
   }
 
   updateVisibility(enabled) {
-    console.log(
-      "FloatingActionTab: updateVisibility called with enabled =",
-      enabled,
-      "link exists =",
-      !!this.link,
-    );
+    if (localStorage.getItem("verbose-css-logs") === "true") {
+      console.log(
+        "FloatingActionTab: updateVisibility called with enabled =",
+        enabled,
+        "link exists =",
+        !!this.link,
+      );
+    }
     if (this.link) {
       // Show tab when enabled (toggle right), hide when disabled (toggle left)
       this.link.style.display = enabled ? "block" : "none";
-      console.log(
-        "FloatingActionTab: Set display to",
-        enabled ? "block" : "none",
-      );
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.log(
+          "FloatingActionTab: Set display to",
+          enabled ? "block" : "none",
+        );
+      }
     }
   }
 
@@ -378,7 +414,9 @@ class FloatingActionTab {
   attachToDOM() {
     // Add to the end of the body
     document.body.appendChild(this.link);
-    console.log("FloatingActionTab: Attached to DOM, element:", this.link);
+    if (localStorage.getItem("verbose-css-logs") === "true") {
+      console.log("FloatingActionTab: Attached to DOM, element:", this.link);
+    }
   }
 
   bindEvents() {
@@ -390,6 +428,7 @@ class FloatingActionTab {
       this.link.addEventListener(
         "touchstart",
         this.handleTouchStart.bind(this),
+        { passive: true },
       );
       this.link.addEventListener("click", this.handleMobileClick.bind(this));
     } else {
@@ -701,7 +740,9 @@ class FloatingActionTab {
       link.download = `donation-tab-analytics-${Date.now()}.json`;
       link.click();
 
-      console.log("FloatingActionTab: Analytics data exported successfully");
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.log("FloatingActionTab: Analytics data exported successfully");
+      }
       return true;
     } catch (error) {
       console.error(
@@ -715,7 +756,9 @@ class FloatingActionTab {
   async resetDonationMetrics() {
     try {
       await this.dataHandler.clearAnalyticsData("donation_analytics");
-      console.log("FloatingActionTab: Donation metrics reset successfully");
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.log("FloatingActionTab: Donation metrics reset successfully");
+      }
       return true;
     } catch (error) {
       console.error(
@@ -755,12 +798,18 @@ class FloatingActionTab {
 
 // Auto-initialize when DOM is ready with timing coordination
 function initializeFloatingActionTab() {
-  console.log("FloatingActionTab: initializeFloatingActionTab called");
+  if (localStorage.getItem("verbose-css-logs") === "true") {
+    console.log("FloatingActionTab: initializeFloatingActionTab called");
+  }
   if (!window.floatingActionTab) {
-    console.log("FloatingActionTab: Creating new instance");
+    if (localStorage.getItem("verbose-css-logs") === "true") {
+      console.log("FloatingActionTab: Creating new instance");
+    }
     window.floatingActionTab = new FloatingActionTab();
   } else {
-    console.log("FloatingActionTab: Instance already exists");
+    if (localStorage.getItem("verbose-css-logs") === "true") {
+      console.log("FloatingActionTab: Instance already exists");
+    }
   }
 }
 

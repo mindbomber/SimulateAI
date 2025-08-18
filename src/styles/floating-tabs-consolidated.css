@@ -894,6 +894,31 @@ svg.floating-action-tab-arrow-icon {
   }
 }
 
+/* Auto-retract behavior for horizontally sliding tabs (surprise/tour/action) */
+@keyframes tab-auto-retract {
+  0%,
+  70% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(100% - var(--floating-tab-protrusion, 90px)));
+  }
+}
+
+/* When expanded and marked for auto-collapse, retract after a short delay */
+.floating-surprise-tab.expanded.auto-collapse {
+  animation: tab-auto-retract var(--tab-auto-retract-duration, 3.2s) ease-in-out
+    forwards;
+  animation-delay: var(--tab-auto-retract-delay, 0.4s);
+}
+
+/* Optional: pause auto-retract while user is interacting */
+.floating-surprise-tab.expanded.auto-collapse:hover,
+.floating-surprise-tab.expanded.auto-collapse:active,
+.floating-surprise-tab.expanded.auto-collapse:focus-within {
+  animation-play-state: paused;
+}
+
 /* ========================================
    ACCESSIBILITY FEATURES
    ======================================== */

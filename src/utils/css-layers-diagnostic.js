@@ -18,8 +18,7 @@ class CSSLayersDiagnostic {
   runDiagnostics() {
     // Only show detailed output if verbose logging is enabled
     const showVerboseOutput =
-      localStorage.getItem("verbose-css-logs") === "true" ||
-      localStorage.getItem("quiet-logs") !== "true";
+      localStorage.getItem("verbose-css-logs") === "true";
 
     if (showVerboseOutput) {
       console.group("🔍 CSS Layers Diagnostic Report");
@@ -40,9 +39,11 @@ class CSSLayersDiagnostic {
 
   checkBrowserSupport() {
     const hasLayerSupport = CSS.supports("@layer", "test");
-    console.log(
-      `📱 Browser Support: CSS Layers ${hasLayerSupport ? "✅ Supported" : "❌ Not Supported"}`,
-    );
+    if (localStorage.getItem("verbose-css-logs") === "true") {
+      console.log(
+        `📱 Browser Support: CSS Layers ${hasLayerSupport ? "✅ Supported" : "❌ Not Supported"}`,
+      );
+    }
 
     this.diagnostics.browserSupport = hasLayerSupport;
 
@@ -61,11 +62,17 @@ class CSSLayersDiagnostic {
       fontSizeBase: rootStyles.getPropertyValue("--font-size-base").trim(),
     };
 
-    console.log("🎨 Color System Values:");
-    console.log(`   • Primary: ${colors.primary || "Not defined"}`);
-    console.log(`   • Primary Dark: ${colors.primaryDark || "Not defined"}`);
-    console.log(`   • Primary Light: ${colors.primaryLight || "Not defined"}`);
-    console.log(`   • Font Size Base: ${colors.fontSizeBase || "Not defined"}`);
+    if (localStorage.getItem("verbose-css-logs") === "true") {
+      console.log("🎨 Color System Values:");
+      console.log(`   • Primary: ${colors.primary || "Not defined"}`);
+      console.log(`   • Primary Dark: ${colors.primaryDark || "Not defined"}`);
+      console.log(
+        `   • Primary Light: ${colors.primaryLight || "Not defined"}`,
+      );
+      console.log(
+        `   • Font Size Base: ${colors.fontSizeBase || "Not defined"}`,
+      );
+    }
 
     this.diagnostics.colors = colors;
 
@@ -91,10 +98,14 @@ class CSSLayersDiagnostic {
       fontFamily: bodyStyles.fontFamily,
     };
 
-    console.log("📝 Font System:");
-    console.log(`   • Base Font Size: ${fonts.baseFontSize || "Not defined"}`);
-    console.log(`   • Body Font Size: ${fonts.bodyFontSize}`);
-    console.log(`   • Font Family: ${fonts.fontFamily}`);
+    if (localStorage.getItem("verbose-css-logs") === "true") {
+      console.log("📝 Font System:");
+      console.log(
+        `   • Base Font Size: ${fonts.baseFontSize || "Not defined"}`,
+      );
+      console.log(`   • Body Font Size: ${fonts.bodyFontSize}`);
+      console.log(`   • Font Family: ${fonts.fontFamily}`);
+    }
 
     this.diagnostics.fonts = fonts;
   }
@@ -107,7 +118,10 @@ class CSSLayersDiagnostic {
       detectedLayers: new Set(),
     };
 
-    console.log("📊 CSS Layers Implementation:");
+    const verbose = localStorage.getItem("verbose-css-logs") === "true";
+    if (verbose) {
+      console.log("📊 CSS Layers Implementation:");
+    }
 
     stylesheets.forEach((sheet, index) => {
       try {
@@ -131,78 +145,101 @@ class CSSLayersDiagnostic {
 
         if (hasLayers) {
           layerInfo.stylesheetsWithLayers++;
-          console.log(`   ✅ ${href}: Has @layer rules`);
+          if (verbose) console.log(`   ✅ ${href}: Has @layer rules`);
         } else {
-          console.log(`   ⚠️ ${href}: No @layer rules`);
+          if (verbose) console.log(`   ⚠️ ${href}: No @layer rules`);
         }
       } catch (error) {
-        console.log(`   ❌ ${sheet.href || "Unknown"}: Access denied (CORS)`);
+        if (verbose)
+          console.log(`   ❌ ${sheet.href || "Unknown"}: Access denied (CORS)`);
       }
     });
 
-    console.log(`📈 Layer Summary:`);
-    console.log(`   • Total stylesheets: ${layerInfo.totalStylesheets}`);
-    console.log(`   • With @layer rules: ${layerInfo.stylesheetsWithLayers}`);
-    console.log(
-      `   • Detected layers: ${Array.from(layerInfo.detectedLayers).join(", ")}`,
-    );
+    if (verbose) {
+      console.log(`📈 Layer Summary:`);
+      console.log(`   • Total stylesheets: ${layerInfo.totalStylesheets}`);
+      console.log(`   • With @layer rules: ${layerInfo.stylesheetsWithLayers}`);
+      console.log(
+        `   • Detected layers: ${Array.from(layerInfo.detectedLayers).join(", ")}`,
+      );
+    }
 
     this.diagnostics.layers = layerInfo;
   }
 
   generateReport() {
-    console.log("\n📋 Diagnostic Summary:");
-
-    if (this.diagnostics.issues.length === 0) {
-      console.log("   ✅ No issues detected");
-    } else {
-      console.log("   ⚠️ Issues found:");
-      this.diagnostics.issues.forEach((issue) => {
-        console.log(`     • ${issue}`);
-      });
+    if (localStorage.getItem("verbose-css-logs") === "true") {
+      console.log("\n📋 Diagnostic Summary:");
     }
 
-    console.log("\n🔧 Recommendations:");
+    if (this.diagnostics.issues.length === 0) {
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.log("   ✅ No issues detected");
+      }
+    } else {
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.log("   ⚠️ Issues found:");
+        this.diagnostics.issues.forEach((issue) => {
+          console.log(`     • ${issue}`);
+        });
+      }
+    }
+
+    if (localStorage.getItem("verbose-css-logs") === "true") {
+      console.log("\n🔧 Recommendations:");
+    }
 
     if (!this.diagnostics.browserSupport) {
-      console.log(
-        "   • Consider fallback CSS for browsers without @layer support",
-      );
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.log(
+          "   • Consider fallback CSS for browsers without @layer support",
+        );
+      }
     }
 
     if (this.diagnostics.layers.stylesheetsWithLayers < 3) {
-      console.log("   • Consider migrating more CSS files to use @layer");
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.log("   • Consider migrating more CSS files to use @layer");
+      }
     }
 
     if (this.diagnostics.issues.length > 0) {
-      console.log("   • Review css-layers-fix.css for additional fixes");
-      console.log("   • Check CSS loading order in app.html");
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.log("   • Review css-layers-fix.css for additional fixes");
+        console.log("   • Check CSS loading order in app.html");
+      }
     }
 
-    console.log("\n💡 Quick Fixes:");
-    console.log("   • Clear browser cache and reload");
-    console.log("   • Check browser developer tools for CSS errors");
-    console.log("   • Verify all CSS files are loading correctly");
+    if (localStorage.getItem("verbose-css-logs") === "true") {
+      console.log("\n💡 Quick Fixes:");
+      console.log("   • Clear browser cache and reload");
+      console.log("   • Check browser developer tools for CSS errors");
+      console.log("   • Verify all CSS files are loading correctly");
+    }
   }
 
   // Method to test specific elements
   testElementStyles(selector) {
     const elements = document.querySelectorAll(selector);
     if (elements.length === 0) {
-      console.log(`❌ No elements found for selector: ${selector}`);
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.log(`❌ No elements found for selector: ${selector}`);
+      }
       return;
     }
 
-    console.group(`🎯 Testing styles for: ${selector}`);
-    elements.forEach((el, index) => {
-      const styles = getComputedStyle(el);
-      console.log(`Element ${index + 1}:`);
-      console.log(`   • Color: ${styles.color}`);
-      console.log(`   • Background: ${styles.backgroundColor}`);
-      console.log(`   • Font Size: ${styles.fontSize}`);
-      console.log(`   • Font Family: ${styles.fontFamily}`);
-    });
-    console.groupEnd();
+    if (localStorage.getItem("verbose-css-logs") === "true") {
+      console.group(`🎯 Testing styles for: ${selector}`);
+      elements.forEach((el, index) => {
+        const styles = getComputedStyle(el);
+        console.log(`Element ${index + 1}:`);
+        console.log(`   • Color: ${styles.color}`);
+        console.log(`   • Background: ${styles.backgroundColor}`);
+        console.log(`   • Font Size: ${styles.fontSize}`);
+        console.log(`   • Font Family: ${styles.fontFamily}`);
+      });
+      console.groupEnd();
+    }
   }
 }
 
@@ -220,11 +257,16 @@ document.addEventListener("DOMContentLoaded", () => {
   ) {
     // Delay slightly to ensure all CSS is loaded
     setTimeout(() => {
-      diagnostic.runDiagnostics();
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        diagnostic.runDiagnostics();
 
-      // Test key elements
-      diagnostic.testElementStyles(".btn-primary");
-      diagnostic.testElementStyles(".hero");
+        // Test key elements
+        diagnostic.testElementStyles(".btn-primary");
+        diagnostic.testElementStyles(".hero");
+      } else {
+        // Silent run to populate diagnostics object for programmatic use
+        diagnostic.runDiagnostics();
+      }
     }, 1000);
   }
 });

@@ -11,10 +11,26 @@
 // EMERGENCY DISABLE FLAG - Set to false to re-enable Firebase tracking
 const EMERGENCY_DISABLE = true; // ENABLED - Stopping Firebase errors immediately
 
-console.log("🚨 Firebase 400 Error Emergency Fix Script Loaded");
-console.log(
-  `🔧 Emergency Disable Status: ${EMERGENCY_DISABLE ? "ACTIVE" : "INACTIVE"}`,
-);
+// Quiet by default; show banner only if verbose flags are set
+const __emergencyVerbose = (() => {
+  try {
+    return (
+      (typeof localStorage !== "undefined" &&
+        (localStorage.getItem("debug") === "true" ||
+          localStorage.getItem("verbose-logs") === "true")) ||
+      false
+    );
+  } catch (_) {
+    return false;
+  }
+})();
+
+if (__emergencyVerbose) {
+  console.log("🚨 Firebase 400 Error Emergency Fix Script Loaded");
+  console.log(
+    `🔧 Emergency Disable Status: ${EMERGENCY_DISABLE ? "ACTIVE" : "INACTIVE"}`,
+  );
+}
 
 // Emergency fix for PWA Service if it exists
 if (typeof window !== "undefined" && window.app && window.app.pwaService) {
@@ -49,7 +65,7 @@ if (typeof window !== "undefined" && window.app && window.app.pwaService) {
     }
   };
 
-  console.log("✅ PWA Service emergency fix applied");
+  __emergencyVerbose && console.log("✅ PWA Service emergency fix applied");
 }
 
 // Emergency fix for Firebase Service if it exists
@@ -92,7 +108,8 @@ if (typeof window !== "undefined" && window.app && window.app.firebaseService) {
     }
   };
 
-  console.log("✅ Firebase Service emergency fix applied");
+  __emergencyVerbose &&
+    console.log("✅ Firebase Service emergency fix applied");
 }
 
 // Monitor Firebase errors and auto-enable emergency mode if needed
@@ -121,7 +138,7 @@ console.error = function (...args) {
 
 // Status reporting
 setInterval(() => {
-  if (firebaseErrorCount > 0) {
+  if (__emergencyVerbose && firebaseErrorCount > 0) {
     console.log(
       `📊 Firebase Error Count: ${firebaseErrorCount} (Emergency: ${EMERGENCY_DISABLE ? "ON" : "OFF"})`,
     );
@@ -141,5 +158,7 @@ window.FirebaseEmergencyFix = {
   }),
 };
 
-console.log("🔧 Firebase Emergency Fix Script Ready");
-console.log("📋 Use window.FirebaseEmergencyFix.getStatus() to check status");
+if (__emergencyVerbose) {
+  console.log("🔧 Firebase Emergency Fix Script Ready");
+  console.log("📋 Use window.FirebaseEmergencyFix.getStatus() to check status");
+}

@@ -84,7 +84,20 @@ class FloatingSurpriseTab {
       await this.dataHandler.initialize();
       await this.loadSurpriseMetrics();
       await this.loadUserPreferences();
-      console.log("FloatingSurpriseTab: DataHandler initialized successfully");
+      try {
+        const __verbose =
+          (typeof localStorage !== "undefined" &&
+            (localStorage.getItem("debug") === "true" ||
+              localStorage.getItem("verbose-logs") === "true")) ||
+          false;
+        if (__verbose) {
+          console.log(
+            "FloatingSurpriseTab: DataHandler initialized successfully",
+          );
+        }
+      } catch (_) {
+        // no-op
+      }
     } catch (error) {
       console.warn(
         "[FloatingSurpriseTab] DataHandler initialization failed, using fallback mode:",
@@ -388,8 +401,12 @@ class FloatingSurpriseTab {
 
     // Handle hover/click events
     if (this.isMobile) {
-      this.link.addEventListener("touchstart", this.boundHandlers.touchStart);
-      this.link.addEventListener("touchend", this.boundHandlers.touchEnd);
+      this.link.addEventListener("touchstart", this.boundHandlers.touchStart, {
+        passive: true,
+      });
+      this.link.addEventListener("touchend", this.boundHandlers.touchEnd, {
+        passive: true,
+      });
       this.link.addEventListener("click", this.boundHandlers.mobileClick);
     } else {
       this.link.addEventListener("mouseenter", this.boundHandlers.mouseEnter);

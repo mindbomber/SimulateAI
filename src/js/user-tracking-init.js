@@ -25,19 +25,31 @@ import logger from "./utils/logger.js";
 // Initialize Google Analytics when DOM is ready
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    logger.info("Initializing Google Analytics tracking system...");
+    // Avoid double initialization: google-analytics.js may auto-init
+    if (
+      typeof googleAnalytics.isReady === "function" &&
+      googleAnalytics.isReady()
+    ) {
+      logger.debug(
+        "Google Analytics already initialized by auto-loader; skipping manual init",
+      );
+    } else if (!googleAnalytics.initialized) {
+      logger.info("Initializing Google Analytics tracking system...");
+      await googleAnalytics.initialize();
+      logger.info("Google Analytics tracking system initialized successfully");
+    }
 
-    // Initialize Google Analytics
-    await googleAnalytics.initialize();
-
-    // Track app startup in GA4
-    googleAnalytics.trackEvent("app_startup", {
-      timestamp: Date.now(),
-      user_agent: navigator.userAgent,
-      viewport: `${window.innerWidth}x${window.innerHeight}`,
-    });
-
-    logger.info("Google Analytics tracking system initialized successfully");
+    // Track app startup in GA4 (only if ready)
+    if (
+      typeof googleAnalytics.isReady === "function" &&
+      googleAnalytics.isReady()
+    ) {
+      googleAnalytics.trackEvent("app_startup", {
+        timestamp: Date.now(),
+        user_agent: navigator.userAgent,
+        viewport: `${window.innerWidth}x${window.innerHeight}`,
+      });
+    }
   } catch (error) {
     logger.error(
       "Failed to initialize Google Analytics tracking system:",

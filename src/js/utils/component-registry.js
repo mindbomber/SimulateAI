@@ -39,7 +39,7 @@ class ComponentRegistry {
       dependencyCache: {},
     };
 
-    // Phase 3.4: Initialize DataHandler integration
+    // Phase 3.4: Initialize DataHandler integration (warn-once if missing)
     this.initializeDataHandlerIntegration();
 
     // Register component factories
@@ -51,9 +51,32 @@ class ComponentRegistry {
    */
   async initializeDataHandlerIntegration() {
     if (!this.dataHandler) {
-      logger.warn(
-        "[ComponentRegistry] DataHandler not available, running in standalone mode",
-      );
+      // Warn only once per page load
+      try {
+        const flagKey = "componentRegistry_warned_no_datahandler";
+        const hasWarned =
+          window.__componentRegistryWarnedNoDH ||
+          (typeof sessionStorage !== "undefined" &&
+            sessionStorage.getItem(flagKey) === "true");
+        if (!hasWarned) {
+          logger.warn(
+            "[ComponentRegistry] DataHandler not available, running in standalone mode",
+          );
+          window.__componentRegistryWarnedNoDH = true;
+          try {
+            if (typeof sessionStorage !== "undefined") {
+              sessionStorage.setItem(flagKey, "true");
+            }
+          } catch (_) {
+            // ignore sessionStorage errors
+          }
+        }
+      } catch (_) {
+        // If any error, fall back to a single warn
+        logger.warn(
+          "[ComponentRegistry] DataHandler not available, running in standalone mode",
+        );
+      }
       return;
     }
 

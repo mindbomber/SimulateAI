@@ -7,13 +7,17 @@
 (function initializeTooltipsGlobally() {
   "use strict";
 
-  console.log("🔧 Tooltip Auto-Initializer: Starting...");
+  if (localStorage.getItem("verbose-css-logs") === "true") {
+    console.log("🔧 Tooltip Auto-Initializer: Starting...");
+  }
 
   // Check if tooltips are already initialized
   if (window.tooltipsAutoInitialized) {
-    console.log(
-      "🔧 Tooltip Auto-Initializer: Already initialized, skipping...",
-    );
+    if (localStorage.getItem("verbose-css-logs") === "true") {
+      console.log(
+        "🔧 Tooltip Auto-Initializer: Already initialized, skipping...",
+      );
+    }
     return;
   }
 
@@ -27,9 +31,11 @@
     const rings = document.querySelectorAll(".category-progress-ring");
     let processedRings = 0;
 
-    console.log(
-      `🔧 Tooltip Auto-Initializer: Found ${rings.length} progress rings`,
-    );
+    if (localStorage.getItem("verbose-css-logs") === "true") {
+      console.log(
+        `🔧 Tooltip Auto-Initializer: Found ${rings.length} progress rings`,
+      );
+    }
 
     rings.forEach((ring, index) => {
       // Skip if already processed
@@ -160,9 +166,11 @@
       processedRings++;
     });
 
-    console.log(
-      `🔧 Tooltip Auto-Initializer: Processed ${processedRings} rings`,
-    );
+    if (localStorage.getItem("verbose-css-logs") === "true") {
+      console.log(
+        `🔧 Tooltip Auto-Initializer: Processed ${processedRings} rings`,
+      );
+    }
   }
 
   /**
@@ -212,9 +220,11 @@
         '.category-progress-ring:not([data-auto-tooltip="true"])',
       );
       if (unprocessedRings.length > 0) {
-        console.log(
-          `🔧 Tooltip Auto-Initializer: Found ${unprocessedRings.length} new rings`,
-        );
+        if (localStorage.getItem("verbose-css-logs") === "true") {
+          console.log(
+            `🔧 Tooltip Auto-Initializer: Found ${unprocessedRings.length} new rings`,
+          );
+        }
         initializeProgressRingTooltips();
       }
     }, 3000);
@@ -228,7 +238,9 @@
     // Global function for manual reinitialization
     window.reinitializeTooltips = initializeProgressRingTooltips;
 
-    console.log("🔧 Tooltip Auto-Initializer: Initialization complete");
+    if (localStorage.getItem("verbose-css-logs") === "true") {
+      console.log("🔧 Tooltip Auto-Initializer: Initialization complete");
+    }
   }
 
   // Start initialization

@@ -152,7 +152,8 @@ class Logger {
 
     // Set log level based on environment
     this.currentLevel = this._environmentCache.logLevel;
-    this.enabledTypes = new Set(["error", "warn", "info"]);
+    // Process only errors and warnings by default to reduce noise
+    this.enabledTypes = new Set(["error", "warn"]);
 
     // Production mode disables most logging
     if (this._environmentCache.isProduction) {
@@ -334,23 +335,17 @@ class Logger {
           case "warn":
             console.warn(...args);
             break;
-          case "info":
-            console.info(...args);
-            break;
-          case "debug":
-            console.debug(...args);
-            break;
-          case "trace":
-            console.trace(...args);
-            break;
           default:
-            console.log(...args);
+            // Suppress info/debug/trace/default console output to reduce noise
             break;
         }
       } catch (e) {
         // Fallback for environments without console methods
         try {
-          console.log(...args);
+          // Only print fallback for errors
+          if (level === "error") {
+            console.log(...args);
+          }
         } catch (fallbackError) {
           // Enterprise error tracking for logging failures
           this._handleError(fallbackError, "console_output_fallback");
@@ -641,9 +636,6 @@ class Logger {
       setTimeout(() => {
         this.circuitBreakerTripped = false;
         this.errorCount = 0;
-        console.info("Logger: Circuit breaker auto-recovery", {
-          instanceId: this.instanceId,
-        });
       }, ENTERPRISE_CONSTANTS.CIRCUIT_BREAKER.RECOVERY_TIMEOUT);
     }
 
@@ -677,17 +669,13 @@ class Logger {
       // Store in performance tracker
       this.performanceMetrics.operationTimes.push(metric);
 
-      // Check performance thresholds
-      if (
-        metricName === "logOperationTime" &&
-        value > ENTERPRISE_CONSTANTS.PERFORMANCE.LOG_OPERATION_THRESHOLD
-      ) {
-        console.warn("Logger: Log operation time exceeded threshold", {
-          threshold: ENTERPRISE_CONSTANTS.PERFORMANCE.LOG_OPERATION_THRESHOLD,
-          actual: value,
-          instanceId: this.instanceId,
-        });
-      }
+      // Check performance thresholds (silenced to reduce console noise)
+      // if (
+      //   metricName === "logOperationTime" &&
+      //   value > ENTERPRISE_CONSTANTS.PERFORMANCE.LOG_OPERATION_THRESHOLD
+      // ) {
+      //   // Previously warned to console; now tracked via telemetry only
+      // }
 
       // Log to enterprise telemetry
       this._logTelemetry(
@@ -745,19 +733,8 @@ class Logger {
     if (this.telemetryBatch.length === 0) return;
 
     try {
-      const batchData = {
-        events: [...this.telemetryBatch],
-        batchId: `${this.instanceId}-${Date.now()}`,
-        timestamp: Date.now(),
-        instanceCount: this.telemetryBatch.length,
-      };
-
       // Send to analytics service (placeholder for actual implementation)
-      console.debug("Logger: Telemetry batch flushed", {
-        batchSize: this.telemetryBatch.length,
-        batchId: batchData.batchId,
-        instanceId: this.instanceId,
-      });
+      // Console output removed to reduce noise; relying on downstream telemetry pipeline
 
       // Clear batch
       this.telemetryBatch = [];
@@ -792,12 +769,7 @@ class Logger {
       }
 
       // Send to log aggregation service (placeholder for actual implementation)
-      console.debug("Logger: Log buffer flushed", {
-        logCount: this.logBuffer.length,
-        batchId: bufferData.batchId,
-        instanceId: this.instanceId,
-        flushTime: performance.now() - flushStart,
-      });
+      // Console output removed to reduce noise
 
       // Update metrics
       this.performanceMetrics.bufferFlushes++;
@@ -846,7 +818,11 @@ class Logger {
         },
       };
 
-      console.debug("Logger: Heartbeat sent", heartbeatData);
+      // Send heartbeat via telemetry instead of console to reduce noise
+      this._logTelemetry(
+        ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.HEALTH_CHECK,
+        heartbeatData,
+      );
     } catch (error) {
       console.error("Logger: Failed to send heartbeat", error);
     }

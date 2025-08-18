@@ -44,6 +44,65 @@ import badgeManager from "../core/badge-manager.js";
 import badgeModal from "./badge-modal.js";
 import { getSystemCollector } from "../services/system-metadata-collector.js";
 
+// Gated logger proxy: keep console quiet by default; enable via localStorage 'debug' or 'verbose-logs'
+const __mgVerbose = (() => {
+  try {
+    return (
+      (typeof localStorage !== "undefined" &&
+        (localStorage.getItem("debug") === "true" ||
+          localStorage.getItem("verbose-logs") === "true")) ||
+      false
+    );
+  } catch (_) {
+    return false;
+  }
+})();
+
+// Shadow console inside this module only
+// eslint-disable-next-line no-unused-vars, no-shadow
+const console = {
+  log: (...args) => {
+    if (__mgVerbose) logger.info("MainGrid", ...args);
+  },
+  info: (...args) => {
+    if (__mgVerbose) logger.info("MainGrid", ...args);
+  },
+  debug: (...args) => {
+    if (__mgVerbose) logger.debug("MainGrid", ...args);
+  },
+  warn: (...args) => logger.warn("MainGrid", ...args),
+  error: (...args) => logger.error("MainGrid", ...args),
+  group: (...args) => {
+    if (__mgVerbose && typeof window !== "undefined") {
+      try {
+        window.console && window.console.group && window.console.group(...args);
+      } catch (_) {
+        void 0;
+      }
+    }
+  },
+  groupEnd: (...args) => {
+    if (__mgVerbose && typeof window !== "undefined") {
+      try {
+        window.console &&
+          window.console.groupEnd &&
+          window.console.groupEnd(...args);
+      } catch (_) {
+        void 0;
+      }
+    }
+  },
+  table: (...args) => {
+    if (__mgVerbose && typeof window !== "undefined") {
+      try {
+        window.console && window.console.table && window.console.table(...args);
+      } catch (_) {
+        void 0;
+      }
+    }
+  },
+};
+
 // Enterprise Constants
 const HIGHLIGHT_DURATION = 2000;
 const MOBILE_HEADER_SHOW_DURATION = 3000; // Duration to show header on mobile touch

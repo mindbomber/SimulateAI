@@ -14,7 +14,9 @@ import {
   onValue,
   remove,
   serverTimestamp,
+  connectDatabaseEmulator,
 } from "firebase/database";
+import { devConfig } from "../config/firebase-config-dev.js";
 import logger from "../utils/logger.js";
 import { CLASSROOM_CONSTANTS } from "../constants/classroom-constants.js";
 import {
@@ -30,6 +32,7 @@ export default class RealtimeClassroomService {
     this.isConnected = false;
     this.fallbackMode = false; // Use localStorage when Firebase is unavailable
     this.initializationPromise = null; // Track initialization status
+    this._emulatorConnected = false;
 
     // Start initialization but don't wait for it in constructor
     this.initializationPromise = this.initializeDatabase();
@@ -55,18 +58,95 @@ export default class RealtimeClassroomService {
       // Try to initialize the database
       this.database = getDatabase(this.firebaseService.app);
 
-      // Test the connection with a simple operation
+      // Ensure we target local emulator in development regardless of databaseURL
       try {
-        const testRef = ref(this.database, ".info/connected");
-        // This will throw if database URL is invalid or connection fails
-        await get(testRef);
-        this.isConnected = true;
-        this.fallbackMode = false;
+        if (
+          !this._emulatorConnected &&
+          ["localhost", "127.0.0.1", "::1"].includes(
+            window.location.hostname,
+          ) &&
+          devConfig?.useEmulators
+        ) {
+          connectDatabaseEmulator(
+            this.database,
+            devConfig.emulatorHost || "127.0.0.1",
+            devConfig.emulatorPorts.database,
+          );
+          this._emulatorConnected = true;
+        }
+      } catch (_) {
+        // no-op; fall back to configured endpoint
+      }
 
-        logger.info(
-          "RealtimeClassroomService",
-          "Database initialized successfully with Firebase",
-        );
+      // Test the connection with a robust operation that avoids special tokens
+      try {
+        let connectedProbe = false;
+
+        // Prefer a one-time listen on .info/connected; fall back to a safe path GET
+        try {
+          const infoRef = ref(this.database, ".info/connected");
+          await new Promise((resolve, reject) => {
+            let unsub = () => {};
+            const timer = setTimeout(() => {
+              try {
+                unsub();
+              } catch (_) {
+                /* ignore */
+              }
+              reject(new Error("RTDB info connection probe timeout"));
+            }, 2000);
+
+            try {
+              // Subscribe once and immediately unsubscribe on first value
+              unsub = onValue(
+                infoRef,
+                () => {
+                  clearTimeout(timer);
+                  try {
+                    unsub();
+                  } catch (_) {
+                    /* ignore */
+                  }
+                  connectedProbe = true;
+                  resolve(true);
+                },
+                (err) => {
+                  clearTimeout(timer);
+                  try {
+                    unsub();
+                  } catch (_) {
+                    /* ignore */
+                  }
+                  reject(err);
+                },
+              );
+            } catch (e) {
+              clearTimeout(timer);
+              try {
+                unsub();
+              } catch (_) {
+                /* ignore */
+              }
+              reject(e);
+            }
+          });
+        } catch (_) {
+          // Fall back to a harmless read on a standard path (avoids special token parsing)
+          const probeRef = ref(this.database, "health/__connection_check");
+          await get(probeRef); // existence not required
+          connectedProbe = true;
+        }
+
+        if (connectedProbe) {
+          this.isConnected = true;
+          this.fallbackMode = false;
+          logger.info(
+            "RealtimeClassroomService",
+            "Database initialized successfully with Firebase",
+          );
+        } else {
+          throw new Error("RTDB connection probe failed");
+        }
       } catch (connectionError) {
         logger.warn(
           "RealtimeClassroomService",
@@ -154,6 +234,19 @@ export default class RealtimeClassroomService {
               ),
             ),
           ]);
+          // Mirror to localStorage to allow immediate local listeners to see it
+          try {
+            const existingClassrooms = JSON.parse(
+              localStorage.getItem("simulateai_classrooms") || "{}",
+            );
+            existingClassrooms[result.classroomCode] = result;
+            localStorage.setItem(
+              "simulateai_classrooms",
+              JSON.stringify(existingClassrooms),
+            );
+          } catch (_) {
+            /* ignore */
+          }
           // Broadcast to other tabs so students in fallback can discover it
           this.broadcastClassroom(result);
           return result;
@@ -597,10 +690,37 @@ export default class RealtimeClassroomService {
             ),
           ]);
           // Notify other tabs promptly with student payload
+          // Use a plain object for broadcast to avoid serverTimestamp serialization issues
           this.broadcastRosterUpdate(classroomCode, {
             studentId,
-            studentInfo,
+            studentInfo: {
+              nickname,
+              joinedAt: Date.now(),
+              isActive: true,
+              lastSeen: Date.now(),
+            },
           });
+          // Mirror to localStorage for same-profile consumers (teacher panel)
+          try {
+            const store = JSON.parse(
+              localStorage.getItem("simulateai_classrooms") || "{}",
+            );
+            const cls = store[classroomCode] || classroom || { classroomCode };
+            cls.roster = cls.roster || {};
+            cls.roster[studentId] = {
+              nickname,
+              joinedAt: Date.now(),
+              isActive: true,
+              lastSeen: Date.now(),
+            };
+            store[classroomCode] = cls;
+            localStorage.setItem(
+              "simulateai_classrooms",
+              JSON.stringify(store),
+            );
+          } catch (_) {
+            /* ignore */
+          }
         } catch (e) {
           logger.warn(
             "RealtimeClassroomService",
@@ -1548,6 +1668,38 @@ export default class RealtimeClassroomService {
           e,
         );
       }
+    }
+
+    // If Firebase DB wasn't ready at subscription time, set a short retry to attach once available
+    if (!this.database && this.firebaseService?.app) {
+      const attachWhenReady = async () => {
+        try {
+          if (!this.database && this.firebaseService?.app) {
+            this.database = getDatabase(this.firebaseService.app);
+          }
+          if (this.database) {
+            const rosterRef = ref(
+              this.database,
+              `classrooms/${classroomCode}/roster`,
+            );
+            const unsubscribe = onValue(rosterRef, (snapshot) => {
+              emit(snapshot.val() || {});
+            });
+            cleanups.push(() => unsubscribe());
+            return true;
+          }
+        } catch (_) {
+          // ignore and retry
+        }
+        return false;
+      };
+      const retryId = setInterval(async () => {
+        const attached = await attachWhenReady();
+        if (attached) {
+          clearInterval(retryId);
+        }
+      }, 1000);
+      cleanups.push(() => clearInterval(retryId));
     }
 
     this.listeners.set(listenerId, () => cleanups.forEach((fn) => fn && fn()));

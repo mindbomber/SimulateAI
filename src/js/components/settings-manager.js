@@ -30,6 +30,55 @@
  */
 
 import googleAnalytics from "../services/google-analytics.js";
+import baseLogger from "../utils/logger.js";
+
+// Quiet-by-default logging: enable with localStorage flags
+const __smShouldLog = () =>
+  localStorage.getItem("debug") === "true" ||
+  localStorage.getItem("verbose-css-logs") === "true" ||
+  localStorage.getItem("verbose-logs") === "true";
+
+// Module-scoped logger that always emits errors, gates others
+const __smLogger = new Proxy(baseLogger, {
+  get(target, prop) {
+    if (prop === "error") return target.error.bind(target);
+    if (
+      prop === "info" ||
+      prop === "warn" ||
+      prop === "debug" ||
+      prop === "log"
+    ) {
+      return (...args) => {
+        if (__smShouldLog()) {
+          const method = prop === "log" ? "info" : prop;
+          return target[method]("SettingsManager", ...args);
+        }
+      };
+    }
+    return target[prop];
+  },
+});
+
+// Shadow console within this module to route through logger and gating
+// Errors are always shown; others require a debug flag
+const console = new Proxy(
+  {},
+  {
+    get(_t, prop) {
+      if (prop === "error")
+        return (...args) => __smLogger.error("SettingsManager", ...args);
+      if (prop === "warn")
+        return (...args) => __smLogger.warn("SettingsManager", ...args);
+      if (prop === "info")
+        return (...args) => __smLogger.info("SettingsManager", ...args);
+      if (prop === "debug")
+        return (...args) => __smLogger.debug("SettingsManager", ...args);
+      if (prop === "log")
+        return (...args) => __smLogger.info("SettingsManager", ...args);
+      return () => {};
+    },
+  },
+);
 
 // Constants
 const SETTINGS_STORAGE_KEY = "simulateai_settings";

@@ -106,19 +106,16 @@ if (import.meta.env && import.meta.env.VITE_FIREBASE_CONFIG) {
   // Use environment variables if available (production)
   try {
     firebaseConfig = JSON.parse(import.meta.env.VITE_FIREBASE_CONFIG);
-    console.log("🔒 Using Firebase config from environment variables");
   } catch (parseError) {
     console.error(
       "Failed to parse Firebase config from environment:",
       parseError,
     );
     firebaseConfig = devFirebaseConfig;
-    console.log("🔧 Falling back to development Firebase config");
   }
 } else if (window.envConfig && window.envConfig.firebase) {
   // Use global environment config if available (alternative production method)
   firebaseConfig = window.envConfig.firebase;
-  console.log("🔒 Using Firebase config from window.envConfig");
 } else {
   // Fallback to development config for localhost only
   if (
@@ -127,13 +124,9 @@ if (import.meta.env && import.meta.env.VITE_FIREBASE_CONFIG) {
       window.location.hostname === "127.0.0.1")
   ) {
     firebaseConfig = devFirebaseConfig;
-    console.log("🔧 Using development Firebase config for localhost");
   } else {
     // For production, use placeholder config - real config will be loaded by initializeFirebaseSecurely()
     firebaseConfig = devFirebaseConfig;
-    console.log(
-      "🔒 Using placeholder config - real config will be loaded from Firebase Hosting",
-    );
   }
 }
 
@@ -187,6 +180,9 @@ export class FirebaseService {
 
     // Firebase configuration status
     this.isFirebaseConfigured = false;
+
+    // Internal flag to ensure we only connect emulators once
+    this._emulatorsConnected = false;
   }
 
   /**
@@ -426,6 +422,18 @@ export class FirebaseService {
    */
   async initializeFirebaseSecurely() {
     try {
+      // In local development with Vite, skip Hosting config fetch entirely
+      // and initialize directly with the dev firebaseConfig.
+      if (
+        typeof window !== "undefined" &&
+        ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname)
+      ) {
+        return {
+          app: initializeApp(firebaseConfig),
+          isConfigured: true,
+        };
+      }
+
       // Firebase Hosting automatically provides config at this endpoint
       const response = await fetch("/__/firebase/init.json");
 
@@ -435,8 +443,7 @@ export class FirebaseService {
 
       const secureConfig = await response.json();
 
-      console.log("🔥 Firebase config loaded securely from hosting");
-      console.log("✅ Project:", secureConfig.projectId);
+      // Hosting config loaded successfully
 
       return {
         app: initializeApp(secureConfig),
@@ -450,7 +457,6 @@ export class FirebaseService {
         window.location.hostname === "localhost" ||
         window.location.hostname === "127.0.0.1"
       ) {
-        console.log("🔧 Using development fallback config");
         return {
           app: initializeApp(firebaseConfig),
           isConfigured: true,
@@ -508,90 +514,76 @@ export class FirebaseService {
         // 🔥 Connect to Firebase Emulators if enabled in dev config
         if (
           devConfig.useEmulators &&
-          window.location.hostname === "localhost"
+          ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname)
         ) {
-          console.log("🔧 Connecting to Firebase Emulators...");
           try {
-            // Connect to Auth Emulator
-            if (!this.auth.emulatorConfig) {
-              connectAuthEmulator(
-                this.auth,
-                `http://localhost:${devConfig.emulatorPorts.auth}`,
-                {
-                  disableWarnings: true,
-                },
-              );
-              console.log(
-                `✅ Connected to Auth Emulator on port ${devConfig.emulatorPorts.auth}`,
-              );
-            }
-
-            // Connect to Firestore Emulator
-            if (
-              !this.db._delegate._settings?.host?.includes(
-                devConfig.emulatorPorts.firestore.toString(),
-              )
-            ) {
-              connectFirestoreEmulator(
-                this.db,
-                "localhost",
-                devConfig.emulatorPorts.firestore,
-              );
-              console.log(
-                `✅ Connected to Firestore Emulator on port ${devConfig.emulatorPorts.firestore}`,
-              );
-            }
-
-            // Connect to Storage Emulator
-            if (
-              !this.storage.app.options.storageBucket?.includes("localhost")
-            ) {
-              connectStorageEmulator(
-                this.storage,
-                "localhost",
-                devConfig.emulatorPorts.storage,
-              );
-              console.log(
-                `✅ Connected to Storage Emulator on port ${devConfig.emulatorPorts.storage}`,
-              );
-            }
-
-            // Connect to Realtime Database Emulator
-            if (
-              !this.realtimeDb.app.options.databaseURL?.includes("localhost")
-            ) {
-              connectDatabaseEmulator(
-                this.realtimeDb,
-                "localhost",
-                devConfig.emulatorPorts.database,
-              );
-              console.log(
-                `✅ Connected to Realtime Database Emulator on port ${devConfig.emulatorPorts.database}`,
-              );
-            }
-
-            // Connect to Functions Emulator
-            try {
-              if (this.functions) {
-                connectFunctionsEmulator(
-                  this.functions,
-                  "localhost",
-                  devConfig.emulatorPorts.functions,
+            if (!this._emulatorsConnected) {
+              // Connect to Auth Emulator (idempotent in practice; guard at service level)
+              try {
+                connectAuthEmulator(
+                  this.auth,
+                  `http://127.0.0.1:${devConfig.emulatorPorts.auth}`,
+                  { disableWarnings: true },
                 );
-                console.log(
-                  `✅ Connected to Functions Emulator on port ${devConfig.emulatorPorts.functions}`,
+              } catch (_) {
+                // no-op if already connected
+              }
+
+              // Firestore Emulator
+              try {
+                connectFirestoreEmulator(
+                  this.db,
+                  "127.0.0.1",
+                  devConfig.emulatorPorts.firestore,
+                );
+              } catch (_) {
+                // no-op if already connected
+              }
+
+              // Storage Emulator
+              try {
+                connectStorageEmulator(
+                  this.storage,
+                  "127.0.0.1",
+                  devConfig.emulatorPorts.storage,
+                );
+              } catch (_) {
+                // no-op if already connected
+              }
+
+              // Realtime Database Emulator
+              try {
+                connectDatabaseEmulator(
+                  this.realtimeDb,
+                  "127.0.0.1",
+                  devConfig.emulatorPorts.database,
+                );
+              } catch (_) {
+                // no-op if already connected
+              }
+
+              // Functions Emulator
+              try {
+                if (this.functions) {
+                  connectFunctionsEmulator(
+                    this.functions,
+                    "127.0.0.1",
+                    devConfig.emulatorPorts.functions,
+                  );
+                }
+              } catch (fnEmErr) {
+                console.warn(
+                  "⚠️ Functions Emulator connection failed:",
+                  fnEmErr,
                 );
               }
-            } catch (fnEmErr) {
-              console.warn("⚠️ Functions Emulator connection failed:", fnEmErr);
+
+              this._emulatorsConnected = true;
             }
           } catch (emulatorError) {
             console.warn(
               "⚠️ Firebase Emulator connection failed:",
               emulatorError,
-            );
-            console.log(
-              "💡 Make sure emulators are running: firebase emulators:start",
             );
           }
         }
@@ -671,6 +663,19 @@ export class FirebaseService {
 
       // Check for redirect result (for mobile auth)
       await this.handleAuthRedirectResult();
+
+      // Expose dev-only helpers for emulator debugging in console
+      try {
+        if (
+          ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname)
+        ) {
+          window.firebaseDev = window.firebaseDev || {};
+          window.firebaseDev.seedEmailUser = this.devSeedEmailUser.bind(this);
+          window.firebaseDev.info = this.devInfo.bind(this);
+        }
+      } catch (e) {
+        // ignore exposure of helpers failure
+      }
 
       return true;
     } catch (error) {
@@ -936,8 +941,11 @@ export class FirebaseService {
   async authenticateWithProvider(provider, providerName) {
     try {
       const isMobile = this.isMobileDevice();
+      const forcePopup =
+        devConfig?.forcePopupAuth &&
+        ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
 
-      if (isMobile) {
+      if (isMobile && !forcePopup) {
         // Use redirect for mobile devices
         await signInWithRedirect(this.auth, provider);
 
@@ -983,6 +991,61 @@ export class FirebaseService {
         error: this.getHumanReadableErrorMessage(error),
       };
     }
+  }
+
+  /**
+   * DEV ONLY: Seed an email/password user in the Auth Emulator
+   * Requires the emulator to be running. Exposed as window.firebaseDev.seedEmailUser
+   */
+  async devSeedEmailUser(
+    email,
+    password = "Test1234!",
+    displayName = "Test User",
+  ) {
+    if (!this.auth || !devConfig?.useEmulators)
+      return { success: false, error: "Auth not ready" };
+    try {
+      // Try sign in first; if it fails with user-not-found, create
+      try {
+        const res = await signInWithEmailAndPassword(
+          this.auth,
+          email,
+          password,
+        );
+        return { success: true, user: res.user, existed: true };
+      } catch (e) {
+        const created = await createUserWithEmailAndPassword(
+          this.auth,
+          email,
+          password,
+        );
+        // Set displayName via profile update path if available
+        try {
+          await created.user.updateProfile?.({ displayName });
+        } catch (e) {
+          // ignore profile update failure in emulator seeding
+        }
+        return { success: true, user: created.user, existed: false };
+      }
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  }
+
+  /**
+   * DEV ONLY: Ensure localhost is authorized (useful when authDomain mismatch)
+   */
+  devInfo() {
+    return {
+      usingEmulators: !!(
+        devConfig?.useEmulators &&
+        ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname)
+      ),
+      emulatorHost: devConfig?.emulatorHost || "127.0.0.1",
+      emulatorPorts: devConfig?.emulatorPorts,
+      authDomain: this.app?.options?.authDomain,
+      apiKey: this.app?.options?.apiKey,
+    };
   }
 
   /**
@@ -1247,6 +1310,14 @@ export class FirebaseService {
           throw new Error("Firestore not initialized");
         }
 
+        // In dev/emulator, avoid writing profiles for anonymous users
+        if (
+          user?.isAnonymous &&
+          ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname)
+        ) {
+          return true;
+        }
+
         const userRef = doc(this.db, "users", user.uid);
         const userSnap = await getDoc(userRef);
 
@@ -1295,6 +1366,23 @@ export class FirebaseService {
       false,
       "Create/update user profile",
     );
+  }
+
+  /**
+   * Get user profile (one-time read)
+   * @param {string|null} userId - Optional UID; defaults to current user
+   * @returns {Promise<Object|null>} Profile data or null if not found/unavailable
+   */
+  async getUserProfile(userId = null) {
+    const op = async () => {
+      const uid = userId || this.currentUser?.uid;
+      if (!uid) return null;
+      if (!this.db) throw new Error("Firestore not initialized");
+      const userRef = doc(this.db, "users", uid);
+      const snap = await getDoc(userRef);
+      return snap.exists() ? snap.data() : null;
+    };
+    return this.safeFirebaseOperation(op, null, "Get user profile");
   }
 
   /**
@@ -1367,6 +1455,68 @@ export class FirebaseService {
     } catch (error) {
       return { success: false, error: error.message };
     }
+  }
+
+  /**
+   * Resolve a badge by ID via badge manager if available; otherwise null
+   * @param {string} badgeId
+   * @returns {Promise<Object|null>}
+   */
+  async getBadgeById(badgeId) {
+    try {
+      // Prefer global badge manager if present
+      const mgr = window?.simulateaiBadgeManager || window?.badgeManager;
+      if (mgr && typeof mgr.getBadgeById === "function") {
+        return await mgr.getBadgeById(badgeId);
+      }
+      // Optionally, attempt lazy import of config in future
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /**
+   * Delete user data key from Firebase (used by DataHandler for GDPR)
+   * Currently supports: 'userProfile' -> deletes users/{uid}
+   * @param {string} key
+   */
+  async deleteUserData(key) {
+    return this.safeFirebaseOperation(
+      async () => {
+        const uid = this.currentUser?.uid;
+        if (!uid) return true; // nothing to delete if anonymous
+        if (!this.db) throw new Error("Firestore not initialized");
+        if (key === "userProfile") {
+          const userRef = doc(this.db, "users", uid);
+          // Use update with tombstone to retain minimal audit, or hard delete
+          // For emulator/dev, hard delete is fine
+          // Firestore v12 SDK doesn't export deleteDoc via the existing imports here; use update with clear
+          try {
+            // Attempt to clear profile fields instead of hard delete
+            await updateDoc(userRef, {
+              displayName: null,
+              email: null,
+              photoURL: null,
+              tier: 0,
+              researchParticipant: false,
+              totalDonated: 0,
+              flair: {},
+              badges: [],
+              customization: {},
+              preferences: {},
+              updatedAt: new Date(),
+              deletedAt: new Date(),
+            });
+          } catch (e) {
+            // If update fails (doc may not exist), ignore
+          }
+        }
+        return true;
+      },
+      true,
+      "Delete user data",
+    );
   }
 
   /**

@@ -30,6 +30,33 @@
  * • Static enterprise methods for fleet monitoring and debugging
  */
 
+import logger from "../utils/logger.js";
+
+// Module-local gated logger proxy to keep console quiet by default
+const __verboseLogs = (() => {
+  try {
+    return (
+      (typeof localStorage !== "undefined" &&
+        (localStorage.getItem("debug") === "true" ||
+          localStorage.getItem("verbose-logs") === "true")) ||
+      false
+    );
+  } catch (_) {
+    return false;
+  }
+})();
+
+const log = {
+  info: (...args) => {
+    if (__verboseLogs) logger.info("BackToTop", ...args);
+  },
+  debug: (...args) => {
+    if (__verboseLogs) logger.debug("BackToTop", ...args);
+  },
+  warn: (...args) => logger.warn("BackToTop", ...args),
+  error: (...args) => logger.error("BackToTop", ...args),
+};
+
 // ⭐ ENTERPRISE CONFIGURATION CONSTANTS ⭐
 const ENTERPRISE_CONSTANTS = {
   // Health monitoring configuration
@@ -466,10 +493,7 @@ class BackToTop {
 
       return true;
     } catch (error) {
-      console.error(
-        "BackToTop: Failed to initialize enterprise monitoring",
-        error,
-      );
+      log.error("Failed to initialize enterprise monitoring", error);
       return false;
     }
   }
@@ -499,7 +523,7 @@ class BackToTop {
     if (this.errorCount >= ENTERPRISE_CONSTANTS.CIRCUIT_BREAKER.MAX_ERRORS) {
       this.circuitBreakerTripped = true;
 
-      console.error("BackToTop: Circuit breaker tripped", {
+      log.error("Circuit breaker tripped", {
         ...errorData,
         circuitBreakerState: "OPEN",
       });
@@ -508,7 +532,7 @@ class BackToTop {
       setTimeout(() => {
         this.circuitBreakerTripped = false;
         this.errorCount = 0;
-        console.info("BackToTop: Circuit breaker auto-recovery", {
+        log.info("Circuit breaker auto-recovery", {
           instanceId: this.instanceId,
         });
       }, ENTERPRISE_CONSTANTS.CIRCUIT_BREAKER.RECOVERY_TIMEOUT);
@@ -519,8 +543,7 @@ class BackToTop {
       ENTERPRISE_CONSTANTS.TELEMETRY.EVENT_TYPES.ERROR_EVENT,
       errorData,
     );
-
-    console.error("BackToTop", `Error in ${context}`, errorData);
+    log.error(`Error in ${context}`, errorData);
   }
 
   /**
@@ -553,7 +576,7 @@ class BackToTop {
         metricName === "scrollHandlerTime" &&
         value > ENTERPRISE_CONSTANTS.PERFORMANCE.SCROLL_HANDLER_THRESHOLD
       ) {
-        console.warn("BackToTop: Scroll handler time exceeded threshold", {
+        log.warn("Scroll handler time exceeded threshold", {
           threshold: ENTERPRISE_CONSTANTS.PERFORMANCE.SCROLL_HANDLER_THRESHOLD,
           actual: value,
           instanceId: this.instanceId,
@@ -564,7 +587,7 @@ class BackToTop {
         metricName === "animationTime" &&
         value > ENTERPRISE_CONSTANTS.PERFORMANCE.ANIMATION_DURATION_THRESHOLD
       ) {
-        console.warn("BackToTop: Animation time exceeded threshold", {
+        log.warn("Animation time exceeded threshold", {
           threshold:
             ENTERPRISE_CONSTANTS.PERFORMANCE.ANIMATION_DURATION_THRESHOLD,
           actual: value,
@@ -578,7 +601,7 @@ class BackToTop {
         metric,
       );
     } catch (error) {
-      console.error("BackToTop: Failed to record performance metric", error);
+      log.error("Failed to record performance metric", error);
     }
   }
 
@@ -613,7 +636,7 @@ class BackToTop {
         this._flushTelemetryBatch();
       }
     } catch (error) {
-      console.error("BackToTop: Failed to log telemetry", error);
+      log.error("Failed to log telemetry", error);
     }
   }
 
@@ -633,7 +656,7 @@ class BackToTop {
       };
 
       // Send to analytics service (placeholder for actual implementation)
-      console.info("BackToTop: Telemetry batch flushed", {
+      log.info("Telemetry batch flushed", {
         batchSize: this.telemetryBatch.length,
         batchId: batchData.batchId,
         instanceId: this.instanceId,
@@ -643,7 +666,7 @@ class BackToTop {
       this.telemetryBatch = [];
       this.lastTelemetryFlush = Date.now();
     } catch (error) {
-      console.error("BackToTop: Failed to flush telemetry batch", error);
+      log.error("Failed to flush telemetry batch", error);
     }
   }
 
@@ -669,9 +692,9 @@ class BackToTop {
         },
       };
 
-      console.debug("BackToTop: Heartbeat sent", heartbeatData);
+      log.debug("Heartbeat sent", heartbeatData);
     } catch (error) {
-      console.error("BackToTop: Failed to send heartbeat", error);
+      log.error("Failed to send heartbeat", error);
     }
   }
 
@@ -733,7 +756,7 @@ class BackToTop {
 
       return healthStatus;
     } catch (error) {
-      console.error("BackToTop: Health check failed", error);
+      log.error("Health check failed", error);
       return {
         instanceId: this.instanceId,
         healthy: false,
@@ -830,32 +853,38 @@ class BackToTop {
    */
   static debugEnterpriseStatus() {
     const healthReport = BackToTop.getEnterpriseHealthReport();
+    if (__verboseLogs) {
+      console.group("🏢 BackToTop Enterprise Status");
+      console.log("📊 Health Report:", healthReport);
+      console.log("📈 Instance Count:", healthReport.totalInstances);
+      console.log("✅ Healthy Instances:", healthReport.healthyInstances);
+      console.log("❌ Unhealthy Instances:", healthReport.unhealthyInstances);
+      console.log("⚡ Aggregate Metrics:", healthReport.aggregateMetrics);
 
-    console.group("🏢 BackToTop Enterprise Status");
-    console.log("📊 Health Report:", healthReport);
-    console.log("📈 Instance Count:", healthReport.totalInstances);
-    console.log("✅ Healthy Instances:", healthReport.healthyInstances);
-    console.log("❌ Unhealthy Instances:", healthReport.unhealthyInstances);
-    console.log("⚡ Aggregate Metrics:", healthReport.aggregateMetrics);
+      healthReport.instances.forEach((instance, index) => {
+        console.group(`📱 Instance ${index + 1} (${instance.instanceId})`);
+        console.log(
+          "Health Status:",
+          instance.healthy ? "✅ Healthy" : "❌ Unhealthy",
+        );
+        console.log("Uptime:", `${Math.round(instance.uptime / 1000)}s`);
+        console.log("Circuit Breaker:", instance.circuitBreakerStatus);
+        console.log("Performance Metrics:", instance.performance);
+        console.log(
+          "Memory Usage:",
+          `${instance.metrics.memoryUsage?.toFixed(2)} MB`,
+        );
+        console.groupEnd();
+      });
 
-    healthReport.instances.forEach((instance, index) => {
-      console.group(`📱 Instance ${index + 1} (${instance.instanceId})`);
-      console.log(
-        "Health Status:",
-        instance.healthy ? "✅ Healthy" : "❌ Unhealthy",
-      );
-      console.log("Uptime:", `${Math.round(instance.uptime / 1000)}s`);
-      console.log("Circuit Breaker:", instance.circuitBreakerStatus);
-      console.log("Performance Metrics:", instance.performance);
-      console.log(
-        "Memory Usage:",
-        `${instance.metrics.memoryUsage?.toFixed(2)} MB`,
-      );
       console.groupEnd();
-    });
-
-    console.groupEnd();
-
+    } else {
+      log.info("Enterprise status summary", {
+        totalInstances: healthReport.totalInstances,
+        healthy: healthReport.healthyInstances,
+        unhealthy: healthReport.unhealthyInstances,
+      });
+    }
     return healthReport;
   }
 }
@@ -887,17 +916,21 @@ window.getBackToTopHealth = function () {
  */
 window.listBackToTopInstances = function () {
   const instances = BackToTop.getAllInstances();
-  console.table(
-    instances.map((instance) => ({
-      instanceId: instance.instanceId,
-      isVisible: instance.isVisible,
-      startTime: new Date(instance.startTime).toLocaleString(),
-      errorCount: instance.errorCount,
-      circuitBreakerTripped: instance.circuitBreakerTripped,
-      totalScrollEvents: instance.performanceMetrics.totalScrollEvents,
-      totalButtonClicks: instance.performanceMetrics.totalButtonClicks,
-    })),
-  );
+  if (__verboseLogs) {
+    console.table(
+      instances.map((instance) => ({
+        instanceId: instance.instanceId,
+        isVisible: instance.isVisible,
+        startTime: new Date(instance.startTime).toLocaleString(),
+        errorCount: instance.errorCount,
+        circuitBreakerTripped: instance.circuitBreakerTripped,
+        totalScrollEvents: instance.performanceMetrics.totalScrollEvents,
+        totalButtonClicks: instance.performanceMetrics.totalButtonClicks,
+      })),
+    );
+  } else {
+    log.info("BackToTop instances", { count: instances.length });
+  }
   return instances;
 };
 

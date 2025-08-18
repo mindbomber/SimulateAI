@@ -73,10 +73,12 @@ class CSSPerformanceAnalyzer {
         this.realTimeMetrics = new Map(savedData.metrics || []);
       }
     } catch (error) {
-      console.warn(
-        "[CSSPerformanceAnalyzer] Failed to load analytics data:",
-        error,
-      );
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.warn(
+          "[CSSPerformanceAnalyzer] Failed to load analytics data:",
+          error,
+        );
+      }
     }
   }
 
@@ -89,7 +91,12 @@ class CSSPerformanceAnalyzer {
     try {
       return await this.dataHandler.getData("css_performance_analytics");
     } catch (error) {
-      console.warn("[CSSPerformanceAnalyzer] Failed to load analytics:", error);
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.warn(
+          "[CSSPerformanceAnalyzer] Failed to load analytics:",
+          error,
+        );
+      }
       return null;
     }
   }
@@ -114,7 +121,12 @@ class CSSPerformanceAnalyzer {
         analyticsData,
       );
     } catch (error) {
-      console.warn("[CSSPerformanceAnalyzer] Failed to save analytics:", error);
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.warn(
+          "[CSSPerformanceAnalyzer] Failed to save analytics:",
+          error,
+        );
+      }
     }
   }
 
@@ -179,8 +191,7 @@ class CSSPerformanceAnalyzer {
 
     // Only show detailed output if verbose logging is enabled
     const showVerboseOutput =
-      localStorage.getItem("verbose-css-logs") === "true" ||
-      localStorage.getItem("quiet-logs") !== "true";
+      localStorage.getItem("verbose-css-logs") === "true";
 
     if (showVerboseOutput) {
       console.group("🚀 CSS Optimization Results");
@@ -230,11 +241,6 @@ class CSSPerformanceAnalyzer {
       }
 
       console.groupEnd();
-    } else {
-      // Just show a summary in quiet mode
-      console.log(
-        `🚀 CSS Optimization: ${gains.fileReduction}, ${gains.ruleReduction} processed`,
-      );
     }
 
     return gains;
@@ -242,7 +248,9 @@ class CSSPerformanceAnalyzer {
 
   measureRealWorldImpact() {
     if (!window.performance) {
-      console.warn("Performance API not available");
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.warn("Performance API not available");
+      }
       return null;
     }
 
@@ -336,7 +344,9 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.hostname === "localhost" ||
     window.location.hostname === "127.0.0.1"
   ) {
-    analyzer.generateReport();
+    if (localStorage.getItem("verbose-css-logs") === "true") {
+      analyzer.generateReport();
+    }
 
     // Track page load analytics
     analyzer.trackPerformanceEvent("page_load", {
@@ -349,7 +359,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("load", () => {
       setTimeout(() => {
         const impact = analyzer.measureRealWorldImpact();
-        if (impact && localStorage.getItem("quiet-logs") !== "true") {
+        if (impact && localStorage.getItem("verbose-css-logs") === "true") {
           console.group("📈 Real-World Performance Metrics");
           console.log(`Total CSS files loaded: ${impact.totalCSSFiles}`);
           console.log(`Total CSS load time: ${impact.totalLoadTime}ms`);
@@ -368,10 +378,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Enhanced integration logging
-  if (analyzer.dataHandler) {
-    console.log("🔗 CSSPerformanceAnalyzer: DataHandler integration active");
-  } else {
-    console.log("ℹ️ CSSPerformanceAnalyzer: Running in standalone mode");
+  if (localStorage.getItem("verbose-css-logs") === "true") {
+    if (analyzer.dataHandler) {
+      console.log("🔗 CSSPerformanceAnalyzer: DataHandler integration active");
+    } else {
+      console.log("ℹ️ CSSPerformanceAnalyzer: Running in standalone mode");
+    }
   }
 });
 

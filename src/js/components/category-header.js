@@ -418,9 +418,19 @@ class CategoryHeader {
       );
 
       if (rings.length === 0) {
-        logger.warn(
-          "CategoryHeader: No progress rings found for tooltip attachment",
-        );
+        // Rate-limit this warning to avoid console spam
+        const now = Date.now();
+        CategoryHeader._lastNoRingsWarn = CategoryHeader._lastNoRingsWarn || 0;
+        if (now - CategoryHeader._lastNoRingsWarn > 60000) {
+          logger.warn(
+            "CategoryHeader: No progress rings found for tooltip attachment",
+          );
+          CategoryHeader._lastNoRingsWarn = now;
+        } else {
+          logger.debug(
+            "CategoryHeader: No progress rings found (suppressed, will warn again after 60s)",
+          );
+        }
         return;
       }
 

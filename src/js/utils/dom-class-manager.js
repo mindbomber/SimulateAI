@@ -4,6 +4,32 @@
  * Addresses the issue with redundant "loaded" and "font-size-medium" class operations
  */
 
+import baseLogger from "./logger.js";
+
+// Gate logs: enabled if any of these flags are set
+const __shouldLog = () =>
+  localStorage.getItem("debug") === "true" ||
+  localStorage.getItem("verbose-css-logs") === "true" ||
+  localStorage.getItem("verbose-logs") === "true";
+
+// Soft logger that respects the debug flags; errors always pass
+const logger = new Proxy(baseLogger, {
+  get(target, prop) {
+    if (prop === "error") return target.error.bind(target);
+    if (
+      prop === "info" ||
+      prop === "warn" ||
+      prop === "debug" ||
+      prop === "log"
+    ) {
+      return (...args) => {
+        if (__shouldLog()) return target[prop](...args);
+      };
+    }
+    return target[prop];
+  },
+});
+
 class DOMClassManager {
   constructor() {
     this.classStates = new Map();
@@ -26,7 +52,7 @@ class DOMClassManager {
     // Set up mutation observer to track external changes
     this.setupMutationObserver();
 
-    console.info("[DOMClassManager] Initialized with redundancy prevention");
+    logger.info("[DOMClassManager] Initialized with redundancy prevention");
   }
 
   /**
@@ -101,7 +127,7 @@ class DOMClassManager {
 
     // Check if class is already applied
     if (this.classStates.get(key)) {
-      console.debug(
+      logger.debug(
         `[DOMClassManager] Skipping redundant addClass: ${className} on ${targetType}`,
       );
       return false; // No operation needed
@@ -111,7 +137,7 @@ class DOMClassManager {
     target.classList.add(className);
     this.classStates.set(key, true);
 
-    console.debug(
+    logger.debug(
       `[DOMClassManager] Added class: ${className} on ${targetType}`,
     );
     return true; // Operation performed
@@ -126,7 +152,7 @@ class DOMClassManager {
 
     // Check if class is already removed
     if (!this.classStates.get(key)) {
-      console.debug(
+      logger.debug(
         `[DOMClassManager] Skipping redundant removeClass: ${className} on ${targetType}`,
       );
       return false; // No operation needed
@@ -136,7 +162,7 @@ class DOMClassManager {
     target.classList.remove(className);
     this.classStates.set(key, false);
 
-    console.debug(
+    logger.debug(
       `[DOMClassManager] Removed class: ${className} on ${targetType}`,
     );
     return true; // Operation performed
@@ -218,7 +244,7 @@ class DOMClassManager {
 
     // Check if target class is already applied
     if (this.classStates.get(`html:${targetClass}`)) {
-      console.debug(
+      logger.debug(
         `[DOMClassManager] Font size ${fontSize} already applied, skipping redundant operation`,
       );
       return false;
@@ -234,7 +260,7 @@ class DOMClassManager {
       { action: "add", target: html, className: targetClass },
     ];
 
-    console.debug(`[DOMClassManager] Changing font size to: ${fontSize}`);
+    logger.debug(`[DOMClassManager] Changing font size to: ${fontSize}`);
     return this.batchOperation(operations);
   }
 
@@ -247,7 +273,7 @@ class DOMClassManager {
     if (loaded) {
       const success = this.addClass(html, "loaded");
       if (!success) {
-        console.debug(
+        logger.debug(
           "[DOMClassManager] Page already marked as loaded, preventing redundant operation",
         );
       }

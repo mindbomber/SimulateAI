@@ -44,7 +44,20 @@ class UIBinder {
       animationsProcessed: 0,
     };
 
-    console.log("[UIBinder] Initialized with theme and component management");
+    try {
+      const __verbose =
+        (typeof localStorage !== "undefined" &&
+          (localStorage.getItem("debug") === "true" ||
+            localStorage.getItem("verbose-logs") === "true")) ||
+        false;
+      if (__verbose) {
+        console.log(
+          "[UIBinder] Initialized with theme and component management",
+        );
+      }
+    } catch (_) {
+      // no-op
+    }
   }
 
   /**
@@ -80,7 +93,18 @@ class UIBinder {
       }
 
       this.isInitialized = true;
-      console.log("[UIBinder] Initialization complete");
+      try {
+        const __verbose =
+          (typeof localStorage !== "undefined" &&
+            (localStorage.getItem("debug") === "true" ||
+              localStorage.getItem("verbose-logs") === "true")) ||
+          false;
+        if (__verbose) {
+          console.log("[UIBinder] Initialization complete");
+        }
+      } catch (_) {
+        // no-op
+      }
     } catch (error) {
       console.error("[UIBinder] Initialization failed:", error);
     }
@@ -146,9 +170,20 @@ class UIBinder {
       }
 
       this.performanceMetrics.themeApplications++;
-      console.log(
-        `[UIBinder] Theme '${themeName}' applied in ${performance.now() - startTime}ms`,
-      );
+      try {
+        const __verbose =
+          (typeof localStorage !== "undefined" &&
+            (localStorage.getItem("debug") === "true" ||
+              localStorage.getItem("verbose-logs") === "true")) ||
+          false;
+        if (__verbose) {
+          console.log(
+            `[UIBinder] Theme '${themeName}' applied in ${performance.now() - startTime}ms`,
+          );
+        }
+      } catch (_) {
+        // no-op
+      }
 
       // Emit theme change event
       this.emit("themeChanged", { theme: themeName, data: themeData });
@@ -548,7 +583,18 @@ class UIBinder {
       document.body.classList.add("ui-prefers-dark");
     }
 
-    console.log("[UIBinder] Accessibility features initialized");
+    try {
+      const __verbose =
+        (typeof localStorage !== "undefined" &&
+          (localStorage.getItem("debug") === "true" ||
+            localStorage.getItem("verbose-logs") === "true")) ||
+        false;
+      if (__verbose) {
+        console.log("[UIBinder] Accessibility features initialized");
+      }
+    } catch (_) {
+      // no-op
+    }
   }
 
   /**

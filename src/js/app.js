@@ -64,7 +64,7 @@ import "./user-tracking-init.js";
 // import './fcm-simple-init.js';
 
 // Import utilities
-import { userPreferences, userProgress } from "./utils/simple-storage.js";
+import { userPreferences } from "./utils/simple-storage.js";
 import { simpleAnalytics } from "./utils/simple-analytics.js";
 import AnalyticsManager from "./utils/analytics.js";
 import Helpers from "./utils/helpers.js";
@@ -73,7 +73,7 @@ import logger from "./utils/logger.js";
 import focusManager from "./utils/focus-manager.js";
 import scrollManager from "./utils/scroll-manager.js";
 import { loopDetector } from "./utils/infinite-loop-detector.js";
-import DOMClassManager from "./utils/dom-class-manager.js";
+// DOMClassManager is accessed via window.DOMClassManager when available
 import configIntegrator from "./utils/config-integrator.js";
 import "./utils/console-cleanup.js"; // Initialize console cleanup utility
 import "./utils/tooltip-auto-init.js"; // Initialize automatic tooltips for all users
@@ -3741,10 +3741,19 @@ class SimulateAIApp {
       // Only initialize if the hero demo container exists and not already initialized
       const demoContainer = document.getElementById("hero-ethics-chart");
       if (demoContainer && !ethicsDemo) {
-        // Import RadarChart dynamically
+        // Import RadarChart dynamically and preload its configuration to avoid lazy-load warnings
         const { default: RadarChart } = await import(
           "./components/radar-chart.js"
         );
+        try {
+          if (typeof RadarChart.initializeAll === "function") {
+            await RadarChart.initializeAll();
+          } else if (typeof RadarChart.loadConfiguration === "function") {
+            await RadarChart.loadConfiguration();
+          }
+        } catch (_) {
+          // Preload is best-effort; instance will still auto-load config if needed
+        }
 
         // Initialize RadarChart directly with demo configuration
         ethicsDemo = new RadarChart("hero-ethics-chart", {
@@ -3781,7 +3790,18 @@ class SimulateAIApp {
   }
 
   setupEventListeners() {
-    console.log("Setting up event listeners with Global Event Manager...");
+    try {
+      const __verbose =
+        (typeof localStorage !== "undefined" &&
+          (localStorage.getItem("debug") === "true" ||
+            localStorage.getItem("verbose-logs") === "true")) ||
+        false;
+      if (__verbose) {
+        console.log("Setting up event listeners with Global Event Manager...");
+      }
+    } catch (_) {
+      // no-op: localStorage may be unavailable or throw in some contexts
+    }
 
     try {
       // Initialize Global Event Manager if not already done
@@ -3801,7 +3821,20 @@ class SimulateAIApp {
       // Setup scenario completion and suggested scenario listeners
       this.setupScenarioEventListeners();
 
-      console.log("Event listeners setup completed with Global Event Manager");
+      try {
+        const __verbose =
+          (typeof localStorage !== "undefined" &&
+            (localStorage.getItem("debug") === "true" ||
+              localStorage.getItem("verbose-logs") === "true")) ||
+          false;
+        if (__verbose) {
+          console.log(
+            "Event listeners setup completed with Global Event Manager",
+          );
+        }
+      } catch (_) {
+        // no-op: localStorage may be unavailable or throw in some contexts
+      }
     } catch (error) {
       console.error("Error setting up event listeners:", error);
       this.showErrorMessage(
@@ -5805,7 +5838,7 @@ class SimulateAIApp {
   /**
    * Apply badge system enhancements to simulateai
    */
-  applyBadgeSystemEnhancements(config = {}) {
+  applyBadgeSystemEnhancements() {
     if (!this.badgeManager) {
       AppDebug.warn("Badge manager not available for simulateai enhancement");
       return;
@@ -5909,7 +5942,7 @@ class SimulateAIApp {
 
       // Try to use the BadgeModal component
       if (badgeModal) {
-        console.log("Using BadgeModal for celebration:", badges);
+        AppDebug.log("Using BadgeModal for celebration:", badges);
 
         // Show each badge with proper timing
         for (let i = 0; i < badges.length; i++) {
@@ -5933,7 +5966,7 @@ class SimulateAIApp {
               totalBadges: badges.length,
             });
           } catch (modalError) {
-            console.error(
+            AppDebug.error(
               `Error showing badge modal for badge ${i + 1}:`,
               modalError,
             );
@@ -5944,7 +5977,7 @@ class SimulateAIApp {
         // Wait for final modal to complete
         await new Promise((resolve) => setTimeout(resolve, 1000));
       } else {
-        console.warn("BadgeModal not available, using fallback notification");
+        AppDebug.warn("BadgeModal not available, using fallback notification");
         // Fallback to simple notification only if BadgeModal truly isn't available
         const badgeTitle =
           badges.length === 1 ? badges[0].title : `${badges.length} new badges`;
@@ -5966,7 +5999,7 @@ class SimulateAIApp {
       setTimeout(() => {
         if (window.NotificationToast) {
           window.NotificationToast.resume();
-          console.log("Badge celebration complete - notifications resumed");
+          AppDebug.log("Badge celebration complete - notifications resumed");
         }
       }, 2000);
     }
@@ -6127,7 +6160,10 @@ class SimulateAIApp {
    * @param {string} scenarioId - Scenario identifier
    * @returns {Object} Scenario responses
    */
-  getScenarioResponses(categoryId, scenarioId) {
+  getScenarioResponses(_categoryId, _scenarioId) {
+    // Mark params as used to satisfy linter while keeping API stable
+    void _categoryId;
+    void _scenarioId;
     // This would be implemented based on how scenario responses are stored
     // For now, return empty object as placeholder
     return {};
@@ -6139,7 +6175,10 @@ class SimulateAIApp {
    * @param {string} scenarioId - Scenario identifier
    * @returns {Object} Ethics scores
    */
-  getScenarioEthicsScores(categoryId, scenarioId) {
+  getScenarioEthicsScores(_categoryId, _scenarioId) {
+    // Mark params as used to satisfy linter while keeping API stable
+    void _categoryId;
+    void _scenarioId;
     // This would be implemented based on how ethics scores are stored
     // For now, return empty object as placeholder
     return {};
@@ -6151,7 +6190,10 @@ class SimulateAIApp {
    * @param {string} scenarioId - Scenario identifier
    * @returns {number} Completion time in milliseconds
    */
-  getScenarioCompletionTime(categoryId, scenarioId) {
+  getScenarioCompletionTime(_categoryId, _scenarioId) {
+    // Mark params as used to satisfy linter while keeping API stable
+    void _categoryId;
+    void _scenarioId;
     // This would be implemented based on how completion times are tracked
     // For now, return 0 as placeholder
     return 0;

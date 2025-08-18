@@ -3550,10 +3550,21 @@ class UIManager {
     this.themeWatchers = new Set();
     this.initialized = false;
 
-    console.log(
-      "[UIManager] Created with DataHandler support:",
-      !!this.dataHandler,
-    );
+    try {
+      const __verbose =
+        (typeof localStorage !== "undefined" &&
+          (localStorage.getItem("debug") === "true" ||
+            localStorage.getItem("verbose-logs") === "true")) ||
+        false;
+      if (__verbose) {
+        console.log(
+          "[UIManager] Created with DataHandler support:",
+          !!this.dataHandler,
+        );
+      }
+    } catch (_) {
+      // no-op
+    }
   }
 
   /**
@@ -3573,7 +3584,18 @@ class UIManager {
       this.setupGlobalThemeMonitoring();
 
       this.initialized = true;
-      console.log("[UIManager] Initialized with global UI preferences");
+      try {
+        const __verbose =
+          (typeof localStorage !== "undefined" &&
+            (localStorage.getItem("debug") === "true" ||
+              localStorage.getItem("verbose-logs") === "true")) ||
+          false;
+        if (__verbose) {
+          console.log("[UIManager] Initialized with global UI preferences");
+        }
+      } catch (_) {
+        // no-op
+      }
     } catch (error) {
       console.warn("[UIManager] Failed to initialize:", error);
     }
@@ -3585,9 +3607,20 @@ class UIManager {
   registerComponent(component) {
     if (component && component.id) {
       this.components.set(component.id, component);
-      console.log(
-        `[UIManager] Registered component: ${component.constructor.name} (${component.id})`,
-      );
+      try {
+        const __verbose =
+          (typeof localStorage !== "undefined" &&
+            (localStorage.getItem("debug") === "true" ||
+              localStorage.getItem("verbose-logs") === "true")) ||
+          false;
+        if (__verbose) {
+          console.log(
+            `[UIManager] Registered component: ${component.constructor.name} (${component.id})`,
+          );
+        }
+      } catch (_) {
+        // no-op
+      }
     }
   }
 

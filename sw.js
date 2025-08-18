@@ -2,14 +2,12 @@
 // Comprehensive PWA service worker with offline support and caching strategies
 
 // Service Worker Configuration
-const CACHE_VERSION = "simulateai-v1.15.1"; // Incremented for PWA notification fixes
+const CACHE_VERSION = "simulateai-v1.15.2"; // Incremented to refresh caches after CSS strategy change
 const CACHE_NAME = `simulateai-main-${CACHE_VERSION}`;
 const OFFLINE_CACHE = "simulateai-offline-v1.2";
 const RUNTIME_CACHE = "simulateai-runtime-v1.2";
 
-// Update strategy configuration
-const UPDATE_CHECK_INTERVAL = 60000; // Check for updates every minute
-const SKIP_WAITING_DELAY = 3000; // Wait 3 seconds before activating new service worker
+// Update strategy configuration (removed unused constants to satisfy linter)
 
 // Core files to cache immediately (only guaranteed files that exist in build)
 const CORE_FILES = ["/", "/index.html", "/app.html", "/manifest.json"];
@@ -17,18 +15,16 @@ const CORE_FILES = ["/", "/index.html", "/app.html", "/manifest.json"];
 // Remove extended files that may not exist after build
 const EXTENDED_FILES = [];
 
-// Network-first resources (always try network first)
-const NETWORK_FIRST = [
-  "/src/js/services/",
-  "/firebase-analytics-dashboard.html",
-  "/firebase-integration-demo.html",
-];
-
-// Cache-first resources (static assets)
-const CACHE_FIRST = ["/src/assets/", "/src/styles/", "/manifest.json"];
+// Legacy NETWORK_FIRST and CACHE_FIRST arrays removed (unused)
 
 // Runtime cache patterns
 const RUNTIME_PATTERNS = [
+  // Prefer fresh CSS to avoid stale UI after deployments/edits
+  {
+    pattern: /\.css(?:\?|$)/,
+    strategy: "network-first",
+    cacheName: "css-assets",
+  },
   {
     pattern: /^https:\/\/www\.gstatic\.com\/firebasejs\//,
     strategy: "stale-while-revalidate",
@@ -211,8 +207,6 @@ self.addEventListener("fetch", (event) => {
 
 // Main request handling logic
 async function handleRequest(request) {
-  const url = new URL(request.url);
-
   try {
     // Check for runtime cache patterns
     for (const pattern of RUNTIME_PATTERNS) {
@@ -403,8 +397,6 @@ function isApiRequest(request) {
 
 // Offline fallback handling
 async function handleOfflineFallback(request) {
-  const url = new URL(request.url);
-
   // For HTML pages, return offline page
   if (request.headers.get("accept")?.includes("text/html")) {
     const offlineCache = await caches.open(OFFLINE_CACHE);

@@ -257,10 +257,23 @@ class UserPreferences {
     this.storage = storage;
     this.dataHandler = app?.dataHandler || null;
 
-    if (this.dataHandler) {
-      console.log("[UserPreferences] DataHandler integration enabled");
-    } else {
-      console.log("[UserPreferences] Using storage-only mode");
+    try {
+      const __storageVerbose =
+        (typeof localStorage !== "undefined" &&
+          (localStorage.getItem("debug") === "true" ||
+            localStorage.getItem("verbose-logs") === "true")) ||
+        false;
+      if (this.dataHandler) {
+        if (__storageVerbose) {
+          logger.info("UserPreferences", "DataHandler integration enabled");
+        }
+      } else {
+        if (__storageVerbose) {
+          logger.info("UserPreferences", "Using storage-only mode");
+        }
+      }
+    } catch (_) {
+      // no-op
     }
   }
 
@@ -294,7 +307,19 @@ class UserPreferences {
           theme,
         );
         if (success) {
-          console.log("[UserPreferences] Theme saved to DataHandler");
+          // Quiet by default; log only in verbose mode
+          try {
+            const __storageVerbose =
+              (typeof localStorage !== "undefined" &&
+                (localStorage.getItem("debug") === "true" ||
+                  localStorage.getItem("verbose-logs") === "true")) ||
+              false;
+            if (__storageVerbose) {
+              logger.info("UserPreferences", "Theme saved to DataHandler");
+            }
+          } catch (_) {
+            // no-op
+          }
           // Also save to storage for immediate access
           this.storage.set("theme", theme);
           return;

@@ -11,6 +11,7 @@
     "build-with-copy": "vite build && npm run post-build",
     "post-build": "node -e \"const fs = require('fs'); fs.copyFileSync('dist/app.html', 'dist/index.html'); console.log('✓ Copied app.html to index.html for GitHub Pages');\"",
     "preview": "vite preview",
+    "emulators": "firebase emulators:start --only auth,database,storage,firestore",
     "icons:generate": "node scripts/generate-favicon.js",
     "test": "echo \"Tests will be added\" && exit 0",
     "test:firebase-config": "node src/js/test/firebase-config-test.js",

@@ -255,8 +255,7 @@ class StateManagementAnalyzer {
 
     // Only show detailed output if verbose logging is enabled
     const showVerboseOutput =
-      localStorage.getItem("verbose-css-logs") === "true" ||
-      localStorage.getItem("quiet-logs") !== "true";
+      localStorage.getItem("verbose-css-logs") === "true";
 
     if (showVerboseOutput) {
       console.group("🎯 State Management CSS Optimization");
@@ -283,50 +282,48 @@ class StateManagementAnalyzer {
 
       console.log("\n🎛️ Class-Specific Analysis:");
       console.log("Before consolidation:");
-    } else {
-      // Just show a summary in quiet mode
+      Object.entries(classAnalysis.before).forEach(([classCombo, files]) => {
+        console.log(
+          `   • class="${classCombo}" → ${files.length} files: ${files.join(", ")}`,
+        );
+      });
+
+      console.log("\nAfter consolidation:");
+      Object.entries(classAnalysis.after).forEach(([classCombo, files]) => {
+        console.log(
+          `   • class="${classCombo}" → ${files.length} file: ${files.join(", ")}`,
+        );
+      });
+
+      console.log(`\n🚀 Overall Improvement: ${classAnalysis.improvement}`);
+
+      console.log("\n📈 Specific Benefits:");
       console.log(
-        `🎯 State Management Optimization: ${optimization.fileReduction}, ${optimization.ruleReduction} processed`,
+        '   • class="loaded font-size-medium" now processes 1 file instead of 4',
       );
+      console.log("   • Better CSS cascade predictability with layers");
+      console.log("   • Centralized state management for easier debugging");
+      console.log("   • Reduced browser parse time for state changes");
+      console.log("   • Single cache entry for all state-related styles");
+
+      // DataHandler integration status
+      if (this.dataHandler) {
+        console.log("\n💾 Persistent Analytics:");
+        console.log("   • DataHandler integration active");
+        console.log(`   • ${this.optimizationHistory.length} events tracked`);
+        console.log("   • Cross-session analytics enabled");
+      }
+
+      console.groupEnd();
     }
-    Object.entries(classAnalysis.before).forEach(([classCombo, files]) => {
-      console.log(
-        `   • class="${classCombo}" → ${files.length} files: ${files.join(", ")}`,
-      );
-    });
-
-    console.log("\nAfter consolidation:");
-    Object.entries(classAnalysis.after).forEach(([classCombo, files]) => {
-      console.log(
-        `   • class="${classCombo}" → ${files.length} file: ${files.join(", ")}`,
-      );
-    });
-
-    console.log(`\n🚀 Overall Improvement: ${classAnalysis.improvement}`);
-
-    console.log("\n📈 Specific Benefits:");
-    console.log(
-      '   • class="loaded font-size-medium" now processes 1 file instead of 4',
-    );
-    console.log("   • Better CSS cascade predictability with layers");
-    console.log("   • Centralized state management for easier debugging");
-    console.log("   • Reduced browser parse time for state changes");
-    console.log("   • Single cache entry for all state-related styles");
-
-    // DataHandler integration status
-    if (this.dataHandler) {
-      console.log("\n💾 Persistent Analytics:");
-      console.log("   • DataHandler integration active");
-      console.log(`   • ${this.optimizationHistory.length} events tracked`);
-      console.log("   • Cross-session analytics enabled");
-    }
-
-    console.groupEnd();
 
     return optimization;
   }
 
   simulatePageLoadImpact() {
+    if (localStorage.getItem("verbose-css-logs") !== "true") {
+      return;
+    }
     // Simulate the impact of state class changes during page load
     const stateChanges = [
       { time: 0, classes: "" },
@@ -444,10 +441,12 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.hostname === "localhost" ||
     window.location.hostname === "127.0.0.1"
   ) {
-    analyzer.generateReport();
-    analyzer.simulatePageLoadImpact();
+    if (localStorage.getItem("verbose-css-logs") === "true") {
+      analyzer.generateReport();
+      analyzer.simulatePageLoadImpact();
+    }
 
-    // Track page load analytics
+    // Track page load analytics (silent)
     analyzer.trackOptimizationEvent("page_load", {
       hostname: window.location.hostname,
       href: window.location.href,
@@ -456,10 +455,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Enhanced integration logging
-  if (analyzer.dataHandler) {
-    console.log("🔗 StateManagementAnalyzer: DataHandler integration active");
-  } else {
-    console.log("ℹ️ StateManagementAnalyzer: Running in standalone mode");
+  if (localStorage.getItem("verbose-css-logs") === "true") {
+    if (analyzer.dataHandler) {
+      console.log("🔗 StateManagementAnalyzer: DataHandler integration active");
+    } else {
+      console.log("ℹ️ StateManagementAnalyzer: Running in standalone mode");
+    }
   }
 });
 

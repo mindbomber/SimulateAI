@@ -11,6 +11,51 @@
  * - Error handling with retry logic
  */
 
+import baseLogger from "../utils/logger.js";
+
+const __dhShouldLog = () =>
+  localStorage.getItem("debug") === "true" ||
+  localStorage.getItem("verbose-logs") === "true";
+
+const __dhLogger = new Proxy(baseLogger, {
+  get(target, prop) {
+    if (prop === "error") return target.error.bind(target);
+    if (
+      prop === "info" ||
+      prop === "warn" ||
+      prop === "debug" ||
+      prop === "log"
+    ) {
+      return (...args) => {
+        if (__dhShouldLog()) {
+          const method = prop === "log" ? "info" : prop;
+          return target[method]("DataHandler", ...args);
+        }
+      };
+    }
+    return target[prop];
+  },
+});
+
+const console = new Proxy(
+  {},
+  {
+    get(_t, prop) {
+      if (prop === "error")
+        return (...args) => __dhLogger.error("DataHandler", ...args);
+      if (prop === "warn")
+        return (...args) => __dhLogger.warn("DataHandler", ...args);
+      if (prop === "info")
+        return (...args) => __dhLogger.info("DataHandler", ...args);
+      if (prop === "debug")
+        return (...args) => __dhLogger.debug("DataHandler", ...args);
+      if (prop === "log")
+        return (...args) => __dhLogger.info("DataHandler", ...args);
+      return () => {};
+    },
+  },
+);
+
 class DataHandler {
   constructor(options = {}) {
     // Handle both old style (firebaseService) and new style (options) constructors

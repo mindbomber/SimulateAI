@@ -103,7 +103,18 @@ class FloatingTourTab {
 
       await this.dataHandler.initialize(firebaseService);
       await this.loadTourMetrics();
-      console.log("FloatingTourTab: DataHandler initialized successfully");
+      try {
+        const __verbose =
+          (typeof localStorage !== "undefined" &&
+            (localStorage.getItem("debug") === "true" ||
+              localStorage.getItem("verbose-logs") === "true")) ||
+          false;
+        if (__verbose) {
+          console.log("FloatingTourTab: DataHandler initialized successfully");
+        }
+      } catch (_) {
+        // no-op
+      }
     } catch (error) {
       console.warn(
         "FloatingTourTab: DataHandler initialization failed, using fallback mode:",
@@ -432,8 +443,11 @@ class FloatingTourTab {
       this.link.addEventListener(
         "touchstart",
         this.boundMethods.handleTouchStart,
+        { passive: true },
       );
-      this.link.addEventListener("touchend", this.boundMethods.handleTouchEnd);
+      this.link.addEventListener("touchend", this.boundMethods.handleTouchEnd, {
+        passive: true,
+      });
       this.link.addEventListener("click", this.boundMethods.handleMobileClick);
     } else {
       this.link.addEventListener(
@@ -456,7 +470,11 @@ class FloatingTourTab {
       "touchstart",
       this.boundMethods.handleTouchStart,
     );
-    this.link.removeEventListener("touchend", this.boundMethods.handleTouchEnd);
+    this.link.removeEventListener(
+      "touchend",
+      this.boundMethods.handleTouchEnd,
+      { passive: true },
+    );
     this.link.removeEventListener("click", this.boundMethods.handleMobileClick);
 
     // Remove desktop listeners

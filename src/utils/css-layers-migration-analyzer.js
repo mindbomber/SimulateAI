@@ -100,10 +100,12 @@ class CSSLayersMigrationAnalyzer {
         this.layerUsageData = new Map(savedData.layerUsageData || []);
       }
     } catch (error) {
-      console.warn(
-        "[CSSLayersMigrationAnalyzer] Failed to load migration data:",
-        error,
-      );
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.warn(
+          "[CSSLayersMigrationAnalyzer] Failed to load migration data:",
+          error,
+        );
+      }
     }
   }
 
@@ -116,10 +118,12 @@ class CSSLayersMigrationAnalyzer {
     try {
       return await this.dataHandler.getData("css_layers_migration_analytics");
     } catch (error) {
-      console.warn(
-        "[CSSLayersMigrationAnalyzer] Failed to load migration analytics:",
-        error,
-      );
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.warn(
+          "[CSSLayersMigrationAnalyzer] Failed to load migration analytics:",
+          error,
+        );
+      }
       return null;
     }
   }
@@ -144,10 +148,12 @@ class CSSLayersMigrationAnalyzer {
         analyticsData,
       );
     } catch (error) {
-      console.warn(
-        "[CSSLayersMigrationAnalyzer] Failed to save migration analytics:",
-        error,
-      );
+      if (localStorage.getItem("verbose-css-logs") === "true") {
+        console.warn(
+          "[CSSLayersMigrationAnalyzer] Failed to save migration analytics:",
+          error,
+        );
+      }
     }
   }
 
@@ -172,9 +178,11 @@ class CSSLayersMigrationAnalyzer {
 
     // Auto-save if persistent mode enabled
     if (this.persistentAnalytics) {
-      this.saveMigrationData().catch((err) =>
-        console.warn("[CSSLayersMigrationAnalyzer] Auto-save failed:", err),
-      );
+      this.saveMigrationData().catch((err) => {
+        if (localStorage.getItem("verbose-css-logs") === "true") {
+          console.warn("[CSSLayersMigrationAnalyzer] Auto-save failed:", err);
+        }
+      });
     }
   }
 
@@ -341,7 +349,9 @@ class CSSLayersMigrationAnalyzer {
         }
       } catch (error) {
         // CORS or other access issues with stylesheet
-        console.debug("Could not analyze stylesheet:", sheet.href);
+        if (localStorage.getItem("verbose-css-logs") === "true") {
+          console.debug("Could not analyze stylesheet:", sheet.href);
+        }
       }
     });
 
@@ -361,8 +371,7 @@ class CSSLayersMigrationAnalyzer {
 
     // Only show detailed output if verbose logging is enabled
     const showVerboseOutput =
-      localStorage.getItem("verbose-css-logs") === "true" ||
-      localStorage.getItem("quiet-logs") !== "true";
+      localStorage.getItem("verbose-css-logs") === "true";
 
     if (showVerboseOutput) {
       console.group("🔄 CSS Layers Migration Analysis");
@@ -422,11 +431,6 @@ class CSSLayersMigrationAnalyzer {
       }
 
       console.groupEnd();
-    } else {
-      // Just show a summary in quiet mode
-      console.log(
-        `🔄 CSS Layers Migration: ${this.cssFiles.migrated.length} migrated, ${this.cssFiles.needsMigration.length} pending`,
-      );
     }
 
     return { plan, usage };
@@ -500,7 +504,9 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.hostname === "localhost" ||
     window.location.hostname === "127.0.0.1"
   ) {
-    analyzer.generateMigrationReport();
+    if (localStorage.getItem("verbose-css-logs") === "true") {
+      analyzer.generateMigrationReport();
+    }
 
     // Track page load analytics
     analyzer.trackMigrationEvent("page_load_analysis", {
@@ -511,12 +517,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Enhanced integration logging
-  if (analyzer.dataHandler) {
-    console.log(
-      "🔗 CSSLayersMigrationAnalyzer: DataHandler integration active",
-    );
-  } else {
-    console.log("ℹ️ CSSLayersMigrationAnalyzer: Running in standalone mode");
+  if (localStorage.getItem("verbose-css-logs") === "true") {
+    if (analyzer.dataHandler) {
+      console.log(
+        "🔗 CSSLayersMigrationAnalyzer: DataHandler integration active",
+      );
+    } else {
+      console.log("ℹ️ CSSLayersMigrationAnalyzer: Running in standalone mode");
+    }
   }
 });
 

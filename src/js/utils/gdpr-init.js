@@ -60,10 +60,32 @@ document.addEventListener("DOMContentLoaded", async () => {
         );
       }
 
-      console.log("GDPR Cookie Notice: Consent updated", consent);
+      try {
+        const __verbose =
+          (typeof localStorage !== "undefined" &&
+            (localStorage.getItem("debug") === "true" ||
+              localStorage.getItem("verbose-logs") === "true")) ||
+          false;
+        if (__verbose) {
+          console.log("GDPR Cookie Notice: Consent updated", consent);
+        }
+      } catch (_) {
+        // no-op
+      }
     });
 
-    console.log("GDPR Cookie Notice: Initialized successfully");
+    try {
+      const __verbose =
+        (typeof localStorage !== "undefined" &&
+          (localStorage.getItem("debug") === "true" ||
+            localStorage.getItem("verbose-logs") === "true")) ||
+        false;
+      if (__verbose) {
+        console.log("GDPR Cookie Notice: Initialized successfully");
+      }
+    } catch (_) {
+      // no-op
+    }
   } catch (error) {
     console.error("GDPR Cookie Notice: Initialization failed", error);
   }

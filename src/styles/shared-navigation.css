@@ -312,6 +312,85 @@
     }
   }
 
+  /* Tablet drawer sizing (768–1024): slide-out panel with constrained width */
+  @media only screen and (width >= 768px) and (width <= 1024px) {
+    .main-nav.force-visible,
+    .main-nav.open,
+    .main-nav.mobile-force-visible,
+    .main-nav.js-open {
+      width: min(85vw, 520px) !important;
+      max-width: 520px !important;
+      right: 0 !important;
+      height: 100dvh !important;
+      padding: 2rem 1.25rem !important;
+
+      /* Ensure drawer stacks content vertically like mobile */
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 1rem !important;
+      overflow-y: auto !important;
+      overscroll-behavior: contain !important;
+      will-change: transform !important;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    /* Ensure all nav groups render inside the drawer regardless of inline-hiding rules */
+    .main-nav.open .nav-group,
+    .main-nav.force-visible .nav-group,
+    .main-nav.mobile-force-visible .nav-group,
+    .main-nav.js-open .nav-group,
+    .main-nav.open .nav-group-primary,
+    .main-nav.open .nav-group-community,
+    .main-nav.open .nav-group-about,
+    .main-nav.open .nav-group-actions,
+    .main-nav.open .nav-group-auth,
+    .main-nav.force-visible .nav-group-primary,
+    .main-nav.force-visible .nav-group-community,
+    .main-nav.force-visible .nav-group-about,
+    .main-nav.force-visible .nav-group-actions,
+    .main-nav.force-visible .nav-group-auth,
+    .main-nav.mobile-force-visible .nav-group-primary,
+    .main-nav.mobile-force-visible .nav-group-community,
+    .main-nav.mobile-force-visible .nav-group-about,
+    .main-nav.mobile-force-visible .nav-group-actions,
+    .main-nav.mobile-force-visible .nav-group-auth,
+    .main-nav.js-open .nav-group-primary,
+    .main-nav.js-open .nav-group-community,
+    .main-nav.js-open .nav-group-about,
+    .main-nav.js-open .nav-group-actions,
+    .main-nav.js-open .nav-group-auth {
+      display: flex !important;
+    }
+
+    /* Column layout inside the drawer */
+    .main-nav.open .nav-group,
+    .main-nav.force-visible .nav-group,
+    .main-nav.mobile-force-visible .nav-group,
+    .main-nav.js-open .nav-group,
+    .main-nav.open .nav-items,
+    .main-nav.force-visible .nav-items,
+    .main-nav.mobile-force-visible .nav-items,
+    .main-nav.js-open .nav-items {
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+      gap: 0.25rem;
+
+      /* Reset inline header-height constraints for stacked layout */
+      height: auto !important;
+      min-height: 0 !important;
+    }
+
+    .main-nav.open .nav-link,
+    .main-nav.force-visible .nav-link,
+    .main-nav.mobile-force-visible .nav-link,
+    .main-nav.js-open .nav-link {
+      width: 100%;
+      justify-content: flex-start;
+    }
+  }
+
   /* Extra Small Viewports - Even more compact - Aligned with media.css */
   @media only screen and (width <= 375px) {
     .main-nav.force-visible,
@@ -644,8 +723,9 @@
       transform 0.2s ease;
     /* Ensure logo aligns properly with siblings in flex container */
     align-self: center;
+
     /* Ensure logo is positioned first in row */
-    order: 1;
+    order: 0;
   }
 
   .logo:hover {
@@ -984,6 +1064,8 @@
     justify-content: center;
   }
 
+  /* Always place toggle to the right of logo (and after inline nav when visible) */
+
   .search-toggle:hover {
     background: rgb(255 255 255 / 20%);
     color: white;
@@ -1256,6 +1338,20 @@
     order: 2;
   }
 
+  /* Collapse inline navigation to drawer at tablet/small-desktop to prevent overflow */
+  @media (width <= 1024px) {
+    .main-nav {
+      display: none; /* hidden until opened as drawer */
+    }
+    /* Show when JS/CSS adds open/force-visible flags (drawer mode) */
+    .main-nav.open,
+    .main-nav.force-visible,
+    .main-nav.mobile-force-visible,
+    .main-nav.js-open {
+      display: flex !important;
+    }
+  }
+
   /* Navigation Group Organization - Modern Flexbox Architecture */
   /* Note: .nav-items replaces legacy .nav-list naming for semantic clarity */
   .nav-group {
@@ -1275,9 +1371,6 @@
   }
 
   /* Primary Navigation Group - Override general nav-items styles */
-  .nav-group-primary {
-    flex: 1;
-  }
 
   .nav-group-primary .nav-items {
     gap: calc(2rem * var(--font-scale, 1));
@@ -1687,6 +1780,8 @@
     .logo-image,
     .logo-compact {
       height: 38px;
+
+      /* Ensure consistent right-side placement next to the logo */
       width: auto;
     }
   }
@@ -2222,6 +2317,8 @@
     min-width: var(--touch-target-min, 44px);
     border-radius: 8px;
     transition: background-color 0.2s ease;
+    /* Always place toggle to the right of logo (and after inline nav when visible) */
+    order: 3;
   }
 
   .nav-toggle:hover {
@@ -2252,11 +2349,21 @@
     background: var(--nav-text-hover, #1e293b);
   }
 
-  @media (width < 768px) {
+  @media (width <= 1024px) {
     .nav-toggle {
       display: flex;
     }
+
+    /* Ensure consistent right-side placement next to the logo */
+    .header-container {
+      justify-content: flex-start;
+    }
+    .nav-toggle {
+      margin-inline-start: auto; /* push toggle to the far right */
+    }
+
     /* Responsive toggle button for smaller screens */
+
     @media only screen and (width <= 375px) {
       .nav-toggle {
         padding: 0.5rem;
@@ -2270,6 +2377,7 @@
         height: 1.5px;
       }
     }
+
     @media only screen and (width <= 320px) {
       .nav-toggle {
         padding: 0.375rem;
@@ -2645,7 +2753,6 @@
     }
 
     .nav-group-primary {
-      flex: 1;
       min-width: 0; /* allow inner scroller to size properly */
     }
 
@@ -3459,9 +3566,11 @@
   }
 
   /* Navigation Toggle Positioning for Desktop */
-  @media only screen and (width >= 768px) {
+
+  /* Hide toggle only above 1024px so it remains visible on tablets */
+  @media only screen and (width > 1024px) {
     .nav-toggle {
-      /* Hide toggle on desktop since nav is always visible */
+      /* Hide toggle on larger desktop since nav is always visible */
       display: none;
     }
   }

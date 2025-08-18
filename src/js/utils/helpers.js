@@ -43,8 +43,46 @@
  * @license Apache-2.0
  */
 
-import logger from "./logger.js";
+import baseLogger from "./logger.js";
 import { COMMON } from "./constants.js";
+
+// Helpers-specific gated logger proxy: quiet by default; enable via localStorage 'debug' or 'verbose-logs'
+const __helpersVerbose = (() => {
+  try {
+    return (
+      (typeof localStorage !== "undefined" &&
+        (localStorage.getItem("debug") === "true" ||
+          localStorage.getItem("verbose-logs") === "true")) ||
+      false
+    );
+  } catch (_) {
+    return false;
+  }
+})();
+
+const NON_CRITICAL_WARN_RE =
+  /Helper health check warning|Slow helper operation|Function called .* can only execute once/i;
+
+// Shadow 'logger' locally so existing calls in this file are gated without touching call sites
+const logger = {
+  info: (...args) => {
+    if (__helpersVerbose) baseLogger.info("Helpers", ...args);
+  },
+  debug: (...args) => {
+    if (__helpersVerbose) baseLogger.debug("Helpers", ...args);
+  },
+  warn: (...args) => {
+    const first = args[0];
+    const msg = typeof first === "string" ? first : "";
+    if (!__helpersVerbose && NON_CRITICAL_WARN_RE.test(msg)) {
+      // Demote frequent, non-critical warnings to info when not verbose
+      baseLogger.info("Helpers", ...args);
+    } else {
+      baseLogger.warn("Helpers", ...args);
+    }
+  },
+  error: (...args) => baseLogger.error("Helpers", ...args),
+};
 
 // Enterprise Configuration Constants
 const ENTERPRISE_HELPERS = {
@@ -5582,15 +5620,27 @@ if (typeof window !== "undefined") {
   window.helperHealth = window.debugHelpers.health;
   window.helperPerf = window.debugHelpers.performance;
 
-  console.log("🔧 Enterprise Helpers Debug Tools Available:");
-  console.log("- window.debugHelpers.stats() - Get statistics");
-  console.log("- window.debugHelpers.performance() - Performance report");
-  console.log("- window.debugHelpers.instances() - Instance fleet status");
-  console.log("- window.debugHelpers.health() - Health check");
-  console.log("- window.debugHelpers.monitor() - Monitor details");
-  console.log("- window.helperStats() - Quick stats shortcut");
-  console.log("- window.helperHealth() - Quick health shortcut");
-  console.log("- window.helperPerf() - Quick performance shortcut");
+  // Quiet by default: only show helper debug banner when verbose logging is enabled
+  try {
+    const __helpersBannerVerbose =
+      (typeof localStorage !== "undefined" &&
+        (localStorage.getItem("debug") === "true" ||
+          localStorage.getItem("verbose-logs") === "true")) ||
+      false;
+    if (__helpersBannerVerbose) {
+      console.log("🔧 Enterprise Helpers Debug Tools Available:");
+      console.log("- window.debugHelpers.stats() - Get statistics");
+      console.log("- window.debugHelpers.performance() - Performance report");
+      console.log("- window.debugHelpers.instances() - Instance fleet status");
+      console.log("- window.debugHelpers.health() - Health check");
+      console.log("- window.debugHelpers.monitor() - Monitor details");
+      console.log("- window.helperStats() - Quick stats shortcut");
+      console.log("- window.helperHealth() - Quick health shortcut");
+      console.log("- window.helperPerf() - Quick performance shortcut");
+    }
+  } catch (_) {
+    // no-op
+  }
 }
 
 // Global cleanup function for better memory management

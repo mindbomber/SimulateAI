@@ -33,7 +33,18 @@ class ScenarioCard {
   static async loadConfiguration() {
     try {
       this.config = await loadScenarioCardConfig();
-      console.log("ScenarioCard configuration loaded successfully");
+      try {
+        const __verbose =
+          (typeof localStorage !== "undefined" &&
+            (localStorage.getItem("debug") === "true" ||
+              localStorage.getItem("verbose-logs") === "true")) ||
+          false;
+        if (__verbose) {
+          console.log("ScenarioCard configuration loaded successfully");
+        }
+      } catch (_) {
+        // no-op
+      }
       return true;
     } catch (error) {
       console.error("Error loading ScenarioCard configuration:", error);
