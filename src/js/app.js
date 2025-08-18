@@ -6838,8 +6838,8 @@ function clearAllButtonStates() {
   });
 }
 
-// Visual feedback function for pattern changes - optimized to prevent unnecessary DOM creation
-function highlightChartChange(pattern) {
+// Visual feedback function for pattern changes - simplified (no label UI)
+function highlightChartChange() {
   const chartContainer = document.getElementById("hero-ethics-chart");
   if (!chartContainer) return;
 
@@ -6854,23 +6854,6 @@ function highlightChartChange(pattern) {
     transform: "scale(1.02)",
     boxShadow: "0 0 20px rgba(0, 123, 255, 0.5)",
   });
-
-  // Don't create a pattern label; only reference existing one if present
-  const label =
-    highlightChartChange.labelElement ||
-    chartContainer.querySelector(".pattern-feedback-label");
-
-  // Update label content and show it
-  if (label) {
-    const patternLabels = {
-      utilitarian: "🎯 Utilitarian",
-      deontological: "⚖️ Rights-Based",
-      virtue: "🌟 Virtue Ethics",
-      balanced: "⚡ Balanced",
-    };
-    label.textContent = patternLabels[pattern] || pattern;
-    label.style.opacity = "1";
-  }
 
   // Reset after animation with proper cleanup
   highlightChartChange.animationTimeout = setTimeout(() => {
@@ -6887,9 +6870,6 @@ function highlightChartChange(pattern) {
       transform: "scale(1)",
       boxShadow: defaultBoxShadow,
     });
-    if (label) {
-      label.style.opacity = "0";
-    }
   }, 1000);
 }
 
@@ -6898,13 +6878,6 @@ highlightChartChange.cleanup = function () {
   if (highlightChartChange.animationTimeout) {
     clearTimeout(highlightChartChange.animationTimeout);
     highlightChartChange.animationTimeout = null;
-  }
-  if (
-    highlightChartChange.labelElement &&
-    highlightChartChange.labelElement.parentNode
-  ) {
-    highlightChartChange.labelElement.remove();
-    highlightChartChange.labelElement = null;
   }
 };
 

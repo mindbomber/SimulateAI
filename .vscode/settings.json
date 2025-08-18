@@ -60,11 +60,5 @@
   },
 
   // Terminal
-  "terminal.integrated.defaultProfile.windows": "PowerShell",
-
-  // Educational Project Specific
-  "workbench.colorCustomizations": {
-    "activityBar.background": "#1a365d",
-    "titleBar.activeBackground": "#2d3748"
-  }
+  "terminal.integrated.defaultProfile.windows": "PowerShell"
 }
