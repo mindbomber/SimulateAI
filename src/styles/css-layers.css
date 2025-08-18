@@ -480,11 +480,61 @@
 
 /* Overrides Layer - Theme overrides and state-specific styles */
 @layer overrides {
+  /* Centralized hero dark mode overrides */
+  body.dark-mode .hero,
+  body.theme-dark .hero {
+    background: linear-gradient(
+      135deg,
+      var(--theme-bg-primary) 0%,
+      var(--theme-bg-secondary) 100%
+    );
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .hero-content h1,
+  body.theme-dark .hero-content h1,
+  body.dark-mode .hero-content h2,
+  body.theme-dark .hero-content h2 {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .hero-content p,
+  body.theme-dark .hero-content p {
+    color: var(--theme-text-secondary);
+  }
+
+  body.dark-mode .hero-title,
+  body.theme-dark .hero-title {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .hero-description,
+  body.theme-dark .hero-description {
+    color: var(--theme-text-secondary);
+  }
+
+  /* Dark mode: keep the same grid overlay as light mode (single grid),
+     only ensure no extra component-level overlays are added */
+  body.dark-mode .hero::before,
+  body.theme-dark .hero::before {
+    background: none; /* prevent component-level dark grids */
+  }
+
+  /* Dark mode: soften grid lines to a darker gray for better blending */
+  body.dark-mode .hero::after,
+  body.theme-dark .hero::after {
+    background-image:
+      linear-gradient(rgb(101 109 118 / 20%) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(101 109 118 / 20%) 1px, transparent 1px);
+    opacity: 0.4; /* slightly subtler than light mode */
+  }
+
   /*
    * Dark Mode Theme Overrides
    * Apply semantic tokens when dark mode is active.
-   * We target both html and body to ensure early paint correctness
-   * (html gets classes during the inline theme-preload shim).
+  * We target both html and body to ensure early paint correctness
+  * (html gets classes during the inline theme-preload shim) and
+  * runtime consistency (SettingsManager mirrors classes to both).
    */
   html.dark-mode,
   body.dark-mode,

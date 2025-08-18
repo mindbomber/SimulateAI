@@ -209,8 +209,15 @@ class SettingsManager {
    */
   applyThemeChoice(themeChoice) {
     const body = document.body;
+    const html = document.documentElement;
 
     // Remove all theme classes
+    html.classList.remove(
+      "theme-light",
+      "theme-dark",
+      "theme-system",
+      "dark-mode",
+    );
     body.classList.remove(
       "theme-light",
       "theme-dark",
@@ -219,16 +226,23 @@ class SettingsManager {
     );
 
     // Add theme class for user's choice
+    html.classList.add(`theme-${themeChoice}`);
     body.classList.add(`theme-${themeChoice}`);
 
     if (themeChoice === "dark") {
+      html.classList.add("dark-mode");
       body.classList.add("dark-mode");
+      // Align UA widgets (forms, etc.) to the chosen scheme
+      html.style.colorScheme = "dark";
     } else if (themeChoice === "light") {
       // Light mode - no dark-mode class needed
+      html.style.colorScheme = "light";
     } else if (themeChoice === "system") {
       // Follow system preference
       const prefersDark = this.systemPrefersDark.matches;
+      html.classList.toggle("dark-mode", prefersDark);
       body.classList.toggle("dark-mode", prefersDark);
+      html.style.colorScheme = prefersDark ? "dark" : "light";
     }
 
     // Store the preference
@@ -244,14 +258,19 @@ class SettingsManager {
    */
   applySystemTheme() {
     const body = document.body;
+    const html = document.documentElement;
     const prefersDark = this.systemPrefersDark.matches;
 
     // Remove explicit theme classes, keep system as default
+    html.classList.remove("theme-light", "theme-dark");
     body.classList.remove("theme-light", "theme-dark");
+    html.classList.add("theme-system");
     body.classList.add("theme-system");
 
     // Apply dark mode based on system preference
+    html.classList.toggle("dark-mode", prefersDark);
     body.classList.toggle("dark-mode", prefersDark);
+    html.style.colorScheme = prefersDark ? "dark" : "light";
 
     console.log(`🎨 System theme applied: ${prefersDark ? "dark" : "light"}`);
   }
@@ -267,7 +286,10 @@ class SettingsManager {
 
       if (!storedTheme || storedTheme === "system") {
         const body = document.body;
+        const html = document.documentElement;
+        html.classList.toggle("dark-mode", e.matches);
         body.classList.toggle("dark-mode", e.matches);
+        html.style.colorScheme = e.matches ? "dark" : "light";
         console.log(`🎨 System theme changed: ${e.matches ? "dark" : "light"}`);
 
         // Trigger any theme-dependent updates
@@ -305,6 +327,23 @@ class SettingsManager {
         } else {
           // Clear any dark mode inline styles for light theme
           this.clearDarkModeInlineStyles();
+          // Also ensure any root-level inline dark preload styles are removed
+          try {
+            const html = document.documentElement;
+            const body = document.body;
+            html.style.removeProperty("background-color");
+            html.style.removeProperty("color");
+            body?.style?.removeProperty?.("background-color");
+            body?.style?.removeProperty?.("color");
+          } catch (e) {
+            // Non-fatal cleanup failure; ignore
+            if (window && window.console) {
+              console.debug(
+                "SettingsManager:onThemeChange cleanup noop",
+                e?.message || e,
+              );
+            }
+          }
         }
       }, 100);
     }
@@ -562,8 +601,19 @@ class SettingsManager {
       });
     });
 
+    // Clear view toggle controls container styles
+    const viewToggleControls = this.getCachedElement(".view-toggle-controls");
+    if (viewToggleControls) {
+      viewToggleControls.style.removeProperty("background");
+      viewToggleControls.style.removeProperty("background-color");
+      viewToggleControls.style.removeProperty("border");
+      viewToggleControls.style.removeProperty("border-color");
+      viewToggleControls.style.removeProperty("box-shadow");
+    }
+
     // Clear other component styles
     const elementsToReset = [
+      ".view-toggle-controls",
       ".view-toggle-btn",
       "kbd",
       ".nav-link",

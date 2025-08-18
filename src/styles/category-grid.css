@@ -326,7 +326,7 @@
     letter-spacing: -0.005em;
     line-height: 1.45;
     color: var(--color-gray-850);
-    text-shadow: 0 0.5px 0.5px rgb(0 0 0 / 1.50%);
+    text-shadow: 0 0.5px 0.5px rgb(0 0 0 / 1.5%);
     background: transparent;
   }
 
@@ -889,10 +889,7 @@
     background: var(--theme-bg-primary);
   }
 
-  /* Categories section dark mode */
-  body.dark-mode .categories-section {
-    background: var(--theme-bg-primary);
-  }
+  /* Categories section dark mode centralized in css-layers.css */
 
   /* .scenarios-grid dark mode styles moved to scenario-browser.css */
 

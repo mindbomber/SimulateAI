@@ -75,16 +75,14 @@
     flex-direction: column;
     gap: var(--spacing-8);
     padding: var(--spacing-6);
-    background: var(--color-surface);
+
+    /* Use semantic theme token; dark mode handled in css-layers.css @layer overrides */
+    background: var(--theme-bg-primary);
     border-radius: var(--radius-lg);
     transition: all 0.3s ease;
   }
 
-  /* Dark mode support for categories section */
-  .dark-mode .categories-section {
-    background: var(--color-surface-dark);
-    border: 1px solid var(--color-border-dark);
-  }
+  /* Dark mode styles are centralized in css-layers.css @layer overrides */
 
   /* Responsive adjustments for categories section */
   @media (max-width: 768px) {
@@ -425,7 +423,7 @@
     padding: var(--spacing-3) var(--spacing-4);
     border: 1px solid var(--color-gray-300);
     border-radius: var(--radius-md);
-    background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+    background: linear-gradient(135deg, #fff 0%, #fafbfc 100%);
     color: var(--color-gray-800);
     font-family:
       -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
@@ -448,7 +446,7 @@
     padding: var(--spacing-3) var(--spacing-4);
     border: 1px solid var(--color-red-300);
     border-radius: var(--radius-md);
-    background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%);
+    background: linear-gradient(135deg, #fff 0%, #fef2f2 100%);
     color: var(--color-red-600);
     font-family:
       -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
@@ -930,7 +928,7 @@
     color: var(--color-gray-800);
 
     /* Enhanced visual styling with gradients and shadows */
-    background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+    background: linear-gradient(135deg, #fff 0%, #fafbfc 100%);
     box-shadow:
       0 1px 3px rgb(0 0 0 / 8%),
       0 1px 2px rgb(0 0 0 / 6%);
@@ -942,7 +940,7 @@
     font-weight: 575;
     color: var(--color-gray-900);
     border: 1px solid var(--color-gray-400);
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
     text-shadow: 0 0.5px 1px rgb(0 0 0 / 4%);
     letter-spacing: -0.005em;
   }
@@ -1573,7 +1571,7 @@
     line-height: 1.4;
 
     /* Enhanced visual styling */
-    background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%);
+    background: linear-gradient(135deg, #fff 0%, #fef2f2 100%);
     box-shadow:
       0 1px 3px rgb(239 68 68 / 12%),
       0 1px 2px rgb(0 0 0 / 6%);

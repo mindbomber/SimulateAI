@@ -55,7 +55,8 @@
 /* ===== COMPONENT-SPECIFIC DARK MODE STYLES ===== */
 @layer components {
   /* Gradient Override Patterns - Component Level */
-  body.dark-mode *[style*="linear-gradient"][style*="var(--color-primary-light)"] {
+  body.dark-mode
+    *[style*="linear-gradient"][style*="var(--color-primary-light)"] {
     background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
   }
 
@@ -68,10 +69,7 @@
     border-color: #444;
   }
 
-  body.dark-mode .hero::before {
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23444444" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-    opacity: 0.3;
-  }
+  /* Dark grid for hero pseudos now centralized in css-layers.css */
 
   /* Scenario Card Components - Using Theme Variables */
   body.dark-mode .scenario-card,
@@ -331,7 +329,6 @@
     background: linear-gradient(135deg, #fff, #4a9eff) !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
-    background-clip: text !important;
   }
 
   body.dark-mode .hero-description {
@@ -440,8 +437,11 @@
   }
 
   /* General modal component dark mode styles consolidated to pre-launch-modal.css for component ownership */
+
   /* body.dark-mode .modal-container styles moved to pre-launch-modal.css */
+
   /* body.dark-mode .modal-header styles moved to pre-launch-modal.css */
+
   /* body.dark-mode .modal-footer styles moved to pre-launch-modal.css */
 
   /* Loading screens */
@@ -575,6 +575,7 @@
   }
 
   /* Reduced Motion - Consolidated universal selector moved to design-tokens.css */
+
   /* Body-scoped overrides for user preference settings */
   body.reduced-motion {
     scroll-behavior: auto !important;
@@ -586,6 +587,7 @@
       --touch-target-min,
       48px
     ); /* Uses media.css touch targets */
+
     padding: calc(var(--container-padding, 16px) * 0.75)
       var(--container-padding, 16px);
     display: flex;
@@ -597,6 +599,7 @@
       --touch-target-min,
       48px
     ); /* Uses media.css touch targets */
+
     padding: calc(var(--container-padding, 16px) * 0.75) 0;
   }
 
@@ -626,6 +629,7 @@
       --touch-target-min,
       48px
     ); /* Uses media.css touch targets */
+
     padding: calc(var(--container-padding, 16px) * 0.75)
       var(--container-padding, 16px);
   }
@@ -761,8 +765,8 @@
     --theme-border-hover: #ccc;
     --theme-shadow: rgb(255 255 255 / 20%);
     --theme-shadow-hover: rgb(255 255 255 / 30%);
-    --theme-accent: #ffff00; /* High contrast yellow */
-    --theme-accent-dark: #ffcc00;
+    --theme-accent: #ff0; /* High contrast yellow */
+    --theme-accent-dark: #fc0;
     --theme-text-on-accent: #000;
 
     /* Override main color system variables for high contrast */
@@ -774,8 +778,8 @@
     --color-gray-600: #fff;
     --color-gray-800: #fff;
     --color-gray-900: #fff;
-    --color-primary: #ffff00;
-    --color-primary-dark: #ffcc00;
+    --color-primary: #ff0;
+    --color-primary-dark: #fc0;
 
     background-color: #000 !important;
     color: #fff !important;
@@ -783,21 +787,21 @@
 
   /* High contrast focus indicators */
   body.theme-high-contrast *:focus {
-    outline: 4px solid #ffff00 !important;
+    outline: 4px solid #ff0 !important;
     outline-offset: 2px !important;
-    background-color: #ffff00 !important;
+    background-color: #ff0 !important;
     color: #000 !important;
   }
 
   /* High contrast links */
   body.theme-high-contrast a {
-    color: #ffff00 !important;
+    color: #ff0 !important;
     text-decoration: underline !important;
   }
 
   body.theme-high-contrast a:hover,
   body.theme-high-contrast a:focus {
-    background-color: #ffff00 !important;
+    background-color: #ff0 !important;
     color: #000 !important;
   }
 

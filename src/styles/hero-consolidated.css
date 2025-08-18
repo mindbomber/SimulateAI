@@ -1087,55 +1087,7 @@ body.dark-mode .hero .orientation-suggestion {
   }
 }
 
-/* ================================
-   DARK MODE OVERRIDES - CONSOLIDATED FROM MAIN.CSS
-   ================================ */
-
-@layer overrides {
-  /* Hero section dark mode styles */
-  body.dark-mode .hero {
-    background: linear-gradient(
-      135deg,
-      var(--theme-bg-primary) 0%,
-      var(--theme-bg-secondary) 100%
-    );
-    color: var(--theme-text-primary);
-  }
-
-  body.dark-mode .hero-content h1,
-  body.dark-mode .hero-content h2 {
-    color: var(--theme-text-primary);
-  }
-
-  body.dark-mode .hero-content p {
-    color: var(--theme-text-secondary);
-  }
-
-  /* Enhanced hero component dark mode styling */
-  body.dark-mode .hero .hero-content {
-    color: var(--theme-text-primary);
-  }
-
-  body.dark-mode .hero-title {
-    color: var(--theme-text-primary);
-  }
-
-  body.dark-mode .hero-description {
-    color: var(--color-gray-200, #e5e7eb);
-    background: linear-gradient(
-      135deg,
-      rgb(30 58 138 / 60%) 0%,
-      rgb(29 78 216 / 55%) 50%,
-      rgb(37 99 235 / 50%) 100%
-    );
-    backdrop-filter: blur(10px);
-  }
-
-  body.dark-mode .hero-actions {
-    /* Ensure actions maintain proper dark mode theming */
-    color: var(--theme-text-primary);
-  }
-}
+/* Dark mode overrides for hero are centralized in css-layers.css @layer overrides */
 
 /* ================================
    ACCESSIBILITY - REDUCED MOTION SUPPORT
@@ -1286,21 +1238,21 @@ body.dark-mode .hero .orientation-suggestion {
 
   /* Hero radar chart theme integration */
   .hero-radar-chart.theme-light {
-    background-color: var(--radar-theme-light-background, #ffffff);
+    background-color: var(--radar-theme-light-background, #fff);
     border-color: var(--radar-theme-light-border, #e2e8f0);
-    color: var(--radar-theme-light-text, #333333);
+    color: var(--radar-theme-light-text, #333);
   }
 
   .hero-radar-chart.theme-dark {
     background-color: var(--radar-theme-dark-background, #1a1a1a);
-    border-color: var(--radar-theme-dark-border, #444444);
-    color: var(--radar-theme-dark-text, #ffffff);
+    border-color: var(--radar-theme-dark-border, #444);
+    color: var(--radar-theme-dark-text, #fff);
   }
 
   .hero-radar-chart.theme-high-contrast {
-    background-color: var(--radar-theme-high-contrast-background, #000000);
-    border-color: var(--radar-theme-high-contrast-border, #ffffff);
-    color: var(--radar-theme-high-contrast-text, #ffffff);
+    background-color: var(--radar-theme-high-contrast-background, #000);
+    border-color: var(--radar-theme-high-contrast-border, #fff);
+    color: var(--radar-theme-high-contrast-text, #fff);
   }
 
   /* ===== DEMO CONTROLS COMPONENTS ===== */
@@ -1889,55 +1841,7 @@ body.dark-mode .hero .orientation-suggestion {
 }
 
 @layer overrides {
-  /* ===== THEME OVERRIDES ===== */
-
-  /* Dark Mode - Hero Base */
-  .dark-mode .hero {
-    background: linear-gradient(
-      135deg,
-      var(--gradient-dark-start, #0d1117) 0%,
-      var(--gradient-dark-end, #1c2128) 100%
-    );
-  }
-
-  .dark-mode .hero::before {
-    opacity: 0.1;
-  }
-
-  /* Hide grid pattern in dark mode for cleaner appearance */
-  .dark-mode .hero::after {
-    display: none;
-  }
-
-  .dark-mode .hero-content {
-    color: var(--theme-text-primary);
-  }
-
-  .dark-mode .hero-section {
-    background: var(--theme-bg-primary);
-    color: var(--theme-text-primary);
-  }
-
-  .dark-mode .hero-section h1,
-  .dark-mode .hero-title {
-    color: var(--theme-text-primary);
-  }
-
-  .dark-mode .hero-section h2 {
-    color: var(--theme-text-primary);
-  }
-
-  .dark-mode .hero-section p,
-  .dark-mode .hero-description {
-    color: var(--theme-text-secondary);
-  }
-
-  .dark-mode .hero-badge {
-    background: var(--theme-accent);
-    color: var(--theme-text-on-accent);
-  }
-
-  /* Dark Mode - Demo Components */
+  /* Dark Mode - Demo Components (kept here as they are hero-demo specific) */
   .dark-mode .demo-btn {
     border-color: var(--demo-btn-border-dark, rgb(255 255 255 / 20%));
     background: var(--demo-btn-background-dark, rgb(255 255 255 / 5%));
@@ -1977,7 +1881,7 @@ body.dark-mode .hero .orientation-suggestion {
   }
 
   .dark-mode .demo-title {
-    color: #ffffff;
+    color: #fff;
   }
 
   .dark-mode .demo-subtitle {
@@ -1987,23 +1891,23 @@ body.dark-mode .hero .orientation-suggestion {
   .dark-mode .scenario-panel {
     background: rgb(0 0 0 / 30%);
     border: 1px solid rgb(255 255 255 / 10%);
-    color: #ffffff;
+    color: #fff;
   }
 
   .dark-mode .scenario-counter {
     background: rgb(255 255 255 / 10%);
-    color: #ffffff;
+    color: #fff;
     border: 1px solid rgb(255 255 255 / 20%);
   }
 
   .dark-mode .scenario-question {
-    color: #ffffff;
+    color: #fff;
   }
 
   .dark-mode .choice-btn {
     background: rgb(255 255 255 / 10%);
     border: 2px solid rgb(255 255 255 / 20%);
-    color: #ffffff;
+    color: #fff;
   }
 
   .dark-mode .choice-btn:hover {
@@ -2023,7 +1927,7 @@ body.dark-mode .hero .orientation-suggestion {
   }
 
   .dark-mode .choice-text {
-    color: #ffffff;
+    color: #fff;
   }
 
   .dark-mode .choice-arrow {
@@ -2033,7 +1937,7 @@ body.dark-mode .hero .orientation-suggestion {
   .dark-mode .scenario-feedback {
     background: rgb(0 0 0 / 80%);
     border: 1px solid rgb(255 255 255 / 20%);
-    color: #ffffff;
+    color: #fff;
   }
 
   .dark-mode .hero .demo-feedback-popover {
@@ -2101,7 +2005,7 @@ body.dark-mode .hero .orientation-suggestion {
   }
 
   .dark-mode .hero .demo-feedback-popover .popover-content {
-    color: #ffffff;
+    color: #fff;
   }
 
   .dark-mode .hero .demo-feedback-popover .popover-content h5 {
@@ -2109,7 +2013,7 @@ body.dark-mode .hero .orientation-suggestion {
   }
 
   .dark-mode .hero .demo-feedback-popover .popover-content p {
-    color: #cccccc;
+    color: #ccc;
   }
 
   .dark-mode .hero .demo-feedback-popover .pattern-emphasis {
@@ -2120,7 +2024,7 @@ body.dark-mode .hero .orientation-suggestion {
   .dark-mode .demo-actions .btn {
     background: rgb(255 255 255 / 10%);
     border: 1px solid rgb(255 255 255 / 20%);
-    color: #ffffff;
+    color: #fff;
   }
 
   .dark-mode .demo-actions .btn:hover {
@@ -2131,7 +2035,7 @@ body.dark-mode .hero .orientation-suggestion {
   .dark-mode .demo-actions .btn-primary {
     background: #4a9eff;
     border-color: #4a9eff;
-    color: #ffffff;
+    color: #fff;
   }
 
   .dark-mode .demo-actions .btn-primary:hover {
@@ -2142,7 +2046,7 @@ body.dark-mode .hero .orientation-suggestion {
   .dark-mode .demo-actions .btn-secondary {
     background: rgb(255 255 255 / 10%);
     border: 1px solid rgb(255 255 255 / 30%);
-    color: #ffffff;
+    color: #fff;
   }
 
   .dark-mode .demo-actions .btn-secondary:hover {

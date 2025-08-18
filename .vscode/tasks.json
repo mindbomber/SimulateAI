@@ -335,6 +335,26 @@
 				"$eslint-stylish"
 			],
 			"group": "test"
+		},
+		{
+			"label": "Lint Code",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"lint"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Lint Code",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"lint"
+			],
+			"group": "test"
 		}
 	]
 }
