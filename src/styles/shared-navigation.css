@@ -3168,6 +3168,75 @@
     box-shadow: 0 12px 28px var(--theme-shadow-hover);
   }
 
+  /* ===== NAVIGATION HIGHLIGHT FIX (Mobile/Tablet) =====
+   * Consolidated from navigation-highlight-fix.css
+   * Scope to <1024px so desktop-specific styles in this file remain authoritative
+   */
+  @media (width < 1024px) {
+    /* Active state: visual emphasis and left indicator bar */
+    .nav-link.active {
+      color: var(--color-primary);
+      background-color: rgb(0 124 186 / 10%);
+      font-weight: var(--font-weight-semibold, 600);
+
+      /* preserve existing padding scale variables if present */
+      padding: calc(0.5rem * var(--font-scale, 1))
+        calc(0.75rem * var(--font-scale, 1));
+      font-size: calc(1rem * var(--font-scale, 1));
+      position: relative; /* ensure ::before positions correctly */
+    }
+
+    .nav-link.active::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: calc(3px * var(--font-scale, 1));
+      height: calc(20px * var(--font-scale, 1));
+      background: var(--color-primary);
+      border-radius: 0 2px 2px 0;
+      display: block;
+    }
+
+    /* Clearer opt-out class for JS-controlled state clearing */
+    .nav-link-clear-active {
+      background-color: transparent;
+      color: inherit;
+      font-weight: inherit;
+      border-bottom-color: transparent;
+      position: relative;
+    }
+
+    .nav-link-clear-active::before,
+    .nav-link-clear-active::after {
+      display: none;
+      content: none;
+      background: transparent;
+      width: 0;
+      height: 0;
+    }
+
+    /* Dark mode variants are defined in @layer overrides (css-layers.css) */
+
+    /* Subtle highlight animation hook */
+    .nav-highlight-animation {
+      animation: highlight-flash 0.3s ease-out;
+    }
+
+    @keyframes highlight-flash {
+      0% {
+        background-color: transparent;
+      }
+      50% {
+        background-color: rgb(0 124 186 / 20%);
+      }
+      100% {
+        background-color: rgb(0 124 186 / 10%);
+      }
+    }
+  }
+
   body.dark-mode .mega-menu-section {
     border-right: 1px solid var(--theme-border);
   }

@@ -355,6 +355,19 @@
 				"lint"
 			],
 			"group": "test"
+		},
+		{
+			"label": "Lint CSS/JS",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"lint"
+			],
+			"problemMatcher": [
+				"$eslint-stylish"
+			],
+			"group": "test"
 		}
 	]
 }

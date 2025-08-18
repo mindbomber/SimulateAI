@@ -3,9 +3,7 @@
  * Styling for individual ethical scenario modals with radar chart integration
  * Based on hero-demo.css but adapted for modal context
  */
-
 @layer components {
-  /* Modal Backdrop */
   .scenario-modal-backdrop {
     position: fixed;
     top: 0;
@@ -922,130 +920,10 @@
       transform: translate(-50%, -50%);
     }
   }
+  /* Dark mode overrides moved to @layer overrides in css-layers.css
+     to comply with SimulateAI CSS architecture. */
 
-  /* ===== DARK MODE SUPPORT ===== */
-  body.dark-mode .scenario-modal-dialog {
-    background: var(--theme-bg-primary);
-    border: 1px solid var(--theme-border);
-    box-shadow:
-      0 20px 25px -5px var(--theme-shadow),
-      0 10px 10px -5px var(--theme-shadow);
-  }
-
-  body.dark-mode .scenario-modal-header {
-    background: var(--theme-bg-secondary);
-    border-bottom: 1px solid var(--theme-border);
-    color: var(--theme-text-primary);
-  }
-
-  body.dark-mode .scenario-title {
-    color: var(--theme-text-primary);
-  }
-
-  body.dark-mode .scenario-category {
-    color: var(--theme-text-secondary);
-  }
-
-  body.dark-mode .scenario-content {
-    background: var(--theme-bg-primary);
-    color: var(--theme-text-primary);
-  }
-
-  body.dark-mode .scenario-main {
-    background: var(--theme-bg-secondary);
-    border: 1px solid var(--theme-border);
-    color: var(--theme-text-primary);
-    box-shadow: 0 8px 25px var(--theme-shadow);
-  }
-
-  body.dark-mode .scenario-sidebar {
-    background: var(--theme-bg-secondary);
-    border: 1px solid var(--theme-border);
-    color: var(--theme-text-primary);
-    box-shadow: 0 8px 25px var(--theme-shadow);
-  }
-
-  body.dark-mode .dilemma-text,
-  body.dark-mode .ethical-question {
-    color: var(--theme-text-secondary);
-  }
-
-  body.dark-mode .dilemma-section h3,
-  body.dark-mode .ethical-question-section h3,
-  body.dark-mode .options-section h3 {
-    color: var(--theme-text-primary);
-  }
-
-  body.dark-mode .option-card {
-    background: var(--theme-bg-secondary);
-    border: 1px solid var(--theme-border);
-    color: var(--theme-text-primary);
-  }
-
-  body.dark-mode .option-card:hover {
-    border-color: var(--theme-border-hover);
-    box-shadow: 0 4px 12px var(--theme-shadow-hover);
-  }
-
-  body.dark-mode .option-card.selected {
-    background: linear-gradient(
-      135deg,
-      rgb(74 158 255 / 10%) 0%,
-      rgb(157 78 221 / 10%) 100%
-    );
-    border-color: #4a9eff;
-  }
-
-  body.dark-mode .option-title {
-    color: var(--theme-text-primary);
-  }
-
-  body.dark-mode .option-description {
-    color: var(--theme-text-secondary);
-  }
-
-  body.dark-mode .option-details {
-    background: rgb(0 0 0 / 20%);
-    border-top: 1px solid var(--theme-border);
-  }
-
-  body.dark-mode .pros-section,
-  body.dark-mode .cons-section {
-    background: var(--theme-bg-secondary);
-    border: 1px solid var(--theme-border);
-    color: var(--theme-text-primary);
-  }
-
-  body.dark-mode .pros-cons-popover {
-    background: var(--theme-bg-primary);
-    border: 1px solid var(--theme-border);
-    box-shadow: 0 25px 50px var(--theme-shadow);
-  }
-
-  body.dark-mode .pros-section h5,
-  body.dark-mode .cons-section h5 {
-    color: var(--theme-text-primary);
-  }
-
-  body.dark-mode .pros-section li,
-  body.dark-mode .cons-section li {
-    color: var(--theme-text-secondary);
-  }
-
-  body.dark-mode .scenario-modal-footer {
-    background: var(--theme-bg-secondary);
-    border-top: 1px solid var(--theme-border);
-  }
-
-  body.dark-mode .chart-legend {
-    color: var(--theme-text-secondary);
-  }
-
-  body.dark-mode .test-mode-indicator {
-    background: rgb(255 193 7 / 20%);
-    color: #ffc107;
-    border: 1px solid rgb(255 193 7 / 30%);
-  }
+  /* Dark mode section removed (centralized in css-layers.css) */
 
   /* ===== SCENARIO MODAL TRIGGER BUTTON ===== */
 
@@ -1055,19 +933,7 @@
 
   /* Scenario card styles moved to scenario-card.css for centralized component management */
 
-  /* ===== ENHANCED DARK MODE SUPPORT ===== */
-
-  /* Scenario card dark mode styles moved to scenario-card.css for centralized component management */
-
-  /* Scenario modal dark mode enhancements */
-  body.dark-mode .scenario-header {
-    background: transparent;
-    color: var(--theme-text-primary);
-  }
-
-  body.dark-mode .scenario-footer {
-    color: var(--theme-text-secondary);
-  }
+  /* Enhanced dark mode support moved to css-layers.css */
 
   /* ===== CHART.JS TOOLTIP FIX ===== */
 
@@ -1092,6 +958,6 @@
    • Maintained responsive breakpoints for component-specific styling
    • Enhanced consistency with global accessibility patterns
    
-   📊 IMPACT: ~25 lines reduced, 2 media queries consolidated to utility classes
-   =============================================== */
-} /* End @layer components */
+  📊 IMPACT: ~25 lines reduced, 2 media queries consolidated to utility classes
+  =============================================== */
+}

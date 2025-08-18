@@ -40,7 +40,7 @@ limitations under the License.
             document.head.appendChild(s);
           }
         } catch (_) {}
-      })();
+  <!-- Removing pattern-feedback-label div if present, if it exists -->
     </script>
 
     <meta charset="UTF-8" />
@@ -142,14 +142,35 @@ limitations under the License.
             });
           }
 
-          // Remove preload class and temporary inline styles after load to re-enable transitions
-          window.addEventListener(
-            "load",
-            function () {
+          // Re-enable transitions AFTER native restoration completes
+          var enableTransitions = function () {
+            try {
               root.classList.remove("theme-preload");
               // Clean up temporary inline styles set for dark preload
               root.style.removeProperty("background-color");
               root.style.removeProperty("color");
+            } catch (_) {}
+          };
+          // Prefer pageshow; fallback to load if needed
+          window.addEventListener(
+            "pageshow",
+            function () {
+              // Double rAF to ensure layout/paint settle
+              requestAnimationFrame(function () {
+                requestAnimationFrame(enableTransitions);
+              });
+            },
+            { once: true },
+          );
+          window.addEventListener(
+            "load",
+            function () {
+              // If pageshow didn't fire (rare), enable on load
+              if (
+                document.documentElement.classList.contains("theme-preload")
+              ) {
+                requestAnimationFrame(enableTransitions);
+              }
             },
             { once: true },
           );
@@ -372,7 +393,7 @@ limitations under the License.
     <!-- 3. Base styles -->
     <link rel="stylesheet" href="src/styles/main.css" />
     <link rel="stylesheet" href="src/styles/accessibility.css" />
-    <link rel="stylesheet" href="src/styles/navigation-highlight-fix.css" />
+    <!-- nav highlight fix merged into shared-navigation.css -->
 
     <!-- 4. Base component styles -->
     <link rel="stylesheet" href="src/styles/simulations.css" />
@@ -382,28 +403,151 @@ limitations under the License.
     <link rel="stylesheet" href="src/styles/shared-navigation.css" />
 
     <!-- 5. Advanced component systems -->
-    <link rel="stylesheet" href="src/styles/advanced-ui-components.css" />
-    <link rel="stylesheet" href="src/styles/enhanced-objects.css" />
+    <!-- Defer non-critical advanced component systems -->
+    <link
+      rel="preload"
+      href="src/styles/advanced-ui-components.css"
+      as="style"
+    />
+    <link
+      rel="stylesheet"
+      href="src/styles/advanced-ui-components.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link rel="stylesheet" href="src/styles/advanced-ui-components.css"
+    /></noscript>
+    <link rel="preload" href="src/styles/enhanced-objects.css" as="style" />
+    <link
+      rel="stylesheet"
+      href="src/styles/enhanced-objects.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link rel="stylesheet" href="src/styles/enhanced-objects.css"
+    /></noscript>
 
     <!-- 6. Utility components -->
-    <link rel="stylesheet" href="src/styles/input-utility-components.css" />
-    <link rel="stylesheet" href="src/styles/form-input-components.css" />
+    <!-- Defer utility component styles -->
+    <link
+      rel="preload"
+      href="src/styles/input-utility-components.css"
+      as="style"
+    />
+    <link
+      rel="stylesheet"
+      href="src/styles/input-utility-components.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link rel="stylesheet" href="src/styles/input-utility-components.css"
+    /></noscript>
+    <link
+      rel="preload"
+      href="src/styles/form-input-components.css"
+      as="style"
+    />
+    <link
+      rel="stylesheet"
+      href="src/styles/form-input-components.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link rel="stylesheet" href="src/styles/form-input-components.css"
+    /></noscript>
 
     <!-- 7. UI utility components -->
-    <link rel="stylesheet" href="src/styles/notification-toast.css" />
-    <link rel="stylesheet" href="src/styles/onboarding-tour.css" />
-    <link rel="stylesheet" href="src/styles/scenario-modal.css" />
-    <link rel="stylesheet" href="src/styles/scenario-reflection-modal.css" />
+    <!-- Defer UI utility and modal systems -->
+    <link rel="preload" href="src/styles/notification-toast.css" as="style" />
+    <link
+      rel="stylesheet"
+      href="src/styles/notification-toast.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link rel="stylesheet" href="src/styles/notification-toast.css"
+    /></noscript>
+    <link rel="preload" href="src/styles/onboarding-tour.css" as="style" />
+    <link
+      rel="stylesheet"
+      href="src/styles/onboarding-tour.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link rel="stylesheet" href="src/styles/onboarding-tour.css"
+    /></noscript>
+    <link rel="preload" href="src/styles/scenario-modal.css" as="style" />
+    <link
+      rel="stylesheet"
+      href="src/styles/scenario-modal.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link rel="stylesheet" href="src/styles/scenario-modal.css"
+    /></noscript>
+    <link
+      rel="preload"
+      href="src/styles/scenario-reflection-modal.css"
+      as="style"
+    />
+    <link
+      rel="stylesheet"
+      href="src/styles/scenario-reflection-modal.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link rel="stylesheet" href="src/styles/scenario-reflection-modal.css"
+    /></noscript>
     <link rel="stylesheet" href="src/styles/radar-chart.css" />
     <link rel="stylesheet" href="src/styles/session-settings.css" />
     <link rel="stylesheet" href="src/styles/profile-customization.css" />
+    <!-- Defer GDPR cookie notice -->
+    <link
+      rel="preload"
+      href="src/styles/components/gdpr-cookie-notice.css"
+      as="style"
+    />
     <link
       rel="stylesheet"
       href="src/styles/components/gdpr-cookie-notice.css"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript
+      ><link
+        rel="stylesheet"
+        href="src/styles/components/gdpr-cookie-notice.css"
+    /></noscript>
 
-    <link rel="stylesheet" href="src/styles/card-component.css" />
-    <link rel="stylesheet" href="src/styles/loader-spinner.css" />
+    <!-- Defer card components and loader styles -->
+    <link rel="preload" href="src/styles/card-component.css" as="style" />
+    <link
+      rel="stylesheet"
+      href="src/styles/card-component.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link rel="stylesheet" href="src/styles/card-component.css"
+    /></noscript>
+    <link rel="preload" href="src/styles/loader-spinner.css" as="style" />
+    <link
+      rel="stylesheet"
+      href="src/styles/loader-spinner.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link rel="stylesheet" href="src/styles/loader-spinner.css"
+    /></noscript>
 
     <!-- 8. Page-specific and theme styles -->
     <link rel="stylesheet" href="src/styles/hero-consolidated.css" />
@@ -413,7 +557,17 @@ limitations under the License.
       href="src/styles/state-management-consolidated.css"
     />
     <link rel="stylesheet" href="src/styles/category-grid.css" />
-    <link rel="stylesheet" href="src/styles/category-page.css" />
+    <!-- Defer category page specific styles (not needed on app.html main view) -->
+    <link rel="preload" href="src/styles/category-page.css" as="style" />
+    <link
+      rel="stylesheet"
+      href="src/styles/category-page.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link rel="stylesheet" href="src/styles/category-page.css"
+    /></noscript>
 
     <!-- Scenario Browser and Components -->
     <link rel="stylesheet" href="src/styles/scenario-browser.css" />
@@ -425,40 +579,167 @@ limitations under the License.
     <link rel="stylesheet" href="src/styles/ethics-analysis.css" />
 
     <!-- User Interaction Components -->
-    <link rel="stylesheet" href="src/styles/user-metadata-collector.css" />
+    <!-- Defer user metadata collector styles -->
+    <link
+      rel="preload"
+      href="src/styles/user-metadata-collector.css"
+      as="style"
+    />
+    <link
+      rel="stylesheet"
+      href="src/styles/user-metadata-collector.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link rel="stylesheet" href="src/styles/user-metadata-collector.css"
+    /></noscript>
 
     <!-- Community and Support Features -->
-    <link rel="stylesheet" href="src/styles/donor-flair-display.css" />
+    <!-- Defer donor flair display styles -->
+    <link rel="preload" href="src/styles/donor-flair-display.css" as="style" />
+    <link
+      rel="stylesheet"
+      href="src/styles/donor-flair-display.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link rel="stylesheet" href="src/styles/donor-flair-display.css"
+    /></noscript>
 
     <!-- 9. Layout fixes and overrides -->
-    <link rel="stylesheet" href="src/styles/layout-fixes.css" />
+    <!-- Defer layout fixes -->
+    <link rel="preload" href="src/styles/layout-fixes.css" as="style" />
+    <link
+      rel="stylesheet"
+      href="src/styles/layout-fixes.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link rel="stylesheet" href="src/styles/layout-fixes.css"
+    /></noscript>
 
     <!-- 10. Ethics Explorer overrides (moved before consolidated modal) -->
-    <link rel="stylesheet" href="src/styles/ethics-explorer.css" />
+    <!-- Defer ethics explorer overrides -->
+    <link rel="preload" href="src/styles/ethics-explorer.css" as="style" />
+    <link
+      rel="stylesheet"
+      href="src/styles/ethics-explorer.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link rel="stylesheet" href="src/styles/ethics-explorer.css"
+    /></noscript>
 
     <!-- Badge System -->
-    <link rel="stylesheet" href="src/styles/badge-modal.css" />
+    <!-- Defer badge system styles -->
+    <link rel="preload" href="src/styles/badge-modal.css" as="style" />
+    <link
+      rel="stylesheet"
+      href="src/styles/badge-modal.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link rel="stylesheet" href="src/styles/badge-modal.css"
+    /></noscript>
 
     <!-- Community Features -->
-    <link rel="stylesheet" href="src/styles/community-features.css" />
+    <!-- Defer community features styles -->
+    <link rel="preload" href="src/styles/community-features.css" as="style" />
+    <link
+      rel="stylesheet"
+      href="src/styles/community-features.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link rel="stylesheet" href="src/styles/community-features.css"
+    /></noscript>
 
     <!-- 11. Modal system - consolidated architecture (loaded LAST for highest specificity) -->
+    <!-- Defer consolidated modal system styles -->
+    <link
+      rel="preload"
+      href="src/styles/simulation-modal-consolidated.css"
+      as="style"
+    />
     <link
       rel="stylesheet"
       href="src/styles/simulation-modal-consolidated.css"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript
+      ><link
+        rel="stylesheet"
+        href="src/styles/simulation-modal-consolidated.css"
+    /></noscript>
 
     <!-- Back to Top Component -->
-    <link rel="stylesheet" href="src/styles/back-to-top.css" />
+    <!-- Defer back-to-top styles -->
+    <link rel="preload" href="src/styles/back-to-top.css" as="style" />
+    <link
+      rel="stylesheet"
+      href="src/styles/back-to-top.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link rel="stylesheet" href="src/styles/back-to-top.css"
+    /></noscript>
 
     <!-- Floating Tabs Consolidated Styles -->
-    <link rel="stylesheet" href="src/styles/floating-tabs-consolidated.css" />
+    <!-- Defer floating tabs styles -->
+    <link
+      rel="preload"
+      href="src/styles/floating-tabs-consolidated.css"
+      as="style"
+    />
+    <link
+      rel="stylesheet"
+      href="src/styles/floating-tabs-consolidated.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link rel="stylesheet" href="src/styles/floating-tabs-consolidated.css"
+    /></noscript>
 
     <!-- Settings Menu Component -->
-    <link rel="stylesheet" href="src/styles/settings-menu.css" />
+    <!-- Defer settings menu, footer, and appearance settings styles -->
+    <link rel="preload" href="src/styles/settings-menu.css" as="style" />
+    <link
+      rel="stylesheet"
+      href="src/styles/settings-menu.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link rel="stylesheet" href="src/styles/settings-menu.css"
+    /></noscript>
     <!-- Footer Component Styles -->
-    <link rel="stylesheet" href="src/styles/footer.css" />
-    <link rel="stylesheet" href="src/styles/appearance-settings.css" />
+    <link rel="preload" href="src/styles/footer.css" as="style" />
+    <link
+      rel="stylesheet"
+      href="src/styles/footer.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript><link rel="stylesheet" href="src/styles/footer.css" /></noscript>
+    <link rel="preload" href="src/styles/appearance-settings.css" as="style" />
+    <link
+      rel="stylesheet"
+      href="src/styles/appearance-settings.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link rel="stylesheet" href="src/styles/appearance-settings.css"
+    /></noscript>
 
     <!-- Icons and Favicons -->
     <link rel="icon" type="image/svg+xml" href="src/assets/icons/favicon.svg" />
@@ -497,45 +778,7 @@ limitations under the License.
     <link rel="prefetch" href="src/js/core/accessibility.js" />
     <link rel="prefetch" href="src/js/core/animation-manager.js" />
 
-    <!-- Scroll restoration configuration -->
-    <script>
-      // Configure scroll restoration (safe to do in head)
-      if ("scrollRestoration" in history) {
-        history.scrollRestoration = "manual";
-      }
-
-      // Single initialization function to prevent duplicate calls
-      let pageInitialized = false;
-
-      function initializePage() {
-        if (pageInitialized) {
-          return; // Prevent duplicate initialization
-        }
-        pageInitialized = true;
-
-        // Only reset scroll position if there's no hash (don't interfere with navigation)
-        if (!window.location.hash) {
-          window.scrollTo(0, 0);
-        }
-
-        // Set loaded state for animations
-        if (window.DOMClassManager) {
-          window.DOMClassManager.setLoadedState(true);
-        } else {
-          document.documentElement.classList.add("loaded");
-        }
-      }
-
-      // Single event listener setup
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initializePage, {
-          once: true,
-        });
-      } else {
-        // DOM already loaded
-        initializePage();
-      }
-    </script>
+    <!-- Scroll management is centralized in src/js/utils/scroll-manager.js -->
 
     <!-- Inert polyfill for older browsers -->
     <script>
@@ -1272,6 +1515,10 @@ limitations under the License.
                       <img
                         src="src/assets/avatars/default-avatar.svg"
                         alt="Donor avatar"
+                        width="64"
+                        height="64"
+                        loading="lazy"
+                        decoding="async"
                       />
                       <div
                         class="donor-badge gold-tier"
@@ -1577,7 +1824,7 @@ limitations under the License.
     <link rel="stylesheet" href="src/styles/donor-wall.css" />
 
     <script type="module">
-      // Initialize enhanced donation widget and donor flair - consolidated initialization
+      // Initialize enhanced donation widget and donor flair - lazy and idle-first
       function initializeDonationComponents() {
         // Debug tracking
         if (window.debugInitTracker) {
@@ -1641,17 +1888,85 @@ limitations under the License.
         }
       }
 
-      // Use a more efficient initialization approach
-      if (document.readyState === "loading") {
-        document.addEventListener(
-          "DOMContentLoaded",
-          initializeDonationComponents,
-          { once: true },
-        );
-      } else {
-        // DOM already loaded, initialize immediately
-        initializeDonationComponents();
-      }
+      // Lazy-init: prefer IntersectionObserver for donor section, fallback to idle
+      (function () {
+        var targetSel = "#donor-appreciation-container";
+        var started = false;
+        var start = function () {
+          if (started) return;
+          started = true;
+          initializeDonationComponents();
+        };
+
+        // Idle callback fallback
+        var idleStart = function () {
+          if ("requestIdleCallback" in window) {
+            requestIdleCallback(
+              function () {
+                start();
+              },
+              { timeout: 2500 },
+            );
+          } else {
+            setTimeout(start, 1200);
+          }
+        };
+
+        // If DOM not ready, wait for it
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", function onReady() {
+            document.removeEventListener("DOMContentLoaded", onReady);
+            var target = document.querySelector(targetSel);
+            if (target && "IntersectionObserver" in window) {
+              try {
+                var io = new IntersectionObserver(
+                  function (entries) {
+                    for (var i = 0; i < entries.length; i++) {
+                      if (entries[i].isIntersecting) {
+                        io.disconnect();
+                        start();
+                        return;
+                      }
+                    }
+                  },
+                  { rootMargin: "800px 0px" },
+                );
+                io.observe(target);
+                // Also schedule idle init as a safety
+                idleStart();
+              } catch (_) {
+                idleStart();
+              }
+            } else {
+              idleStart();
+            }
+          });
+        } else {
+          var targetNow = document.querySelector(targetSel);
+          if (targetNow && "IntersectionObserver" in window) {
+            try {
+              var ioNow = new IntersectionObserver(
+                function (entries) {
+                  for (var j = 0; j < entries.length; j++) {
+                    if (entries[j].isIntersecting) {
+                      ioNow.disconnect();
+                      start();
+                      return;
+                    }
+                  }
+                },
+                { rootMargin: "800px 0px" },
+              );
+              ioNow.observe(targetNow);
+              idleStart();
+            } catch (_) {
+              idleStart();
+            }
+          } else {
+            idleStart();
+          }
+        }
+      })();
     </script>
 
     <!-- Donation Preferences Component -->

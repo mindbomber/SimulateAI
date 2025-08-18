@@ -49,7 +49,14 @@
   html {
     scroll-behavior: auto;
     scroll-snap-type: none;
-    overflow-x: hidden;
+
+    /* Reserve vertical scrollbar to prevent layout shift when it appears */
+
+    /* x hidden, y auto */
+    overflow: hidden auto;
+
+    /* Keep a stable gutter so layout doesn't shift when scrollbar toggles */
+    scrollbar-gutter: stable both-edges;
   }
 
   html.loaded {
@@ -135,6 +142,18 @@
 
   .justify-between {
     justify-content: space-between;
+  }
+
+  /* Performance: avoid painting below-the-fold heavy sections until needed */
+  .donor-appreciation-section,
+  .donor-wall-container,
+  footer,
+  .professional-footer,
+  #donor-appreciation,
+  #donor-appreciation-container {
+    /* Reserve reasonable intrinsic height to prevent jumps when revealed */
+    content-visibility: auto;
+    contain-intrinsic-size: 800px;
   }
 }
 
@@ -650,6 +669,30 @@
     color: var(--color-primary);
   }
 
+  /* Dark-mode mobile/tablet active highlight for navigation */
+  @media (width < 1024px) {
+    body.dark-mode .nav-link.active,
+    body.theme-dark .nav-link.active {
+      color: #4a9eff;
+      background-color: rgb(74 158 255 / 15%);
+      font-weight: var(--font-weight-semibold, 600);
+      padding: calc(0.5rem * var(--font-scale, 1))
+        calc(0.75rem * var(--font-scale, 1));
+      font-size: calc(1rem * var(--font-scale, 1));
+    }
+
+    body.dark-mode .nav-link.active::before,
+    body.theme-dark .nav-link.active::before {
+      background: #4a9eff;
+    }
+
+    body.dark-mode .nav-link-clear-active,
+    body.theme-dark .nav-link-clear-active {
+      color: var(--theme-text-primary);
+      background: transparent;
+    }
+  }
+
   /* Ethics demo section dark mode */
   body.dark-mode .ethics-demo-section.layout-container-responsive,
   body.theme-dark .ethics-demo-section.layout-container-responsive {
@@ -959,6 +1002,166 @@
       var(--color-primary-dark),
       var(--color-primary)
     );
+  }
+
+  /* Scenario modal dark mode (centralized) */
+  body.dark-mode .scenario-modal-dialog,
+  body.theme-dark .scenario-modal-dialog {
+    background: var(--theme-bg-primary);
+    border: 1px solid var(--theme-border);
+    box-shadow:
+      0 20px 25px -5px var(--theme-shadow),
+      0 10px 10px -5px var(--theme-shadow);
+  }
+
+  body.dark-mode .scenario-modal-header,
+  body.theme-dark .scenario-modal-header {
+    background: var(--theme-bg-secondary);
+    border-bottom: 1px solid var(--theme-border);
+    color: var(--theme-text-primary);
+  }
+
+  /* .scenario-title and .scenario-description are already centralized above */
+  body.dark-mode .scenario-category,
+  body.theme-dark .scenario-category {
+    color: var(--theme-text-secondary);
+  }
+
+  /* Let inner panels own backgrounds; scenario-content should remain transparent */
+  body.dark-mode .scenario-content,
+  body.theme-dark .scenario-content {
+    background: transparent;
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .scenario-main,
+  body.theme-dark .scenario-main {
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+    color: var(--theme-text-primary);
+    box-shadow: 0 8px 25px var(--theme-shadow);
+  }
+
+  body.dark-mode .scenario-sidebar,
+  body.theme-dark .scenario-sidebar {
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+    color: var(--theme-text-primary);
+    box-shadow: 0 8px 25px var(--theme-shadow);
+  }
+
+  body.dark-mode .dilemma-text,
+  body.theme-dark .dilemma-text,
+  body.dark-mode .ethical-question,
+  body.theme-dark .ethical-question {
+    color: var(--theme-text-secondary);
+  }
+
+  body.dark-mode .dilemma-section h3,
+  body.theme-dark .dilemma-section h3,
+  body.dark-mode .ethical-question-section h3,
+  body.theme-dark .ethical-question-section h3,
+  body.dark-mode .options-section h3,
+  body.theme-dark .options-section h3 {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .option-card,
+  body.theme-dark .option-card {
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .option-card:hover,
+  body.theme-dark .option-card:hover {
+    border-color: var(--theme-border-hover);
+    box-shadow: 0 4px 12px var(--theme-shadow-hover);
+  }
+
+  body.dark-mode .option-card.selected,
+  body.theme-dark .option-card.selected {
+    background: linear-gradient(
+      135deg,
+      rgb(74 158 255 / 10%) 0%,
+      rgb(157 78 221 / 10%) 100%
+    );
+    border-color: #4a9eff;
+  }
+
+  body.dark-mode .option-title,
+  body.theme-dark .option-title {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .option-description,
+  body.theme-dark .option-description {
+    color: var(--theme-text-secondary);
+  }
+
+  body.dark-mode .option-details,
+  body.theme-dark .option-details {
+    background: rgb(0 0 0 / 20%);
+    border-top: 1px solid var(--theme-border);
+  }
+
+  body.dark-mode .pros-section,
+  body.theme-dark .pros-section,
+  body.dark-mode .cons-section,
+  body.theme-dark .cons-section {
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .pros-cons-popover,
+  body.theme-dark .pros-cons-popover {
+    background: var(--theme-bg-primary);
+    border: 1px solid var(--theme-border);
+    box-shadow: 0 25px 50px var(--theme-shadow);
+  }
+
+  body.dark-mode .pros-section h5,
+  body.theme-dark .pros-section h5,
+  body.dark-mode .cons-section h5,
+  body.theme-dark .cons-section h5 {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .pros-section li,
+  body.theme-dark .pros-section li,
+  body.dark-mode .cons-section li,
+  body.theme-dark .cons-section li {
+    color: var(--theme-text-secondary);
+  }
+
+  body.dark-mode .scenario-modal-footer,
+  body.theme-dark .scenario-modal-footer {
+    background: var(--theme-bg-secondary);
+    border-top: 1px solid var(--theme-border);
+  }
+
+  body.dark-mode .chart-legend,
+  body.theme-dark .chart-legend {
+    color: var(--theme-text-secondary);
+  }
+
+  body.dark-mode .test-mode-indicator,
+  body.theme-dark .test-mode-indicator {
+    background: rgb(255 193 7 / 20%);
+    color: #ffc107;
+    border: 1px solid rgb(255 193 7 / 30%);
+  }
+
+  body.dark-mode .scenario-header,
+  body.theme-dark .scenario-header {
+    background: transparent;
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .scenario-footer,
+  body.theme-dark .scenario-footer {
+    color: var(--theme-text-secondary);
   }
 
   /* Impact explanation list items dark mode */

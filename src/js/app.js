@@ -6855,43 +6855,22 @@ function highlightChartChange(pattern) {
     boxShadow: "0 0 20px rgba(0, 123, 255, 0.5)",
   });
 
-  // Reuse or create pattern label element to avoid repeated DOM creation
-  let label = highlightChartChange.labelElement;
-  if (!label) {
-    label = document.createElement("div");
-    label.className = "pattern-feedback-label";
-    label.style.cssText = `
-      position: absolute;
-      top: -30px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #007bff;
-      color: white;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-weight: bold;
-      font-size: 14px;
-      z-index: 1000;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      animation: fadeInOut 2s ease-in-out;
-    `;
-
-    chartContainer.style.position = "relative";
-    chartContainer.appendChild(label);
-    highlightChartChange.labelElement = label;
-  }
+  // Don't create a pattern label; only reference existing one if present
+  const label =
+    highlightChartChange.labelElement ||
+    chartContainer.querySelector(".pattern-feedback-label");
 
   // Update label content and show it
-  const patternLabels = {
-    utilitarian: "🎯 Utilitarian",
-    deontological: "⚖️ Rights-Based",
-    virtue: "🌟 Virtue Ethics",
-    balanced: "⚡ Balanced",
-  };
-
-  label.textContent = patternLabels[pattern] || pattern;
-  label.style.opacity = "1";
+  if (label) {
+    const patternLabels = {
+      utilitarian: "🎯 Utilitarian",
+      deontological: "⚖️ Rights-Based",
+      virtue: "🌟 Virtue Ethics",
+      balanced: "⚡ Balanced",
+    };
+    label.textContent = patternLabels[pattern] || pattern;
+    label.style.opacity = "1";
+  }
 
   // Reset after animation with proper cleanup
   highlightChartChange.animationTimeout = setTimeout(() => {

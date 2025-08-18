@@ -46,31 +46,44 @@ class ScrollManager {
    * Setup global scroll behavior - minimal intervention
    */
   setupGlobalScrollBehavior() {
-    // Only reset scroll position for fresh page loads (not hash navigation)
-    if (
-      !window.location.hash &&
-      window.location.pathname.includes("app.html")
-    ) {
-      this.resetScrollPosition();
-    }
+    // Do NOT force any scroll position on load.
+    // Allow native browser scroll restoration to run without interference.
 
-    // Setup event listeners for scroll reset only when needed
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", () => {
-        // Only reset if no hash in URL
-        if (!window.location.hash) {
-          this.resetScrollPosition();
+    // Delay enabling smooth scrolling until after restoration completes
+    const applyLoadedClass = () => {
+      try {
+        if (window.DOMClassManager) {
+          window.DOMClassManager.setLoadedState(true);
+        } else {
+          document.documentElement.classList.add("loaded");
         }
-      });
-    }
-
-    // Only reset on fresh page loads, respect browser back/forward behavior
-    window.addEventListener("pageshow", (event) => {
-      // Don't reset if this is a back/forward navigation or hash change
-      if (!event.persisted && !window.location.hash && !document.referrer) {
-        this.resetScrollPosition();
+      } catch (e) {
+        // Non-fatal: if DOMClassManager is unavailable, just proceed
+        if (typeof logger?.debug === "function") {
+          logger.debug("ScrollManager", "applyLoadedClass noop or failed", e);
+        }
       }
+    };
+
+    // Use pageshow which fires after restoration; rAF to ensure layout is settled
+    window.addEventListener("pageshow", () => {
+      requestAnimationFrame(() => requestAnimationFrame(applyLoadedClass));
     });
+
+    // As a fallback (in case pageshow doesn't fire in some browsers),
+    // apply after DOMContentLoaded without changing scroll position
+    if (document.readyState === "loading") {
+      document.addEventListener(
+        "DOMContentLoaded",
+        () => {
+          requestAnimationFrame(() => applyLoadedClass());
+        },
+        { once: true },
+      );
+    } else {
+      // Document already loaded
+      requestAnimationFrame(() => applyLoadedClass());
+    }
   }
 
   /**

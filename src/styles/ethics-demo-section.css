@@ -7,6 +7,8 @@
  * Maintains onboarding tour compatibility with preserved IDs
  */
 
+/* stylelint-disable media-feature-range-notation */
+
 /* ================================
    ETHICS DEMO SECTION BASE
    ================================ */
@@ -73,7 +75,9 @@
       var(--color-primary-dark, #1557b0) 100%
     );
     background-clip: text;
+    /* stylelint-disable-next-line property-no-vendor-prefix */
     -webkit-background-clip: text;
+    /* stylelint-disable-next-line property-no-vendor-prefix */
     -webkit-text-fill-color: transparent;
   }
 
@@ -92,8 +96,11 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-2xl, 4rem);
-    align-items: start;
-    justify-items: center; /* Center grid items horizontally */
+
+    /* Stretch items so sibling panels can match heights */
+
+    /* Center grid items horizontally */
+    place-items: stretch center;
     max-width: 100%; /* Use full container width */
     margin: 0 auto;
     width: 100%;
@@ -120,14 +127,21 @@
      ================================ */
 
   .demo-controls-panel {
-    background: var(--color-white, #ffffff);
+    background: var(--color-white, #fff);
     border-radius: var(--radius-lg, 12px);
     padding: var(--spacing-xl, 3rem);
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 10%);
     border: 1px solid var(--color-gray-200, #e5e7eb);
-    height: fit-content;
+
+    /* Let the grid row height determine panel height (equal with radar panel) */
+    height: auto;
     width: 100%;
     max-width: 500px; /* Consistent max-width for alignment */
+
+    /* Ensure the panel can expand to match sibling height */
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
   }
 
   .controls-title {
@@ -183,7 +197,7 @@
       var(--color-indigo-600, #4f46e5) 0%,
       var(--color-indigo-500, #6366f1) 100%
     );
-    color: var(--color-white, #ffffff);
+    color: var(--color-white, #fff);
     border: none;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -261,7 +275,7 @@
      ================================ */
 
   .radar-chart-panel {
-    background: var(--color-white, #ffffff);
+    background: var(--color-white, #fff);
     border-radius: var(--radius-lg, 12px);
     padding: var(--spacing-xl, 3rem);
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 10%);
@@ -269,9 +283,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
+    /* Maintain a good minimum visual size, but allow matching the sibling */
     min-height: 500px;
     width: 100%;
     max-width: 500px; /* Consistent max-width for alignment */
+    align-self: stretch;
   }
 
   .radar-chart-wrapper {
@@ -299,7 +316,10 @@
   @media (min-width: 1024px) {
     .demo-help-sections {
       max-width: 1200px; /* Match main container */
-      gap: 2.5rem;
+      gap: var(--spacing-xl, 3rem);
+
+      /* On single column, revert to natural heights */
+      align-items: start;
     }
   }
 
@@ -313,7 +333,7 @@
   /* Accordion Styles */
   .radar-instructions-accordion,
   .ethics-glossary-accordion {
-    background: var(--color-white, #ffffff);
+    background: var(--color-white, #fff);
     border-radius: var(--radius-md, 8px);
     border: 1px solid var(--color-gray-200, #e5e7eb);
     overflow: visible; /* Allow floating content to extend outside */
@@ -381,7 +401,7 @@
     z-index: 1000;
 
     /* Visual styling for floating effect */
-    background: var(--color-white, #ffffff);
+    background: var(--color-white, #fff);
     border: 1px solid var(--color-gray-200, #e5e7eb);
     border-radius: 0 0 var(--radius-md, 8px) var(--radius-md, 8px);
     box-shadow:
@@ -554,7 +574,7 @@
     bottom: calc(100% + 12px); /* Position directly above the button */
     left: 50%;
     transform: translateX(-50%);
-    background: var(--color-white, #ffffff);
+    background: var(--color-white, #fff);
     color: var(--color-gray-800, #1f2937);
     padding: var(--spacing-md, 1.5rem);
     border-radius: var(--radius-lg, 12px);
@@ -629,7 +649,7 @@
     height: 0;
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
-    border-top: 8px solid var(--color-white, #ffffff);
+    border-top: 8px solid var(--color-white, #fff);
   }
 
   /* Arrow border for professional look */
@@ -684,7 +704,9 @@
       var(--color-primary-light, #4285f4) 100%
     );
     background-clip: text;
+    /* stylelint-disable-next-line property-no-vendor-prefix */
     -webkit-background-clip: text;
+    /* stylelint-disable-next-line property-no-vendor-prefix */
     -webkit-text-fill-color: transparent;
   }
 
