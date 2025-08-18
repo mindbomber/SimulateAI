@@ -66,6 +66,7 @@ tmp/
 temp/
 *.tmp
 *.temp
+.trash/
 
 # Cache
 .cache

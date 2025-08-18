@@ -16,37 +16,46 @@
     --root=<path>     Root to scan (default: process.cwd())
 */
 
-import fsp from 'fs/promises';
-import path from 'path';
+import fsp from "fs/promises";
+import path from "path";
 
 const CWD = process.cwd();
 const args = process.argv.slice(2);
 const options = Object.fromEntries(
   args
-    .filter(a => a.startsWith('--'))
-    .map(a => {
-      const [k, v] = a.replace(/^--/, '').split('=');
+    .filter((a) => a.startsWith("--"))
+    .map((a) => {
+      const [k, v] = a.replace(/^--/, "").split("=");
       return [k, v ?? true];
-    })
+    }),
 );
 
-const APPLY = Boolean(options.apply === true || options.apply === 'true');
+const APPLY = Boolean(options.apply === true || options.apply === "true");
+const VERIFY_DEBUG = Boolean(
+  options.verifyDebug === true || options.verifyDebug === "true",
+);
+const VERIFY_TESTDEMO = Boolean(
+  options.verifyTestDemo === true || options.verifyTestDemo === "true",
+);
+const VERIFY_ANY = Boolean(
+  options.verifyAny === true || options.verifyAny === "true",
+);
 const ROOT = path.resolve(options.root ? String(options.root) : CWD);
-const TRASH_BASE = path.resolve(ROOT, String(options.trash || '.trash'));
+const TRASH_BASE = path.resolve(ROOT, String(options.trash || ".trash"));
 const TS = new Date()
   .toISOString()
-  .replace(/[:.]/g, '-')
-  .replace('T', '_')
+  .replace(/[:.]/g, "-")
+  .replace("T", "_")
   .slice(0, 19);
 const TRASH_DIR = path.join(TRASH_BASE, TS);
 
 const SKIP_DIRS = new Set([
-  'node_modules',
-  'dist',
-  '.git',
-  '.trash',
-  '.vscode',
-  '.github',
+  "node_modules",
+  "dist",
+  ".git",
+  ".trash",
+  ".vscode",
+  ".github",
 ]);
 
 const mdPatterns = [
@@ -62,12 +71,19 @@ const mdPatterns = [
 ];
 
 const testDemoPatterns = [
+  // suffix patterns
   /-test\.html$/i,
   /-demo\.html$/i,
   /-debug.*\.html$/i,
   /-test\.js$/i,
   /-demo.*\.js$/i,
   /-debug.*\.js$/i,
+  // prefix patterns (e.g., test-foo.html/js)
+  /^test-.*\.html$/i,
+  /^test-.*\.js$/i,
+  // additional debug prefix patterns (e.g., debug-foo.html/js)
+  /^debug-.*\.html$/i,
+  /^debug-.*\.js$/i,
 ];
 
 function isLegacyMd(file) {
@@ -104,7 +120,7 @@ async function moveToTrash(absFile) {
 }
 
 function formatCount(n) {
-  return String(n).padStart(5, ' ');
+  return String(n).padStart(5, " ");
 }
 
 (async () => {
@@ -125,26 +141,79 @@ function formatCount(n) {
   testDemo.sort();
 
   console.log(`Scan root: ${ROOT}`);
-  console.log(`Apply mode: ${APPLY ? 'YES (move to .trash)' : 'NO (dry run)'}`);
-  console.log('');
+  console.log(`Apply mode: ${APPLY ? "YES (move to .trash)" : "NO (dry run)"}`);
+  console.log("");
   console.log(`Legacy .md files: ${formatCount(legacyMd.length)}`);
   console.log(`Test/Demo files : ${formatCount(testDemo.length)}`);
-  console.log('');
+  console.log("");
 
   const preview = (arr, label) => {
     if (arr.length === 0) return;
     console.log(`First ${Math.min(arr.length, 20)} ${label}:`);
-    arr.slice(0, 20).forEach((f) => console.log('  ' + path.relative(ROOT, f)));
+    arr.slice(0, 20).forEach((f) => console.log("  " + path.relative(ROOT, f)));
     if (arr.length > 20) console.log(`  ... and ${arr.length - 20} more`);
-    console.log('');
+    console.log("");
   };
 
-  preview(legacyMd, 'legacy .md');
-  preview(testDemo, 'test/demo');
+  preview(legacyMd, "legacy .md");
+  preview(testDemo, "test/demo");
+
+  // Verification mode: fail if any debug-* files exist
+  if (!APPLY && VERIFY_DEBUG) {
+    const debugOnly = testDemo.filter((f) =>
+      /^debug-.*\.(html|js)$/i.test(path.basename(f)),
+    );
+    if (debugOnly.length > 0) {
+      console.error("\n❌ Found debug files present:");
+      debugOnly.forEach((f) => console.error("  " + path.relative(ROOT, f)));
+      console.error(
+        "\nFailing verification. Remove or quarantine these files (run: npm run cleanup:legacy:apply).",
+      );
+      process.exit(2);
+    } else {
+      console.log("✅ No debug-* files detected. Verification passed.");
+      process.exit(0);
+    }
+  }
+
+  // Verification mode: fail if any test/demo/debug matched files exist
+  if (!APPLY && VERIFY_TESTDEMO) {
+    if (testDemo.length > 0) {
+      console.error("\n❌ Found test/demo/debug files present:");
+      testDemo.forEach((f) => console.error("  " + path.relative(ROOT, f)));
+      console.error(
+        "\nFailing verification. Remove or quarantine these files (run: npm run cleanup:legacy:apply).",
+      );
+      process.exit(2);
+    } else {
+      console.log("✅ No test/demo/debug files detected. Verification passed.");
+      process.exit(0);
+    }
+  }
+
+  // Verification mode: fail if any matched files (md or test/demo/debug) exist
+  if (!APPLY && VERIFY_ANY) {
+    const any = [...legacyMd, ...testDemo];
+    if (any.length > 0) {
+      console.error("\n❌ Found non-production files present:");
+      any.forEach((f) => console.error("  " + path.relative(ROOT, f)));
+      console.error(
+        "\nFailing verification. Remove or quarantine these files (run: npm run cleanup:legacy:apply).",
+      );
+      process.exit(2);
+    } else {
+      console.log(
+        "✅ No legacy/test/demo/debug files detected. Verification passed.",
+      );
+      process.exit(0);
+    }
+  }
 
   if (!APPLY) {
-    console.log('Dry run complete. Re-run with --apply to move files to .trash.');
-    console.log('Example: npm run cleanup:legacy:apply');
+    console.log(
+      "Dry run complete. Re-run with --apply to move files to .trash.",
+    );
+    console.log("Example: npm run cleanup:legacy:apply");
     return;
   }
 
@@ -156,10 +225,10 @@ function formatCount(n) {
       await moveToTrash(file);
       moved++;
     } catch (err) {
-      console.error('Failed to move:', path.relative(ROOT, file), err.message);
+      console.error("Failed to move:", path.relative(ROOT, file), err.message);
     }
   }
 
   console.log(`Moved ${moved} files to: ${TRASH_DIR}`);
-  console.log('Review and delete permanently when ready.');
+  console.log("Review and delete permanently when ready.");
 })();

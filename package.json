@@ -21,9 +21,12 @@
     "check-policy": "echo \"HTML generation policy compliance: ✓ No standalone HTML generation\" && npm run lint",
     "security-check": "node scripts/security-check.js",
     "security-install": "npm install -g eslint-plugin-security",
-  "pre-commit-test": "node scripts/security-check.js && echo 'Security check passed!'",
-  "cleanup:legacy": "node scripts/cleanup-legacy-files.js",
-  "cleanup:legacy:apply": "node scripts/cleanup-legacy-files.js --apply"
+    "pre-commit-test": "node scripts/security-check.js && echo 'Security check passed!'",
+    "cleanup:legacy": "node scripts/cleanup-legacy-files.js",
+    "cleanup:legacy:apply": "node scripts/cleanup-legacy-files.js --apply",
+    "verify:no-debug": "node scripts/cleanup-legacy-files.js --verifyDebug",
+    "verify:no-test-demo": "node scripts/cleanup-legacy-files.js --verifyTestDemo",
+    "verify:no-nonprod": "node scripts/cleanup-legacy-files.js --verifyAny"
   },
   "keywords": [
     "ai-ethics-education",
