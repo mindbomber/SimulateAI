@@ -137,23 +137,8 @@
     --mobile-auth-color-hover: #1e1b4b; /* Darker for authority */
   }
 
-  /* ===== UNIVERSAL SELECTORS - GLOBAL FOUNDATION ===== */
-  /* Fundamental CSS reset for consistent box model */
-  * {
-    box-sizing: border-box;
-  }
-
-  /* Accessibility: Reduced motion support */
+  /* Accessibility: Reduced motion support (component-scoped only) */
   @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-
     .animated,
     .fade,
     .slide,
@@ -165,12 +150,8 @@
     }
   }
 
-  /* Data saver mode: Remove resource-heavy visual elements */
+  /* Data saver mode: limit heavy visuals within navigation scope */
   @media (prefers-reduced-data: reduce) {
-    * {
-      background-image: none !important;
-    }
-
     .thumbnail,
     .hero-image,
     .background-image,

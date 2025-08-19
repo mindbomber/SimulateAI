@@ -25,40 +25,28 @@
     </title>
     <meta
       name="description"
-      content="Experience the future of ethical AI education through immersive, consequence-driven simulations. Join educators, students, researchers, AI enthusiasts, and philosophy practitioners in exploring AI ethics, safety, and governance."
+      content="Experience the future of ethical AI education through immersive, consequence-driven simulations. Join educators, students, and researchers in exploring AI ethics."
     />
     <meta
       name="keywords"
-      content="AI ethics education, interactive simulations, ethical AI, AI researchers, AI enthusiasts, artificial intelligence ethics, moral philosophy, AI safety, machine learning ethics, research study, ISTE standards, digital citizenship, AI governance, philosophy of AI, computational ethics"
+      content="AI ethics education, interactive simulations, ethical AI, research study, ISTE standards, digital citizenship"
     />
 
-    <!-- Google Analytics is initialized via centralized service (no inline gtag to avoid double-init) -->
-    <meta name="author" content="SimulateAI Educational Platform" />
-
-    <!-- Preserve query params like ?join=CODE when navigating from root to app.html -->
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-4SVB78MBHN"
+    ></script>
     <script>
-      (function () {
-        try {
-          var hasQuery =
-            window.location.search && window.location.search.length > 1;
-          // Only redirect on localhost/dev, and only if we have a query string
-          var isLocal =
-            location.hostname === "localhost" ||
-            location.hostname === "127.0.0.1";
-          if (
-            isLocal &&
-            hasQuery &&
-            !location.pathname.toLowerCase().includes("app.html")
-          ) {
-            var target =
-              "/app.html" + window.location.search + window.location.hash;
-            window.location.replace(target);
-          }
-        } catch (e) {
-          // no-op
-        }
-      })();
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-4SVB78MBHN");
     </script>
+    <meta name="author" content="SimulateAI Educational Platform" />
 
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="website" />
@@ -110,88 +98,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <!-- Icons and Favicons -->
     <link rel="icon" type="image/svg+xml" href="src/assets/icons/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" sizes="any" />
-    <link rel="icon" type="image/png" href="src/assets/icons/favicon.png" />
-    <link rel="apple-touch-icon" href="src/assets/icons/apple-touch-icon.png" />
-    <meta
-      name="msapplication-TileImage"
-      content="src/assets/icons/favicon.svg"
-    />
-
     <link rel="manifest" href="/manifest.json" />
-
-    <!-- Early theme-preload shim: apply correct theme before CSS to prevent FOUC -->
-    <style id="theme-preload-style">
-      html.theme-preload,
-      html.theme-preload * {
-        transition: none !important;
-      }
-    </style>
-    <script>
-      (function () {
-        try {
-          var val = null;
-          try {
-            val = localStorage.getItem("simulateai_theme_preference");
-          } catch (_) {}
-          if (!val) {
-            try {
-              val =
-                localStorage.getItem("simulateai_theme") ||
-                localStorage.getItem("theme");
-            } catch (_) {}
-          }
-          var prefersDark = false;
-          try {
-            prefersDark =
-              window.matchMedia &&
-              window.matchMedia("(prefers-color-scheme: dark)").matches;
-          } catch (_) {}
-          var theme =
-            val === "dark" || val === "light" || val === "system"
-              ? val === "system"
-                ? prefersDark
-                  ? "dark"
-                  : "light"
-                : val
-              : prefersDark
-                ? "dark"
-                : "light";
-
-          document.documentElement.classList.add("theme-preload");
-          document.documentElement.style.colorScheme = theme;
-
-          var apply = function () {
-            var b = document.body;
-            if (!b) return;
-            b.classList.remove("theme-dark", "theme-light", "dark-mode");
-            if (theme === "dark") {
-              b.classList.add("theme-dark", "dark-mode");
-            } else {
-              b.classList.add("theme-light");
-            }
-          };
-
-          if (document.body) {
-            apply();
-          } else {
-            document.addEventListener("DOMContentLoaded", apply, {
-              once: true,
-            });
-          }
-
-          window.addEventListener(
-            "load",
-            function () {
-              document.documentElement.classList.remove("theme-preload");
-            },
-            { once: true },
-          );
-        } catch (e) {}
-      })();
-    </script>
 
     <!-- Structured Data - Organization -->
     <script type="application/ld+json">
@@ -1183,134 +1091,10 @@
           transform: none;
         }
       }
-
-      /* Dark Mode Support for How It Works Section */
-      body.dark-mode .how-it-works,
-      body.theme-dark .how-it-works {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-        color: var(--theme-text-primary, #f1f5f9);
-      }
-
-      body.dark-mode .steps-list li,
-      body.theme-dark .steps-list li {
-        background: var(--theme-bg-secondary, #1e293b);
-        color: var(--theme-text-primary, #f1f5f9);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        border: 1px solid var(--theme-border, #334155);
-      }
-
-      body.dark-mode .steps-list li::before,
-      body.theme-dark .steps-list li::before {
-        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-        color: white;
-      }
-
-      /* Dark Mode Support for Section Intro */
-      body.dark-mode .section-intro,
-      body.theme-dark .section-intro {
-        background: var(--theme-bg-secondary, #1e293b);
-        color: var(--theme-text-primary, #f1f5f9);
-      }
-
-      /* Dark Mode Support for Feature Cards */
-      body.dark-mode .feature-card,
-      body.theme-dark .feature-card {
-        background: var(--theme-bg-secondary, #1e293b);
-        color: var(--theme-text-primary, #f1f5f9);
-        border-color: var(--theme-border, #334155);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-      }
-
-      body.dark-mode .feature-card:hover,
-      body.theme-dark .feature-card:hover {
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-      }
-
-      body.dark-mode .feature-card h3,
-      body.theme-dark .feature-card h3 {
-        color: var(--theme-text-primary, #f1f5f9);
-      }
-
-      body.dark-mode .feature-card p,
-      body.theme-dark .feature-card p {
-        color: var(--theme-text-secondary, #cbd5e1);
-      }
-
-      /* Dark Mode Support for Research Highlight */
-      body.dark-mode .research-highlight,
-      body.theme-dark .research-highlight {
-        background: linear-gradient(135deg, #2d1b3d 0%, #3a1e3a 100%);
-        border-color: var(--theme-accent-purple, #8b5cf6);
-        color: var(--theme-text-primary, #f1f5f9);
-      }
-
-      body.dark-mode .research-highlight h2,
-      body.theme-dark .research-highlight h2 {
-        color: var(--theme-accent-purple, #a78bfa);
-      }
-
-      body.dark-mode .benefit-item,
-      body.theme-dark .benefit-item {
-        background: var(--theme-bg-secondary, #1e293b);
-        color: var(--theme-text-primary, #f1f5f9);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-      }
-
-      /* Dark Mode Support for Audience Cards */
-      body.dark-mode .audience-card,
-      body.theme-dark .audience-card {
-        background: linear-gradient(135deg, #1e3a2e 0%, #2d5a3d 100%);
-        border-color: var(--theme-accent-green, #10b981);
-        color: var(--theme-text-primary, #f1f5f9);
-      }
-
-      body.dark-mode .audience-card h3,
-      body.theme-dark .audience-card h3 {
-        color: var(--theme-accent-green, #34d399);
-      }
-
-      /* Dark Mode Support for Privacy Section */
-      body.dark-mode .privacy-section,
-      body.theme-dark .privacy-section {
-        background: linear-gradient(135deg, #1e2a3a 0%, #2d1b3d 100%);
-        border-color: var(--theme-accent-blue, #3b82f6);
-        color: var(--theme-text-primary, #f1f5f9);
-      }
-
-      body.dark-mode .privacy-item,
-      body.theme-dark .privacy-item {
-        background: var(--theme-bg-secondary, #1e293b);
-        color: var(--theme-text-primary, #f1f5f9);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-      }
-
-      body.dark-mode .privacy-item .checkmark,
-      body.theme-dark .privacy-item .checkmark {
-        color: var(--theme-accent-green, #10b981);
-      }
-
-      /* Dark Mode Support for Community Section */
-      body.dark-mode .community-section,
-      body.theme-dark .community-section {
-        background: linear-gradient(135deg, #1a2332 0%, #2d3748 100%);
-        color: var(--theme-text-primary, #f1f5f9);
-      }
-
-      body.dark-mode .community-button,
-      body.theme-dark .community-button {
-        background: var(--theme-bg-secondary, #1e293b);
-        color: var(--theme-accent-blue, #60a5fa);
-        border-color: var(--theme-accent-blue, #3b82f6);
-      }
-
-      body.dark-mode .community-button:hover,
-      body.theme-dark .community-button:hover {
-        background: var(--theme-accent-blue, #3b82f6);
-        color: var(--theme-text-primary, #f1f5f9);
-      }
     </style>
 
     <!-- PWA Manifest and Icons -->
+    <link rel="manifest" href="./manifest.json" />
 
     <!-- Favicons and App Icons -->
     <link
@@ -1339,27 +1123,20 @@
       content="./src/assets/icons/Square Icon_512_x_512.png"
     />
 
-    <!-- Preload critical module -->
-    <link rel="modulepreload" href="./src/js/app.js" crossorigin />
+    <!-- Preload critical resources -->
+    <!-- Preload only index init (no app bundle to avoid CSS overrides) -->
+    <link rel="preload" href="./src/js/index-init.js" as="script" crossorigin />
 
     <!-- Load CSS Files -->
-    <link rel="stylesheet" href="./src/styles/css-layers.css" />
-    <link rel="stylesheet" href="./src/styles/design-tokens.css" />
-    <link rel="stylesheet" href="./src/styles/media.css" />
     <link rel="stylesheet" href="./src/styles/shared-navigation.css" />
     <link rel="stylesheet" href="./src/styles/settings-menu.css" />
     <link rel="stylesheet" href="./src/styles/badge-modal.css" />
-    <link rel="stylesheet" href="./src/styles/pwa-notifications.css" />
-    <link rel="stylesheet" href="./src/styles/footer.css" />
-    <link
-      rel="stylesheet"
-      href="./src/styles/components/gdpr-cookie-notice-fallback.css"
-    />
 
-    <!-- early-theme-init.js removed; using inline theme-preload shim above -->
+    <!-- Early theme initialization - Apply theme immediately to prevent FOUC -->
+    <script src="./src/js/utils/early-theme-init.js"></script>
 
-    <!-- Google reCAPTCHA v3 (non-blocking) -->
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <!-- Google reCAPTCHA v3 -->
+    <script src="https://www.google.com/recaptcha/api.js"></script>
   </head>
   <body>
     <!-- Hero Section -->
@@ -1578,11 +1355,10 @@
 
         <div class="audience-card">
           <div class="icon">🔬</div>
-          <h3>AI Researchers</h3>
+          <h3>Researchers</h3>
           <p>
-            To access decision-making datasets, design ethics studies,
-            contribute to AI safety research, and collaborate on machine
-            learning ethics scholarship.
+            To access decision-making datasets, design studies, and contribute
+            to AI ethics scholarship.
           </p>
         </div>
 
@@ -1596,12 +1372,12 @@
         </div>
 
         <div class="audience-card">
-          <div class="icon">🤖</div>
-          <h3>AI Enthusiasts</h3>
+          <div class="icon">📜</div>
+          <h3>Philosophy Enthusiasts</h3>
           <p>
-            To explore cutting-edge AI ethics discussions, engage with the
-            latest research, and participate in shaping responsible AI
-            development.
+            To engage with fundamental questions about consciousness, moral
+            reasoning, and the nature of intelligence through practical
+            scenarios.
           </p>
         </div>
 
@@ -1728,7 +1504,8 @@
     <script type="module" src="src/js/components/back-to-top.js"></script>
 
     <!-- Main Application -->
-    <script type="module" src="src/js/app.js"></script>
+    <!-- Use a lightweight initializer for the landing page to avoid pulling full app CSS -->
+    <script type="module" src="src/js/index-init.js"></script>
 
     <script>
       // Floating Emojis Animation
@@ -2139,27 +1916,15 @@
       });
     </script>
 
-    <!-- Centralized analytics initializer -->
-    <script type="module" src="src/js/user-tracking-init.js"></script>
-
     <!-- PWA Service Worker Registration -->
     <script>
-      // Remove base URL for localhost development and other typical local hosts
-      (function () {
-        try {
-          var h = window.location.hostname;
-          var isLocal =
-            h === "localhost" ||
-            h === "127.0.0.1" ||
-            h === "::1" ||
-            /(^|\.)local$/.test(h) ||
-            /^192\.168\./.test(h);
-          if (isLocal) {
-            var baseTag = document.getElementById("custom-domain-base");
-            if (baseTag) baseTag.remove();
-          }
-        } catch (e) {}
-      })();
+      // Remove base URL for localhost development
+      if (window.location.hostname === "localhost") {
+        const baseTag = document.getElementById("custom-domain-base");
+        if (baseTag) {
+          baseTag.remove();
+        }
+      }
 
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", async () => {
@@ -2301,7 +2066,12 @@
       // Track PWA usage
       window.addEventListener("appinstalled", () => {
         console.log("🎉 PWA was installed");
-        // Tracking handled by centralized analytics service if needed
+        if (window.gtag) {
+          gtag("event", "pwa_installed", {
+            event_category: "PWA",
+            event_label: "app_installed",
+          });
+        }
       });
 
       // Detect PWA launch
@@ -2312,7 +2082,12 @@
         console.log("📱 Running as PWA");
         document.body.classList.add("pwa-mode");
 
-        // Tracking handled by centralized analytics service if needed
+        if (window.gtag) {
+          gtag("event", "pwa_launch", {
+            event_category: "PWA",
+            event_label: "standalone_launch",
+          });
+        }
       }
 
       // Handle offline/online status
@@ -2387,12 +2162,5 @@
         }
       }
     </script>
-
-    <!-- GDPR Cookie Notice -->
-    <script
-      type="module"
-      src="./src/js/components/gdpr-cookie-notice.js"
-    ></script>
-    <script type="module" src="./src/js/utils/gdpr-init.js"></script>
   </body>
 </html>

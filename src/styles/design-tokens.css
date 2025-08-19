@@ -479,9 +479,10 @@
 
   /* Accessibility: Reduced Motion Support */
   @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
+    /* Scope to body descendants to avoid bleeding into shadow roots and system UI */
+    body *,
+    body *::before,
+    body *::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
@@ -491,9 +492,9 @@
 
   /* Print Optimization */
   @media print {
-    *,
-    *::before,
-    *::after {
+    body *,
+    body *::before,
+    body *::after {
       background: transparent !important;
       color: black !important;
       box-shadow: none !important;
@@ -502,15 +503,16 @@
   }
 
   /* High Contrast Mode Support */
-  @media (prefers-contrast: high) {
-    *,
-    *::before,
-    *::after {
-      border-color: currentColor;
+  @media (prefers-contrast: more) {
+    body *,
+    body *::before,
+    body *::after {
+      border-color: currentcolor;
     }
   }
 
   /* ===== STANDARDIZED COMPONENT PATTERNS ===== */
+
   /* These patterns ensure consistent theming across all components */
 
   /* Base Component Pattern */

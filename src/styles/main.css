@@ -136,16 +136,9 @@
     --transition-slow: 350ms ease-in-out;
   }
 
-  /* Reset and Base Styles */
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    /* Prevent any element from creating horizontal overflow */
-    max-width: 100%;
-  }
+  /* Reset and Base Styles
+     Note: Global reset is centralized in css-layers.css @layer reset.
+     Avoid duplicating universal selectors here to prevent overriding components. */
 
   html {
     /* Use browser default scroll behavior - much more reliable */

@@ -16,6 +16,7 @@ import {
   logClassroomEvent,
 } from "../utils/classroom-utils.js";
 import logger from "../utils/logger.js";
+import SCENARIO_MODES from "../constants/scenario-modes.js";
 
 export default class StudentClassroomModals {
   constructor(dataHandler, firebaseService) {
@@ -820,6 +821,12 @@ export default class StudentClassroomModals {
    */
   async launchScenario(scenarioId, categoryId = null) {
     try {
+      // Ensure classroom student mode when launching via classroom flows
+      if (window.scenarioCoordinator) {
+        window.scenarioCoordinator.setMode(
+          SCENARIO_MODES.CLASSROOM_LIVE_STUDENT,
+        );
+      }
       // Preferred: use MainGrid API (can accept null categoryId)
       if (
         window.app &&

@@ -7,6 +7,9 @@
  */
 
 import ScenarioBrowser from "../components/scenario-browser.js";
+import ScenarioCoordinator, {
+  SCENARIO_MODES,
+} from "../core/scenario-coordinator.js";
 
 /**
  * Integration manager for connecting ScenarioBrowser with SimulateAI ecosystem
@@ -15,11 +18,13 @@ export class ScenarioBrowserIntegration {
   constructor(app) {
     this.app = app;
     this.scenarioBrowser = null;
+    this.scenarioCoordinator = null;
     this.integrationConfig = {
       routeThroughSimulateAI: true,
       useSimulateAIModals: true,
       enableUnifiedNavigation: true,
       preserveEducationalContext: true,
+      defaultScenarioMode: SCENARIO_MODES.RESEARCH_FULL,
     };
   }
 
@@ -181,6 +186,26 @@ export class ScenarioBrowserIntegration {
    */
   async openScenarioModalDirect(categoryId, scenarioId) {
     try {
+      // Ensure coordinator is present and bound with the configured mode (reuse global if available)
+      const globalCoordinator = window.scenarioCoordinator;
+      if (globalCoordinator) {
+        this.scenarioCoordinator = globalCoordinator;
+        this.scenarioCoordinator.setMode(
+          this.integrationConfig.defaultScenarioMode,
+        );
+      } else {
+        if (!this.scenarioCoordinator) {
+          this.scenarioCoordinator = new ScenarioCoordinator({
+            mode: this.integrationConfig.defaultScenarioMode,
+          });
+          this.scenarioCoordinator.bind();
+        } else {
+          this.scenarioCoordinator.setMode(
+            this.integrationConfig.defaultScenarioMode,
+          );
+        }
+      }
+
       // Try to use the existing modal system from the main app
       if (this.app && this.app.scenarioModal) {
         this.app.scenarioModal.open(scenarioId, categoryId);

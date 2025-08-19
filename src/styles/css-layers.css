@@ -23,16 +23,21 @@
 
 /* Reset Layer - Import your reset styles here */
 @layer reset {
-  /* Universal reset will be imported from main.css */
-
-  /* Box sizing and base resets */
+  /* Box-sizing reset only to avoid global margin/padding overrides */
   *,
   *::before,
   *::after {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  }
+
+  /* Responsive media without constraining all elements */
+  img,
+  video,
+  canvas,
+  svg,
+  iframe {
     max-width: 100%;
+    height: auto;
   }
 }
 
@@ -64,6 +69,8 @@
   }
 
   body {
+    /* Keep body margin reset local instead of via universal selector */
+    margin: 0;
     font-family: var(
       --font-family-base,
       var(
@@ -1558,9 +1565,9 @@
 
   /* Reduced motion preferences */
   @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
+    body *,
+    body *::before,
+    body *::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;

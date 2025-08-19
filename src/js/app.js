@@ -31,6 +31,81 @@
  * providing access to app services, analytics, and configuration.
  */
 
+// Global styles SSOT (Single Source of Truth)
+// Order matters: layers → tokens → media → base → components/utilities
+import "../styles/css-layers.css"; // layers definition
+import "../styles/design-tokens.css"; // tokens
+import "../styles/media.css"; // media queries foundation
+import "../styles/main.css"; // base + many component @imports
+import "../styles/accessibility.css"; // a11y helpers
+
+// Core base component styles not pulled via main.css
+import "../styles/simulations.css";
+import "../styles/layout-components.css";
+import "../styles/shared-navigation.css";
+
+// Advanced component systems (deferred in HTML previously)
+import "../styles/advanced-ui-components.css";
+import "../styles/enhanced-objects.css";
+
+// Utility components
+import "../styles/input-utility-components.css";
+import "../styles/form-input-components.css";
+
+// UI utilities and modal systems
+import "../styles/notification-toast.css";
+// onboarding-tour.css and scenario-modal.css are already imported by main.css
+import "../styles/scenario-reflection-modal.css";
+
+// Settings & profile
+import "../styles/session-settings.css";
+import "../styles/profile-customization.css";
+
+// GDPR cookie notice (component styles)
+import "../styles/components/gdpr-cookie-notice.css";
+
+// Card & loader components
+import "../styles/card-component.css";
+import "../styles/loader-spinner.css";
+
+// Page-specific and consolidated styles used on app.html
+import "../styles/hero-consolidated.css";
+import "../styles/ethics-demo-section.css";
+import "../styles/state-management-consolidated.css";
+
+// Scenario/Category components not covered by main.css imports
+import "../styles/category-page.css"; // preloaded before, safe to include here
+import "../styles/scenario-card.css";
+import "../styles/ethics-analysis.css";
+
+// User interaction & community features
+import "../styles/user-metadata-collector.css";
+import "../styles/donor-flair-display.css";
+
+// Layout fixes and overrides
+import "../styles/layout-fixes.css";
+
+// Ethics explorer overrides
+import "../styles/ethics-explorer.css";
+
+// Badge and community systems
+import "../styles/badge-modal.css";
+import "../styles/community-features.css";
+
+// Modal system (consolidated architecture)
+import "../styles/simulation-modal-consolidated.css";
+
+// Misc UI components
+import "../styles/back-to-top.css";
+import "../styles/floating-tabs-consolidated.css";
+import "../styles/settings-menu.css";
+import "../styles/footer.css";
+import "../styles/appearance-settings.css";
+
+// Donation widgets
+import "../styles/enhanced-donation-widget.css";
+import "../styles/donor-wall.css";
+
 // Import core modules
 import AccessibilityManager from "./core/accessibility.js";
 import AnimationManager from "./core/animation-manager.js";
@@ -77,6 +152,9 @@ import { loopDetector } from "./utils/infinite-loop-detector.js";
 import configIntegrator from "./utils/config-integrator.js";
 import "./utils/console-cleanup.js"; // Initialize console cleanup utility
 import "./utils/tooltip-auto-init.js"; // Initialize automatic tooltips for all users
+// GDPR cookie notice initialization and component (consolidated under main entry to avoid separate chunks)
+import "./components/gdpr-cookie-notice.js";
+import "./utils/gdpr-init.js";
 
 // Import system metadata collection
 import { getSystemCollector } from "./services/system-metadata-collector.js";
@@ -94,6 +172,10 @@ import { getAllCategories, getCategoryScenarios } from "../data/categories.js";
 
 // JSON SSOT Configuration System
 import { appStartup } from "./app-startup.js";
+// Scenario coordination (modes)
+import ScenarioCoordinator, {
+  SCENARIO_MODES,
+} from "./core/scenario-coordinator.js";
 
 // Community and Authentication Services
 // import AuthService from './services/auth-service.js'; // Now handled by ServiceManager
@@ -397,6 +479,19 @@ class SimulateAIApp {
       highContrast: false,
       largeText: false,
     };
+
+    // ScenarioCoordinator: single instance for the app (defaults preserved)
+    try {
+      this.scenarioCoordinator = new ScenarioCoordinator({
+        mode: SCENARIO_MODES.RESEARCH_FULL,
+      });
+      this.scenarioCoordinator.bind();
+      // Expose globally so other integrations can reuse instead of creating new
+      window.scenarioCoordinator = this.scenarioCoordinator;
+    } catch (e) {
+      // Non-fatal; app can operate without the coordinator
+      AppDebug.warn("ScenarioCoordinator could not be initialized", e);
+    }
 
     // Enhanced error handling and recovery
     this.errorBoundary = null;
@@ -4574,6 +4669,13 @@ class SimulateAIApp {
    * Handle scenario completion and show reflection modal
    */
   handleScenarioCompleted(event) {
+    // If ScenarioCoordinator is managing reflection/badges, skip duplicate handling
+    if (this.scenarioCoordinator || window.scenarioCoordinator) {
+      AppDebug.log(
+        "ScenarioCoordinator active: deferring reflection/progress handling",
+      );
+      return;
+    }
     const {
       categoryId,
       scenarioId,

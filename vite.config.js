@@ -28,6 +28,7 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: "dist",
       assetsDir: "assets",
+      manifest: true, // Generate asset manifest for runtime injection
       sourcemap: false, // Disable sourcemaps for production
       target: "es2020",
       rollupOptions: {
@@ -135,6 +136,30 @@ export default defineConfig(({ mode }) => {
               } catch (e) {
                 console.warn(
                   "Could not copy shared-navigation.html:",
+                  e.message,
+                );
+              }
+
+              // Provide stable PNG icons for PWA manifest (avoid SVG for install icons)
+              // We duplicate apple-touch-icon.png as 192 and 512 for now; replace with proper sizes later.
+              try {
+                const applePng = fs.readFileSync(
+                  "src/assets/icons/apple-touch-icon.png",
+                );
+                // Emit to a stable, non-hashed path so public/manifest.json can reference it
+                this.emitFile({
+                  type: "asset",
+                  fileName: "icons/icon-192.png",
+                  source: applePng,
+                });
+                this.emitFile({
+                  type: "asset",
+                  fileName: "icons/icon-512.png",
+                  source: applePng,
+                });
+              } catch (e) {
+                console.warn(
+                  "Could not copy PNG icons for manifest (apple-touch-icon.png missing):",
                   e.message,
                 );
               }

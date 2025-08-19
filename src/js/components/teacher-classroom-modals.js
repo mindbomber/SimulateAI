@@ -9,6 +9,7 @@
 import ModalUtility from "./modal-utility.js";
 import RealtimeClassroomService from "../services/realtime-classroom-service.js";
 import { CLASSROOM_CONSTANTS } from "../constants/classroom-constants.js";
+import SCENARIO_MODES from "../constants/scenario-modes.js";
 import {
   generateClassroomShareUrl,
   sanitizeClassroomName,
@@ -610,6 +611,12 @@ export default class TeacherClassroomModals {
           },
         );
 
+        // In teacher preview, use classroom_live_instructor mode (no badges/persist)
+        if (window.scenarioCoordinator) {
+          window.scenarioCoordinator.setMode(
+            SCENARIO_MODES.CLASSROOM_LIVE_INSTRUCTOR,
+          );
+        }
         window.app.categoryGrid.openScenarioModalDirect(categoryId, scenarioId);
       } else if (
         window.app &&
@@ -626,6 +633,11 @@ export default class TeacherClassroomModals {
           },
         );
 
+        if (window.scenarioCoordinator) {
+          window.scenarioCoordinator.setMode(
+            SCENARIO_MODES.CLASSROOM_LIVE_INSTRUCTOR,
+          );
+        }
         window.app.categoryGrid.openScenarioModal(scenarioId, categoryId);
       } else {
         // Fallback to alert if app is not available
