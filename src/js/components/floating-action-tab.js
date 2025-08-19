@@ -295,13 +295,15 @@ class FloatingActionTab {
           e.detail,
         );
       }
-      const { settings } = e.detail;
-      // Use the getSetting method to ensure we get the default if undefined
-      const enabled =
-        settings.donateTabEnabled !== undefined
-          ? settings.donateTabEnabled
-          : true; // Default to true if undefined
-      this.updateVisibility(enabled);
+      const { settings, isDonor } = e.detail;
+      // Resolve flattened and simple keys
+      const rawEnabled =
+        settings.interface_donateTabEnabled ??
+        settings.donateTabEnabled ??
+        true;
+      // Gating rule: non-donors cannot turn it off (visibility required)
+      const effectiveEnabled = isDonor ? !!rawEnabled : true;
+      this.updateVisibility(effectiveEnabled);
     });
 
     // Listen for settings manager ready
@@ -312,13 +314,13 @@ class FloatingActionTab {
           e.detail,
         );
       }
-      const { settings } = e.detail;
-      // Use the getSetting method to ensure we get the default if undefined
-      const enabled =
-        settings.donateTabEnabled !== undefined
-          ? settings.donateTabEnabled
-          : true; // Default to true if undefined
-      this.updateVisibility(enabled);
+      const { settings, isDonor } = e.detail;
+      const rawEnabled =
+        settings.interface_donateTabEnabled ??
+        settings.donateTabEnabled ??
+        true;
+      const effectiveEnabled = isDonor ? !!rawEnabled : true;
+      this.updateVisibility(effectiveEnabled);
     });
   }
 
@@ -326,23 +328,26 @@ class FloatingActionTab {
     // Apply initial settings if available
     const applySettings = () => {
       if (window.settingsManager) {
-        const enabled = window.settingsManager.getSetting("donateTabEnabled");
+        const isDonor = !!window.settingsManager.isDonor;
+        const enabled =
+          window.settingsManager.getSetting("interface_donateTabEnabled") ??
+          window.settingsManager.getSetting("donateTabEnabled") ??
+          true;
         if (localStorage.getItem("verbose-css-logs") === "true") {
           console.log(
             "FloatingActionTab: Settings found, donateTabEnabled =",
             enabled,
           );
         }
-        this.updateVisibility(enabled);
+        this.updateVisibility(isDonor ? !!enabled : true);
       } else {
         if (localStorage.getItem("verbose-css-logs") === "true") {
           console.log(
-            "FloatingActionTab: Settings manager not ready, using default (true)",
+            "FloatingActionTab: Settings manager not ready, keeping hidden to avoid flash",
           );
         }
-        // Default to true (ON) when settings manager is not ready
-        // This ensures fresh browser sessions show the tab initially
-        this.updateVisibility(true);
+        // Keep hidden until settings are ready to avoid flash of content
+        this.updateVisibility(false);
       }
     };
 
@@ -365,8 +370,20 @@ class FloatingActionTab {
       );
     }
     if (this.link) {
-      // Show tab when enabled (toggle right), hide when disabled (toggle left)
-      this.link.style.display = enabled ? "block" : "none";
+      // Show tab when enabled, hide when disabled; keep a11y in sync
+      if (enabled) {
+        this.link.style.display = "block";
+        this.link.setAttribute("aria-hidden", "false");
+        this.link.removeAttribute("hidden");
+        this.link.removeAttribute("inert");
+        this.link.removeAttribute("tabindex");
+      } else {
+        this.link.style.display = "none";
+        this.link.setAttribute("aria-hidden", "true");
+        this.link.setAttribute("hidden", "");
+        this.link.setAttribute("inert", "");
+        this.link.setAttribute("tabindex", "-1");
+      }
       if (localStorage.getItem("verbose-css-logs") === "true") {
         console.log(
           "FloatingActionTab: Set display to",
@@ -406,6 +423,13 @@ class FloatingActionTab {
     this.link.className = "floating-tab-link";
     this.link.setAttribute("aria-label", "Navigate to donation page");
     this.link.setAttribute("data-page", "donate");
+
+    // Default-hide to prevent flash before settings/donor status are applied
+    this.link.style.display = "none";
+    this.link.setAttribute("aria-hidden", "true");
+    this.link.setAttribute("hidden", "");
+    this.link.setAttribute("inert", "");
+    this.link.setAttribute("tabindex", "-1");
 
     // Wrap the container in the link
     this.link.appendChild(this.container);

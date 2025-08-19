@@ -6848,28 +6848,12 @@ function highlightChartChange() {
     clearTimeout(highlightChartChange.animationTimeout);
   }
 
-  // OPTIMIZED: Batch chart container style updates for better performance
-  Object.assign(chartContainer.style, {
-    transition: "all 0.3s ease",
-    transform: "scale(1.02)",
-    boxShadow: "0 0 20px rgba(0, 123, 255, 0.5)",
-  });
+  // Use a CSS class for transient highlight to avoid inline style mutations
+  chartContainer.classList.add("radar-highlight");
 
   // Reset after animation with proper cleanup
   highlightChartChange.animationTimeout = setTimeout(() => {
-    // OPTIMIZED: Batch reset style operations
-    // Restore theme-appropriate box-shadow instead of removing it
-    const isDarkMode =
-      document.body.classList.contains("dark-mode") ||
-      document.body.classList.contains("theme-dark");
-    const defaultBoxShadow = isDarkMode
-      ? "-4px 4px 8px rgba(255, 255, 255, 0.05)"
-      : "-4px 4px 8px rgba(0, 0, 0, 0.12)";
-
-    Object.assign(chartContainer.style, {
-      transform: "scale(1)",
-      boxShadow: defaultBoxShadow,
-    });
+    chartContainer.classList.remove("radar-highlight");
   }, 1000);
 }
 

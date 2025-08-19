@@ -331,13 +331,17 @@ class FloatingTourTab {
     // Listen for settings changes
     window.addEventListener("settingsChanged", (e) => {
       const { settings } = e.detail;
-      this.updateVisibility(settings.tourTabEnabled);
+      const enabled =
+        settings.interface_tourTabEnabled ?? settings.tourTabEnabled ?? true;
+      this.updateVisibility(!!enabled);
     });
 
     // Listen for settings manager ready
     window.addEventListener("settingsManagerReady", (e) => {
       const { settings } = e.detail;
-      this.updateVisibility(settings.tourTabEnabled);
+      const enabled =
+        settings.interface_tourTabEnabled ?? settings.tourTabEnabled ?? true;
+      this.updateVisibility(!!enabled);
     });
   }
 
@@ -345,16 +349,22 @@ class FloatingTourTab {
     // Apply initial settings if available
     const applySettings = () => {
       if (window.settingsManager) {
-        const enabled = window.settingsManager.getSetting("tourTabEnabled");
-        this.updateVisibility(enabled);
+        const enabled =
+          window.settingsManager.getSetting("interface_tourTabEnabled") ??
+          window.settingsManager.getSetting("tourTabEnabled") ??
+          true;
+        this.updateVisibility(!!enabled);
       } else {
-        // Default to enabled if settings manager not available
-        this.updateVisibility(true);
+        // Keep hidden until settings manager is available to avoid flash
+        this.updateVisibility(false);
       }
     };
 
     // Try immediately
     applySettings();
+
+    // Also try on next microtask to catch very-early settings init
+    Promise.resolve().then(applySettings);
 
     // Also try after a short delay in case settings manager isn't ready
     setTimeout(applySettings, 100);
@@ -362,7 +372,19 @@ class FloatingTourTab {
 
   updateVisibility(enabled) {
     if (this.link) {
-      this.link.style.display = enabled ? "block" : "none";
+      if (enabled) {
+        this.link.style.display = "block";
+        this.link.setAttribute("aria-hidden", "false");
+        this.link.removeAttribute("hidden");
+        this.link.removeAttribute("inert");
+        this.link.removeAttribute("tabindex");
+      } else {
+        this.link.style.display = "none";
+        this.link.setAttribute("aria-hidden", "true");
+        this.link.setAttribute("hidden", "");
+        this.link.setAttribute("inert", "");
+        this.link.setAttribute("tabindex", "-1");
+      }
     }
   }
 
@@ -402,6 +424,13 @@ class FloatingTourTab {
     );
     this.link.setAttribute("data-action", "tour");
     this.link.id = "take-tour-floating";
+
+    // Default-hide to prevent flash before settings/state are applied
+    this.link.style.display = "none";
+    this.link.setAttribute("aria-hidden", "true");
+    this.link.setAttribute("hidden", "");
+    this.link.setAttribute("inert", "");
+    this.link.setAttribute("tabindex", "-1");
 
     // Wrap the container in the link
     this.link.appendChild(this.container);

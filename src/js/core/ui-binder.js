@@ -327,6 +327,17 @@ class UIBinder {
    * Modal Management
    */
   async showModal(modalConfig) {
+    // Configure close behavior with sensible defaults
+    const closeOnEsc =
+      modalConfig.closeOnEsc === undefined ? true : !!modalConfig.closeOnEsc;
+    const closeOnBackdrop =
+      modalConfig.closeOnBackdrop === undefined
+        ? true
+        : !!modalConfig.closeOnBackdrop;
+    const showCloseButton =
+      modalConfig.showCloseButton === undefined
+        ? true
+        : !!modalConfig.showCloseButton;
     const modal = document.createElement("div");
     modal.className = "ui-modal";
     modal.innerHTML = `
@@ -334,7 +345,11 @@ class UIBinder {
             <div class="ui-modal-content" role="dialog" aria-modal="true">
                 <div class="ui-modal-header">
                     <h2>${modalConfig.title || ""}</h2>
-                    <button class="ui-modal-close" aria-label="Close modal">&times;</button>
+                    ${
+                      showCloseButton
+                        ? '<button class="ui-modal-close" aria-label="Close modal">&times;</button>'
+                        : ""
+                    }
                 </div>
                 <div class="ui-modal-body">
                     ${modalConfig.content || ""}
@@ -368,8 +383,12 @@ class UIBinder {
       if (modalConfig.onClose) modalConfig.onClose();
     };
 
-    closeBtn.addEventListener("click", closeModal);
-    backdrop.addEventListener("click", closeModal);
+    if (closeBtn) {
+      closeBtn.addEventListener("click", closeModal);
+    }
+    if (backdrop && closeOnBackdrop) {
+      backdrop.addEventListener("click", closeModal);
+    }
 
     // Action handlers - OPTIMIZED: Batch DOM queries
     if (modalConfig.actions) {
@@ -390,8 +409,8 @@ class UIBinder {
       });
     }
 
-    // Accessibility
-    this.setupModalAccessibility(modal);
+    // Accessibility (pass policy flags)
+    this.setupModalAccessibility(modal, { closeOnEsc });
 
     // Add to DOM
     document.body.appendChild(modal);
@@ -407,8 +426,9 @@ class UIBinder {
     return modal;
   }
 
-  setupModalAccessibility(modal) {
+  setupModalAccessibility(modal, options = {}) {
     const modalContent = modal.querySelector(".ui-modal-content");
+    const closeOnEsc = options.closeOnEsc !== false; // default true
 
     // Focus management
     const focusableElements = modalContent.querySelectorAll(
@@ -432,8 +452,15 @@ class UIBinder {
           e.preventDefault();
           firstElement.focus();
         }
-      } else if (e.key === "Escape") {
-        modal.querySelector(".ui-modal-close").click();
+      } else if (e.key === "Escape" && closeOnEsc) {
+        const closeBtn = modal.querySelector(".ui-modal-close");
+        if (closeBtn) {
+          closeBtn.click();
+        } else {
+          // Fallback: remove modal if close button hidden but ESC allowed
+          modal.remove();
+          document.body.classList.remove("ui-modal-open");
+        }
       }
     });
   }

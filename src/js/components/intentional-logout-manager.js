@@ -4,6 +4,7 @@
  */
 
 import eventDispatcher, { AUTH_EVENTS } from "../utils/event-dispatcher.js";
+import AUTH_SESSION_CONSTANTS from "../constants/auth-session-constants.js";
 
 class IntentionalLogoutManager {
   constructor(authService) {
@@ -13,16 +14,21 @@ class IntentionalLogoutManager {
     this.logoutTimer = null;
     this.warningTimer = null;
     this.isShowingLogoutModal = false;
+    this._usingUIBinder = false;
+    this._countdownTimerId = null;
+    this._bc = null;
 
-    // Configuration
+    // Configuration (centralized)
     this.config = {
-      inactivityTimeout: 30 * 60 * 1000, // 30 minutes
-      warningTime: 5 * 60 * 1000, // 5 minutes before logout
-      sessionRefreshInterval: 60 * 1000, // Check every minute
-      maxSessionDuration: 8 * 60 * 60 * 1000, // 8 hours max session
+      inactivityTimeout: AUTH_SESSION_CONSTANTS.INACTIVITY_TIMEOUT_MS,
+      warningTime: AUTH_SESSION_CONSTANTS.WARNING_TIME_MS,
+      sessionRefreshInterval:
+        AUTH_SESSION_CONSTANTS.SESSION_REFRESH_INTERVAL_MS,
+      maxSessionDuration: AUTH_SESSION_CONSTANTS.MAX_SESSION_DURATION_MS,
     };
 
     this.initializeSessionMonitoring();
+    this.setupCrossTabCoordination();
   }
 
   /**
@@ -101,6 +107,61 @@ class IntentionalLogoutManager {
   }
 
   /**
+   * Cross-tab/session coordination using BroadcastChannel with storage fallback
+   */
+  setupCrossTabCoordination() {
+    try {
+      this._bc = new BroadcastChannel(AUTH_SESSION_CONSTANTS.BROADCAST.CHANNEL);
+      this._bc.onmessage = (e) => {
+        const msg = e?.data || {};
+        if (msg.type === "session_extend") {
+          this.lastActivity = Date.now();
+        } else if (msg.type === "session_logout") {
+          // Avoid double UI if already showing
+          if (!this.isShowingLogoutModal) {
+            this.handleIntentionalLogout(msg.reason || "external", {
+              title: msg.title || "Session Ended",
+              message: msg.message || "You have been signed out.",
+              reason: msg.detail || "Session ended in another tab.",
+              showReauthenticate: true,
+            });
+          }
+        }
+      };
+    } catch (_) {
+      // Fallback: storage events
+      window.addEventListener("storage", (ev) => {
+        if (
+          ev.key === AUTH_SESSION_CONSTANTS.STORAGE_KEYS.SESSION_EXTEND &&
+          ev.newValue
+        ) {
+          this.lastActivity = Date.now();
+        }
+        if (
+          ev.key === AUTH_SESSION_CONSTANTS.STORAGE_KEYS.SESSION_LOGOUT &&
+          ev.newValue
+        ) {
+          if (!this.isShowingLogoutModal) {
+            const payload = (() => {
+              try {
+                return JSON.parse(ev.newValue);
+              } catch (_) {
+                return {};
+              }
+            })();
+            this.handleIntentionalLogout(payload.reason || "external", {
+              title: payload.title || "Session Ended",
+              message: payload.message || "You have been signed out.",
+              reason: payload.detail || "Session ended in another tab.",
+              showReauthenticate: true,
+            });
+          }
+        }
+      });
+    }
+  }
+
+  /**
    * Start monitoring for inactivity
    */
   startInactivityMonitoring() {
@@ -123,11 +184,17 @@ class IntentionalLogoutManager {
       }
 
       // Continue monitoring
-      setTimeout(checkInactivity, 30000); // Check every 30 seconds
+      setTimeout(
+        checkInactivity,
+        AUTH_SESSION_CONSTANTS.INACTIVITY_CHECK_INTERVAL_MS,
+      );
     };
 
     // Start monitoring
-    setTimeout(checkInactivity, 30000);
+    setTimeout(
+      checkInactivity,
+      AUTH_SESSION_CONSTANTS.INACTIVITY_CHECK_INTERVAL_MS,
+    );
   }
 
   /**
@@ -175,6 +242,10 @@ class IntentionalLogoutManager {
       title: "Session Timeout Warning",
       message: `You will be signed out in ${minutes} minute${minutes > 1 ? "s" : ""} due to inactivity.`,
       reason: "This helps protect your account when you step away.",
+      // UX policy: warnings allow escape/backdrop close
+      closeOnEsc: true,
+      closeOnBackdrop: true,
+      showCloseButton: true,
       actions: [
         {
           text: "Stay Signed In",
@@ -230,6 +301,10 @@ class IntentionalLogoutManager {
       title: options.title || "Signed Out",
       message: options.message || "You have been signed out.",
       reason: options.reason || "Session ended.",
+      // UX policy: forced/terminal flows shouldn't close via Esc/backdrop
+      closeOnEsc: false,
+      closeOnBackdrop: false,
+      showCloseButton: true,
       actions: [
         ...(options.showReauthenticate
           ? [
@@ -278,6 +353,20 @@ class IntentionalLogoutManager {
       // Clear local session data
       this.clearSessionData();
       this.clearUserData();
+
+      // Cross-tab broadcast
+      try {
+        this._bc?.postMessage?.({
+          type: "session_logout",
+          reason: "intentional",
+        });
+        localStorage.setItem(
+          AUTH_SESSION_CONSTANTS.STORAGE_KEYS.SESSION_LOGOUT,
+          JSON.stringify({ reason: "intentional", ts: Date.now() }),
+        );
+      } catch (_) {
+        /* no-op */
+      }
     } catch (error) {
       // Even if logout fails, clear local session
       this.clearSessionData();
@@ -292,67 +381,142 @@ class IntentionalLogoutManager {
   showLogoutModal(config) {
     this.hideLogoutModal(); // Hide any existing modal
 
-    this.logoutModal = document.createElement("div");
-    this.logoutModal.className = "intentional-logout-modal";
-    this.logoutModal.innerHTML = `
-      <div class="logout-modal-overlay">
-        <div class="logout-modal-content">
-          <div class="logout-modal-header">
-            <div class="logout-modal-icon">${this.getIconForType(config.type)}</div>
-            <h3 class="logout-modal-title">${config.title}</h3>
-          </div>
-          <div class="logout-modal-body">
-            <p class="logout-modal-message">${config.message}</p>
-            <p class="logout-modal-reason">${config.reason}</p>
-            ${config.countdown ? `<div class="logout-countdown" data-seconds="${config.countdown}"></div>` : ""}
-          </div>
-          <div class="logout-modal-actions">
-            ${config.actions
-              .map(
-                (action) => `
-              <button class="logout-action-btn ${action.primary ? "primary" : "secondary"}" 
-                      data-action="${action.text}">
-                ${action.text}
-              </button>
-            `,
-              )
-              .join("")}
-          </div>
+    const uiBinder = this.getUIBinder();
+    // If UIBinder is present, we use its header (title). Content includes icon + body only.
+    const contentHtml = uiBinder
+      ? `
+      <div class="intentional-logout-modal" data-type="${config.type || "logout"}">
+        <div class="logout-modal-body">
+          <div class="logout-modal-icon" aria-hidden="true">${this.getIconForType(config.type)}</div>
+          <p class="logout-modal-message">${config.message}</p>
+          <p class="logout-modal-reason">${config.reason}</p>
+          ${config.countdown ? `<div class="logout-countdown" data-seconds="${config.countdown}"></div>` : ""}
         </div>
-      </div>
-    `;
+      </div>`
+      : `
+      <div class="intentional-logout-modal" data-type="${config.type || "logout"}">
+        <div class="logout-modal-header">
+          <div class="logout-modal-icon">${this.getIconForType(config.type)}</div>
+          <h3 class="logout-modal-title">${config.title}</h3>
+        </div>
+        <div class="logout-modal-body">
+          <p class="logout-modal-message">${config.message}</p>
+          <p class="logout-modal-reason">${config.reason}</p>
+          ${config.countdown ? `<div class="logout-countdown" data-seconds="${config.countdown}"></div>` : ""}
+        </div>
+      </div>`;
 
-    // Add event listeners
-    config.actions.forEach((action) => {
-      const button = this.logoutModal.querySelector(
-        `[data-action="${action.text}"]`,
-      );
-      if (button) {
-        button.addEventListener("click", action.action);
-      }
-    });
+    const actions = (config.actions || []).map((a, idx) => ({
+      id: `action-${idx}`,
+      label: a.text,
+      type: a.primary ? "primary" : "secondary",
+      handler: () => a.action?.(),
+    }));
 
-    // Handle countdown
-    if (config.countdown && config.autoAction) {
-      this.startCountdown(config.countdown, config.autoAction);
-    }
-
-    // Prevent modal close on overlay click for important logouts
-    if (config.type === "logout") {
-      this.logoutModal.addEventListener("click", (e) => {
-        e.stopPropagation();
+    if (uiBinder) {
+      this._usingUIBinder = true;
+      uiBinder.showModal({
+        title: config.title,
+        content: contentHtml,
+        actions,
+        closeOnEsc: config.closeOnEsc,
+        closeOnBackdrop: config.closeOnBackdrop,
+        showCloseButton: config.showCloseButton,
+        onClose: () => {
+          this.isShowingLogoutModal = false;
+          this.clearCountdownTimer();
+        },
       });
-    }
+      this.isShowingLogoutModal = true;
+      if (config.countdown && config.autoAction) {
+        this.startCountdownUIBinder(config.countdown, config.autoAction);
+      }
+    } else {
+      // Legacy fallback: inline modal DOM
+      this._usingUIBinder = false;
+      this.logoutModal = document.createElement("div");
+      this.logoutModal.className = "intentional-logout-modal-legacy-wrapper";
+      this.logoutModal.innerHTML = `
+        <div class="logout-modal-overlay">
+      <div class="logout-modal-content" role="dialog" aria-modal="true" aria-labelledby="logout-modal-title" aria-describedby="logout-modal-desc">
+            ${contentHtml}
+            <div class="logout-modal-actions">
+              ${(config.actions || [])
+                .map(
+                  (action) => `
+                <button class="logout-action-btn ${action.primary ? "primary" : "secondary"}" data-action="${action.text}">
+                  ${action.text}
+                </button>`,
+                )
+                .join("")}
+            </div>
+          </div>
+        </div>`;
 
-    document.body.appendChild(this.logoutModal);
+      // Wire actions
+      (config.actions || []).forEach((action) => {
+        const btn = this.logoutModal.querySelector(
+          `[data-action="${action.text}"]`,
+        );
+        if (btn) btn.addEventListener("click", action.action);
+      });
+
+      if (config.countdown && config.autoAction) {
+        this.startCountdown(config.countdown, config.autoAction);
+      }
+
+      document.body.appendChild(this.logoutModal);
+      // Focus the first actionable element for accessibility
+      const focusable = this.logoutModal.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+      if (focusable.length) {
+        focusable[0].focus();
+      }
+      // Optional: simple focus trap
+      const content = this.logoutModal.querySelector(".logout-modal-content");
+      content &&
+        content.addEventListener("keydown", (e) => {
+          if (e.key === "Tab") {
+            const els = content.querySelectorAll(
+              'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+            );
+            if (!els.length) return;
+            const first = els[0];
+            const last = els[els.length - 1];
+            if (e.shiftKey && document.activeElement === first) {
+              e.preventDefault();
+              last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+              e.preventDefault();
+              first.focus();
+            }
+          } else if (e.key === "Escape" && config.closeOnEsc) {
+            this.hideLogoutModal();
+          }
+        });
+      this.isShowingLogoutModal = true;
+    }
+  }
+
+  /**
+   * Resolve global UIBinder instance if available
+   */
+  getUIBinder() {
+    try {
+      return window.uiBinder || window.UIBinderInstance || null;
+    } catch (_) {
+      return null;
+    }
   }
 
   /**
    * Start countdown timer
    */
   startCountdown(seconds, autoAction) {
-    const countdownElement =
-      this.logoutModal?.querySelector(".logout-countdown");
+    const countdownElement = this._usingUIBinder
+      ? document.querySelector(".ui-modal .logout-countdown")
+      : this.logoutModal?.querySelector(".logout-countdown");
     if (!countdownElement) return;
 
     let remaining = seconds;
@@ -368,21 +532,42 @@ class IntentionalLogoutManager {
       }
 
       remaining--;
-      setTimeout(updateCountdown, 1000);
+      this._countdownTimerId = setTimeout(
+        updateCountdown,
+        AUTH_SESSION_CONSTANTS.COUNTDOWN_UPDATE_MS,
+      );
     };
 
     updateCountdown();
+  }
+
+  startCountdownUIBinder(seconds, autoAction) {
+    // Defer once to ensure modal is in DOM
+    setTimeout(() => this.startCountdown(seconds, autoAction), 50);
   }
 
   /**
    * Hide logout modal
    */
   hideLogoutModal() {
-    if (this.logoutModal) {
+    if (this._usingUIBinder) {
+      // Close the most recent UI modal if present
+      const closeBtn = document.querySelector(".ui-modal .ui-modal-close");
+      if (closeBtn) closeBtn.click();
+      this.clearCountdownTimer();
+    } else if (this.logoutModal) {
       this.logoutModal.remove();
       this.logoutModal = null;
+      this.clearCountdownTimer();
     }
     this.isShowingLogoutModal = false;
+  }
+
+  clearCountdownTimer() {
+    if (this._countdownTimerId) {
+      clearTimeout(this._countdownTimerId);
+      this._countdownTimerId = null;
+    }
   }
 
   /**
@@ -407,6 +592,12 @@ class IntentionalLogoutManager {
     // Update session start time if needed
     try {
       localStorage.setItem("session_start_time", Date.now().toString());
+      // Cross-tab ping
+      localStorage.setItem(
+        AUTH_SESSION_CONSTANTS.STORAGE_KEYS.SESSION_EXTEND,
+        String(Date.now()),
+      );
+      this._bc?.postMessage?.({ type: "session_extend" });
     } catch (error) {
       // Ignore storage errors
     }
@@ -479,6 +670,15 @@ class IntentionalLogoutManager {
           session_duration:
             Date.now() - (this.getSessionStartTime() || Date.now()),
           user_id: this.authService?.currentUser?.uid || "anonymous",
+          timestamp: Date.now(),
+        });
+      }
+      // Optional: educational analytics
+      if (window.simpleAnalytics?.isEnabled?.()) {
+        window.simpleAnalytics.trackEvent?.("simulation_action", {
+          event_category: "system",
+          event_action: "intentional_logout",
+          logout_reason: reason,
           timestamp: Date.now(),
         });
       }

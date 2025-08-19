@@ -228,6 +228,78 @@
     background-color: var(--color-primary);
     color: var(--color-white, #fff);
   }
+
+  /* Intentional Logout Modal - base component styles */
+  .intentional-logout-modal {
+    color: var(--theme-text-primary, #2d3748);
+  }
+
+  .intentional-logout-modal .logout-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 24px 24px 12px;
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+  }
+
+  .intentional-logout-modal .logout-modal-icon {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    font-size: 20px;
+    border-radius: 8px;
+    background: var(--secondary-bg, #f8f9fa);
+    border: 1px solid var(--border-color, #e2e8f0);
+  }
+
+  .intentional-logout-modal .logout-modal-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--theme-text-primary, #2d3748);
+  }
+
+  .intentional-logout-modal .logout-modal-body {
+    padding: 16px 24px;
+  }
+
+  .intentional-logout-modal .logout-modal-message {
+    margin: 0 0 8px;
+    font-size: 14px;
+  }
+
+  .intentional-logout-modal .logout-modal-reason {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-secondary, #6b7280);
+    background: var(--secondary-bg, #f8f9fa);
+    border-left: 4px solid var(--accent-color, #0ea5e9);
+    padding: 10px 12px;
+    border-radius: 4px;
+  }
+
+  .intentional-logout-modal .logout-countdown {
+    margin-top: 12px;
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+      "Courier New", monospace;
+    color: var(--text-secondary, #6b7280);
+  }
+
+  .intentional-logout-modal .logout-modal-actions {
+    padding: 20px 24px 24px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .intentional-logout-modal .logout-action-btn,
+  .ui-modal .ui-btn.ui-btn-primary,
+  .ui-modal .ui-btn.ui-btn-secondary {
+    min-width: 120px;
+  }
 }
 
 /* Utilities Layer - Helper classes */
@@ -497,6 +569,45 @@
   /* stylelint-enable rule-empty-line-before */
 }
 
+/* Overrides Layer - Theme and state-specific overrides */
+@layer overrides {
+  /* Intentional Logout Modal - dark mode overrides */
+  body.dark-mode .intentional-logout-modal,
+  body.theme-dark .intentional-logout-modal {
+    color: var(--theme-text-primary, #e5e7eb);
+  }
+
+  body.dark-mode .intentional-logout-modal .logout-modal-header,
+  body.theme-dark .intentional-logout-modal .logout-modal-header {
+    border-bottom-color: var(--border-color, #404040);
+  }
+
+  body.dark-mode .intentional-logout-modal .logout-modal-icon,
+  body.theme-dark .intentional-logout-modal .logout-modal-icon {
+    background: var(--theme-bg-secondary, #2d2d2d);
+    border-color: var(--border-color, #404040);
+  }
+
+  body.dark-mode .intentional-logout-modal .logout-modal-title,
+  body.theme-dark .intentional-logout-modal .logout-modal-title,
+  body.dark-mode .intentional-logout-modal .logout-modal-message,
+  body.theme-dark .intentional-logout-modal .logout-modal-message {
+    color: var(--theme-text-primary, #e5e7eb);
+  }
+
+  body.dark-mode .intentional-logout-modal .logout-modal-reason,
+  body.theme-dark .intentional-logout-modal .logout-modal-reason {
+    background: var(--theme-bg-secondary, #2d2d2d);
+    color: var(--theme-text-primary, #e5e7eb);
+    border-left-color: var(--accent-color, #4dabf7);
+  }
+
+  body.dark-mode .intentional-logout-modal .logout-countdown,
+  body.theme-dark .intentional-logout-modal .logout-countdown {
+    color: var(--text-secondary, #a3a3a3);
+  }
+}
+
 /* Overrides Layer - Theme overrides and state-specific styles */
 @layer overrides {
   /* Centralized hero dark mode overrides */
@@ -555,9 +666,7 @@
   * (html gets classes during the inline theme-preload shim) and
   * runtime consistency (SettingsManager mirrors classes to both).
    */
-  html.dark-mode,
   body.dark-mode,
-  html.theme-dark,
   body.theme-dark {
     color-scheme: dark;
 

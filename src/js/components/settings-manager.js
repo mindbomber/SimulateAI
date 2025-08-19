@@ -30,55 +30,6 @@
  */
 
 import googleAnalytics from "../services/google-analytics.js";
-import baseLogger from "../utils/logger.js";
-
-// Quiet-by-default logging: enable with localStorage flags
-const __smShouldLog = () =>
-  localStorage.getItem("debug") === "true" ||
-  localStorage.getItem("verbose-css-logs") === "true" ||
-  localStorage.getItem("verbose-logs") === "true";
-
-// Module-scoped logger that always emits errors, gates others
-const __smLogger = new Proxy(baseLogger, {
-  get(target, prop) {
-    if (prop === "error") return target.error.bind(target);
-    if (
-      prop === "info" ||
-      prop === "warn" ||
-      prop === "debug" ||
-      prop === "log"
-    ) {
-      return (...args) => {
-        if (__smShouldLog()) {
-          const method = prop === "log" ? "info" : prop;
-          return target[method]("SettingsManager", ...args);
-        }
-      };
-    }
-    return target[prop];
-  },
-});
-
-// Shadow console within this module to route through logger and gating
-// Errors are always shown; others require a debug flag
-const console = new Proxy(
-  {},
-  {
-    get(_t, prop) {
-      if (prop === "error")
-        return (...args) => __smLogger.error("SettingsManager", ...args);
-      if (prop === "warn")
-        return (...args) => __smLogger.warn("SettingsManager", ...args);
-      if (prop === "info")
-        return (...args) => __smLogger.info("SettingsManager", ...args);
-      if (prop === "debug")
-        return (...args) => __smLogger.debug("SettingsManager", ...args);
-      if (prop === "log")
-        return (...args) => __smLogger.info("SettingsManager", ...args);
-      return () => {};
-    },
-  },
-);
 
 // Constants
 const SETTINGS_STORAGE_KEY = "simulateai_settings";
@@ -103,10 +54,6 @@ class SettingsManager {
     this.settings = {};
     this.isDonor = false; // Will be loaded async
     this.isInitialized = false;
-
-    // Theme state tracking to avoid duplicate work
-    this.lastResolvedTheme = null; // 'dark' | 'light'
-    this.lastThemeChoiceNormalized = null; // 'dark' | 'light' | 'system'
 
     // Performance optimizations: Cache DOM elements
     this.domCache = new Map();
@@ -160,12 +107,7 @@ class SettingsManager {
       window.dispatchEvent(
         new CustomEvent("settingsManagerReady", {
           detail: {
-            settings: {
-              surpriseTabEnabled: this.getSetting("surpriseTabEnabled"),
-              tourTabEnabled: this.getSetting("tourTabEnabled"),
-              donateTabEnabled: this.getSetting("donateTabEnabled"),
-              ...this.settings, // Include other settings
-            },
+            settings: this.settings,
             isDonor: this.isDonor,
             appConfig: this.appConfig,
             settingsSchema: this.settingsSchema,
@@ -209,15 +151,8 @@ class SettingsManager {
    */
   applyThemeChoice(themeChoice) {
     const body = document.body;
-    const html = document.documentElement;
 
     // Remove all theme classes
-    html.classList.remove(
-      "theme-light",
-      "theme-dark",
-      "theme-system",
-      "dark-mode",
-    );
     body.classList.remove(
       "theme-light",
       "theme-dark",
@@ -226,23 +161,16 @@ class SettingsManager {
     );
 
     // Add theme class for user's choice
-    html.classList.add(`theme-${themeChoice}`);
     body.classList.add(`theme-${themeChoice}`);
 
     if (themeChoice === "dark") {
-      html.classList.add("dark-mode");
       body.classList.add("dark-mode");
-      // Align UA widgets (forms, etc.) to the chosen scheme
-      html.style.colorScheme = "dark";
     } else if (themeChoice === "light") {
       // Light mode - no dark-mode class needed
-      html.style.colorScheme = "light";
     } else if (themeChoice === "system") {
       // Follow system preference
       const prefersDark = this.systemPrefersDark.matches;
-      html.classList.toggle("dark-mode", prefersDark);
       body.classList.toggle("dark-mode", prefersDark);
-      html.style.colorScheme = prefersDark ? "dark" : "light";
     }
 
     // Store the preference
@@ -258,19 +186,14 @@ class SettingsManager {
    */
   applySystemTheme() {
     const body = document.body;
-    const html = document.documentElement;
     const prefersDark = this.systemPrefersDark.matches;
 
     // Remove explicit theme classes, keep system as default
-    html.classList.remove("theme-light", "theme-dark");
     body.classList.remove("theme-light", "theme-dark");
-    html.classList.add("theme-system");
     body.classList.add("theme-system");
 
     // Apply dark mode based on system preference
-    html.classList.toggle("dark-mode", prefersDark);
     body.classList.toggle("dark-mode", prefersDark);
-    html.style.colorScheme = prefersDark ? "dark" : "light";
 
     console.log(`🎨 System theme applied: ${prefersDark ? "dark" : "light"}`);
   }
@@ -286,10 +209,7 @@ class SettingsManager {
 
       if (!storedTheme || storedTheme === "system") {
         const body = document.body;
-        const html = document.documentElement;
-        html.classList.toggle("dark-mode", e.matches);
         body.classList.toggle("dark-mode", e.matches);
-        html.style.colorScheme = e.matches ? "dark" : "light";
         console.log(`🎨 System theme changed: ${e.matches ? "dark" : "light"}`);
 
         // Trigger any theme-dependent updates
@@ -310,14 +230,6 @@ class SettingsManager {
    * Handle theme changes - update dependent components
    */
   onThemeChange(themeName) {
-    // Skip if this theme was already applied (prevents duplicate styling)
-    if (this.lastResolvedTheme === themeName) {
-      return;
-    }
-
-    // Update last resolved theme immediately so listeners see consistent state
-    this.lastResolvedTheme = themeName;
-
     // Update dark mode dependent components based on current theme
     if (this.isInitialized) {
       setTimeout(() => {
@@ -327,23 +239,6 @@ class SettingsManager {
         } else {
           // Clear any dark mode inline styles for light theme
           this.clearDarkModeInlineStyles();
-          // Also ensure any root-level inline dark preload styles are removed
-          try {
-            const html = document.documentElement;
-            const body = document.body;
-            html.style.removeProperty("background-color");
-            html.style.removeProperty("color");
-            body?.style?.removeProperty?.("background-color");
-            body?.style?.removeProperty?.("color");
-          } catch (e) {
-            // Non-fatal cleanup failure; ignore
-            if (window && window.console) {
-              console.debug(
-                "SettingsManager:onThemeChange cleanup noop",
-                e?.message || e,
-              );
-            }
-          }
         }
       }, 100);
     }
@@ -601,19 +496,8 @@ class SettingsManager {
       });
     });
 
-    // Clear view toggle controls container styles
-    const viewToggleControls = this.getCachedElement(".view-toggle-controls");
-    if (viewToggleControls) {
-      viewToggleControls.style.removeProperty("background");
-      viewToggleControls.style.removeProperty("background-color");
-      viewToggleControls.style.removeProperty("border");
-      viewToggleControls.style.removeProperty("border-color");
-      viewToggleControls.style.removeProperty("box-shadow");
-    }
-
     // Clear other component styles
     const elementsToReset = [
-      ".view-toggle-controls",
       ".view-toggle-btn",
       "kbd",
       ".nav-link",
@@ -931,20 +815,7 @@ class SettingsManager {
 
       // Fallback to localStorage
       const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
-      let settings = {};
-      if (stored) {
-        try {
-          settings = JSON.parse(stored);
-        } catch (parseError) {
-          console.warn(
-            "[SettingsManager] Failed to parse localStorage settings:",
-            parseError,
-          );
-          // Clear corrupted data
-          localStorage.removeItem(SETTINGS_STORAGE_KEY);
-          settings = {};
-        }
-      }
+      const settings = stored ? JSON.parse(stored) : {};
 
       // If we found settings in localStorage and have DataHandler, migrate them
       if (settings && Object.keys(settings).length > 0 && this.dataHandler) {
@@ -1262,82 +1133,83 @@ class SettingsManager {
     // Surprise tab toggle
     if (eventElements.surpriseToggle) {
       eventElements.surpriseToggle.addEventListener("change", (e) => {
-        const oldValue = this.settings.surpriseTabEnabled;
-        this.settings.surpriseTabEnabled = e.target.checked;
+        const newValue = !!e.target.checked;
+        const oldValue = this.getSetting("interface_surpriseTabEnabled");
+
+        // Apply via flattened key API (and mirror simple key for backward compat)
+        this.setSetting("interface_surpriseTabEnabled", newValue);
+        this.settings.surpriseTabEnabled = newValue;
 
         // Track the settings change
         googleAnalytics.trackEvent("settings_change", {
-          settingName: "surpriseTabEnabled",
+          settingName: "interface_surpriseTabEnabled",
           oldValue,
-          newValue: e.target.checked,
+          newValue,
           settingType: "toggle",
           category: "interface",
           context: "settings_panel",
         });
-
-        this.saveSettingsSync();
-        this.applySettings();
       });
     }
 
     // Tour tab toggle
     if (eventElements.tourToggle) {
       eventElements.tourToggle.addEventListener("change", (e) => {
-        const oldValue = this.settings.tourTabEnabled;
-        this.settings.tourTabEnabled = e.target.checked;
+        const newValue = !!e.target.checked;
+        const oldValue = this.getSetting("interface_tourTabEnabled");
+
+        // Apply via flattened key API (and mirror simple key for backward compat)
+        this.setSetting("interface_tourTabEnabled", newValue);
+        this.settings.tourTabEnabled = newValue;
 
         // Track the settings change
         googleAnalytics.trackEvent("settings_change", {
-          settingName: "tourTabEnabled",
+          settingName: "interface_tourTabEnabled",
           oldValue,
-          newValue: e.target.checked,
+          newValue,
           settingType: "toggle",
           category: "interface",
           context: "settings_panel",
         });
-
-        this.saveSettingsSync();
-        this.applySettings();
       });
     }
 
-    // Donate tab toggle
+    // Donate tab toggle (special gating rules)
     if (eventElements.donateToggle) {
       eventElements.donateToggle.addEventListener("change", (e) => {
-        const oldValue = this.settings.donateTabEnabled;
+        const newValue = !!e.target.checked;
+        const oldValue = this.getSetting("interface_donateTabEnabled");
 
         // Only donors can disable the donate tab
-        if (!this.isDonor && !e.target.checked) {
+        if (!this.isDonor && !newValue) {
           e.target.checked = true;
           this.showDonationRequiredMessage();
 
           // Track the restricted action
           googleAnalytics.trackEvent("settings_restriction", {
-            settingName: "donateTabEnabled",
+            settingName: "interface_donateTabEnabled",
             attemptedValue: false,
             restrictionReason: "non_donor",
             category: "access_control",
             context: "settings_panel",
           });
-
           return;
         }
 
-        this.settings.donateTabEnabled = e.target.checked;
+        // Apply via flattened key API (and mirror simple key for backward compat)
+        this.setSetting("interface_donateTabEnabled", newValue);
+        this.settings.donateTabEnabled = newValue;
 
         // Track the settings change
         googleAnalytics.trackEvent("settings_change", {
-          settingName: "donateTabEnabled",
+          settingName: "interface_donateTabEnabled",
           oldValue,
-          newValue: e.target.checked,
+          newValue,
           settingType: "toggle",
           category: "interface",
           userType: this.isDonor ? "donor" : "regular",
           context: "settings_panel",
         });
-
-        this.saveSettingsSync();
-        this.applySettings();
       });
     }
 
@@ -1536,34 +1408,34 @@ class SettingsManager {
     const updates = [];
 
     // Update toggle states only if different
-    if (
-      elements.surpriseToggle &&
-      elements.surpriseToggle.checked !== this.getSetting("surpriseTabEnabled")
-    ) {
-      updates.push(
-        () =>
-          (elements.surpriseToggle.checked =
-            this.getSetting("surpriseTabEnabled")),
-      );
+    if (elements.surpriseToggle) {
+      const current =
+        this.getSetting("interface_surpriseTabEnabled") ??
+        this.settings.surpriseTabEnabled ??
+        true;
+      if (elements.surpriseToggle.checked !== !!current) {
+        updates.push(() => (elements.surpriseToggle.checked = !!current));
+      }
     }
 
-    if (
-      elements.tourToggle &&
-      elements.tourToggle.checked !== this.getSetting("tourTabEnabled")
-    ) {
-      updates.push(
-        () => (elements.tourToggle.checked = this.getSetting("tourTabEnabled")),
-      );
+    if (elements.tourToggle) {
+      const current =
+        this.getSetting("interface_tourTabEnabled") ??
+        this.settings.tourTabEnabled ??
+        true;
+      if (elements.tourToggle.checked !== !!current) {
+        updates.push(() => (elements.tourToggle.checked = !!current));
+      }
     }
 
-    if (
-      elements.donateToggle &&
-      elements.donateToggle.checked !== this.getSetting("donateTabEnabled")
-    ) {
-      updates.push(
-        () =>
-          (elements.donateToggle.checked = this.getSetting("donateTabEnabled")),
-      );
+    if (elements.donateToggle) {
+      const current =
+        this.getSetting("interface_donateTabEnabled") ??
+        this.settings.donateTabEnabled ??
+        true;
+      if (elements.donateToggle.checked !== !!current) {
+        updates.push(() => (elements.donateToggle.checked = !!current));
+      }
     }
 
     // Handle donor-only functionality
@@ -1585,7 +1457,7 @@ class SettingsManager {
         }
       } else {
         if (
-          !this.getSetting("donateTabEnabled") &&
+          !this.settings.donateTabEnabled &&
           !donateToggleWrapper?.classList.contains("settings-disabled")
         ) {
           updates.push(() => {
@@ -1706,6 +1578,13 @@ class SettingsManager {
       html.classList.add(`font-size-${fontSize}`);
     }
 
+    // Apply or clear dark mode styles based on current theme
+    if (body.classList.contains("dark-mode")) {
+      this.forceDarkModeComponents();
+    } else {
+      this.clearDarkModeInlineStyles();
+    }
+
     // Update theme-color meta tag
     this.updateMetaTags();
   }
@@ -1718,27 +1597,20 @@ class SettingsManager {
     const themeValue =
       this.settings.theme || this.settings.appearance_theme || "system";
 
-    // Normalize to one of: 'light' | 'dark' | 'system'
+    // Update stored preference to match settings
+    // Use 'system' instead of 'auto' for consistency
     const normalizedTheme = themeValue === "auto" ? "system" : themeValue;
 
-    // Persist/class update if the normalized choice changed (even if resolved stays same)
-    if (this.lastThemeChoiceNormalized !== normalizedTheme) {
-      this.applyThemeChoice(normalizedTheme);
-      this.lastThemeChoiceNormalized = normalizedTheme;
-    }
+    this.applyThemeChoice(normalizedTheme);
 
-    // Resolve to the concrete theme that affects styling
-    const resolvedTheme =
+    // Trigger theme change events
+    this.onThemeChange(
       normalizedTheme === "system"
         ? this.systemPrefersDark.matches
           ? "dark"
           : "light"
-        : normalizedTheme;
-
-    // Only notify/apply downstream changes when the resolved theme actually changes
-    if (this.lastResolvedTheme !== resolvedTheme) {
-      this.onThemeChange(resolvedTheme);
-    }
+        : normalizedTheme,
+    );
   }
 
   /**
@@ -1839,19 +1711,11 @@ class SettingsManager {
   }
 
   notifySettingsChanged() {
-    // Create a complete settings object with defaults resolved
-    const completeSettings = {
-      surpriseTabEnabled: this.getSetting("surpriseTabEnabled"),
-      tourTabEnabled: this.getSetting("tourTabEnabled"),
-      donateTabEnabled: this.getSetting("donateTabEnabled"),
-      ...this.settings, // Include other settings
-    };
-
     // Dispatch custom event for other components to listen to
     window.dispatchEvent(
       new CustomEvent("settingsChanged", {
         detail: {
-          settings: completeSettings,
+          settings: this.settings,
           isDonor: this.isDonor,
         },
       }),
@@ -2347,8 +2211,8 @@ class SettingsManager {
 
     new Notification("SimulateAI Test", {
       body: "Notifications are working correctly!",
-      icon: "/src/assets/icons/favicon.svg",
-      badge: "/src/assets/icons/favicon.svg",
+      icon: "/favicon.ico",
+      badge: "/favicon.ico",
     });
   }
 
@@ -2404,35 +2268,53 @@ class SettingsManager {
 
   // Public API methods
   getSetting(key) {
-    // Return the current setting value, or default if undefined
-    const currentValue = this.settings[key];
-    if (currentValue !== undefined) {
-      return currentValue;
+    // Direct hit first
+    if (
+      this.settings &&
+      Object.prototype.hasOwnProperty.call(this.settings, key)
+    ) {
+      return this.settings[key];
     }
 
-    // If setting is undefined, return the default value from schema
-    const settingDef = this.findSettingDefinition(key);
-    if (settingDef && settingDef.default !== undefined) {
-      return settingDef.default;
+    // Fallback: allow simple keys (e.g., "donateTabEnabled") by resolving to flattened keys
+    if (typeof key === "string" && !key.includes("_")) {
+      // Try to find a flattened key that ends with _{key}
+      const suffix = `_${key}`;
+      const match = Object.keys(this.settings || {}).find((k) =>
+        k.endsWith(suffix),
+      );
+      if (match) return this.settings[match];
     }
 
-    // Final fallback for critical interface settings
-    const criticalDefaults = {
-      tourTabEnabled: true,
-      surpriseTabEnabled: true,
-      donateTabEnabled: true,
-    };
-
-    return criticalDefaults[key] !== undefined
-      ? criticalDefaults[key]
-      : currentValue;
+    return undefined;
   }
 
   setSetting(key, value) {
-    // Validate the setting before applying
-    const validatedValue = this.validateSingleSetting(key, value);
+    // Resolve to flattened key if a simple key was provided
+    let targetKey = key;
+    if (typeof key === "string" && !key.includes("_")) {
+      // Attempt to resolve using schema
+      const schema = this.settingsSchema?.settings || {};
+      for (const [category, defs] of Object.entries(schema)) {
+        if (Object.prototype.hasOwnProperty.call(defs, key)) {
+          targetKey = `${category}_${key}`;
+          break;
+        }
+      }
+      // If not found in schema, try suffix match in current settings
+      if (targetKey === key) {
+        const suffix = `_${key}`;
+        const match = Object.keys(this.settings || {}).find((k) =>
+          k.endsWith(suffix),
+        );
+        if (match) targetKey = match;
+      }
+    }
 
-    this.settings[key] = validatedValue;
+    // Validate the setting before applying
+    const validatedValue = this.validateSingleSetting(targetKey, value);
+
+    this.settings[targetKey] = validatedValue;
     this.saveSettingsSync();
     this.applySettings();
     this.updateUI();
@@ -2508,15 +2390,16 @@ class SettingsManager {
   }
 
   reset() {
+    // Use flattened keys consistent with schema
     this.settings = {
-      surpriseTabEnabled: true,
-      tourTabEnabled: true,
-      donateTabEnabled: true,
-      theme: "auto",
-      fontSize: "medium",
-      highContrast: false,
-      reducedMotion: false,
-      largeClickTargets: false,
+      interface_surpriseTabEnabled: true,
+      interface_tourTabEnabled: true,
+      interface_donateTabEnabled: true,
+      appearance_theme: "auto",
+      appearance_fontSize: "medium",
+      accessibility_highContrast: false,
+      accessibility_reducedMotion: false,
+      accessibility_largeClickTargets: false,
     };
     this.saveSettingsSync();
     this.applySettings();

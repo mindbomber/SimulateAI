@@ -67,15 +67,14 @@ export default class RealtimeClassroomService {
           ) &&
           devConfig?.useEmulators
         ) {
-          connectDatabaseEmulator(
-            this.database,
-            devConfig.emulatorHost || "127.0.0.1",
-            devConfig.emulatorPorts.database,
-          );
+          const host = devConfig.emulatorHost || "127.0.0.1";
+          const port = devConfig.emulatorPorts.database;
+          // Bind the SDK to the emulator; actual connectivity is verified below via SDK probe
+          connectDatabaseEmulator(this.database, host, port);
           this._emulatorConnected = true;
         }
       } catch (_) {
-        // no-op; fall back to configured endpoint
+        // no-op; SDK-level probe below will decide fallback
       }
 
       // Test the connection with a robust operation that avoids special tokens
@@ -170,6 +169,30 @@ export default class RealtimeClassroomService {
   }
 
   /**
+   * Derive the Realtime Database namespace for the emulator REST probe.
+   * Tries databaseURL host prefix, then falls back to projectId-default-rtdb.
+   * @returns {string}
+   * @private
+   */
+  _getDatabaseNamespace() {
+    try {
+      const dbUrl = this.firebaseService?.app?.options?.databaseURL;
+      if (dbUrl) {
+        const u = new URL(dbUrl);
+        const host = u.host || ""; // e.g., simulateai-research-default-rtdb.firebaseio.com
+        const first = host.split(".")[0];
+        if (first) return first;
+      }
+      const projectId = this.firebaseService?.app?.options?.projectId;
+      if (projectId) return `${projectId}-default-rtdb`;
+    } catch (_) {
+      // ignore
+    }
+    // Safe generic fallback
+    return "local-default-rtdb";
+  }
+
+  /**
    * Create a new classroom with scenarios and instructor information
    * @param {Object} classroomData - Classroom configuration
    * @param {string} classroomData.classroomName - Name of the classroom
@@ -188,13 +211,37 @@ export default class RealtimeClassroomService {
       // Generate unique classroom code
       const classroomCode = await this.generateUniqueClassroomCode();
 
+      // Resolve instructor identity: when using Firebase, security rules require instructorId == auth.uid
+      let effectiveInstructorId = classroomData.instructorId;
+      let effectiveInstructorName = classroomData.instructorName;
+      try {
+        const uid = this.firebaseService?.auth?.currentUser?.uid;
+        const displayName =
+          this.firebaseService?.auth?.currentUser?.displayName;
+        if (this.firebaseService?.app && uid) {
+          if (effectiveInstructorId !== uid) {
+            logger.debug(
+              "RealtimeClassroomService",
+              "Overriding instructorId with authenticated uid for security rules",
+              { provided: effectiveInstructorId, uid },
+            );
+            effectiveInstructorId = uid;
+          }
+          if (!effectiveInstructorName && displayName) {
+            effectiveInstructorName = displayName;
+          }
+        }
+      } catch (_) {
+        // ignore identity resolution errors
+      }
+
       // Create classroom object
       const classroom = {
         classroomId: `classroom_${Date.now()}`,
         classroomName: classroomData.classroomName,
         classroomCode: classroomCode,
-        instructorId: classroomData.instructorId,
-        instructorName: classroomData.instructorName,
+        instructorId: effectiveInstructorId || classroomData.instructorId,
+        instructorName: effectiveInstructorName || classroomData.instructorName,
         dateCreated: new Date().toISOString(),
         selectedScenarios: classroomData.selectedScenarios || [],
         sessionStatus: {
@@ -471,6 +518,23 @@ export default class RealtimeClassroomService {
       // Try Firebase first if available; otherwise fallback
       let classroom = null;
       let usingFirebase = false;
+      // Resolve student identity for Firebase rules (studentId must equal auth.uid or be instructor)
+      let effectiveStudentId = studentId;
+      try {
+        const uid = this.firebaseService?.auth?.currentUser?.uid;
+        if (this.firebaseService?.app && uid) {
+          if (effectiveStudentId !== uid) {
+            logger.debug(
+              "RealtimeClassroomService",
+              "Overriding studentId with authenticated uid for security rules",
+              { provided: effectiveStudentId, uid },
+            );
+            effectiveStudentId = uid;
+          }
+        }
+      } catch (_) {
+        // ignore
+      }
 
       // If we don't have a database yet but app exists, try to create one
       if (!this.database && this.firebaseService?.app) {
@@ -650,19 +714,19 @@ export default class RealtimeClassroomService {
       }
 
       // Check if student already joined
-      if (classroom.roster && classroom.roster[studentId]) {
+      if (classroom.roster && classroom.roster[effectiveStudentId]) {
         logger.warn(
           "RealtimeClassroomService",
           "Student already in classroom",
           {
             classroomCode,
-            studentId,
+            studentId: effectiveStudentId,
           },
         );
         return {
           classroomCode,
           ...classroom,
-          studentInfo: classroom.roster[studentId],
+          studentInfo: classroom.roster[effectiveStudentId],
         };
       }
 
@@ -677,7 +741,7 @@ export default class RealtimeClassroomService {
       if (usingFirebase) {
         const rosterRef = ref(
           this.database,
-          `classrooms/${classroomCode}/roster/${studentId}`,
+          `classrooms/${classroomCode}/roster/${effectiveStudentId}`,
         );
         try {
           await Promise.race([
@@ -692,7 +756,7 @@ export default class RealtimeClassroomService {
           // Notify other tabs promptly with student payload
           // Use a plain object for broadcast to avoid serverTimestamp serialization issues
           this.broadcastRosterUpdate(classroomCode, {
-            studentId,
+            studentId: effectiveStudentId,
             studentInfo: {
               nickname,
               joinedAt: Date.now(),
@@ -707,7 +771,7 @@ export default class RealtimeClassroomService {
             );
             const cls = store[classroomCode] || classroom || { classroomCode };
             cls.roster = cls.roster || {};
-            cls.roster[studentId] = {
+            cls.roster[effectiveStudentId] = {
               nickname,
               joinedAt: Date.now(),
               isActive: true,
@@ -744,7 +808,7 @@ export default class RealtimeClassroomService {
           }
           return await this.joinClassroomFallback(
             classroomCode,
-            studentId,
+            effectiveStudentId,
             nickname,
           );
         }
@@ -752,7 +816,7 @@ export default class RealtimeClassroomService {
         // Initialize student choices structure
         const choicesRef = ref(
           this.database,
-          `classrooms/${classroomCode}/studentChoices/${studentId}`,
+          `classrooms/${classroomCode}/studentChoices/${effectiveStudentId}`,
         );
         try {
           await Promise.race([
@@ -794,7 +858,7 @@ export default class RealtimeClassroomService {
           }
           return await this.joinClassroomFallback(
             classroomCode,
-            studentId,
+            effectiveStudentId,
             nickname,
           );
         }
@@ -802,18 +866,18 @@ export default class RealtimeClassroomService {
         // Use fallback write path
         const result = await this.joinClassroomFallback(
           classroomCode,
-          studentId,
+          effectiveStudentId,
           nickname,
         );
         // Notify other tabs promptly with student payload
         this.broadcastRosterUpdate(classroomCode, {
-          studentId,
+          studentId: effectiveStudentId,
           studentInfo: result.studentInfo,
         });
         // Best-effort background publish to Firebase for cross-profile discovery
         this.publishRosterEntryToFirebaseIfPossible(
           classroomCode,
-          studentId,
+          effectiveStudentId,
           result.studentInfo,
         ).catch(() => {});
         return result;
@@ -821,7 +885,7 @@ export default class RealtimeClassroomService {
 
       logger.info("RealtimeClassroomService", "Student joined classroom", {
         classroomCode,
-        studentId,
+        studentId: effectiveStudentId,
         nickname,
       });
 

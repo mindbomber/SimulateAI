@@ -298,6 +298,10 @@ export default class RadarChart {
 
     // Track initialization status
     this.isInitialized = false;
+    // Prevent parallel/double initialization
+    this.initializing = false;
+    // Track last init attempt to throttle recoveries
+    this.lastInitAttempt = 0;
 
     // Enterprise health monitoring
     this.isHealthy = true;
@@ -535,6 +539,26 @@ export default class RadarChart {
     const startTime = performance.now();
 
     try {
+      // Prevent concurrent or duplicate initialization
+      if (this.initializing) {
+        logger.warn(
+          "RadarChart",
+          "Initialization already in progress, skipping",
+        );
+        return;
+      }
+
+      // If already initialized and chart exists, avoid rebuilding
+      if (this.isInitialized && this.chart) {
+        logger.info(
+          "RadarChart",
+          "Chart already initialized, skipping re-init",
+        );
+        return;
+      }
+
+      this.initializing = true;
+      this.lastInitAttempt = Date.now();
       // Check circuit breaker
       if (this.circuitBreaker.isOpen) {
         logger.warn(
@@ -576,9 +600,17 @@ export default class RadarChart {
 
       // OPTIMIZED: Batch DOM style changes to minimize reflows
       const canvasStyles = {
-        width: this.options.width + "px",
-        height: this.options.height + "px",
+        // In hero demo, let the canvas fully fill its container; elsewhere use configured size
+        width:
+          this.options.context === "hero-demo"
+            ? "100%"
+            : this.options.width + "px",
+        height:
+          this.options.context === "hero-demo"
+            ? "100%"
+            : this.options.height + "px",
         maxWidth: "100%",
+        maxHeight: "100%",
         display: "block",
         margin: "0 auto",
         position: "relative",
@@ -703,7 +735,11 @@ export default class RadarChart {
     } catch (error) {
       logger.error("Failed to initialize radar chart:", error);
       this._handleError(error, "initializeChart");
-      this.showFallbackChart();
+      // Enter a minimal error state instead of rendering legacy HTML fallback
+      this._enterFailsafeMode();
+    } finally {
+      // Always clear initializing flag
+      this.initializing = false;
     }
   }
 
@@ -881,7 +917,8 @@ export default class RadarChart {
     // CRITICAL: Add rendering optimization for sharp, crisp charts
     baseConfig.options.devicePixelRatio = window.devicePixelRatio || 1;
     baseConfig.options.responsive = true;
-    baseConfig.options.maintainAspectRatio = true;
+    // Allow the chart to grow to fill its container, especially for hero demo
+    baseConfig.options.maintainAspectRatio = false;
 
     // Ensure crisp font rendering
     baseConfig.options.font = {
@@ -1705,32 +1742,7 @@ export default class RadarChart {
     return false;
   }
 
-  /**
-   * Show fallback chart if Chart.js fails
-   */
-  showFallbackChart() {
-    const config = RadarChart.config;
-    this.container.innerHTML = `
-            <div class="radar-chart-fallback">
-                <h4>${this.options.title}</h4>
-                <div class="fallback-scores">
-                    ${Object.entries(this.currentScores)
-                      .map(
-                        ([axis, score]) => `
-                        <div class="score-item">
-                            <span class="axis-label">${this.ETHICAL_AXES[axis].label}:</span>
-                            <span class="score-value">${score}/${config.scoring.maxScore}</span>
-                            <div class="score-bar">
-                                <div class="score-fill" style="width: ${(score / config.scoring.maxScore) * config.chart.scalePercentage}%"></div>
-                            </div>
-                        </div>
-                    `,
-                      )
-                      .join("")}
-                </div>
-            </div>
-        `;
-  }
+  // Legacy HTML fallback removed – we rely on a minimal error state when needed
 
   /**
    * Destroy the chart and clean up
@@ -2263,7 +2275,23 @@ export default class RadarChart {
 
       switch (context) {
         case "initializeChart":
-          this.initializeChart();
+          // If we still have a live chart, prefer a lightweight refresh
+          if (this.chart && this.isInitialized) {
+            this.refreshChart(true);
+            break;
+          }
+          // Throttle re-initialization attempts to avoid loops
+          if (Date.now() - this.lastInitAttempt < 2000) {
+            logger.warn(
+              "RadarChart",
+              "Skipping re-initialization due to recent attempt",
+            );
+            break;
+          }
+          // Only attempt rebuild if not initializing already
+          if (!this.initializing) {
+            this.initializeChart();
+          }
           break;
         case "updateScores":
           this.refreshChart();
@@ -2294,18 +2322,13 @@ export default class RadarChart {
       failures: this.circuitBreaker.failures,
     });
 
-    // Show fallback chart if possible
-    try {
-      this.showFallbackChart();
-    } catch (error) {
-      // Final fallback - show error message
-      this.container.innerHTML = `
-        <div class="radar-chart-error">
-          <p>Chart temporarily unavailable</p>
-          <p>Instance: ${this.instanceId}</p>
-        </div>
-      `;
-    }
+    // Render a simple, accessible error message (no HTML fallback UI)
+    this.container.innerHTML = `
+      <div class="radar-chart-error" role="status" aria-live="polite">
+        <p>Chart temporarily unavailable</p>
+        <p>Instance: ${this.instanceId}</p>
+      </div>
+    `;
   }
 
   // === STATIC ENTERPRISE METHODS ===

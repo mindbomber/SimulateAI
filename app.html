@@ -40,6 +40,8 @@ limitations under the License.
             document.head.appendChild(s);
           }
         } catch (_) {}
+        // Ensure IIFE is closed to avoid SyntaxError on early parse
+      })();
     </script>
 
     <meta charset="UTF-8" />
@@ -173,9 +175,63 @@ limitations under the License.
             },
             { once: true },
           );
+
+          // Sync browser UI theme color to avoid white title bar splashes
+          try {
+            var metaTheme = document.querySelector('meta[name="theme-color"]');
+            if (metaTheme) {
+              metaTheme.setAttribute(
+                "content",
+                theme === "dark" ? "#0d1117" : "#ffffff",
+              );
+            }
+          } catch (_) {}
         } catch (e) {
           /* no-op */
         }
+      })();
+    </script>
+
+    <!-- Preload guard: hide floating tabs until settings are applied to prevent any flash -->
+    <style id="floating-tabs-preload-style">
+      .floating-action-tab-link,
+      .floating-surprise-tab-link,
+      .floating-tour-tab-link,
+      .floating-tab-link {
+        display: none !important;
+      }
+    </style>
+    <script>
+      (function () {
+        var guard = document.getElementById("floating-tabs-preload-style");
+        if (!guard) return;
+
+        var cleanup = function () {
+          try {
+            if (guard && guard.parentNode) {
+              guard.parentNode.removeChild(guard);
+              guard = null;
+            }
+          } catch (_) {}
+        };
+
+        // Remove guard when settings manager signals readiness
+        window.addEventListener(
+          "settingsManagerReady",
+          function () {
+            cleanup();
+          },
+          { once: true },
+        );
+
+        // Fallback: ensure guard is removed after load to avoid permanent hide in edge cases
+        window.addEventListener(
+          "load",
+          function () {
+            setTimeout(cleanup, 1500);
+          },
+          { once: true },
+        );
       })();
     </script>
 
@@ -2033,11 +2089,7 @@ limitations under the License.
 
     <!-- Event system loaded earlier to prevent race conditions -->
 
-    <!-- Intentional Logout System -->
-    <script
-      type="module"
-      src="src/js/styles/intentional-logout.css.js"
-    ></script>
+    <!-- Intentional Logout System (styles handled via CSS Layers) -->
     <script
       type="module"
       src="src/js/components/intentional-logout-manager.js"

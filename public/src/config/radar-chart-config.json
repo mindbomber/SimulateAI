@@ -352,8 +352,7 @@
   },
   "accessibility": {
     "ariaLabels": {
-      "chart": "Interactive radar chart showing ethical impact across eight dimensions",
-      "fallback": "Radar chart fallback showing ethical scores in list format"
+      "chart": "Interactive radar chart showing ethical impact across eight dimensions"
     }
   },
   "version": "1.0.0",

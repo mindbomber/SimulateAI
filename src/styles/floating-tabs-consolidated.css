@@ -63,6 +63,13 @@
   z-index: 1001; /* Highest priority for tour */
 }
 
+/* No-Flash utility: allow JS to reveal once settings are loaded */
+@layer components {
+  .no-flash-initially {
+    display: none !important;
+  }
+}
+
 /* Modal compatibility */
 .modal-backdrop ~ .floating-action-tab-link,
 .modal-backdrop ~ .floating-surprise-tab-link,
