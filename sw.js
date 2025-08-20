@@ -2,7 +2,7 @@
 // Comprehensive PWA service worker with offline support and caching strategies
 
 // Service Worker Configuration
-const CACHE_VERSION = "simulateai-v1.15.2"; // Incremented to refresh caches after CSS strategy change
+const CACHE_VERSION = "simulateai-v1.15.3"; // Increment to refresh caches after redirect handling fix
 const CACHE_NAME = `simulateai-main-${CACHE_VERSION}`;
 const OFFLINE_CACHE = "simulateai-offline-v1.2";
 const RUNTIME_CACHE = "simulateai-runtime-v1.2";
@@ -58,7 +58,9 @@ self.addEventListener("install", (event) => {
         // Cache files individually to avoid complete failure if one file fails
         const cachePromises = CORE_FILES.map(async (url) => {
           try {
-            await cache.add(new Request(url, { cache: "reload" }));
+            await cache.add(
+              new Request(url, { cache: "reload", redirect: "follow" }),
+            );
             console.log(`✅ Cached: ${url}`);
           } catch (error) {
             console.warn(`⚠️ Failed to cache: ${url}`, error);
@@ -78,7 +80,9 @@ self.addEventListener("install", (event) => {
 
         for (const file of offlineFiles) {
           try {
-            await cache.add(new Request(file, { cache: "reload" }));
+            await cache.add(
+              new Request(file, { cache: "reload", redirect: "follow" }),
+            );
             console.log(`✅ Cached offline file: ${file}`);
           } catch (error) {
             console.warn(`⚠️ Failed to cache offline file: ${file}`, error);
@@ -202,6 +206,28 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // For navigations, force redirect follow and normalize clean URLs
+  if (request.mode === "navigate") {
+    event.respondWith(
+      (async () => {
+        try {
+          const u = new URL(request.url);
+          // Normalize /page.html -> /page when cleanUrls are enabled on Hosting
+          if (u.pathname.endsWith(".html")) {
+            u.pathname = u.pathname.replace(/\.html$/, "");
+          }
+          return await fetch(u.toString(), {
+            redirect: "follow",
+            cache: "no-store",
+          });
+        } catch (e) {
+          return handleOfflineFallback(request);
+        }
+      })(),
+    );
+    return;
+  }
+
   // Handle different request types with appropriate strategies
   event.respondWith(handleRequest(request));
 });
@@ -262,7 +288,7 @@ async function handleAppShell(request) {
 
   if (cachedResponse) {
     // Update cache in background
-    fetch(request)
+    fetchWithFollow(request)
       .then((response) => {
         if (response.ok) {
           cache.put(request, response.clone());
@@ -277,7 +303,7 @@ async function handleAppShell(request) {
 
   // Not in cache, fetch from network
   try {
-    const response = await fetch(request);
+    const response = await fetchWithFollow(request);
     if (response.ok) {
       cache.put(request, response.clone());
     }
@@ -313,7 +339,7 @@ async function cacheFirst(request, cache) {
   }
 
   try {
-    const response = await fetch(request);
+    const response = await fetchWithFollow(request);
     if (response.ok) {
       cache.put(request, response.clone());
     }
@@ -326,7 +352,7 @@ async function cacheFirst(request, cache) {
 async function networkFirst(request, cache, timeout = 5000) {
   try {
     const response = await Promise.race([
-      fetch(request),
+      fetchWithFollow(request),
       new Promise((_, reject) =>
         setTimeout(() => reject(new Error("Network timeout")), timeout),
       ),
@@ -348,7 +374,7 @@ async function networkFirst(request, cache, timeout = 5000) {
 async function staleWhileRevalidate(request, cache) {
   const cachedResponse = await cache.match(request);
 
-  const networkResponse = fetch(request)
+  const networkResponse = fetchWithFollow(request)
     .then((response) => {
       if (response.ok) {
         cache.put(request, response.clone());
@@ -361,6 +387,17 @@ async function staleWhileRevalidate(request, cache) {
     });
 
   return cachedResponse || networkResponse;
+}
+
+// Ensure redirects are always followed to avoid opaqueredirect errors in SW
+function fetchWithFollow(request, init = {}) {
+  try {
+    const req = new Request(request, { ...init, redirect: "follow" });
+    return fetch(req);
+  } catch (_) {
+    // Fallback to direct fetch if cloning fails
+    return fetch(request);
+  }
 }
 
 // Request type detection

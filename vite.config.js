@@ -92,7 +92,7 @@ export default defineConfig(({ mode }) => {
                 }
               }
 
-              // Copy media.css to src/styles/
+              // Copy media.css to src/styles/ (canonical) and assets/ (compat alias for legacy links)
               try {
                 const mediaCssContent = fs.readFileSync(
                   "src/styles/media.css",
@@ -101,6 +101,12 @@ export default defineConfig(({ mode }) => {
                 this.emitFile({
                   type: "asset",
                   fileName: "src/styles/media.css",
+                  source: mediaCssContent,
+                });
+                // Back-compat path some pages may request
+                this.emitFile({
+                  type: "asset",
+                  fileName: "assets/media.css",
                   source: mediaCssContent,
                 });
               } catch (e) {

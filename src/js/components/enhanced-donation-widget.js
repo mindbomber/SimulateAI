@@ -633,7 +633,15 @@ class EnhancedDonationWidget {
       }
 
       // Try Firebase Functions first
-      const functions = window.firebase.functions();
+      // Use explicit region matching deployed Cloud Functions
+      // In compat v9, pass App (or use app().functions(region)) — passing a region string directly is invalid
+      const app =
+        window.firebase.apps && window.firebase.apps.length
+          ? window.firebase.app()
+          : null;
+      const functions = app
+        ? app.functions("us-central1")
+        : window.firebase.functions();
       const createCheckoutSession = functions.httpsCallable(
         "createCheckoutSession",
       );
@@ -656,12 +664,20 @@ class EnhancedDonationWidget {
         throw error;
       }
     } catch (error) {
-      console.warn("Firebase Functions not available, using fallback:", error);
-      // Fallback for local development
-      this.simulateStripeCheckout(tier, "authenticated");
-
-      // Simulate adding to donor wall in development
-      await this.simulateAddToDonorWall(tier, "authenticated");
+      console.warn("Donation (authenticated) failed:", error);
+      const isDev =
+        window.envConfig?.isDevelopment?.() ??
+        (typeof window !== "undefined" &&
+          window.location.hostname === "localhost");
+      if (isDev) {
+        // Dev fallback only
+        this.simulateStripeCheckout(tier, "authenticated");
+        await this.simulateAddToDonorWall(tier, "authenticated");
+      } else {
+        alert(
+          "Donations are temporarily unavailable. Please try again shortly.",
+        );
+      }
     }
   }
 
@@ -676,16 +692,29 @@ class EnhancedDonationWidget {
         throw new Error("Failed to load Stripe SDK");
       }
 
-      const functions = window.firebase.functions();
+      // Use explicit region matching deployed Cloud Functions
+      // In compat v9, pass App (or use app().functions(region)) — passing a region string directly is invalid
+      const app =
+        window.firebase.apps && window.firebase.apps.length
+          ? window.firebase.app()
+          : null;
+      const functions = app
+        ? app.functions("us-central1")
+        : window.firebase.functions();
       const createAnonymousCheckout = functions.httpsCallable(
         "createAnonymousCheckout",
       );
 
+      // Cloud Function expects: { priceId, tier, donorEmail }
+      // - priceId: Stripe Price for the selected tier (one-time payment)
+      // - tier: string identifier ("1" | "2" | "3") for server-side metadata
+      // - donorEmail: optional; let Stripe collect during Checkout if omitted
       const result = await createAnonymousCheckout({
+        priceId: tier.priceId,
         tier: tier.id.toString(),
-        email: "", // Let Stripe collect email during checkout for receipts
-        message,
-        amount: tier.amount,
+        donorEmail: "",
+        // Preserve optional message for future metadata expansion if backend supports it
+        // message,
       });
 
       // Redirect to Stripe Checkout
@@ -698,11 +727,20 @@ class EnhancedDonationWidget {
         throw error;
       }
     } catch (error) {
-      // Fallback for local development
-      this.simulateStripeCheckout(tier, "anonymous", ""); // Empty email, Stripe will collect
-
-      // Simulate adding to donor wall in development
-      await this.simulateAddToDonorWall(tier, "anonymous", "", message); // Empty email
+      console.warn("Donation (anonymous) failed:", error);
+      const isDev =
+        window.envConfig?.isDevelopment?.() ??
+        (typeof window !== "undefined" &&
+          window.location.hostname === "localhost");
+      if (isDev) {
+        // Dev fallback only
+        this.simulateStripeCheckout(tier, "anonymous", "");
+        await this.simulateAddToDonorWall(tier, "anonymous", "", message);
+      } else {
+        alert(
+          "Donations are temporarily unavailable. Please try again shortly.",
+        );
+      }
     }
   }
 

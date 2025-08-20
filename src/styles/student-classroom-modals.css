@@ -1,0 +1,119 @@
+/* Student Waiting Room Modal base styles (unlayered to ensure cascade wins) */
+.student-waiting-room-modal .session-status-display {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3, 0.75rem);
+}
+
+.student-waiting-room-modal .session-status-display .status-indicator {
+  /* Override global .status-indicator (12x12 dot) to be a flex row container */
+  display: flex !important;
+  align-items: center;
+  gap: var(--spacing-3, 0.75rem);
+  width: auto !important;
+  height: auto !important;
+  border-radius: 0 !important; /* remove dot shape */
+  margin-right: 0; /* reset global margin */
+  background: none; /* avoid dot colors interfering */
+}
+
+.student-waiting-room-modal .status-text {
+  /* Ensure text block behaves like normal flow */
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0; /* allow wrapping within container */
+}
+
+.student-waiting-room-modal #status-title {
+  margin: 0 0 var(--spacing-1, 0.25rem) 0;
+}
+
+.student-waiting-room-modal #status-description {
+  /* Force horizontal writing and normal word wrapping */
+  display: block;
+  margin: 0;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: anywhere;
+  writing-mode: horizontal-tb;
+}
+
+/* Use semantic theme token so it adapts in light/dark modes */
+.student-waiting-room-modal .scenario-title {
+  color: var(--theme-text-primary);
+}
+
+/* Final Choices Modal styles */
+.final-choices-container .choices-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3, 0.75rem);
+}
+
+.final-choices-container .choice-review-item {
+  padding: var(--spacing-3, 0.75rem) var(--spacing-4, 1rem);
+  border: 1px solid var(--border-subtle, rgb(0 0 0 / 8%));
+  border-radius: var(--radius-2, 8px);
+  background: var(--surface-elevated, transparent);
+}
+
+.final-choices-container .scenario-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3, 0.75rem);
+  margin-bottom: var(--spacing-2, 0.5rem);
+}
+
+.final-choices-container .scenario-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  background: var(--accent-muted, rgb(0 0 0 / 6%));
+  color: var(--theme-text-primary);
+  font-weight: 600;
+}
+
+.final-choices-container .scenario-info h5 {
+  margin: 0;
+  color: var(--theme-text-primary);
+}
+
+.final-choices-container .scenario-category {
+  color: var(--theme-text-tertiary, #666);
+  font-size: 0.9em;
+}
+
+.final-choices-container .choice-display {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1, 0.25rem);
+}
+
+.final-choices-container .choice-label {
+  color: var(--theme-text-tertiary, #666);
+  font-size: 0.9em;
+}
+
+.final-choices-container .choice-value {
+  color: var(--theme-text-primary);
+  font-weight: 600;
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+
+.final-choices-container .choice-description {
+  color: var(--theme-text-secondary);
+  font-size: 0.95em;
+  line-height: 1.4;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+
+.final-choices-container .confidence-level {
+  color: var(--theme-text-tertiary, #666);
+  font-size: 0.875em;
+}

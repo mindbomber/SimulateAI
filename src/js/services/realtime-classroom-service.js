@@ -55,8 +55,40 @@ export default class RealtimeClassroomService {
         return;
       }
 
-      // Try to initialize the database
-      this.database = getDatabase(this.firebaseService.app);
+      // Try to initialize the database with configured or derived URL
+      try {
+        const overrideUrl =
+          (typeof window !== "undefined" && window.SIMULATEAI_RTDB_URL) || null;
+        const configuredUrl =
+          overrideUrl || this.firebaseService?.app?.options?.databaseURL;
+        let derivedUrl = null;
+        if (!configuredUrl) {
+          const projectId = this.firebaseService?.app?.options?.projectId;
+          if (projectId) {
+            derivedUrl = `https://${projectId}-default-rtdb.firebaseio.com`;
+          }
+        }
+
+        if (configuredUrl) {
+          this.database = getDatabase(this.firebaseService.app);
+        } else if (derivedUrl) {
+          this.database = getDatabase(this.firebaseService.app, derivedUrl);
+        } else {
+          throw new Error(
+            "Realtime Database not configured and no projectId to derive URL",
+          );
+        }
+      } catch (rtdbConfigErr) {
+        logger.warn(
+          "RealtimeClassroomService",
+          "RTDB not available or misconfigured; entering fallback mode",
+          rtdbConfigErr,
+        );
+        this.fallbackMode = true;
+        this.isConnected = true; // Allow app flow using localStorage fallback
+        this.database = null;
+        return;
+      }
 
       // Ensure we target local emulator in development regardless of databaseURL
       try {
@@ -169,6 +201,62 @@ export default class RealtimeClassroomService {
   }
 
   /**
+   * Ensure this.database is initialized using the same rules as initializeDatabase
+   * without running connectivity probes. Safe to call multiple times.
+   * @private
+   * @returns {boolean} true if database is available after ensuring
+   */
+  _ensureDatabase() {
+    try {
+      if (this.database) return true;
+      if (!this.firebaseService?.app) return false;
+
+      // Prefer configured URL (including runtime override), else derive from projectId
+      const overrideUrl =
+        (typeof window !== "undefined" && window.SIMULATEAI_RTDB_URL) || null;
+      const configuredUrl =
+        overrideUrl || this.firebaseService?.app?.options?.databaseURL;
+      let derivedUrl = null;
+      if (!configuredUrl) {
+        const projectId = this.firebaseService?.app?.options?.projectId;
+        if (projectId) {
+          derivedUrl = `https://${projectId}-default-rtdb.firebaseio.com`;
+        }
+      }
+
+      if (configuredUrl) {
+        this.database = getDatabase(this.firebaseService.app);
+      } else if (derivedUrl) {
+        this.database = getDatabase(this.firebaseService.app, derivedUrl);
+      } else {
+        return false;
+      }
+
+      // Bind emulator in development if configured
+      try {
+        if (
+          !this._emulatorConnected &&
+          ["localhost", "127.0.0.1", "::1"].includes(
+            window.location.hostname,
+          ) &&
+          devConfig?.useEmulators
+        ) {
+          const host = devConfig.emulatorHost || "127.0.0.1";
+          const port = devConfig.emulatorPorts.database;
+          connectDatabaseEmulator(this.database, host, port);
+          this._emulatorConnected = true;
+        }
+      } catch (_) {
+        // ignore emulator binding errors
+      }
+
+      return !!this.database;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /**
    * Derive the Realtime Database namespace for the emulator REST probe.
    * Tries databaseURL host prefix, then falls back to projectId-default-rtdb.
    * @returns {string}
@@ -261,13 +349,9 @@ export default class RealtimeClassroomService {
       };
 
       // Prefer Firebase if possible; fallback on failure
-      // Ensure database exists if app is available
-      if (!this.database && this.firebaseService?.app) {
-        try {
-          this.database = getDatabase(this.firebaseService.app);
-        } catch (e) {
-          // ignore
-        }
+      // Ensure database exists if app is available (use derived URL when needed)
+      if (!this.database) {
+        this._ensureDatabase();
       }
 
       if (this.database) {
@@ -400,11 +484,7 @@ export default class RealtimeClassroomService {
       if (!this.firebaseService?.app) return;
       // Ensure db exists
       if (!this.database) {
-        try {
-          this.database = getDatabase(this.firebaseService.app);
-        } catch (_) {
-          return; // Can't initialize db
-        }
+        if (!this._ensureDatabase()) return; // Can't initialize db
       }
 
       if (!this.database) return;
@@ -536,13 +616,9 @@ export default class RealtimeClassroomService {
         // ignore
       }
 
-      // If we don't have a database yet but app exists, try to create one
-      if (!this.database && this.firebaseService?.app) {
-        try {
-          this.database = getDatabase(this.firebaseService.app);
-        } catch (e) {
-          // ignore; we'll rely on fallback
-        }
+      // If we don't have a database yet, try to create one (derived/configured URL)
+      if (!this.database) {
+        this._ensureDatabase();
       }
 
       if (this.database) {
@@ -570,6 +646,13 @@ export default class RealtimeClassroomService {
             "Firebase read failed during join; will try fallback",
             e,
           );
+          // If the error indicates a permission issue, surface a clearer message
+          const msg = (e && (e.message || e.code || "").toString()) || "";
+          if (/permission/i.test(msg) || /PERMISSION_DENIED/i.test(msg)) {
+            throw new Error(
+              "Permission denied while accessing classroom. Please sign in and try again.",
+            );
+          }
         }
       }
 
@@ -945,11 +1028,7 @@ export default class RealtimeClassroomService {
     try {
       if (!this.firebaseService?.app) return;
       if (!this.database) {
-        try {
-          this.database = getDatabase(this.firebaseService.app);
-        } catch (_) {
-          return;
-        }
+        if (!this._ensureDatabase()) return;
       }
       if (!this.database) return;
 
@@ -2159,12 +2238,8 @@ export default class RealtimeClassroomService {
       const code = generateClassroomCode();
 
       // Prefer Firebase if database is available; else use fallback
-      if (!this.database && this.firebaseService?.app) {
-        try {
-          this.database = getDatabase(this.firebaseService.app);
-        } catch (e) {
-          // ignore
-        }
+      if (!this.database) {
+        this._ensureDatabase();
       }
 
       if (!this.database) {
@@ -2232,6 +2307,9 @@ export default class RealtimeClassroomService {
    */
   async getClassroom(classroomCode) {
     try {
+      if (!this.database) {
+        this._ensureDatabase();
+      }
       if (this.fallbackMode || !this.database) {
         const existingClassrooms = JSON.parse(
           localStorage.getItem("simulateai_classrooms") || "{}",

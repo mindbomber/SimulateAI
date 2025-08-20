@@ -20,9 +20,8 @@ Write-Host ""
 Write-Host "🔍 Verifying build output..." -ForegroundColor Yellow
 $criticalFiles = @(
     "dist/index.html",
-    "dist/app.html", 
-    "dist/sw.js",
-    "dist/manifest.json"
+    "dist/app.html",
+    "dist/sw.js"
 )
 
 foreach ($file in $criticalFiles) {
@@ -32,6 +31,17 @@ foreach ($file in $criticalFiles) {
         Write-Host "❌ $file - MISSING!" -ForegroundColor Red
         exit 1
     }
+}
+
+# Allow hashed or nested manifest files produced by Vite
+$manifestPath = Get-ChildItem -Path "dist" -Recurse -Include "manifest*.json","*.webmanifest" -ErrorAction SilentlyContinue |
+  Select-Object -First 1 -ExpandProperty FullName
+
+if ($manifestPath) {
+    Write-Host "✅ Manifest found: $manifestPath" -ForegroundColor Green
+} else {
+    Write-Host "❌ Manifest file not found in dist (expected manifest*.json or *.webmanifest)" -ForegroundColor Red
+    exit 1
 }
 Write-Host ""
 

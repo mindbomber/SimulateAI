@@ -17,6 +17,7 @@ import {
 } from "../utils/classroom-utils.js";
 import logger from "../utils/logger.js";
 import SCENARIO_MODES from "../constants/scenario-modes.js";
+import scenarioDataManager from "../data/scenario-data-manager.js";
 
 export default class StudentClassroomModals {
   constructor(dataHandler, firebaseService) {
@@ -81,7 +82,11 @@ export default class StudentClassroomModals {
       });
     } catch (error) {
       logger.error("StudentClassroomModals", "Initialization failed", error);
-      throw error;
+      // Provide clearer guidance to the caller/UI
+      const msg = error?.message?.includes("authenticated")
+        ? "You must be signed in to join classrooms. Please sign in or use Guest Mode if enabled."
+        : error?.message || "Initialization failed";
+      throw new Error(msg);
     }
   }
 
@@ -421,7 +426,8 @@ export default class StudentClassroomModals {
       logger.error("StudentClassroomModals", "Failed to join classroom", error);
 
       // Show specific error messages
-      let errorMessage = "Failed to join classroom";
+      let errorMessage =
+        error?.message || "Failed to join classroom. Please try again.";
       if (error.message.includes("not found")) {
         errorMessage =
           "Classroom not found. Please check the code and try again.";
@@ -431,6 +437,12 @@ export default class StudentClassroomModals {
       } else if (error.message.includes("nickname")) {
         errorMessage =
           "This nickname is already taken. Please choose a different one.";
+      } else if (
+        error.message.includes("signed in") ||
+        error.message.includes("authenticated")
+      ) {
+        errorMessage =
+          "Please sign in to join. If you don't have an account, ask your instructor about Guest Mode.";
       }
 
       this.showErrorToast(errorMessage);
@@ -1163,25 +1175,111 @@ export default class StudentClassroomModals {
    * Show final choices modal (after all scenarios completed)
    */
   showFinalChoicesModal(studentChoices) {
-    const modalContent = this.buildFinalChoicesContent(studentChoices);
-
+    // Render immediately with a lightweight placeholder, then hydrate with mapped titles
     this.finalChoicesModal = new ModalUtility({
       title: "✅ Session Complete - Your Choices",
-      content: modalContent,
+      content:
+        '<div class="final-choices-container"><div class="session-summary"><h3>Loading your choices…</h3></div></div>',
       size: "large",
       className: "student-final-choices-modal",
       onClose: () => this.handleFinalChoicesClose(),
     });
 
     this.finalChoicesModal.open();
-    this.setupFinalChoicesEvents();
+    // Build full content asynchronously so we can map option IDs to titles
+    this.buildFinalChoicesContent(studentChoices)
+      .then((html) => {
+        if (this.finalChoicesModal?.element) {
+          this.finalChoicesModal.setContent(html);
+          this.setupFinalChoicesEvents();
+        }
+      })
+      .catch((e) => {
+        logger.warn(
+          "StudentClassroomModals",
+          "Failed to render final choices with option titles",
+          e,
+        );
+        if (this.finalChoicesModal?.element) {
+          // Fallback to simple rendering without mapped titles
+          const fallback = this._buildFinalChoicesFallback(studentChoices);
+          this.finalChoicesModal.setContent(fallback);
+          this.setupFinalChoicesEvents();
+        }
+      });
   }
 
   /**
    * Build final choices modal content
    */
-  buildFinalChoicesContent(studentChoices) {
+  async buildFinalChoicesContent(studentChoices) {
     const scenarios = this.currentClassroom?.selectedScenarios || [];
+
+    // Helper: resolve chosen option title + description for a given scenario by loading scenario data
+    const resolveChoiceTitle = async (scenarioMeta, choiceObj) => {
+      try {
+        const scenarioId = scenarioMeta.scenarioId || scenarioMeta.id;
+        const categoryId = scenarioMeta.categoryId || scenarioMeta.category;
+        // choice can be a string or an object { id/value/text/label }
+        const choiceField = choiceObj?.choice;
+        const rawChoice =
+          typeof choiceField === "object" && choiceField !== null
+            ? choiceField.id ||
+              choiceField.value ||
+              choiceField.text ||
+              choiceField.label
+            : choiceField;
+        if (!scenarioId || !categoryId || !rawChoice) return null;
+
+        const scenarioData = await scenarioDataManager.getScenario(
+          categoryId,
+          scenarioId,
+        );
+        const options = scenarioData?.options || [];
+        const match = options.find(
+          (opt) =>
+            opt?.id === rawChoice ||
+            opt?.value === rawChoice ||
+            opt?.text === rawChoice ||
+            opt?.label === rawChoice,
+        );
+        if (!match) return null;
+        return {
+          title: match.text || match.label || null,
+          description: match.description || "",
+        };
+      } catch (_) {
+        return null;
+      }
+    };
+
+    // Resolve all titles in parallel for snappy rendering
+    const resolvedTitles = await Promise.all(
+      scenarios.map(async (scenario) => {
+        const choice = studentChoices.scenarios?.[scenario.scenarioId];
+        const details = await resolveChoiceTitle(scenario, choice);
+        // Compute a sensible original display from the provided choice shape
+        let original = null;
+        const choiceField = choice?.choice;
+        if (typeof choiceField === "object" && choiceField !== null) {
+          original =
+            choiceField.text ||
+            choiceField.label ||
+            choiceField.value ||
+            choiceField.id ||
+            null;
+        } else if (typeof choiceField === "string") {
+          original = choiceField;
+        }
+        return {
+          id: scenario.scenarioId,
+          title: details?.title || null,
+          description: details?.description || "",
+          original,
+          confidence: choice?.confidence || null,
+        };
+      }),
+    );
 
     return `
       <div class="final-choices-container">
@@ -1208,7 +1306,25 @@ export default class StudentClassroomModals {
           <div class="choices-list">
             ${scenarios
               .map((scenario, index) => {
-                const choice = studentChoices.scenarios?.[scenario.scenarioId];
+                const resolved = resolvedTitles[index];
+                const displayTitle =
+                  resolved?.title ||
+                  resolved?.original ||
+                  (typeof studentChoices.scenarios?.[scenario.scenarioId]
+                    ?.choice === "object"
+                    ? studentChoices.scenarios?.[scenario.scenarioId]?.choice
+                        ?.text ||
+                      studentChoices.scenarios?.[scenario.scenarioId]?.choice
+                        ?.label ||
+                      studentChoices.scenarios?.[scenario.scenarioId]?.choice
+                        ?.value ||
+                      studentChoices.scenarios?.[scenario.scenarioId]?.choice
+                        ?.id
+                    : studentChoices.scenarios?.[scenario.scenarioId]
+                        ?.choice) ||
+                  "No response recorded";
+                const displayDescription = resolved?.description || "";
+                const confidence = resolved?.confidence;
                 return `
                 <div class="choice-review-item">
                   <div class="scenario-header">
@@ -1220,8 +1336,9 @@ export default class StudentClassroomModals {
                   </div>
                   <div class="choice-display">
                     <span class="choice-label">Your choice:</span>
-                    <span class="choice-value">${choice?.choice || "No response recorded"}</span>
-                    ${choice?.confidence ? `<span class="confidence-level">Confidence: ${choice.confidence}/10</span>` : ""}
+                    <span class="choice-value">${displayTitle}</span>
+                    ${displayDescription ? `<div class="choice-description">${displayDescription}</div>` : ""}
+                    ${confidence ? `<span class="confidence-level">Confidence: ${confidence}/10</span>` : ""}
                   </div>
                 </div>
               `;
@@ -1247,6 +1364,47 @@ export default class StudentClassroomModals {
         </div>
       </div>
     `;
+  }
+
+  // Fallback (non-async) renderer in case mapping fails
+  _buildFinalChoicesFallback(studentChoices) {
+    const scenarios = this.currentClassroom?.selectedScenarios || [];
+    return `
+      <div class="final-choices-container">
+        <div class="choices-review">
+          <h4>📝 Your Choices Review</h4>
+          <div class="choices-list">
+            ${scenarios
+              .map((scenario, index) => {
+                const choice = studentChoices.scenarios?.[scenario.scenarioId];
+                const choiceField = choice?.choice;
+                const display =
+                  typeof choiceField === "object" && choiceField !== null
+                    ? choiceField.text ||
+                      choiceField.label ||
+                      choiceField.value ||
+                      choiceField.id
+                    : choiceField || "No response recorded";
+                return `
+                <div class="choice-review-item">
+                  <div class="scenario-header">
+                    <span class="scenario-number">${index + 1}</span>
+                    <div class="scenario-info">
+                      <h5>${scenario.title}</h5>
+                      <span class="scenario-category">${scenario.category}</span>
+                    </div>
+                  </div>
+                  <div class="choice-display">
+                    <span class="choice-label">Your choice:</span>
+                    <span class="choice-value">${display}</span>
+                    ${choice?.confidence ? `<span class="confidence-level">Confidence: ${choice.confidence}/10</span>` : ""}
+                  </div>
+                </div>`;
+              })
+              .join("")}
+          </div>
+        </div>
+      </div>`;
   }
 
   /**

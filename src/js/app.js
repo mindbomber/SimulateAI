@@ -105,6 +105,8 @@ import "../styles/appearance-settings.css";
 // Donation widgets
 import "../styles/enhanced-donation-widget.css";
 import "../styles/donor-wall.css";
+import "../styles/teacher-classroom-modals.css";
+import "../styles/student-classroom-modals.css";
 
 // Import core modules
 import AccessibilityManager from "./core/accessibility.js";

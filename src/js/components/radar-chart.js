@@ -751,10 +751,16 @@ export default class RadarChart {
   _deferredInitialization() {
     // Use requestAnimationFrame for optimal timing
     requestAnimationFrame(() => {
-      if (!this.chart) return;
+      // Bail if chart was destroyed before rAF flush
+      if (!this.chart || this.isDestroyed) return;
 
       // Single chart update instead of multiple scattered updates
-      this.chart.update("none");
+      try {
+        this.chart.update("none");
+      } catch (e) {
+        logger.warn("RadarChart", "Chart update skipped after destroy", e);
+        return;
+      }
       logger.info("RadarChart", "Chart updated/redrawn");
 
       // Context-specific polygon visibility handling
@@ -837,7 +843,7 @@ export default class RadarChart {
       ? config.chart.animationDuration
       : 0;
 
-    // Add tooltip callbacks using configuration
+    // Add tooltip callbacks using configuration with strong null guards
     baseConfig.options.plugins.tooltip.callbacks = {
       title: (context) => {
         // Safety check: ensure context exists and has elements
@@ -861,7 +867,8 @@ export default class RadarChart {
         if (
           !context ||
           typeof context.dataIndex !== "number" ||
-          !context.parsed
+          !context.parsed ||
+          context.parsed.r == null
         ) {
           return ["Score: N/A", "", "Data not available"];
         }
@@ -887,7 +894,9 @@ export default class RadarChart {
 
     // SIMPLIFIED: Use Chart.js built-in tooltips with proper styling via CSS
     // Enable built-in tooltips - much simpler and more reliable
-    baseConfig.options.plugins.tooltip.enabled = true;
+    // Disable tooltips if data is missing or empty to avoid plugin issues
+    const hasData = Array.isArray(axesData) && axesData.length > 0;
+    baseConfig.options.plugins.tooltip.enabled = hasData;
     baseConfig.options.plugins.tooltip.intersect = false;
     baseConfig.options.plugins.tooltip.position = "nearest";
 
@@ -1684,7 +1693,15 @@ export default class RadarChart {
                   chartType: chartInstance.config?.type || "unknown",
                 },
               );
-              chartInstance.destroy();
+              try {
+                chartInstance.destroy();
+              } catch (e) {
+                logger.warn(
+                  "RadarChart",
+                  "Orphaned chart destroy threw; continuing",
+                  e,
+                );
+              }
               cleanupCount++;
             }
           }
@@ -1749,6 +1766,7 @@ export default class RadarChart {
    */
   destroy() {
     try {
+      this.isDestroyed = true;
       // Log destruction for enterprise monitoring
       this._logTelemetry("instance_destroyed", {
         uptime: Date.now() - this.createdAt,

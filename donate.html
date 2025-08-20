@@ -98,6 +98,29 @@
     <!-- Navigation container for SharedNavigation component injection -->
     <div id="navigation-container"></div>
 
+    <!-- Optional Debug Panel (shown when ?debug=1) -->
+    <div
+      id="donation-debug"
+      style="
+        display: none;
+        position: fixed;
+        bottom: 12px;
+        left: 12px;
+        z-index: 10000;
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        padding: 10px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        line-height: 1.4;
+        max-width: 360px;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+      "
+    >
+      <div style="font-weight: 600; margin-bottom: 6px">Donation Debug</div>
+      <div id="donation-debug-content">Initializing…</div>
+    </div>
+
     <div class="container">
       <div class="page-header">
         <h1>🎓 Support AI Ethics Research</h1>
@@ -162,6 +185,23 @@
           Your donation helps advance AI ethics research and education. You
           should receive a receipt via email shortly.
         </p>
+        <p
+          id="thank-you-tier"
+          style="margin-top: 8px; display: none; color: #155724"
+        ></p>
+      </div>
+
+      <!-- Cancellation message -->
+      <div
+        class="thank-you"
+        id="cancel-message"
+        style="background: #f8d7da; border-color: #f5c6cb"
+      >
+        <h3>⏹️ Donation Cancelled</h3>
+        <p>
+          No charge was made. You can choose a support level above anytime to
+          try again.
+        </p>
       </div>
 
       <div
@@ -179,40 +219,140 @@
       </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+    <!-- Firebase SDK (via Hosting for correct project config/versioning) -->
+    <script src="/__/firebase/10.12.2/firebase-app-compat.js"></script>
+    <script src="/__/firebase/10.12.2/firebase-functions-compat.js"></script>
+    <!-- App Check (compat) to satisfy Cloud Functions enforceAppCheck in production -->
+    <script src="/__/firebase/10.12.2/firebase-app-check-compat.js"></script>
+    <!-- Injected config from Firebase Hosting -->
+    <script src="/__/firebase/init.js"></script>
 
-    <!-- Firebase Configuration -->
+    <!-- Firebase Initialization (prefer Hosting-injected config) -->
     <script>
-      // Firebase configuration should use environment variables in production
-      // For development/demo purposes only - DO NOT use hardcoded keys in production
-      const firebaseConfig = {
-        apiKey: window.FIREBASE_CONFIG?.apiKey || "PLACEHOLDER_API_KEY",
-        authDomain:
-          window.FIREBASE_CONFIG?.authDomain ||
-          "simulateai-research.firebaseapp.com",
-        projectId: window.FIREBASE_CONFIG?.projectId || "simulateai-research",
-        storageBucket:
-          window.FIREBASE_CONFIG?.storageBucket ||
-          "simulateai-research.appspot.com",
-        messagingSenderId:
-          window.FIREBASE_CONFIG?.messagingSenderId || "PLACEHOLDER_SENDER_ID",
-        appId: window.FIREBASE_CONFIG?.appId || "PLACEHOLDER_APP_ID",
-        measurementId: "G-XXXXXXXXXX",
-      };
+      // Prefer Hosting-injected config with a robust JSON fallback
+      (async () => {
+        try {
+          if (typeof firebase === "undefined") {
+            console.error("Firebase SDK not loaded");
+            return;
+          }
 
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
+          let injectedConfig =
+            window.firebaseConfig || window.FIREBASE_CONFIG || null;
+          if (!injectedConfig) {
+            // Fallback: fetch config JSON directly if init.js not yet available in this context
+            try {
+              const res = await fetch("/__/firebase/init.json", {
+                cache: "no-store",
+              });
+              if (res.ok) {
+                injectedConfig = await res.json();
+                console.info("Loaded Firebase config via JSON fallback.");
+              }
+            } catch (e) {
+              // swallow; will warn below if still missing
+            }
+          }
 
-      // Check for donation success in URL parameters
+          if (!injectedConfig) {
+            console.warn(
+              "No Firebase config found on donate.html; ensure Hosting init.js is loaded.",
+            );
+            return;
+          }
+
+          // Initialize app once
+          if (!firebase.apps || firebase.apps.length === 0) {
+            firebase.initializeApp(injectedConfig);
+            console.info("Firebase initialized:", injectedConfig.projectId);
+          }
+
+          // Activate Firebase App Check (required by Cloud Functions in production)
+          try {
+            if (firebase.appCheck) {
+              const siteKey =
+                window.location.hostname === "localhost" ||
+                window.location.hostname === "127.0.0.1"
+                  ? "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // Google test key for localhost
+                  : "6LcuUpsrAAAAAEzAeX1qx0cjShEt7Nf0f73rvLjf"; // Production site key
+              firebase.appCheck().activate(siteKey, true);
+              console.info("🛡️ App Check activated on donate page");
+            } else {
+              console.warn("App Check SDK not available on donate page");
+            }
+          } catch (appCheckError) {
+            console.warn("App Check activation failed:", appCheckError);
+          }
+
+          // Optional debug surface
+          try {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get("debug") === "1") {
+              const panel = document.getElementById("donation-debug");
+              const content = document.getElementById("donation-debug-content");
+              if (panel && content) {
+                panel.style.display = "block";
+                const app = firebase.app ? firebase.app() : null;
+                const proj =
+                  app?.options?.projectId ||
+                  injectedConfig.projectId ||
+                  "unknown";
+                const hasFunctions = !!firebase.functions;
+                let appCheckStatus = "unavailable";
+                let tokenSnippet = "n/a";
+                if (firebase.appCheck) {
+                  appCheckStatus = "enabled";
+                  try {
+                    const tok = await firebase.appCheck().getToken(false);
+                    if (tok?.token) {
+                      tokenSnippet = tok.token.slice(0, 12) + "…";
+                    }
+                  } catch (e) {
+                    appCheckStatus = "error";
+                  }
+                }
+                content.innerHTML = `
+                    <div>Project: <strong>${proj}</strong></div>
+                    <div>Functions SDK: <strong>${hasFunctions ? "loaded" : "missing"}</strong></div>
+                    <div>App Check: <strong>${appCheckStatus}</strong>${tokenSnippet !== "n/a" ? ` (token ${tokenSnippet})` : ""}</div>
+                    <div>Region (client): <strong>us-central1</strong></div>
+                    <div>Hostname: <strong>${location.hostname}</strong></div>
+                  `;
+              }
+            }
+          } catch {}
+        } catch (e) {
+          console.error("Failed to initialize Firebase:", e);
+        }
+      })();
+
+      // Check for donation status in URL parameters
       const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get("donation_success") === "true") {
-        document.getElementById("thank-you-message").classList.add("show");
-        // Scroll to thank you message
-        document
-          .getElementById("thank-you-message")
-          .scrollIntoView({ behavior: "smooth" });
+      const isSuccess = urlParams.get("donation_success") === "true";
+      const isCancelled = urlParams.get("donation_cancelled") === "true";
+      if (isSuccess) {
+        const thankYou = document.getElementById("thank-you-message");
+        thankYou.classList.add("show");
+        const tier = urlParams.get("tier");
+        if (tier) {
+          const tierMap = {
+            1: "Bronze ($5)",
+            2: "Silver ($10)",
+            3: "Gold ($20)",
+          };
+          const tierEl = document.getElementById("thank-you-tier");
+          if (tierEl) {
+            tierEl.textContent = `Tier selected: ${tierMap[tier] || `#${tier}`}`;
+            tierEl.style.display = "block";
+          }
+        }
+        thankYou.scrollIntoView({ behavior: "smooth" });
+      } else if (isCancelled) {
+        const cancel = document.getElementById("cancel-message");
+        if (cancel) {
+          cancel.classList.add("show");
+          cancel.scrollIntoView({ behavior: "smooth" });
+        }
       }
     </script>
 

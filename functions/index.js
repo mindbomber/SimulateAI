@@ -488,16 +488,22 @@ function isValidURL(string) {
 
 // ===== STRIPE INTEGRATION FUNCTIONS =====
 
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+// Validate required Stripe configuration early to surface clear errors
+const STRIPE_SECRET = process.env.STRIPE_SECRET_KEY;
+if (!STRIPE_SECRET) {
+  console.warn(
+    "⚠️ STRIPE_SECRET_KEY is not configured. Stripe callables will fail until set.",
+  );
+}
+const stripe = require("stripe")(STRIPE_SECRET || "");
 
 /**
  * Create Stripe Checkout Session
  * Called from frontend when user wants to donate
  */
-const region = functions.region(process.env.FUNCTIONS_REGION || "us-central1");
 const enforceAppCheck = process.env.FUNCTIONS_EMULATOR ? false : true;
 
-exports.createCheckoutSession = region.https.onCall(
+exports.createCheckoutSession = functions.https.onCall(
   { enforceAppCheck },
   async (data, context) => {
     try {
@@ -585,7 +591,7 @@ exports.createCheckoutSession = region.https.onCall(
  * Verify Payment Success
  * Called from frontend after successful Stripe checkout
  */
-exports.verifyPaymentSuccess = region.https.onCall(
+exports.verifyPaymentSuccess = functions.https.onCall(
   { enforceAppCheck },
   async (data, context) => {
     try {
@@ -663,7 +669,7 @@ exports.verifyPaymentSuccess = region.https.onCall(
  * Create Anonymous Stripe Checkout Session
  * Allows donations without user authentication
  */
-exports.createAnonymousCheckout = region.https.onCall(
+exports.createAnonymousCheckout = functions.https.onCall(
   { enforceAppCheck },
   async (data, _context) => {
     try {
@@ -696,8 +702,8 @@ exports.createAnonymousCheckout = region.https.onCall(
           },
         ],
         mode: "payment",
-        success_url: `${process.env.APP_FRONTEND_URL || "http://localhost:3000"}/?donation_success=true&tier=${tier}`,
-        cancel_url: `${process.env.APP_FRONTEND_URL || "http://localhost:3000"}/?donation_cancelled=true`,
+        success_url: `${process.env.APP_FRONTEND_URL || "http://localhost:3000"}/donate.html?donation_success=true&tier=${tier}`,
+        cancel_url: `${process.env.APP_FRONTEND_URL || "http://localhost:3000"}/donate.html?donation_cancelled=true`,
         metadata: {
           tier,
           tierName: getTierName(tier),
@@ -724,7 +730,7 @@ exports.createAnonymousCheckout = region.https.onCall(
  * Stripe Webhook Handler
  * Handles all Stripe events securely
  */
-exports.stripeWebhook = region.https.onRequest(async (req, res) => {
+exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
   const sig = req.headers["stripe-signature"];
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 

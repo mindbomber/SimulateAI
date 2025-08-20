@@ -1,9 +1,6 @@
 /*
  * CSS Layers Architecture
  * Copyright 2025 Armando Sori - Licensed under Apache License, Version 2.0
- * 
- * Defines CSS cascade layers for better organization and reduced specificity conflicts
- * Load this file FIRST to establish layer order
  */
 
 /* Define CSS Layers in order of specificity (lowest to highest) */
@@ -1156,6 +1153,15 @@
     border: 1px solid var(--theme-border);
     color: var(--theme-text-primary);
     box-shadow: 0 8px 25px var(--theme-shadow);
+  }
+
+  /* Overrides Layer - Component-scoped corrections */
+  @layer overrides {
+    /* Ensure scenario titles in the Create Classroom modal use the modal's text color,
+     overriding any global accessibility color (e.g., #fff) */
+    .teacher-create-classroom-modal .scenario-info .scenario-title {
+      color: inherit;
+    }
   }
 
   body.dark-mode .scenario-sidebar,

@@ -492,8 +492,72 @@ export class FirebaseService {
 
         this.auth = getAuth(this.app);
         this.db = getFirestore(this.app);
-        this.storage = getStorage(this.app);
-        this.realtimeDb = getDatabase(this.app);
+        // Initialize Cloud Storage with explicit bucket selection when available
+        try {
+          const storageOverride =
+            (typeof window !== "undefined" &&
+              window.SIMULATEAI_STORAGE_BUCKET) ||
+            null; // e.g., "gs://simulateai-research.firebasestorage.app"
+          const configBucket = this.app?.options?.storageBucket || null; // e.g., "simulateai-research.firebasestorage.app"
+          let bucketUrl = null;
+
+          if (storageOverride) {
+            bucketUrl = storageOverride;
+          } else if (configBucket) {
+            bucketUrl = configBucket.startsWith("gs://")
+              ? configBucket
+              : `gs://${configBucket}`;
+          }
+
+          this.storage = bucketUrl
+            ? getStorage(this.app, bucketUrl)
+            : getStorage(this.app);
+          try {
+            console.info(
+              "📦 Firebase Storage initialized",
+              bucketUrl
+                ? { bucket: bucketUrl }
+                : { bucket: configBucket || "(default)" },
+            );
+          } catch (_) {
+            /* non-fatal */
+          }
+        } catch (storageInitErr) {
+          console.warn("⚠️ Storage initialization failed:", storageInitErr);
+          this.storage = null;
+        }
+        // Initialize Realtime Database with safe fallbacks to avoid FATAL URL parse errors
+        try {
+          // Allow explicit override via global var for emergencies
+          const overrideUrl =
+            (typeof window !== "undefined" && window.SIMULATEAI_RTDB_URL) ||
+            null;
+          const configuredUrl = overrideUrl || this.app?.options?.databaseURL;
+          let derivedUrl = null;
+          if (!configuredUrl) {
+            const projectId = this.app?.options?.projectId;
+            if (projectId) {
+              // Default RTDB hostname convention
+              derivedUrl = `https://${projectId}-default-rtdb.firebaseio.com`;
+            }
+          }
+
+          if (configuredUrl) {
+            this.realtimeDb = getDatabase(this.app);
+          } else if (derivedUrl) {
+            // Pass explicit URL when hosting config omitted databaseURL
+            this.realtimeDb = getDatabase(this.app, derivedUrl);
+          } else {
+            // No way to determine RTDB endpoint – run without RTDB
+            this.realtimeDb = null;
+          }
+        } catch (rtdbInitErr) {
+          console.warn(
+            "⚠️ Skipping Realtime Database initialization:",
+            rtdbInitErr,
+          );
+          this.realtimeDb = null;
+        }
         this.analytics = getAnalytics(this.app);
         this.performance = getPerformance(this.app);
         // Initialize Cloud Functions (client)
@@ -609,6 +673,14 @@ export class FirebaseService {
           this.app,
           this.hybridData,
         );
+        // Ensure storage service uses the exact same Storage instance (emulator + bucket alignment)
+        try {
+          if (this.storageService && this.storage) {
+            this.storageService.storage = this.storage;
+          }
+        } catch (_) {
+          /* non-fatal */
+        }
 
         // Initialize analytics service with error handling
         try {

@@ -785,16 +785,8 @@ class ScenarioModal {
         uptime: Date.now() - this.createdAt,
       });
 
-      if (this.modal) {
-        this.modal.remove();
-        this.modal = null;
-      }
-      if (this.backdrop) {
-        this.backdrop.remove();
-        this.backdrop = null;
-      }
-
-      // Clean up radar chart instance first
+      // IMPORTANT: Destroy the Chart.js instance BEFORE removing the DOM
+      // Prevents tooltip/mouseout handlers from firing on a detached canvas
       if (this.radarChart) {
         try {
           logger.info("ScenarioModal", "Destroying radar chart during cleanup");
@@ -806,6 +798,16 @@ class ScenarioModal {
             e,
           );
         }
+      }
+
+      // Now safely remove modal/backdrop elements
+      if (this.modal) {
+        this.modal.remove();
+        this.modal = null;
+      }
+      if (this.backdrop) {
+        this.backdrop.remove();
+        this.backdrop = null;
       }
 
       // Reset all state flags

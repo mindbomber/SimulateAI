@@ -49,6 +49,9 @@ export default class TeacherClassroomModals {
     );
 
     this.initialized = false;
+
+    // Bound handlers cache to keep stable references for add/removeEventListener
+    this._boundSelectedScenarioClick = null;
   }
 
   /**
@@ -311,10 +314,10 @@ export default class TeacherClassroomModals {
               </div>
               <div class="scenario-actions">
                 <button class="btn btn-sm btn-outline preview-scenario" data-scenario-id="${scenario.id}">
-                  👁️ Preview
+                  Preview
                 </button>
                 <button class="btn btn-sm btn-primary add-scenario" data-scenario-id="${scenario.id}">
-                  ➕ Add
+                  Add
                 </button>
               </div>
             </div>
@@ -527,8 +530,35 @@ export default class TeacherClassroomModals {
       return;
     }
 
-    const scenarioItem = event.currentTarget.closest(".selected-scenario-item");
-    const scenarioId = scenarioItem.dataset.scenarioId;
+    // Support both direct listeners (currentTarget is the button) and delegated clicks (currentTarget is container)
+    // Try resolve from the actual click target first (delegated), then fall back
+    const btn =
+      (event.target &&
+        event.target.closest &&
+        event.target.closest(".remove-scenario")) ||
+      (event.currentTarget &&
+      event.currentTarget.matches &&
+      event.currentTarget.matches(".remove-scenario")
+        ? event.currentTarget
+        : null);
+
+    // Resolve the selected item even when the listener is attached on a container
+    let scenarioItem =
+      (event.target &&
+        event.target.closest &&
+        event.target.closest(".selected-scenario-item")) ||
+      (btn && btn.closest && btn.closest(".selected-scenario-item")) ||
+      (event.currentTarget &&
+        event.currentTarget.closest &&
+        event.currentTarget.closest(".selected-scenario-item"));
+
+    if (!scenarioItem) {
+      // Nothing to do if we can't resolve the item
+      return;
+    }
+
+    const scenarioId = scenarioItem.dataset && scenarioItem.dataset.scenarioId;
+    if (!scenarioId) return;
 
     // Set update flag
     this.updateInProgress = true;
@@ -553,7 +583,7 @@ export default class TeacherClassroomModals {
         `.add-scenario[data-scenario-id="${scenarioId}"]`,
       );
       if (addButton) {
-        addButton.textContent = "➕ Add";
+        addButton.textContent = "Add";
         addButton.disabled = false;
         addButton.className = "btn btn-sm btn-primary add-scenario";
       }
@@ -564,6 +594,126 @@ export default class TeacherClassroomModals {
       });
     } finally {
       // Clear update flag after a short delay
+      setTimeout(() => {
+        this.updateInProgress = false;
+      }, 100);
+    }
+  }
+
+  /**
+   * Handle moving a selected scenario up in the list
+   */
+  handleMoveScenarioUp(event) {
+    // Prevent rapid-fire clicks that could cause infinite loops
+    if (this.updateInProgress) {
+      return;
+    }
+
+    const btn =
+      (event.target &&
+        event.target.closest &&
+        event.target.closest(".move-up")) ||
+      (event.currentTarget &&
+      event.currentTarget.matches &&
+      event.currentTarget.matches(".move-up")
+        ? event.currentTarget
+        : null);
+
+    let scenarioItem =
+      (event.target &&
+        event.target.closest &&
+        event.target.closest(".selected-scenario-item")) ||
+      (btn && btn.closest && btn.closest(".selected-scenario-item")) ||
+      (event.currentTarget &&
+        event.currentTarget.closest &&
+        event.currentTarget.closest(".selected-scenario-item"));
+    if (!scenarioItem) return;
+
+    const scenarioId = scenarioItem.dataset && scenarioItem.dataset.scenarioId;
+    if (!scenarioId) return;
+    const index = this.selectedScenarios.findIndex((s) => s.id === scenarioId);
+    if (index <= 0) return; // Already at the top
+
+    this.updateInProgress = true;
+
+    try {
+      // Swap with previous
+      const prev = this.selectedScenarios[index - 1];
+      this.selectedScenarios[index - 1] = this.selectedScenarios[index];
+      this.selectedScenarios[index] = prev;
+
+      // Reassign order values
+      this.selectedScenarios.forEach((s, i) => (s.order = i));
+
+      // Update UI and validation
+      this.debouncedUpdateDisplay();
+      this.validateCreateClassroomForm();
+
+      logClassroomEvent("scenario_moved_up", {
+        scenario_id: scenarioId,
+        new_order: index - 1,
+      });
+    } finally {
+      setTimeout(() => {
+        this.updateInProgress = false;
+      }, 100);
+    }
+  }
+
+  /**
+   * Handle moving a selected scenario down in the list
+   */
+  handleMoveScenarioDown(event) {
+    // Prevent rapid-fire clicks that could cause infinite loops
+    if (this.updateInProgress) {
+      return;
+    }
+
+    const btn =
+      (event.target &&
+        event.target.closest &&
+        event.target.closest(".move-down")) ||
+      (event.currentTarget &&
+      event.currentTarget.matches &&
+      event.currentTarget.matches(".move-down")
+        ? event.currentTarget
+        : null);
+
+    let scenarioItem =
+      (event.target &&
+        event.target.closest &&
+        event.target.closest(".selected-scenario-item")) ||
+      (btn && btn.closest && btn.closest(".selected-scenario-item")) ||
+      (event.currentTarget &&
+        event.currentTarget.closest &&
+        event.currentTarget.closest(".selected-scenario-item"));
+    if (!scenarioItem) return;
+
+    const scenarioId = scenarioItem.dataset && scenarioItem.dataset.scenarioId;
+    if (!scenarioId) return;
+    const index = this.selectedScenarios.findIndex((s) => s.id === scenarioId);
+    if (index < 0 || index >= this.selectedScenarios.length - 1) return; // Already at bottom or not found
+
+    this.updateInProgress = true;
+
+    try {
+      // Swap with next
+      const next = this.selectedScenarios[index + 1];
+      this.selectedScenarios[index + 1] = this.selectedScenarios[index];
+      this.selectedScenarios[index] = next;
+
+      // Reassign order values
+      this.selectedScenarios.forEach((s, i) => (s.order = i));
+
+      // Update UI and validation
+      this.debouncedUpdateDisplay();
+      this.validateCreateClassroomForm();
+
+      logClassroomEvent("scenario_moved_down", {
+        scenario_id: scenarioId,
+        new_order: index + 1,
+      });
+    } finally {
       setTimeout(() => {
         this.updateInProgress = false;
       }, 100);
@@ -958,6 +1108,14 @@ export default class TeacherClassroomModals {
       // Restore scroll position
       container.scrollTop = scrollTop;
 
+      // Update the "Selected Scenarios (N)" header count
+      const headerEl = this.createClassroomModal?.element?.querySelector(
+        ".selected-scenarios h4",
+      );
+      if (headerEl) {
+        headerEl.textContent = `📝 Selected Scenarios (${this.selectedScenarios.length})`;
+      }
+
       // Remove all existing event listeners first to prevent duplicates
       const oldButtons = container.querySelectorAll(
         ".remove-scenario, .move-up, .move-down",
@@ -977,11 +1135,12 @@ export default class TeacherClassroomModals {
    */
   attachSelectedScenarioEvents(container) {
     // Use event delegation to prevent duplicate listeners
-    container.removeEventListener("click", this.handleSelectedScenarioClick);
-    container.addEventListener(
-      "click",
-      this.handleSelectedScenarioClick.bind(this),
-    );
+    if (!this._boundSelectedScenarioClick) {
+      this._boundSelectedScenarioClick =
+        this.handleSelectedScenarioClick.bind(this);
+    }
+    container.removeEventListener("click", this._boundSelectedScenarioClick);
+    container.addEventListener("click", this._boundSelectedScenarioClick);
   }
 
   /**

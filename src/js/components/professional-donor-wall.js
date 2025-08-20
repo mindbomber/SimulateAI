@@ -218,8 +218,8 @@ class ProfessionalDonorWall {
 
     // For development and production builds, resolve relative to base
     if (path.startsWith("src/assets/")) {
-      // In production, assets are moved to /assets/ directory
-      return path.replace("src/assets/", "./assets/");
+      // Build emits a stable copy under /src/assets/, use absolute path for reliability
+      return `/${path}`; // e.g., /src/assets/avatars/default-avatar.svg
     }
 
     return path;
