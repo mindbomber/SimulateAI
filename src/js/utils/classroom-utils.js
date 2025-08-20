@@ -403,45 +403,7 @@ export function generateClassroomShareUrl(
   const params = new URLSearchParams();
   params.set("join", classroomCode);
 
-  // If options contains a seed payload, embed a compact base64 seed
-  if (!isString && optionsOrBase?.seed) {
-    try {
-      const seed = optionsOrBase.seed;
-      // Minimal classroom seed (avoid large fields)
-      const compactSeed = {
-        classroomId: seed.classroomId,
-        classroomName: seed.classroomName,
-        classroomCode: seed.classroomCode,
-        instructorName: seed.instructorName,
-        selectedScenarios: Array.isArray(seed.selectedScenarios)
-          ? seed.selectedScenarios.map((s) => ({
-              id: s.id || s.scenarioId || s.title,
-              title: s.title,
-              category: s.category,
-            }))
-          : [],
-        settings: seed.settings || {},
-        sessionStatus: seed.sessionStatus || {
-          isLive: false,
-          isPaused: false,
-          currentScenario: 0,
-          startTime: null,
-          completedAt: null,
-        },
-      };
-      const encoded = btoa(
-        unescape(encodeURIComponent(JSON.stringify(compactSeed))),
-      );
-      params.set("seed", encoded);
-    } catch (e) {
-      logger.warn(
-        "ClassroomUtils",
-        "Failed to embed classroom seed in share URL",
-        e,
-      );
-    }
-  }
-
+  // Seed embedding removed: share URLs now include only the join code
   return `${baseUrl}?${params.toString()}`;
 }
 

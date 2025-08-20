@@ -331,14 +331,38 @@
           </div>
 
           <!-- User Profile (shown when signed in) -->
-          <div class="nav-item" data-user-content style="display: none">
-            <button
-              class="btn btn-outline nav-auth-btn"
+          <div
+            class="nav-item nav-item-dropdown"
+            data-user-content
+            style="display: none"
+          >
+            <a
+              href="#"
+              class="nav-link"
+              aria-expanded="false"
+              aria-haspopup="true"
               id="profile-nav"
-              title="Go to Profile"
+              role="button"
+              aria-controls="profile-menu"
+              title="Profile menu"
             >
               Profile
-            </button>
+              <span class="dropdown-arrow" aria-hidden="true">▼</span>
+            </a>
+            <div
+              class="dropdown-menu"
+              id="profile-menu"
+              role="menu"
+              aria-labelledby="profile-nav"
+            >
+              <a
+                href="#"
+                class="dropdown-item"
+                id="profile-signout"
+                role="menuitem"
+                >Sign Out</a
+              >
+            </div>
           </div>
         </div>
       </div>

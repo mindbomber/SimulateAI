@@ -34,6 +34,7 @@ export class AuthService {
     this.logoutManager = null;
     this.uidNormalizer = null;
     this.firestoreService = null;
+    this.isLoginModalOpen = false;
 
     // DataHandler integration for centralized data management
     this.app = app;
@@ -137,6 +138,22 @@ export class AuthService {
     this.currentUser = user;
 
     if (user) {
+      // Notify listeners that auth state has changed and user signed in
+      try {
+        eventDispatcher.emit(AUTH_EVENTS.AUTH_STATE_CHANGED, {
+          user,
+          isAuthenticated: true,
+        });
+        if (!previousUser || previousUser?.uid !== user.uid) {
+          eventDispatcher.emit(AUTH_EVENTS.USER_SIGNED_IN, {
+            user,
+            uid: user.uid,
+          });
+        }
+      } catch (_) {
+        // ignore event dispatch errors
+      }
+
       // Load user profile using centralized UID
       const currentUID = this.getCurrentUID();
       this.userProfile = await this.firebaseService.getUserProfile(currentUID);
@@ -168,6 +185,21 @@ export class AuthService {
       this.userProfile = null;
       this.updateUIForAnonymousUser();
 
+      // Notify listeners that auth state has changed and user signed out
+      try {
+        eventDispatcher.emit(AUTH_EVENTS.AUTH_STATE_CHANGED, {
+          user: null,
+          isAuthenticated: false,
+        });
+        if (previousUser) {
+          eventDispatcher.emit(AUTH_EVENTS.USER_SIGNED_OUT, {
+            previousUid: previousUser.uid,
+          });
+        }
+      } catch (_) {
+        // ignore event dispatch errors
+      }
+
       // Clear session data when user logs out
       if (previousUser) {
         try {
@@ -183,6 +215,10 @@ export class AuthService {
    * Show login modal using existing modal system
    */
   showLoginModal() {
+    // Prevent duplicate modals
+    if (this.isLoginModalOpen) {
+      return;
+    }
     const loginHTML = `
       <div class="auth-modal">
         <div class="auth-header">
@@ -316,6 +352,63 @@ export class AuthService {
     });
 
     modal.open();
+    this.isLoginModalOpen = true;
+
+    // Reset flag when the modal signals close (primary, immediate path)
+    try {
+      if (typeof modal.on === "function") {
+        modal.on("close", () => {
+          this.isLoginModalOpen = false;
+        });
+      }
+    } catch (_) {
+      // no-op: modal may not implement event emitter
+    }
+
+    // Defensive: observer-based reset if DOM-backed modal element exists
+    try {
+      const el = /** @type {Node|undefined} */ (modal.element);
+      if (el && el.nodeType === 1) {
+        const observer = new MutationObserver(() => {
+          try {
+            if (!document.body.contains(el)) {
+              this.isLoginModalOpen = false;
+              observer.disconnect();
+            }
+          } catch (_) {
+            // If contains throws for any reason, clear flag conservatively
+            this.isLoginModalOpen = false;
+            observer.disconnect();
+          }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+      }
+    } catch (_) {
+      // no-op: observer fallback not available in this environment
+    }
+
+    // Final safety: short polling to clear flag once modal reports closed/is not open
+    try {
+      let attempts = 0;
+      const maxAttempts = 40; // ~10s at 250ms
+      const poll = setInterval(() => {
+        attempts++;
+        try {
+          if (!modal || (typeof modal.isOpen === "boolean" && !modal.isOpen)) {
+            this.isLoginModalOpen = false;
+            clearInterval(poll);
+          } else if (attempts >= maxAttempts) {
+            // Give up eventually to avoid a stuck interval
+            clearInterval(poll);
+          }
+        } catch (_) {
+          this.isLoginModalOpen = false;
+          clearInterval(poll);
+        }
+      }, 250);
+    } catch (_) {
+      // no-op: polling is an optional safety net
+    }
 
     // Set up authentication event handlers after modal content is rendered
     // Use a small delay to ensure DOM is ready
@@ -984,24 +1077,11 @@ export class AuthService {
    */
   updateAuthenticationUI(isAuthenticated, user) {
     // Update navigation sign in/out buttons
-    const signInBtn = document.getElementById("sign-in-nav");
-    const signOutBtn = document.getElementById("sign-out-nav");
-    const linkAccountsBtn = document.getElementById("link-accounts-nav");
     const userNameElement = document.getElementById("nav-user-name");
 
-    if (signInBtn) {
-      signInBtn.addEventListener("click", () => this.showLoginModal());
-    }
-
-    if (signOutBtn) {
-      signOutBtn.addEventListener("click", () => this.signOut());
-    }
-
-    if (linkAccountsBtn) {
-      linkAccountsBtn.addEventListener("click", () =>
-        this.showAccountLinkingModal(),
-      );
-    }
+    // NOTE: Event listeners for auth buttons are centralized in SharedNavigation
+    // to avoid duplicate bindings and double-invocations. This method should
+    // only update UI state (labels, visibility) and not attach listeners.
 
     // Update user greeting
     if (userNameElement && user) {
@@ -1014,6 +1094,19 @@ export class AuthService {
       if (linkedProviders.length > 1) {
         userNameElement.title = `Linked accounts: ${linkedProviders.map((p) => p.providerId.replace(".com", "")).join(", ")}`;
       }
+    }
+
+    // Keep shared navigation profile menu in sync (label + visibility)
+    try {
+      if (
+        typeof window !== "undefined" &&
+        window.sharedNav &&
+        typeof window.sharedNav.updateUserDisplay === "function"
+      ) {
+        window.sharedNav.updateUserDisplay(user || null);
+      }
+    } catch (_) {
+      // No-op: navigation may not be initialized on certain pages
     }
   }
 

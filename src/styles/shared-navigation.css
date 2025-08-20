@@ -223,6 +223,27 @@
     ); /* Container gets even higher z-index when hovered */
   }
 
+  /* ===== PROFILE NAVIGATION HOVER LOGIC (pointer/hover capable only) ===== */
+  @media (hover: hover) and (pointer: fine) {
+    /* Keep profile menu open when hovering over trigger or menu within auth group */
+    .nav-group-auth .nav-item-dropdown:hover #profile-menu,
+    .nav-group-auth #profile-nav:hover + #profile-menu {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      z-index: var(--z-dropdown-hover);
+    }
+
+    /* Ensure profile dropdown positions to the right under auth group */
+    .nav-group-auth .nav-item-dropdown #profile-menu {
+      position: absolute !important;
+      top: calc(100% + 5px) !important;
+      right: 0 !important;
+      left: auto !important;
+      white-space: nowrap;
+    }
+  }
+
   /* Settings menu should close when user scrolls away */
   /* This will be handled by JavaScript, but we ensure it has proper positioning */
   .settings-menu {
@@ -1317,6 +1338,20 @@
     justify-content: center;
   }
 
+  /* Blog and About top-level links: remove default underline in normal mode */
+  .nav-group-blog .nav-link,
+  .nav-group-about .nav-link {
+    text-decoration: none;
+  }
+  .nav-group-blog .nav-link:hover,
+  .nav-group-about .nav-link:hover {
+    text-decoration: none;
+  }
+  .nav-group-blog .nav-link:focus,
+  .nav-group-about .nav-link:focus {
+    text-decoration: none;
+  }
+
   /* Authentication Group */
   .nav-group-auth {
     margin-left: calc(1.5rem * var(--font-scale, 1));
@@ -1372,6 +1407,28 @@
     ); /* Indigo-600 to Indigo-700 */
     box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4); /* Indigo-500 */
     transform: translateY(-1px);
+  }
+
+  /* Profile dropdown positioning in auth group */
+  .nav-group-auth .nav-item-dropdown {
+    position: relative;
+  }
+
+  .nav-group-auth .nav-item-dropdown .dropdown-menu {
+    left: auto;
+    right: 0;
+    min-width: 160px;
+  }
+
+  .nav-group-auth .dropdown-item {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    color: var(--nav-text-color, #334155);
+    text-decoration: none;
+  }
+
+  .nav-group-auth .dropdown-item:hover {
+    background: var(--nav-bg-hover, #f8fafc);
   }
 
   /* Dropdown Menu Styles */

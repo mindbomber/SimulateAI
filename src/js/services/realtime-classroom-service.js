@@ -791,7 +791,7 @@ export default class RealtimeClassroomService {
             "Firebase roster write failed; falling back",
             e,
           );
-          // Seed localStorage with classroom so fallback can proceed
+          // Ensure localStorage has minimal classroom data so fallback can proceed
           try {
             const existingClassrooms = JSON.parse(
               localStorage.getItem("simulateai_classrooms") || "{}",
@@ -841,7 +841,7 @@ export default class RealtimeClassroomService {
             "Firebase choices write failed; falling back",
             e,
           );
-          // Seed and fallback
+          // Ensure localStorage has minimal classroom data and fallback
           try {
             const existingClassrooms = JSON.parse(
               localStorage.getItem("simulateai_classrooms") || "{}",

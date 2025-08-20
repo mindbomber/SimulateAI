@@ -7,6 +7,8 @@ export const SCENARIO_MODES = Object.freeze({
   RESEARCH_FULL: "research_full",
   BADGE_ONLY: "badge_only",
   PREVIEW: "preview",
+  // New unified classroom-live mode for students joining a live classroom
+  CLASSROOM_LIVE: "classroom_live",
   CLASSROOM_LIVE_STUDENT: "classroom_live_student",
   CLASSROOM_LIVE_INSTRUCTOR: "classroom_live_instructor",
 });
@@ -34,6 +36,14 @@ export const MODE_CONFIGS = Object.freeze({
     persistProgress: false,
     analyticsLevel: "none",
     classroomOverlay: false,
+  },
+  // Unified classroom mode for student participants receiving scenarios from instructor
+  [SCENARIO_MODES.CLASSROOM_LIVE]: {
+    showReflection: false,
+    enableBadges: false,
+    persistProgress: false,
+    analyticsLevel: "classroom", // classroom-focused analytics
+    classroomOverlay: "student",
   },
   [SCENARIO_MODES.CLASSROOM_LIVE_STUDENT]: {
     showReflection: true,

@@ -9,6 +9,7 @@ import TeacherClassroomModals from "../components/teacher-classroom-modals.js";
 import StudentClassroomModals from "../components/student-classroom-modals.js";
 import globalEventManager from "../core/global-event-manager.js";
 import logger from "../utils/logger.js";
+import eventDispatcher, { AUTH_EVENTS } from "../utils/event-dispatcher.js";
 
 class ClassroomIntegrationManager {
   constructor(dataHandler, firebaseService) {
@@ -34,7 +35,75 @@ class ClassroomIntegrationManager {
 
     try {
       // Get current user and determine capabilities
-      this.currentUser = await this.firebaseService.getCurrentUser();
+      this.currentUser =
+        (window.authService && window.authService.getCurrentUser?.()) ||
+        (await this.firebaseService.getCurrentUser());
+
+      // Stay in sync with global auth state (so we don't re-prompt users)
+      this._onAuthStateChanged = (event) => {
+        try {
+          const user = event?.detail?.user || null;
+          this.currentUser = user;
+        } catch (_) {
+          // ignore
+        }
+      };
+      try {
+        eventDispatcher.on(
+          AUTH_EVENTS.AUTH_STATE_CHANGED,
+          this._onAuthStateChanged,
+        );
+      } catch (_) {
+        // ignore
+      }
+
+      // On explicit sign-out, ensure any active classroom session is exited/cleaned
+      this._onUserSignedOut = async () => {
+        try {
+          // Prefer silent leave to avoid prompts during sign-out
+          if (
+            this.studentModals &&
+            typeof this.studentModals.forceLeaveClassroom === "function"
+          ) {
+            await this.studentModals.forceLeaveClassroom();
+          } else if (
+            this.studentModals &&
+            typeof this.studentModals.handleLeaveClassroom === "function"
+          ) {
+            // Fallback if older build without forceLeaveClassroom
+            try {
+              // Temporarily bypass confirmation by setting suppress flag
+              this.studentModals._suppressWaitingRoomClose = true;
+              await this.studentModals.handleLeaveClassroom();
+            } finally {
+              this.studentModals._suppressWaitingRoomClose = false;
+            }
+          }
+
+          // Also close any teacher-side modals/listeners
+          try {
+            this.teacherModals?.cleanup?.();
+          } catch (_) {
+            // ignore
+          }
+
+          logger.info(
+            "ClassroomIntegrationManager",
+            "Performed classroom cleanup on user sign-out",
+          );
+        } catch (err) {
+          logger.warn(
+            "ClassroomIntegrationManager",
+            "Sign-out classroom cleanup encountered an error",
+            err,
+          );
+        }
+      };
+      try {
+        eventDispatcher.on(AUTH_EVENTS.USER_SIGNED_OUT, this._onUserSignedOut);
+      } catch (_) {
+        // ignore
+      }
 
       // Initialize both teacher and student modals
       // (Users can switch between roles in the same session)
@@ -107,8 +176,13 @@ class ClassroomIntegrationManager {
    */
   async handleCreateClassroom() {
     try {
-      // Check if user is authenticated
-      if (!this.currentUser) {
+      // Check if user is authenticated (use latest from AuthService if available)
+      const user =
+        (window.authService && window.authService.getCurrentUser?.()) ||
+        this.currentUser ||
+        (await this.firebaseService.getCurrentUser());
+      this.currentUser = user;
+      if (!user) {
         await this.handleUnauthenticatedUser("create");
         return;
       }
@@ -137,8 +211,13 @@ class ClassroomIntegrationManager {
    */
   async handleJoinClassroom() {
     try {
-      // Check if user is authenticated
-      if (!this.currentUser) {
+      // Check if user is authenticated (use latest from AuthService if available)
+      const user =
+        (window.authService && window.authService.getCurrentUser?.()) ||
+        this.currentUser ||
+        (await this.firebaseService.getCurrentUser());
+      this.currentUser = user;
+      if (!user) {
         await this.handleUnauthenticatedUser("join");
         return;
       }
@@ -296,7 +375,7 @@ class ClassroomIntegrationManager {
           
           .classroom-auth-modal .modal-container {
             position: relative;
-            background: white;
+            background: var(--theme-bg-primary, #fff);
             border-radius: 12px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             max-width: 600px;
@@ -311,20 +390,20 @@ class ClassroomIntegrationManager {
             align-items: center;
             justify-content: space-between;
             padding: 20px 24px;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid var(--theme-border-primary, #e0e0e0);
           }
           
           .classroom-auth-modal .modal-header h3 {
             margin: 0;
             font-size: 1.4em;
-            color: #333;
+            color: var(--theme-text-primary, #333);
           }
           
           .classroom-auth-modal .modal-close-btn {
             background: none;
             border: none;
             font-size: 24px;
-            color: #666;
+            color: var(--theme-text-secondary, #666);
             cursor: pointer;
             padding: 0;
             width: 32px;
@@ -337,8 +416,8 @@ class ClassroomIntegrationManager {
           }
           
           .classroom-auth-modal .modal-close-btn:hover {
-            background: #f5f5f5;
-            color: #333;
+            background: var(--theme-bg-secondary, #f5f5f5);
+            color: var(--theme-text-primary, #333);
           }
           
           .classroom-auth-modal .modal-body {
@@ -352,7 +431,7 @@ class ClassroomIntegrationManager {
           
           .classroom-auth-modal .auth-message p {
             font-size: 1.1em;
-            color: #555;
+            color: var(--theme-text-secondary, #555);
             margin: 0;
           }
           
@@ -362,7 +441,7 @@ class ClassroomIntegrationManager {
           }
           
           .classroom-auth-modal .auth-choice {
-            border: 2px solid #e0e0e0;
+            border: 2px solid var(--theme-border-primary, #e0e0e0);
             border-radius: 8px;
             padding: 20px;
             transition: all 0.2s ease;
@@ -370,8 +449,12 @@ class ClassroomIntegrationManager {
           }
           
           .classroom-auth-modal .auth-choice.recommended {
-            border-color: #4285f4;
-            background: linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%);
+            border-color: var(--theme-accent-primary, var(--color-primary, #4285f4));
+            background: linear-gradient(
+              135deg,
+              var(--theme-bg-secondary, #f8fbff) 0%,
+              var(--theme-bg-tertiary, #e3f2fd) 100%
+            );
           }
           
           .classroom-auth-modal .auth-choice.recommended::before {
@@ -379,8 +462,8 @@ class ClassroomIntegrationManager {
             position: absolute;
             top: -8px;
             right: 16px;
-            background: #4285f4;
-            color: white;
+            background: var(--theme-accent-primary, var(--color-primary, #4285f4));
+            color: var(--theme-text-on-accent, #fff);
             padding: 4px 12px;
             border-radius: 12px;
             font-size: 0.75em;
@@ -399,11 +482,11 @@ class ClassroomIntegrationManager {
           }
           
           .classroom-auth-modal .auth-choice.recommended .choice-icon {
-            color: #4285f4;
+            color: var(--theme-accent-primary, var(--color-primary, #4285f4));
           }
           
           .classroom-auth-modal .auth-choice.guest .choice-icon {
-            color: #ff9800;
+            color: var(--accent-color, #ff9800);
           }
           
           .classroom-auth-modal .choice-content h4 {
@@ -415,7 +498,7 @@ class ClassroomIntegrationManager {
           .classroom-auth-modal .choice-content p {
             margin: 0 0 16px 0;
             text-align: center;
-            color: #666;
+            color: var(--theme-text-secondary, #666);
           }
           
           .classroom-auth-modal .choice-benefits {
@@ -446,23 +529,23 @@ class ClassroomIntegrationManager {
           }
           
           .classroom-auth-modal .btn-auth-primary {
-            background: #4285f4;
-            color: white;
+            background: var(--color-primary, #4285f4);
+            color: var(--theme-text-on-accent, #fff);
           }
           
           .classroom-auth-modal .btn-auth-primary:hover {
-            background: #3367d6;
+            background: var(--color-primary-dark, #3367d6);
             transform: translateY(-1px);
           }
           
           .classroom-auth-modal .btn-auth-secondary {
-            background: #f5f5f5;
-            color: #333;
-            border: 1px solid #ddd;
+            background: var(--theme-bg-secondary, #f5f5f5);
+            color: var(--theme-text-primary, #333);
+            border: 1px solid var(--theme-border-primary, #ddd);
           }
           
           .classroom-auth-modal .btn-auth-secondary:hover {
-            background: #e8e8e8;
+            background: var(--theme-bg-tertiary, #e8e8e8);
             transform: translateY(-1px);
           }
           
@@ -539,11 +622,71 @@ class ClassroomIntegrationManager {
    */
   async handleSignIn(action) {
     try {
-      // Trigger authentication
-      await this.firebaseService.signInWithGoogle();
+      // Prefer centralized AuthService so modals/state are unified
+      if (
+        window.authService &&
+        typeof window.authService.showLoginModal === "function"
+      ) {
+        // If already authenticated, proceed immediately
+        const existingUser = window.authService.getCurrentUser?.();
+        if (existingUser) {
+          this.currentUser = existingUser;
+        } else {
+          // Show the central login modal and wait for sign-in event
+          window.authService.showLoginModal();
+          await new Promise((resolve) => {
+            let resolved = false;
+            let listenerAttached = false;
+            let handler = null;
 
-      // Update current user
-      this.currentUser = await this.firebaseService.getCurrentUser();
+            const cleanup = () => {
+              try {
+                if (listenerAttached && handler) {
+                  eventDispatcher.off(AUTH_EVENTS.USER_SIGNED_IN, handler);
+                }
+              } catch (_) {
+                // ignore
+              }
+              listenerAttached = false;
+            };
+
+            const timeout = setTimeout(() => {
+              if (!resolved) {
+                resolved = true;
+                cleanup();
+                resolve(); // soft-timeout: don't hang UI
+              }
+            }, 15000);
+
+            handler = (evt) => {
+              try {
+                if (resolved) return;
+                resolved = true;
+                clearTimeout(timeout);
+                cleanup();
+                this.currentUser =
+                  evt?.detail?.user ||
+                  window.authService.getCurrentUser?.() ||
+                  null;
+                resolve();
+              } catch (_) {
+                resolve();
+              }
+            };
+            // Listen to our centralized dispatcher events
+            try {
+              eventDispatcher.on(AUTH_EVENTS.USER_SIGNED_IN, handler);
+              listenerAttached = true;
+            } catch (_) {
+              // ignore
+            }
+          });
+        }
+      } else {
+        // Fallback: direct provider sign-in
+        await this.firebaseService.signInWithGoogle();
+        this.currentUser = await this.firebaseService.getCurrentUser();
+      }
 
       if (this.currentUser) {
         logger.info(
@@ -875,6 +1018,23 @@ class ClassroomIntegrationManager {
   cleanup() {
     this.teacherModals?.cleanup();
     this.studentModals?.cleanup();
+
+    // Remove auth state listener if attached
+    try {
+      if (this._onAuthStateChanged) {
+        eventDispatcher.off(
+          AUTH_EVENTS.AUTH_STATE_CHANGED,
+          this._onAuthStateChanged,
+        );
+      }
+      if (this._onUserSignedOut) {
+        eventDispatcher.off(AUTH_EVENTS.USER_SIGNED_OUT, this._onUserSignedOut);
+      }
+    } catch (_) {
+      // ignore
+    }
+    this._onAuthStateChanged = null;
+    this._onUserSignedOut = null;
 
     this.initialized = false;
     logger.info("ClassroomIntegrationManager", "Cleanup completed");

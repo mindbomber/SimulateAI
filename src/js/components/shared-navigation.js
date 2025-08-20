@@ -1052,17 +1052,61 @@ class SharedNavigation {
     // Authentication buttons
     const signInBtn = this.getCachedElement("signInBtn", "#sign-in-nav");
     const signOutBtn = this.getCachedElement("signOutBtn", "#sign-out-nav");
+    const profileSignout = document.getElementById("profile-signout");
 
     if (signInBtn) {
+      // Remove existing to avoid duplicates
+      if (this.eventListeners.has(signInBtn)) {
+        const handlers = this.eventListeners.get(signInBtn);
+        Object.entries(handlers).forEach(([event, handler]) => {
+          signInBtn.removeEventListener(event, handler);
+        });
+      }
       const signInHandler = () => this.handleSignIn();
       signInBtn.addEventListener("click", signInHandler);
       this.eventListeners.set(signInBtn, { click: signInHandler });
     }
 
     if (signOutBtn) {
+      // Remove existing to avoid duplicates
+      if (this.eventListeners.has(signOutBtn)) {
+        const handlers = this.eventListeners.get(signOutBtn);
+        Object.entries(handlers).forEach(([event, handler]) => {
+          signOutBtn.removeEventListener(event, handler);
+        });
+      }
       const signOutHandler = () => this.handleSignOut();
       signOutBtn.addEventListener("click", signOutHandler);
       this.eventListeners.set(signOutBtn, { click: signOutHandler });
+    }
+
+    if (profileSignout) {
+      // Remove existing listeners
+      if (this.eventListeners.has(profileSignout)) {
+        const handlers = this.eventListeners.get(profileSignout);
+        Object.entries(handlers).forEach(([event, handler]) => {
+          profileSignout.removeEventListener(event, handler);
+        });
+      }
+
+      const profileSignoutHandler = async (e) => {
+        e.preventDefault();
+        try {
+          // Prefer centralized auth service
+          const auth =
+            (window.app && window.app.authService) || window.authService;
+          if (auth && typeof auth.signOut === "function") {
+            await auth.signOut();
+          }
+        } finally {
+          // Close dropdown after action
+          const trigger = document.getElementById("profile-nav");
+          const menu = document.getElementById("profile-menu");
+          if (trigger && menu) this.closeDropdown(trigger, menu);
+        }
+      };
+      profileSignout.addEventListener("click", profileSignoutHandler);
+      this.eventListeners.set(profileSignout, { click: profileSignoutHandler });
     }
   }
 
@@ -1830,7 +1874,7 @@ class SharedNavigation {
       if (profileBtn) {
         const displayName = user.displayName || user.email || "User";
         const firstName = displayName.split(" ")[0]; // Get first name
-        profileBtn.innerHTML = `👤 ${firstName} <span class="dropdown-arrow" aria-hidden="true">▼</span>`;
+        profileBtn.innerHTML = `${firstName} <span class="dropdown-arrow" aria-hidden="true">▼</span>`;
         profileBtn.title = `${displayName}'s profile menu`;
       }
     } else {

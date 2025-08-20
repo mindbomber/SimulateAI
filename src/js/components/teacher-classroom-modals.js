@@ -1106,11 +1106,9 @@ export default class TeacherClassroomModals {
         });
       });
 
-    // Copy share URL (with lightweight classroom seed to aid discovery)
+    // Copy share URL (seed removed; join code only)
     modal.querySelector("#copy-share-url")?.addEventListener("click", () => {
-      const shareUrl = generateClassroomShareUrl(classroom.classroomCode, {
-        seed: classroom,
-      });
+      const shareUrl = generateClassroomShareUrl(classroom.classroomCode);
       navigator.clipboard.writeText(shareUrl).then(() => {
         this.showSuccessToast("Share link copied to clipboard");
       });

@@ -23,6 +23,7 @@ import { getAllCategories } from "../../data/categories.js";
 import { typewriterSequence } from "../utils/typewriter.js";
 import { loadScenarioModalConfig } from "../utils/scenario-modal-config-loader.js";
 import DataHandler from "../core/data-handler.js";
+import { getModeConfig } from "../constants/scenario-modes.js";
 
 class ScenarioModal {
   constructor(options = {}) {
@@ -1838,15 +1839,27 @@ class ScenarioModal {
       sessionId: this._generateSessionId(),
     };
 
-    // Save to DataHandler first
+    // Respect scenario mode persistence settings
     try {
-      await this.dataHandler.saveScenarioCompletion(completionData);
-      logger.info(
-        "💾 Scenario completion data saved to DataHandler:",
-        completionData,
-      );
+      const mode = window.scenarioCoordinator?.mode;
+      const cfg = mode ? getModeConfig(mode) : { persistProgress: true };
+      if (cfg.persistProgress) {
+        await this.dataHandler.saveScenarioCompletion(completionData);
+        logger.info(
+          "💾 Scenario completion data saved to DataHandler:",
+          completionData,
+        );
+      } else {
+        logger.info(
+          "⏭️ Skipping persistence due to scenario mode persistProgress=false",
+          { mode, scenarioId: this.currentScenarioId },
+        );
+      }
     } catch (error) {
-      logger.error("❌ Failed to save scenario completion data:", error);
+      logger.error(
+        "❌ Failed during scenario completion persistence step:",
+        error,
+      );
     }
 
     // Dispatch initial scenario completion event (for immediate progress tracking)

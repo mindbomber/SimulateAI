@@ -92,40 +92,7 @@ export default class StudentClassroomModals {
     try {
       await this.initialize(isGuestMode);
 
-      // Seed import: if share link contains a compact classroom seed, import it to localStorage
-      try {
-        const params = new URLSearchParams(window.location.search);
-        const seedEncoded = params.get("seed");
-        if (seedEncoded) {
-          const json = decodeURIComponent(escape(atob(seedEncoded)));
-          const seed = JSON.parse(json);
-          if (seed && seed.classroomCode) {
-            const store = JSON.parse(
-              localStorage.getItem("simulateai_classrooms") || "{}",
-            );
-            if (!store[seed.classroomCode]) {
-              store[seed.classroomCode] = seed;
-              localStorage.setItem(
-                "simulateai_classrooms",
-                JSON.stringify(store),
-              );
-              logger.info(
-                "StudentClassroomModals",
-                "Imported classroom seed from share link",
-                { classroomCode: seed.classroomCode },
-              );
-            }
-            // If no code prefilled, use the seed’s code
-            if (!prefilledCode) prefilledCode = seed.classroomCode;
-          }
-        }
-      } catch (seedErr) {
-        logger.debug(
-          "StudentClassroomModals",
-          "Seed import skipped/failed",
-          seedErr,
-        );
-      }
+      // Seed import removed: join flow relies on 'join' code only
 
       const modalContent = this.buildJoinClassroomContent(
         prefilledCode,
@@ -744,6 +711,64 @@ export default class StudentClassroomModals {
   }
 
   /**
+   * Force leave classroom without user confirmation (used for global sign-out cleanup)
+   * - Removes the student from roster when possible
+   * - Silently closes modals and tears down listeners
+   */
+  async forceLeaveClassroom() {
+    try {
+      if (this.currentClassroom && this.currentStudent) {
+        try {
+          await this.classroomService.removeStudent(
+            this.currentClassroom.classroomCode,
+            this.currentStudent.uid,
+          );
+        } catch (removeErr) {
+          // Non-fatal: still proceed with local cleanup
+          logger.warn(
+            "StudentClassroomModals",
+            "Force leave: failed to remove student from roster",
+            removeErr,
+          );
+        }
+      }
+
+      // Close waiting room modal if open (no confirmation)
+      try {
+        this._suppressWaitingRoomClose = true;
+        this.waitingRoomModal?.close();
+      } catch (_) {
+        // ignore
+      } finally {
+        this._suppressWaitingRoomClose = false;
+      }
+
+      // Local teardown
+      this.cleanup();
+
+      // Best-effort event logging without user toasts
+      try {
+        if (this.currentClassroom && this.currentStudent) {
+          logClassroomEvent("student_left_silent", {
+            classroom_code: this.currentClassroom.classroomCode,
+            student_id: this.currentStudent.uid,
+            reason: "sign_out",
+          });
+        }
+      } catch (_) {
+        // ignore logging errors
+      }
+    } catch (error) {
+      logger.error(
+        "StudentClassroomModals",
+        "Force leave classroom failed",
+        error,
+      );
+      // Silent failure; do not surface toast during sign-out
+    }
+  }
+
+  /**
    * Start scenario session (transition from waiting room to scenarios)
    */
   async startScenarioSession(classroom) {
@@ -823,9 +848,7 @@ export default class StudentClassroomModals {
     try {
       // Ensure classroom student mode when launching via classroom flows
       if (window.scenarioCoordinator) {
-        window.scenarioCoordinator.setMode(
-          SCENARIO_MODES.CLASSROOM_LIVE_STUDENT,
-        );
+        window.scenarioCoordinator.setMode(SCENARIO_MODES.CLASSROOM_LIVE);
       }
       // Preferred: use MainGrid API (can accept null categoryId)
       if (

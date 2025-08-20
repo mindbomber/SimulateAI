@@ -1778,6 +1778,20 @@ limitations under the License.
       }
     </script>
 
+    <!-- Dev-only entry: ensure CSS (imported in src/js/app.js) loads on Vite dev server -->
+    <script type="module">
+      try {
+        const isLocalDev =
+          location.hostname === "localhost" && location.port === "3000";
+        if (isLocalDev) {
+          // Load the main app entry which imports the consolidated CSS bundles
+          import("/src/js/app.js");
+        }
+      } catch (e) {
+        // no-op; dev convenience only
+      }
+    </script>
+
     <!-- Fallback injector for preview/prod: load built assets from Vite manifest when tags weren't transformed -->
     <script>
       (function () {
