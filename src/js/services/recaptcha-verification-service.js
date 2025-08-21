@@ -14,7 +14,7 @@ import logger from "../utils/logger.js";
  */
 const RECAPTCHA_VERIFICATION_CONFIG = {
   PROJECT_ID: "simulateai-research",
-  SITE_KEY: "6LcuUpsrAAAAAEzAeX1qx0cjShEt7Nf0f73rvLjf",
+  SITE_KEY: "6LfizIQrAAAAAETdjKY14uI3ckhF-JeUujcloH53",
 
   // Minimum acceptable risk scores (0.0 to 1.0)
   SCORE_THRESHOLDS: {

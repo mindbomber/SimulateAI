@@ -40,6 +40,15 @@ class EnvironmentConfig {
         publishableKey: metaEnv.VITE_STRIPE_PUBLISHABLE_KEY || "pk_demo_key",
       },
 
+      // reCAPTCHA Enterprise (site key is public)
+      recaptcha: {
+        enterpriseSiteKey:
+          metaEnv.VITE_RECAPTCHA_ENTERPRISE_SITE_KEY ||
+          metaEnv.VITE_RECAPTCHA_SITE_KEY ||
+          // Fallback to configured production site key (public, non-secret)
+          "6LfizIQrAAAAAETdjKY14uI3ckhF-JeUujcloH53",
+      },
+
       // Environment Settings
       environment:
         metaEnv.VITE_ENVIRONMENT ||
@@ -103,6 +112,10 @@ class EnvironmentConfig {
 
   getStripePublishableKey() {
     return this.config.stripe.publishableKey;
+  }
+
+  getRecaptchaEnterpriseSiteKey() {
+    return this.config.recaptcha?.enterpriseSiteKey;
   }
 
   getEnvironment() {

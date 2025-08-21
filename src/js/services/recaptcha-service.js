@@ -13,7 +13,7 @@ import logger from "../utils/logger.js";
  * Configuration for Google reCAPTCHA Enterprise
  */
 const RECAPTCHA_CONFIG = {
-  SITE_KEY: "6LcuUpsrAAAAAEzAeX1qx0cjShEt7Nf0f73rvLjf",
+  SITE_KEY: "6LfizIQrAAAAAETdjKY14uI3ckhF-JeUujcloH53",
   ACTIONS: {
     SUBMIT_FORM: "submit_form",
     CONTACT_FORM: "contact_form",

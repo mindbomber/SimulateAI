@@ -4,7 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Support AI Ethics Research - Anonymous Donation</title>
-    <link rel="stylesheet" href="src/styles/enhanced-donation-widget.css" />
+
+    <!-- Performance hints for Stripe -->
+    <link rel="preconnect" href="https://js.stripe.com" crossorigin />
+    <link rel="preconnect" href="https://m.stripe.com" crossorigin />
+    <link rel="preconnect" href="https://api.stripe.com" crossorigin />
     <style>
       body {
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -166,17 +170,85 @@
 
         <h2>Quick & Secure Donation</h2>
         <p>
-          Support our research with a secure one-time donation. No account
-          creation required - just choose your support level and donate in
-          seconds via Stripe.
+          Support our research with a secure one-time donation. No account is
+          required—choose a level and complete checkout with Stripe in seconds.
         </p>
-      </div>
 
-      <!-- Donation Widget Container -->
-      <div
-        class="donation-widget-container"
-        id="donation-widget-container"
-      ></div>
+        <!-- Simple Checkout (direct buttons) -->
+        <div
+          id="simple-checkout"
+          style="
+            margin: 18px 0 28px;
+            padding: 16px;
+            background: #f8f9fb;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+          "
+          aria-labelledby="simple-checkout-title"
+        >
+          <div
+            id="simple-checkout-title"
+            style="font-weight: 600; color: #2c3e50; margin-bottom: 10px"
+          >
+            Choose a donation level
+          </div>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap">
+            <button
+              class="simple-donate-btn"
+              data-tier="1"
+              data-price-id="price_1RkyADJDA3nPZHAFQJr2ySBR"
+              style="
+                background: #667eea;
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                padding: 10px 14px;
+                cursor: pointer;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              "
+            >
+              $5 Bronze
+            </button>
+            <button
+              class="simple-donate-btn"
+              data-tier="2"
+              data-price-id="price_1RkyADJDA3nPZHAFXasv2dM0"
+              style="
+                background: #4c51bf;
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                padding: 10px 14px;
+                cursor: pointer;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              "
+            >
+              $10 Silver
+            </button>
+            <button
+              class="simple-donate-btn"
+              data-tier="3"
+              data-price-id="price_1RkyADJDA3nPZHAFoyRLGmpQ"
+              style="
+                background: #2b6cb0;
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                padding: 10px 14px;
+                cursor: pointer;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              "
+            >
+              $20 Gold
+            </button>
+          </div>
+          <div style="margin-top: 10px; color: #6c757d; font-size: 0.92em">
+            Protected by reCAPTCHA Enterprise and Firebase App Check. Payments
+            are processed by Stripe. Refunds are available on request within 7
+            days.
+          </div>
+        </div>
+      </div>
 
       <!-- Thank you message -->
       <div class="thank-you" id="thank-you-message">
@@ -227,6 +299,13 @@
     <!-- Injected config from Firebase Hosting -->
     <script src="/__/firebase/init.js"></script>
 
+    <!-- reCAPTCHA Enterprise (needed to generate client tokens) -->
+    <script
+      src="https://www.google.com/recaptcha/enterprise.js?render=6LfizIQrAAAAAETdjKY14uI3ckhF-JeUujcloH53"
+      async
+      defer
+    ></script>
+
     <!-- Firebase Initialization (prefer Hosting-injected config) -->
     <script>
       // Prefer Hosting-injected config with a robust JSON fallback
@@ -267,16 +346,21 @@
             console.info("Firebase initialized:", injectedConfig.projectId);
           }
 
-          // Activate Firebase App Check (required by Cloud Functions in production)
+          // Activate Firebase App Check with reCAPTCHA Enterprise provider
           try {
             if (firebase.appCheck) {
               const siteKey =
                 window.location.hostname === "localhost" ||
                 window.location.hostname === "127.0.0.1"
                   ? "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // Google test key for localhost
-                  : "6LcuUpsrAAAAAEzAeX1qx0cjShEt7Nf0f73rvLjf"; // Production site key
-              firebase.appCheck().activate(siteKey, true);
-              console.info("🛡️ App Check activated on donate page");
+                  : "6LfizIQrAAAAAETdjKY14uI3ckhF-JeUujcloH53"; // Production App Check site key (Enterprise)
+              // Use Enterprise provider for stronger protection
+              const provider =
+                new firebase.appCheck.ReCaptchaEnterpriseProvider(siteKey);
+              firebase.appCheck().activate(provider, true);
+              console.info(
+                "🛡️ App Check (Enterprise) activated on donate page",
+              );
             } else {
               console.warn("App Check SDK not available on donate page");
             }
@@ -308,15 +392,53 @@
                       tokenSnippet = tok.token.slice(0, 12) + "…";
                     }
                   } catch (e) {
-                    appCheckStatus = "error";
+                    appCheckStatus = `error: ${e?.message || "token fetch failed"}`;
                   }
                 }
+                // reCAPTCHA diagnostics
+                const recaptchaLoaded = !!(
+                  window.grecaptcha && window.grecaptcha.enterprise
+                );
+                const recaptchaScripts = Array.from(document.scripts)
+                  .map((s) => s.src)
+                  .filter(
+                    (src) => src && src.includes("recaptcha/enterprise.js"),
+                  );
+                const recaptchaHost =
+                  recaptchaScripts
+                    .map((src) =>
+                      src.includes("recaptcha.net")
+                        ? "recaptcha.net"
+                        : src.includes("google.com")
+                          ? "google.com"
+                          : "other",
+                    )
+                    .join(", ") || "none";
+                // Extract render site key from the loaded script as ground truth
+                const renderKey = (() => {
+                  try {
+                    const s = Array.from(document.scripts).find(
+                      (s) =>
+                        s.src &&
+                        s.src.includes("recaptcha/enterprise.js?render="),
+                    );
+                    if (s && s.src) {
+                      const u = new URL(s.src);
+                      const k = u.searchParams.get("render");
+                      if (k) return k;
+                    }
+                  } catch {}
+                  // Fallback to known production key
+                  return "6LfizIQrAAAAAETdjKY14uI3ckhF-JeUujcloH53";
+                })();
+                const recaptchaKey = (renderKey || "").slice(0, 8) + "…";
                 content.innerHTML = `
                     <div>Project: <strong>${proj}</strong></div>
                     <div>Functions SDK: <strong>${hasFunctions ? "loaded" : "missing"}</strong></div>
-                    <div>App Check: <strong>${appCheckStatus}</strong>${tokenSnippet !== "n/a" ? ` (token ${tokenSnippet})` : ""}</div>
+          <div>App Check: <strong>${appCheckStatus}</strong>${tokenSnippet !== "n/a" ? ` (token ${tokenSnippet})` : ""}</div>
                     <div>Region (client): <strong>us-central1</strong></div>
                     <div>Hostname: <strong>${location.hostname}</strong></div>
+                    <div>reCAPTCHA: <strong>${recaptchaLoaded ? "ready" : "not ready"}</strong> (host: ${recaptchaHost}, key: ${recaptchaKey})</div>
                   `;
               }
             }
@@ -356,19 +478,302 @@
       }
     </script>
 
-    <!-- Initialize Enhanced Donation Widget (visible, no accordion) -->
+    <!-- Simple Checkout only: environment + analytics + handlers -->
     <script type="module">
       // Ensure environment config is available for Stripe key resolution
       import "./src/js/utils/env-config.js";
-      import "./src/js/components/enhanced-donation-widget.js";
+      import "./src/js/user-tracking-init.js";
+      import globalEventManager from "./src/js/core/global-event-manager.js";
+      import googleAnalytics from "./src/js/services/google-analytics.js";
 
       window.addEventListener("DOMContentLoaded", () => {
-        const container = document.getElementById("donation-widget-container");
-        if (container && window.EnhancedDonationWidget) {
-          // Render card style so tiers are immediately visible (no extra click)
-          window.EnhancedDonationWidget.init("donation-widget-container", {
-            style: "card",
-            showBenefits: true,
+        // Wire up Simple Checkout buttons
+        const simpleButtons = Array.from(
+          document.querySelectorAll(".simple-donate-btn"),
+        );
+        if (simpleButtons.length) {
+          // Disable until reCAPTCHA is truly ready to avoid missing tokens
+          simpleButtons.forEach((b) => (b.disabled = true));
+
+          const params = new URLSearchParams(window.location.search);
+          const isDebug = params.get("debug") === "1";
+          // Resolve Enterprise site key robustly: envConfig (if valid) → script render param → known fallback
+          const getEnterpriseSiteKey = () => {
+            const fromEnv = window.envConfig?.getRecaptchaEnterpriseSiteKey?.();
+            // Basic sanity check: Enterprise keys usually start with "6L" and are ~40+ chars
+            if (
+              typeof fromEnv === "string" &&
+              fromEnv.startsWith("6L") &&
+              fromEnv.length > 25
+            ) {
+              return fromEnv;
+            }
+            try {
+              const s = Array.from(document.scripts).find(
+                (s) =>
+                  s.src && s.src.includes("recaptcha/enterprise.js?render="),
+              );
+              if (s && s.src) {
+                const u = new URL(s.src);
+                const rendered = u.searchParams.get("render");
+                if (rendered) return rendered;
+              }
+            } catch {}
+            // Final fallback to production key
+            return "6LfizIQrAAAAAETdjKY14uI3ckhF-JeUujcloH53";
+          };
+          const siteKey = getEnterpriseSiteKey();
+
+          const loadScript = (src) =>
+            new Promise((resolve, reject) => {
+              const existing = Array.from(document.scripts).some(
+                (s) => s.src && s.src.includes(src),
+              );
+              if (existing) return resolve();
+              const s = document.createElement("script");
+              s.src = src;
+              s.async = true;
+              s.defer = true;
+              s.onload = resolve;
+              s.onerror = reject;
+              document.head.appendChild(s);
+            });
+
+          const ensureRecaptchaLoaded = async (timeoutMs = 8000) => {
+            const start = Date.now();
+            // Wait for google.com script first (already included), then fallback to recaptcha.net if needed
+            while (Date.now() - start < timeoutMs) {
+              if (window.grecaptcha?.enterprise) {
+                try {
+                  await new Promise((r) =>
+                    window.grecaptcha.enterprise.ready(r),
+                  );
+                } catch {}
+                return true;
+              }
+              // After 2000ms, try recaptcha.net fallback
+              if (Date.now() - start > 2000 && !window.__recaptchaNetLoading) {
+                window.__recaptchaNetLoading = true;
+                try {
+                  await loadScript(
+                    `https://www.recaptcha.net/recaptcha/enterprise.js?render=${encodeURIComponent(
+                      siteKey || "",
+                    )}`,
+                  );
+                } catch (e) {
+                  if (isDebug)
+                    console.warn("[donate] recaptcha.net load failed", e);
+                }
+              }
+              await new Promise((r) => setTimeout(r, 150));
+            }
+            return false;
+          };
+
+          ensureRecaptchaLoaded().then((ready) => {
+            if (!ready) {
+              if (isDebug) {
+                console.warn(
+                  "[donate] reCAPTCHA Enterprise not ready after timeout (possible blocker)",
+                );
+                const dbg = document.getElementById("donation-debug-content");
+                if (dbg)
+                  dbg.innerHTML += `<div style="margin-top:6px;color:#ffb3b3">reCAPTCHA not ready – check ad blockers or network</div>`;
+              }
+              // Keep buttons disabled if not ready
+              return;
+            }
+            simpleButtons.forEach((b) => (b.disabled = false));
+          });
+          const getStripeKey = () =>
+            (window.envConfig?.getStripePublishableKey &&
+              window.envConfig.getStripePublishableKey()) ||
+            (import.meta && import.meta.env
+              ? import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
+              : undefined);
+
+          const loadStripe = async () => {
+            if (window.Stripe) return true;
+            await new Promise((resolve, reject) => {
+              const s = document.createElement("script");
+              s.src = "https://js.stripe.com/v3/";
+              s.async = true;
+              s.onload = resolve;
+              s.onerror = reject;
+              document.head.appendChild(s);
+            });
+            return !!window.Stripe;
+          };
+
+          const createCheckout = async (priceId, tier) => {
+            const tierLabel =
+              { 1: "bronze", 2: "silver", 3: "gold" }[+tier] || String(tier);
+            const params = new URLSearchParams(window.location.search);
+            const isDebug = params.get("debug") === "1";
+            // Analytics: donation started
+            try {
+              googleAnalytics?.trackEvent?.("donation_started", {
+                event_category: "donation",
+                event_action: "start",
+                tier: tierLabel,
+                method: "simple",
+              });
+              globalEventManager?.emit?.("donation.start", {
+                tier: tierLabel,
+                source: "donate_page_simple",
+              });
+            } catch {}
+            // Get reCAPTCHA Enterprise token
+            const action = "donate_simple";
+            let token = "";
+            const getTokenOnce = async () => {
+              // Ensure loaded (retry with fallback if necessary)
+              if (!window.grecaptcha?.enterprise) {
+                const ok = await (async () =>
+                  ensureRecaptchaLoaded?.() ?? false)();
+                if (!ok || !window.grecaptcha?.enterprise) return "";
+              }
+              try {
+                await window.grecaptcha.enterprise.ready();
+              } catch {}
+              // Always execute with resolved key to avoid empty tokens due to key mismatch/undefined
+              return await window.grecaptcha.enterprise.execute(siteKey, {
+                action,
+              });
+            };
+            try {
+              // Try up to 3 times with small backoff
+              for (let i = 0; i < 3 && !token; i++) {
+                token = await getTokenOnce();
+                if (!token) {
+                  if (isDebug)
+                    console.warn(
+                      `[donate] reCAPTCHA token empty on attempt ${i + 1}`,
+                    );
+                  await new Promise((r) => setTimeout(r, 400 + i * 250));
+                }
+              }
+            } catch (e) {
+              console.warn("reCAPTCHA Enterprise failed:", e);
+            }
+
+            if (!token) {
+              const msg =
+                "Preparing protection. Please wait a moment and try again.";
+              if (isDebug) {
+                console.warn("[donate] No reCAPTCHA token generated");
+                alert(`${msg} (debug: missing token)`);
+              } else {
+                alert(msg);
+              }
+              return;
+            }
+
+            // Optional App Check header
+            let appCheckHeader = {};
+            if (window.firebase?.appCheck) {
+              try {
+                const t = await window.firebase.appCheck().getToken(false);
+                if (t?.token)
+                  appCheckHeader = { "X-Firebase-AppCheck": t.token };
+              } catch {}
+            }
+
+            // Call the HTTP endpoint (CORS-enabled)
+            const app = window.firebase?.app ? window.firebase.app() : null;
+            const projectId = app?.options?.projectId || "simulateai-research";
+            const region = "us-central1";
+            const url = `https://${region}-${projectId}.cloudfunctions.net/createAnonymousCheckoutHttp`;
+            const resp = await fetch(url, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                ...appCheckHeader,
+              },
+              body: JSON.stringify({
+                priceId,
+                tier: tier.toString(),
+                donorEmail: "",
+                recaptchaToken: token,
+                recaptchaAction: action,
+              }),
+            });
+            if (!resp.ok) {
+              let serverError = {};
+              try {
+                serverError = await resp.json();
+              } catch {}
+              const message = serverError.error || `HTTP ${resp.status}`;
+              if (isDebug) {
+                console.error("[donate] createAnonymousCheckoutHttp failed", {
+                  status: resp.status,
+                  body: serverError,
+                });
+              }
+              throw new Error(message);
+            }
+            const data = await resp.json();
+
+            // Prefer direct URL; fallback to sessionId via Stripe SDK
+            if (data?.url) {
+              try {
+                googleAnalytics?.trackEvent?.("donation_checkout_redirected", {
+                  event_category: "donation",
+                  event_action: "redirect",
+                  tier: tierLabel,
+                  method: "simple",
+                });
+                globalEventManager?.emit?.("donation.redirect", {
+                  tier: tierLabel,
+                  url: data.url,
+                });
+              } catch {}
+              window.location.href = data.url;
+              return;
+            }
+            const stripeKey = getStripeKey();
+            if (!stripeKey) throw new Error("Missing Stripe publishable key");
+            const ok = await loadStripe();
+            if (!ok) throw new Error("Failed to load Stripe SDK");
+            const stripe = window.Stripe(stripeKey);
+            const { error } = await stripe.redirectToCheckout({
+              sessionId: data.sessionId,
+            });
+            if (error) throw error;
+          };
+
+          simpleButtons.forEach((btn) => {
+            btn.addEventListener("click", async () => {
+              btn.disabled = true;
+              const priceId = btn.getAttribute("data-price-id");
+              const tier = btn.getAttribute("data-tier");
+              try {
+                await createCheckout(priceId, tier);
+              } catch (e) {
+                console.warn("Simple checkout failed:", e);
+                try {
+                  googleAnalytics?.trackEvent?.("donation_failed", {
+                    event_category: "donation",
+                    event_action: "fail",
+                    reason: e?.message || String(e),
+                  });
+                  globalEventManager?.emit?.("donation.error", {
+                    message: e?.message || String(e),
+                  });
+                } catch {}
+                const params = new URLSearchParams(window.location.search);
+                const isDebug = params.get("debug") === "1";
+                const generic =
+                  "Donations are temporarily unavailable. Please try again shortly.";
+                alert(
+                  isDebug && e?.message
+                    ? `${generic}\n\nDebug: ${e.message}`
+                    : generic,
+                );
+              } finally {
+                btn.disabled = false;
+              }
+            });
           });
         }
       });

@@ -705,20 +705,83 @@ class EnhancedDonationWidget {
         "createAnonymousCheckout",
       );
 
-      // Cloud Function expects: { priceId, tier, donorEmail }
-      // - priceId: Stripe Price for the selected tier (one-time payment)
-      // - tier: string identifier ("1" | "2" | "3") for server-side metadata
-      // - donorEmail: optional; let Stripe collect during Checkout if omitted
-      const result = await createAnonymousCheckout({
-        priceId: tier.priceId,
-        tier: tier.id.toString(),
-        donorEmail: "",
-        // Preserve optional message for future metadata expansion if backend supports it
-        // message,
-      });
+      // Execute reCAPTCHA Enterprise to obtain a token
+      const siteKey = window.envConfig?.getRecaptchaEnterpriseSiteKey?.();
+      const recaptchaAction = "donate_anonymous";
+      let recaptchaToken = "";
+
+      if (window.grecaptcha && window.grecaptcha.enterprise && siteKey) {
+        try {
+          await window.grecaptcha.enterprise.ready();
+          recaptchaToken = await window.grecaptcha.enterprise.execute(siteKey, {
+            action: recaptchaAction,
+          });
+        } catch (e) {
+          console.warn("reCAPTCHA Enterprise execution failed:", e);
+        }
+      } else {
+        console.warn(
+          "reCAPTCHA Enterprise not available; proceeding without token (may be blocked by server)",
+        );
+      }
+
+      // Cloud Function expects: { priceId, tier, donorEmail, recaptchaToken, recaptchaAction }
+      let result;
+      try {
+        result = await createAnonymousCheckout({
+          priceId: tier.priceId,
+          tier: tier.id.toString(),
+          donorEmail: "",
+          recaptchaToken,
+          recaptchaAction,
+          // message,
+        });
+      } catch (callableErr) {
+        // Fallback: direct HTTP call with CORS and App Check header
+        const app = window.firebase.app ? window.firebase.app() : null;
+        const projectId = app?.options?.projectId || "simulateai-research";
+        const region = "us-central1";
+        const url = `https://${region}-${projectId}.cloudfunctions.net/createAnonymousCheckoutHttp`;
+        let appCheckHeader = {};
+        if (window.firebase.appCheck) {
+          try {
+            const t = await window.firebase.appCheck().getToken(false);
+            if (t?.token) {
+              appCheckHeader = { "X-Firebase-AppCheck": t.token };
+            }
+          } catch (e) {
+            void e; // App Check optional; proceed without header
+          }
+        }
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...appCheckHeader,
+          },
+          body: JSON.stringify({
+            priceId: tier.priceId,
+            tier: tier.id.toString(),
+            donorEmail: "",
+            recaptchaToken,
+            recaptchaAction,
+          }),
+        });
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({}));
+          throw new Error(err.error || `HTTP ${resp.status}`);
+        }
+        const data = await resp.json();
+        result = { data };
+      }
 
       // Redirect to Stripe Checkout
       const stripe = window.Stripe(this.getStripeKey());
+      // Prefer URL if present
+      if (result.data?.url) {
+        window.location.href = result.data.url;
+        return;
+      }
       const { error } = await stripe.redirectToCheckout({
         sessionId: result.data.sessionId,
       });

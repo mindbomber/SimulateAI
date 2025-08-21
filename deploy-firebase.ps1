@@ -2,6 +2,9 @@
 # Firebase Hosting Secure Deployment Script
 # Deploys SimulateAI to Firebase Hosting with automatic config injection
 
+# Ensure we run from the script's directory (workspace root)
+Set-Location -Path $PSScriptRoot
+
 Write-Host "🔥 Firebase Hosting Deployment - SimulateAI" -ForegroundColor Cyan
 Write-Host "🌐 Custom Domain: simulateai.io" -ForegroundColor Green
 Write-Host ""

@@ -165,11 +165,64 @@ class AnonymousDonation {
         .functions()
         .httpsCallable("createAnonymousCheckout");
 
-      const result = await createAnonymousCheckout({
-        priceId: this.priceIds[tier],
-        tier,
-        donorEmail: donorEmail.trim(),
-      });
+      // Execute reCAPTCHA Enterprise
+      const siteKey = window.envConfig?.getRecaptchaEnterpriseSiteKey?.();
+      const recaptchaAction = "donate_anonymous";
+      let recaptchaToken = "";
+      if (window.grecaptcha && window.grecaptcha.enterprise && siteKey) {
+        try {
+          await window.grecaptcha.enterprise.ready();
+          recaptchaToken = await window.grecaptcha.enterprise.execute(siteKey, {
+            action: recaptchaAction,
+          });
+        } catch (e) {
+          console.warn("reCAPTCHA Enterprise execution failed:", e);
+        }
+      }
+
+      let result;
+      try {
+        result = await createAnonymousCheckout({
+          priceId: this.priceIds[tier],
+          tier,
+          donorEmail: donorEmail.trim(),
+          recaptchaToken,
+          recaptchaAction,
+        });
+      } catch (callableErr) {
+        const app = window.firebase.app ? window.firebase.app() : null;
+        const projectId = app?.options?.projectId || "simulateai-research";
+        const region = "us-central1";
+        const url = `https://${region}-${projectId}.cloudfunctions.net/createAnonymousCheckoutHttp`;
+        let appCheckHeader = {};
+        if (window.firebase.appCheck) {
+          try {
+            const t = await window.firebase.appCheck().getToken(false);
+            if (t?.token) {
+              appCheckHeader = { "X-Firebase-AppCheck": t.token };
+            }
+          } catch (e) {
+            void e; // App Check optional; proceed without header
+          }
+        }
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...appCheckHeader },
+          body: JSON.stringify({
+            priceId: this.priceIds[tier],
+            tier,
+            donorEmail: donorEmail.trim(),
+            recaptchaToken,
+            recaptchaAction,
+          }),
+        });
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({}));
+          throw new Error(err.error || `HTTP ${resp.status}`);
+        }
+        const data = await resp.json();
+        result = { data };
+      }
 
       if (result.data.url) {
         // Redirect to Stripe Checkout

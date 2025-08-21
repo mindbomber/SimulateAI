@@ -13,7 +13,7 @@ export const APP_CHECK_CONFIG = {
     window.location.hostname === "localhost" ||
     window.location.hostname === "127.0.0.1"
       ? "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // Test key for localhost
-      : "6LcuUpsrAAAAAEzAeX1qx0cjShEt7Nf0f73rvLjf", // Production Enterprise key
+      : "6LfizIQrAAAAAETdjKY14uI3ckhF-JeUujcloH53", // Production Enterprise key
 
   // Auto-refresh tokens - DISABLED to prevent loops
   AUTO_REFRESH_ENABLED: false,

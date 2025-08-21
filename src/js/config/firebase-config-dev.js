@@ -18,7 +18,7 @@ export const VAPID_KEY = "dev-vapid-key-placeholder";
 
 // reCAPTCHA Enterprise Configuration (development)
 export const recaptchaConfig = {
-  siteKey: "6LcuUpsrAAAAAEzAeX1qx0cjShEt7Nf0f73rvLjf", // Production Enterprise key for development testing
+  siteKey: "6LfizIQrAAAAAETdjKY14uI3ckhF-JeUujcloH53", // Production Enterprise key for development testing
   action: "submit",
 };
 
