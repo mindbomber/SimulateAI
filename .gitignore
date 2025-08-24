@@ -1,0 +1,23 @@
+node_modules/
+dist/
+.vite/
+.trash/
+
+# Local environment
+.env
+.env.*
+functions/.env
+
+# Generated icons and manifests
+public/icons/
+
+# Build artifacts in public/src (generated copy)
+public/src/js/config/firebase-config.js
+
+# OS/editor
+.DS_Store
+.VSCodeCounter/
+.history/
+.idea/
+.vscode/*
+!.vscode/tasks.jsonnode_modules
