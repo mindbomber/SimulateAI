@@ -43,24 +43,28 @@ class ScrollLockManager {
    * @param {string} reason - Component or reason for locking scroll
    */
   lock(reason = 'unknown') {
-    this.lockCount++;
-    this.lockReasons.add(reason);
-    
-    if (this.lockCount === 1) {
-      // First lock - store scroll position and apply lock
-      this.originalScrollY = window.pageYOffset || document.documentElement.scrollTop;
+    try {
+      this.lockCount++;
+      this.lockReasons.add(reason);
       
-      // Apply scroll lock
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${this.originalScrollY}px`;
-      document.body.style.width = '100%';
-      
-      if (this.debugMode) {
-        console.log(`[ScrollLockManager] Scroll locked by "${reason}" (count: ${this.lockCount})`);
+      if (this.lockCount === 1) {
+        // First lock - store scroll position and apply lock
+        this.originalScrollY = window.pageYOffset || document.documentElement.scrollTop;
+        
+        // Apply scroll lock
+        document.body.style.overflow = 'hidden';
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${this.originalScrollY}px`;
+        document.body.style.width = '100%';
+        
+        if (this.debugMode) {
+          console.log(`[ScrollLockManager] Scroll locked by "${reason}" (count: ${this.lockCount})`);
+        }
+      } else if (this.debugMode) {
+        console.log(`[ScrollLockManager] Additional lock by "${reason}" (count: ${this.lockCount})`);
       }
-    } else if (this.debugMode) {
-      console.log(`[ScrollLockManager] Additional lock by "${reason}" (count: ${this.lockCount})`);
+    } catch (error) {
+      console.error(`[ScrollLockManager] Error in lock("${reason}"):`, error);
     }
   }
 
@@ -69,25 +73,31 @@ class ScrollLockManager {
    * @param {string} reason - Component or reason for unlocking scroll
    */
   unlock(reason = 'unknown') {
-    if (this.lockCount <= 0) {
-      if (this.debugMode) {
-        console.warn(`[ScrollLockManager] Attempted to unlock scroll with "${reason}" but no locks exist`);
+    try {
+      if (this.lockCount <= 0) {
+        if (this.debugMode) {
+          console.warn(`[ScrollLockManager] Attempted to unlock scroll with "${reason}" but no locks exist`);
+        }
+        return;
       }
-      return;
-    }
 
-    this.lockCount--;
-    this.lockReasons.delete(reason);
-    
-    if (this.lockCount === 0) {
-      // Last unlock - restore scroll
-      this.restore();
+      this.lockCount--;
+      this.lockReasons.delete(reason);
       
-      if (this.debugMode) {
-        console.log(`[ScrollLockManager] Scroll unlocked by "${reason}" - fully restored`);
+      if (this.lockCount === 0) {
+        // Last unlock - restore scroll
+        this.restore();
+        
+        if (this.debugMode) {
+          console.log(`[ScrollLockManager] Scroll unlocked by "${reason}" - fully restored`);
+        }
+      } else if (this.debugMode) {
+        console.log(`[ScrollLockManager] Lock removed by "${reason}" (count: ${this.lockCount}, remaining: ${Array.from(this.lockReasons).join(', ')})`);
       }
-    } else if (this.debugMode) {
-      console.log(`[ScrollLockManager] Lock removed by "${reason}" (count: ${this.lockCount}, remaining: ${Array.from(this.lockReasons).join(', ')})`);
+    } catch (error) {
+      console.error(`[ScrollLockManager] Error in unlock("${reason}"):`, error);
+      // Force restoration on error
+      this.forceUnlock();
     }
   }
 
