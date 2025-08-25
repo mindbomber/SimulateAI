@@ -147,6 +147,7 @@ import AnalyticsManager from "./utils/analytics.js";
 import Helpers from "./utils/helpers.js";
 import canvasManager from "./utils/canvas-manager-compat.js";
 import logger from "./utils/logger.js";
+import scrollLockManager from "./utils/scroll-lock-manager.js";
 import focusManager from "./utils/focus-manager.js";
 import scrollManager from "./utils/scroll-manager.js";
 import { loopDetector } from "./utils/infinite-loop-detector.js";
@@ -7496,8 +7497,14 @@ SimulateAIApp.exportDiagnostics = function () {
 
 // Start the app when DOM is loaded
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", () => app.init());
+  document.addEventListener("DOMContentLoaded", () => {
+    // Emergency scroll restoration on page load to ensure scroll always works
+    scrollLockManager.forceUnlock();
+    app.init();
+  });
 } else {
+  // Emergency scroll restoration for already loaded pages
+  scrollLockManager.forceUnlock();
   app.init();
 }
 

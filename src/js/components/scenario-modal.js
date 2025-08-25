@@ -24,6 +24,7 @@ import { typewriterSequence } from "../utils/typewriter.js";
 import { loadScenarioModalConfig } from "../utils/scenario-modal-config-loader.js";
 import DataHandler from "../core/data-handler.js";
 import { getModeConfig } from "../constants/scenario-modes.js";
+import scrollLockManager from "../utils/scroll-lock-manager.js";
 
 class ScenarioModal {
   constructor(options = {}) {
@@ -821,7 +822,7 @@ class ScenarioModal {
       this.radarChart = null;
 
       // Restore body scrolling
-      document.body.style.overflow = "";
+      scrollLockManager.unlock('scenario-modal');
 
       // Remove event listeners
       if (this.escapeHandler) {
@@ -1814,6 +1815,12 @@ class ScenarioModal {
       setTimeout(async () => {
         await this.closeAndWait();
 
+        // CRITICAL: Emergency scroll restoration for test scenarios too
+        setTimeout(() => {
+          scrollLockManager.forceUnlock();
+          logger.info("🔓 Emergency scroll restoration completed after test scenario modal close");
+        }, 100);
+
         // Dispatch test scenario modal closed event
         const testClosedEvent = new CustomEvent("scenario-modal-closed", {
           detail: testCompletionData,
@@ -1880,6 +1887,13 @@ class ScenarioModal {
     setTimeout(async () => {
       await this.closeAndWait();
 
+      // CRITICAL: Emergency scroll restoration after scenario completion
+      // This ensures scroll functionality is always restored even if modal cleanup fails
+      setTimeout(() => {
+        scrollLockManager.forceUnlock();
+        logger.info("🔓 Emergency scroll restoration completed after scenario modal close");
+      }, 100);
+
       // Dispatch event after modal is fully closed (for badge display)
       const closedEvent = new CustomEvent("scenario-modal-closed", {
         detail: completionData,
@@ -1911,7 +1925,7 @@ class ScenarioModal {
     this.previousFocusedElement = document.activeElement;
 
     // Prevent body scrolling
-    document.body.style.overflow = "hidden";
+    scrollLockManager.lock('scenario-modal');
 
     // Add show class for animation and wait for it to complete
     await new Promise((resolve) => {
@@ -2001,7 +2015,7 @@ class ScenarioModal {
     }
 
     // Restore body scrolling
-    document.body.style.overflow = "";
+    scrollLockManager.unlock('scenario-modal');
 
     // Remove event listeners
     if (this.escapeHandler) {

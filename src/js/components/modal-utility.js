@@ -4,6 +4,7 @@
  */
 
 import logger from "../utils/logger.js";
+import scrollLockManager from "../utils/scroll-lock-manager.js";
 
 class ModalUtility {
   constructor({
@@ -147,7 +148,7 @@ class ModalUtility {
     }, 100);
 
     // Add body class to prevent scrolling
-    document.body.style.overflow = "hidden";
+    scrollLockManager.lock('modal-utility');
   }
 
   close() {
@@ -179,7 +180,7 @@ class ModalUtility {
     }, animationDuration);
 
     // Restore body scrolling
-    document.body.style.overflow = "";
+    scrollLockManager.unlock('modal-utility');
 
     // Call onClose callback if provided
     if (this.onClose && typeof this.onClose === "function") {

@@ -5,6 +5,7 @@
 
 import { UI } from "../utils/constants.js";
 import DataHandler from "../core/data-handler.js";
+import scrollLockManager from "../utils/scroll-lock-manager.js";
 
 class SharedNavigation {
   constructor(app = null) {
@@ -1667,7 +1668,7 @@ class SharedNavigation {
     }
 
     // Prevent body scroll
-    document.body.style.overflow = "hidden";
+    scrollLockManager.lock('mobile-nav');
   }
 
   /**
@@ -1694,7 +1695,7 @@ class SharedNavigation {
     }
 
     // Restore body scroll
-    document.body.style.overflow = "";
+    scrollLockManager.unlock('mobile-nav');
   }
 
   /**

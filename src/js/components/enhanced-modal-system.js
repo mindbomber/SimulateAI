@@ -12,6 +12,7 @@
  */
 
 import logger from "../utils/logger.js";
+import scrollLockManager from "../utils/scroll-lock-manager.js";
 
 // Enhanced modal constants
 const MODAL_CONSTANTS = {
@@ -658,14 +659,9 @@ export class EnhancedModal {
 
   setBodyScrolling(enabled) {
     if (enabled) {
-      document.body.style.overflow = "";
-      document.body.style.paddingRight = "";
+      scrollLockManager.unlock('enhanced-modal');
     } else {
-      // Calculate scrollbar width to prevent layout shift
-      const scrollbarWidth =
-        window.innerWidth - document.documentElement.clientWidth;
-      document.body.style.overflow = "hidden";
-      document.body.style.paddingRight = `${scrollbarWidth}px`;
+      scrollLockManager.lock('enhanced-modal');
     }
   }
 

@@ -36,6 +36,7 @@ import {
 } from "../../data/categories.js";
 import { CategoryMetadataManager } from "../utils/category-metadata-manager.js";
 import logger from "../utils/logger.js";
+import scrollLockManager from "../utils/scroll-lock-manager.js";
 import PreLaunchModal from "./pre-launch-modal.js";
 import ScenarioModal from "./scenario-modal.js";
 import ScenarioCard from "./scenario-card.js";
@@ -2665,7 +2666,7 @@ class MainGrid {
     this.batchModalCleanup(elementsToRemove, elementsToModify);
 
     // Handle body styles separately (immediate synchronous operations)
-    document.body.style.overflow = "";
+    scrollLockManager.forceUnlock(); // Ensure all scroll locks are cleared
     document.body.classList.remove("modal-open");
   }
 

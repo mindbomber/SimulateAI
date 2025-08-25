@@ -1,9 +1,11 @@
 /**
  * Unified Scroll Management System
  * Consolidates all scroll-related functionality into a single, efficient manager
+ * Updated to work with ScrollLockManager to prevent conflicts
  */
 
 import { logger } from "./logger.js";
+import scrollLockManager from "./scroll-lock-manager.js";
 
 class ScrollManager {
   constructor() {
@@ -88,10 +90,14 @@ class ScrollManager {
 
   /**
    * Unified scroll position reset - minimal intervention
+   * Updated to use centralized scroll lock management
    */
   resetScrollPosition() {
     // Use the most reliable method for all browsers
     window.scrollTo(0, 0);
+
+    // Force unlock any scroll locks to ensure scrolling works
+    scrollLockManager.forceUnlock();
 
     // Set loaded state immediately - no delay needed
     if (window.DOMClassManager) {
