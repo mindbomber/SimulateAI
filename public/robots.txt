@@ -1,0 +1,35 @@
+User-agent: *
+Allow: /
+
+# Main pages
+Allow: /index.html
+Allow: /blog.html
+Allow: /about.html
+Allow: /app.html
+
+# Static assets
+Allow: /src/
+Allow: /manifest.json
+Allow: /browserconfig.xml
+
+# Disallow test and development files
+Disallow: /*test*.html
+Disallow: /*debug*.html
+Disallow: /*demo*.html
+Disallow: /admin-*
+Disallow: /phase-*
+Disallow: /component-*
+Disallow: /badge-*
+Disallow: /category-*
+Disallow: /chart*
+Disallow: /community-*
+Disallow: /datahandler-*
+Disallow: /breadcrumb-*
+Disallow: /authservice-*
+Disallow: /clear-storage.html
+
+# Sitemap location
+Sitemap: https://simulateai.io/sitemap.xml
+
+# Crawl-delay (optional - helps prevent overwhelming your server)
+Crawl-delay: 1

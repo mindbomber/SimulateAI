@@ -1,0 +1,1220 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="page-id" content="help-faq" />
+    <title>SimulateAI Help & FAQ - Support Center</title>
+    <meta
+      name="description"
+      content="Comprehensive help center and FAQ for SimulateAI - get answers about technical questions, classroom integration, ethical frameworks, and more."
+    />
+
+    <!-- Google Analytics is initialized via centralized service (no inline gtag to avoid double-init) -->
+
+    <!-- Early theme-preload shim: apply correct theme before CSS to prevent FOUC -->
+    <style id="theme-preload-style">
+      html.theme-preload,
+      html.theme-preload * {
+        transition: none !important;
+      }
+    </style>
+    <script>
+      (function () {
+        try {
+          var val = null;
+          try {
+            val = localStorage.getItem("simulateai_theme_preference");
+          } catch (_) {}
+          if (!val) {
+            try {
+              val =
+                localStorage.getItem("simulateai_theme") ||
+                localStorage.getItem("theme");
+            } catch (_) {}
+          }
+          var prefersDark = false;
+          try {
+            prefersDark =
+              window.matchMedia &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches;
+          } catch (_) {}
+          var theme =
+            val === "dark" || val === "light" || val === "system"
+              ? val === "system"
+                ? prefersDark
+                  ? "dark"
+                  : "light"
+                : val
+              : prefersDark
+                ? "dark"
+                : "light";
+
+          document.documentElement.classList.add("theme-preload");
+          document.documentElement.style.colorScheme = theme;
+
+          var apply = function () {
+            var b = document.body;
+            if (!b) return;
+            b.classList.remove("theme-dark", "theme-light", "dark-mode");
+            if (theme === "dark") {
+              b.classList.add("theme-dark", "dark-mode");
+            } else {
+              b.classList.add("theme-light");
+            }
+          };
+
+          if (document.body) {
+            apply();
+          } else {
+            document.addEventListener("DOMContentLoaded", apply, {
+              once: true,
+            });
+          }
+
+          window.addEventListener(
+            "load",
+            function () {
+              document.documentElement.classList.remove("theme-preload");
+            },
+            { once: true },
+          );
+        } catch (e) {}
+      })();
+    </script>
+
+    <!-- SEO and Social Meta -->
+    <meta property="og:title" content="SimulateAI Help & FAQ" />
+    <meta
+      property="og:description"
+      content="Your one-stop hub for answers, troubleshooting tips, and direct support for SimulateAI"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://simulateai.com/help-faq.html" />
+
+    <!-- Accessibility -->
+    <meta
+      name="accessibility-features"
+      content="keyboard-navigation,skip-links,high-contrast,large-text,screen-reader-support"
+    />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="src/styles/main.css" />
+    <link rel="stylesheet" href="src/styles/shared-navigation.css" />
+    <link rel="stylesheet" href="src/styles/accessibility.css" />
+    <link rel="stylesheet" href="src/styles/footer.css" />
+
+    <!-- Centralized analytics initializer -->
+    <script type="module" src="src/js/user-tracking-init.js"></script>
+
+    <!-- Help & FAQ Specific Styles -->
+    <style>
+      :root {
+        --help-primary: #4c7fff;
+        --help-dark: #0b0f19;
+        --help-light: #f5f7fa;
+        --help-card-bg: #ffffff;
+        --help-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+        --help-border-radius: 1rem;
+        --help-success: #22c55e;
+        --help-warning: #f59e0b;
+        --help-info: #3b82f6;
+        --help-purple: #8b5cf6;
+      }
+
+      .help-wrapper {
+        max-width: 1000px;
+        margin: 2rem auto;
+        padding: 2rem 1rem;
+        background: var(--help-light);
+        border-radius: var(--help-border-radius);
+        min-height: calc(100vh - 4rem);
+      }
+
+      .help-hero {
+        text-align: center;
+        margin-bottom: 3rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 2rem;
+        border-radius: var(--help-border-radius);
+      }
+
+      .help-hero h1 {
+        font-size: clamp(2.5rem, 5vw + 1rem, 4rem);
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .help-hero p {
+        font-size: 1.3rem;
+        line-height: 1.6;
+        max-width: 700px;
+        margin: 0 auto 2rem;
+        opacity: 0.95;
+      }
+
+      .help-nav {
+        background: var(--help-card-bg);
+        border-radius: var(--help-border-radius);
+        padding: 1.5rem;
+        margin-bottom: 3rem;
+        box-shadow: var(--help-shadow);
+      }
+
+      .help-nav ul {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .help-nav a {
+        color: var(--help-primary);
+        font-weight: 600;
+        text-decoration: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 2rem;
+        transition: all 0.3s ease;
+        border: 2px solid var(--help-primary);
+        background: transparent;
+        white-space: nowrap;
+        display: inline-block;
+        margin: 0;
+      }
+
+      .help-nav a:hover,
+      .help-nav a:focus {
+        background: var(--help-primary);
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      .help-section {
+        background: var(--help-card-bg);
+        border-radius: var(--help-border-radius);
+        padding: 2.5rem;
+        margin-bottom: 3rem;
+        box-shadow: var(--help-shadow);
+      }
+
+      .help-section h2 {
+        color: var(--help-primary);
+        font-size: 2.2rem;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        border-bottom: 3px solid rgba(76, 127, 255, 0.1);
+        padding-bottom: 1rem;
+      }
+
+      .faq {
+        margin-bottom: 1.5rem;
+        border: 2px solid transparent;
+        border-radius: 0.8rem;
+        transition: all 0.3s ease;
+      }
+
+      .faq:hover {
+        border-color: rgba(76, 127, 255, 0.2);
+        box-shadow: 0 4px 12px rgba(76, 127, 255, 0.1);
+      }
+
+      .faq details {
+        background: rgba(76, 127, 255, 0.02);
+        border-radius: 0.8rem;
+        overflow: hidden;
+      }
+
+      .faq summary {
+        cursor: pointer;
+        padding: 1.5rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: var(--help-dark);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .faq summary:hover {
+        background: rgba(76, 127, 255, 0.05);
+      }
+
+      .faq summary::marker {
+        display: none;
+      }
+
+      .faq summary::after {
+        content: "▼";
+        transition: transform 0.3s ease;
+        color: var(--help-primary);
+        font-weight: bold;
+      }
+
+      .faq details[open] summary::after {
+        transform: rotate(180deg);
+      }
+
+      .faq h3 {
+        margin: 0;
+        font-size: 1.1rem;
+      }
+
+      .faq-content {
+        padding: 0 1.5rem 1.5rem;
+        line-height: 1.7;
+        color: var(--help-dark);
+      }
+
+      .faq-content p {
+        margin: 0 0 1rem;
+      }
+
+      .faq-content code {
+        background: rgba(76, 127, 255, 0.1);
+        padding: 0.2rem 0.5rem;
+        border-radius: 0.3rem;
+        font-family: "Monaco", "Menlo", monospace;
+      }
+
+      .faq-content a {
+        color: var(--help-primary);
+        text-decoration: none;
+        font-weight: 600;
+        border-bottom: 1px solid transparent;
+        transition: border-color 0.2s ease;
+      }
+
+      .faq-content a:hover {
+        border-bottom-color: var(--help-primary);
+      }
+
+      .cat {
+        display: inline-block;
+        font-size: 0.7rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-left: 1rem;
+      }
+
+      .cat.tech {
+        background: var(--help-info);
+        color: white;
+      }
+      .cat.creative {
+        background: var(--help-purple);
+        color: white;
+      }
+      .cat.research {
+        background: var(--help-success);
+        color: white;
+      }
+      .cat.origin {
+        background: var(--help-warning);
+        color: white;
+      }
+      .cat.getting-started {
+        background: var(--help-primary);
+        color: white;
+      }
+      .cat.account {
+        background: #ec4899;
+        color: white;
+      }
+      .cat.classroom {
+        background: #10b981;
+        color: white;
+      }
+      .cat.troubleshoot {
+        background: #f59e0b;
+        color: white;
+      }
+
+      .coming-soon {
+        background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+        color: white;
+        font-size: 0.7rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-left: 1rem;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .contact-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+      }
+
+      .contact-card {
+        background: var(--help-card-bg);
+        padding: 2rem;
+        border-radius: var(--help-border-radius);
+        box-shadow: var(--help-shadow);
+        text-align: center;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+      }
+
+      .contact-card:hover {
+        border-color: var(--help-primary);
+        transform: translateY(-4px);
+      }
+
+      .contact-card h3 {
+        color: var(--help-primary);
+        margin-top: 0;
+      }
+
+      .help-button {
+        display: inline-block;
+        padding: 0.8rem 2rem;
+        background: var(--help-primary);
+        color: white;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        margin-top: 1rem;
+      }
+
+      .help-button:hover,
+      .help-button:focus {
+        background: #3a5acc;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(76, 127, 255, 0.3);
+      }
+
+      .help-button.secondary {
+        background: var(--help-success);
+      }
+
+      .help-button.warning {
+        background: var(--help-warning);
+      }
+
+      /* Desktop and tablet layout */
+      @media (min-width: 769px) {
+        .help-nav ul {
+          flex-direction: row;
+          justify-content: center;
+        }
+      }
+
+      /* Mobile responsive design */
+      @media (max-width: 768px) {
+        .help-wrapper {
+          margin: 1rem;
+          padding: 1rem;
+        }
+
+        .help-hero {
+          padding: 2rem 1rem;
+        }
+
+        .help-nav ul {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .contact-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .faq summary {
+          padding: 1rem;
+          font-size: 1rem;
+        }
+
+        .faq-content {
+          padding: 0 1rem 1rem;
+        }
+      }
+    </style>
+
+    <!-- Icons and Favicons -->
+    <link rel="icon" type="image/svg+xml" href="src/assets/icons/favicon.svg" />
+    <link rel="icon" type="image/png" href="src/assets/icons/favicon.png" />
+  </head>
+
+  <body class="help-page" data-page-id="help-faq">
+    <!-- Skip to content for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- ARIA live regions for announcements -->
+    <div
+      id="aria-live-polite"
+      aria-live="polite"
+      aria-atomic="true"
+      class="sr-only"
+    ></div>
+    <div
+      id="aria-live-assertive"
+      aria-live="assertive"
+      aria-atomic="true"
+      class="sr-only"
+    ></div>
+
+    <!-- Enhanced Header -->
+    <div id="navigation-container">
+      <!-- Shared navigation will be injected here -->
+    </div>
+
+    <!-- Main Content -->
+    <main id="main-content" class="help-wrapper">
+      <!-- Hero Section -->
+      <header class="help-hero">
+        <h1>🆘 Help & FAQ</h1>
+        <p>
+          Your one-stop hub for answers, troubleshooting tips, and direct
+          support. Find everything from technical questions to philosophical
+          frameworks that power SimulateAI.
+        </p>
+      </header>
+
+      <!-- Quick Navigation -->
+      <nav class="help-nav" aria-label="FAQ sections">
+        <ul>
+          <li><a href="#getting-started">Getting Started</a></li>
+          <li><a href="#account">Account & Login</a></li>
+          <li><a href="#classroom">Classroom Integration</a></li>
+          <li><a href="#technical">Technical Questions</a></li>
+          <li><a href="#creative">Creative & UX</a></li>
+          <li><a href="#research">Research & Philosophy</a></li>
+          <li><a href="#origin">Origin & Roadmap</a></li>
+          <li><a href="#troubleshooting">Troubleshooting</a></li>
+          <li><a href="#contact">Contact Support</a></li>
+        </ul>
+      </nav>
+
+      <!-- Getting Started Section -->
+      <section id="getting-started" class="help-section">
+        <h2>🚀 Getting Started</h2>
+
+        <div class="faq">
+          <details open>
+            <summary>
+              <h3>How do I create my free educator account?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                Click <strong>Sign In</strong> at the top-right of any page,
+                choose <strong>Educator</strong>, and authenticate with Google
+                or Microsoft. You'll immediately see the Educator Tools
+                dashboard with access to curriculum kits, assessment tools, and
+                professional development resources.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>What browsers and devices are supported?</h3>
+              <span class="coming-soon">Coming Soon</span>
+            </summary>
+            <div class="faq-content">
+              <p>
+                <strong>🚧 Coming Soon!</strong> Full device compatibility
+                testing is currently in development. SimulateAI will work on any
+                modern browser (Chrome 100+, Edge 100+, Safari 15+, Firefox
+                100+) and all current iOS/Android tablets. We recommend using a
+                desktop or tablet for the best experience with interactive
+                scenarios and radar charts.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>Is SimulateAI really free for educators?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                Yes! All core features including scenarios, curriculum kits,
+                assessment tools, and basic analytics are completely free for
+                K-12 educators. We also offer premium district partnerships with
+                advanced features, training, and dedicated support.
+              </p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- Account & Login Section -->
+      <section id="account" class="help-section">
+        <h2>🔐 Account & Login</h2>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>I forgot my password—what do I do?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                Select <em>Forgot Password</em> on the login screen and enter
+                your email. We'll send a reset link within two minutes. Still
+                waiting? Check spam or whitelist <code>@simulateai.io</code> in
+                your email settings.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>Can students log in with Google Classroom?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                Yes! Students can sign in with their Google accounts. Your
+                roster auto-syncs once you connect your Classroom in Educator
+                Tools → <strong>Integrations</strong>. This makes class
+                management seamless and secure.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>How do I switch between student and teacher accounts?</h3>
+              <span class="coming-soon">Coming Soon</span>
+            </summary>
+            <div class="faq-content">
+              <p>
+                <strong>🚧 Coming Soon!</strong> Account switching functionality
+                is currently under development. For now, you can sign out and
+                sign back in with different account types. In the future, you'll
+                be able to click your profile icon in the top-right corner and
+                select "Switch View" to toggle between educator and student
+                perspectives. This will let you preview exactly what your
+                students will see and experience.
+              </p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- Classroom Integration Section -->
+      <section id="classroom" class="help-section">
+        <h2>🏫 Classroom Integration</h2>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>How do I assign a scenario to my class?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                Navigate to any scenario page and click <strong>Assign</strong>.
+                Select your class, due date, and optional reflection prompts.
+                Students will see it in their dashboard immediately. You can
+                track progress and view analytics in real-time.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>Are the lessons aligned to ISTE Standards?</h3>
+              <span class="coming-soon">Coming Soon</span>
+            </summary>
+            <div class="faq-content">
+              <p>
+                <strong>🚧 Coming Soon!</strong> Detailed ISTE Standards
+                alignment documentation is currently being finalized. Our
+                curriculum team is working to ensure each scenario maps to
+                specific standards including Digital Citizen (1.2), Critical
+                Thinking (1.4), and Knowledge Constructor (3.3). Comprehensive
+                alignment maps will be available in the
+                <a href="educator-tools.html#curriculum">Educator Tools</a>
+                section soon.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>Can I customize scenarios for my curriculum?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                Currently, scenarios are pre-built by our educational team.
+                However, you can use our reflection prompts and discussion
+                guides to adapt any scenario to your specific learning
+                objectives. Custom scenario creation is on our roadmap for 2025!
+              </p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- Technical Questions Section -->
+      <section id="technical" class="help-section">
+        <h2>🔧 Technical Curiosity</h2>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>What tech stack did you use?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                SimulateAI is built with modern web technologies: vanilla
+                JavaScript for the frontend, Firebase for backend services,
+                Chart.js for radar visualizations, and Vite for development
+                tooling. We prioritize performance, accessibility, and
+                cross-platform compatibility.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>Is this built as a PWA or native app?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                SimulateAI is a Progressive Web App (PWA) that works seamlessly
+                across all devices. You can install it on mobile devices for
+                offline access to scenarios and a native app-like experience,
+                while maintaining full cross-platform compatibility.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>How did you manage scenario branching and metadata?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                We use a JSON-based scenario engine with decision trees and
+                weighted ethical dimensions. Each choice maps to our
+                8-dimensional ethical framework (Fairness, Sustainability,
+                Autonomy, etc.) and influences the final radar chart
+                visualization through algorithmic scoring.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>How scalable is the platform?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                SimulateAI is built on Firebase, which auto-scales to handle
+                millions of users. We use efficient caching, lazy loading, and
+                optimized database queries to ensure fast performance even with
+                large classroom deployments and concurrent usage.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>Do you use Firebase?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                Yes! We leverage Firebase Authentication for secure login,
+                Firestore for real-time data, Firebase Storage for curriculum
+                resources, and Firebase Analytics for educational insights. This
+                ensures reliability, security, and FERPA compliance.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>Is the source code open?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                SimulateAI is currently proprietary, but we're exploring
+                open-source components for educational scenarios and ethical
+                frameworks. We believe in transparency and may open-source the
+                core scenario engine in the future to benefit the broader
+                educational community.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>How do you handle user data and consent?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                We're FERPA and COPPA compliant with strict data protection.
+                Student data is encrypted, never sold, and used only for
+                educational purposes. Parents and educators maintain full
+                control with easy data export/deletion. See our
+                <a href="privacy-notice.html">Privacy Notice</a> for details.
+              </p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- Creative & UX Section -->
+      <section id="creative" class="help-section">
+        <h2>🎨 Creative & UX Exploration</h2>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>Who designed the radar chart?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                Our radar chart was designed by our educational UX team in
+                collaboration with ethics researchers. The 8-dimensional
+                framework is based on established ethical theories, and the
+                visual design prioritizes clarity and student understanding over
+                complexity.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>Can I remix or create my own scenarios?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                Not yet, but this is our most-requested feature! We're
+                developing a scenario builder for educators that will launch in
+                late 2025. For now, you can adapt our reflection prompts and
+                discussion guides to customize the learning experience for your
+                students.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>How do badges or ethical visualizations work?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                Students earn badges for completing scenarios, demonstrating
+                growth in ethical reasoning, and participating in discussions.
+                The radar chart visualizes their ethical decision-making
+                patterns across 8 dimensions, helping them understand their
+                values and areas for growth.
+              </p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- Research & Philosophy Section -->
+      <section id="research" class="help-section">
+        <h2>🧠 Philosophical & Research Driven</h2>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>What ethical frameworks does SimulateAI use?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                We integrate four major ethical traditions: Virtue Ethics
+                (Aristotle), Utilitarianism (Mill), Deontological Ethics (Kant),
+                and Care Ethics (Gilligan). Our 8-dimensional framework maps to
+                these traditions while remaining accessible to K-12 students.
+                See our <a href="ethics-guide.html">Ethics Guide</a> for
+                details.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>How is this different from a regular ethics quiz?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                Unlike quizzes with "right" answers, SimulateAI presents complex
+                scenarios where multiple ethical choices are valid. Students
+                explore consequences, consider stakeholder perspectives, and
+                develop reasoning skills rather than memorizing rules. The focus
+                is on ethical thinking, not ethical answers.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>Do you collect data for research?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                Only with explicit consent and IRB approval. We partner with
+                universities to study ethical reasoning development, but all
+                research is anonymous, voluntary, and focused on improving AI
+                ethics education. Students and educators can opt out at any
+                time.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>Can we analyze trends across user decisions?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                Educators can view aggregated, anonymous classroom trends to
+                understand common ethical reasoning patterns. Individual student
+                data remains private. We're developing research dashboards for
+                districts interested in understanding ethical development across
+                their programs.
+              </p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- Origin & Roadmap Section -->
+      <section id="origin" class="help-section">
+        <h2>🚀 Origin Story & Roadmap</h2>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>How did this project start?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                SimulateAI began as a research project exploring how young
+                people reason about AI ethics. We realized traditional ethics
+                education wasn't preparing students for AI-driven futures, so we
+                built an interactive platform that makes complex ethical
+                thinking accessible and engaging.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>What challenges did you face building it?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                Balancing academic rigor with student engagement was our biggest
+                challenge. We needed scenarios complex enough to prompt genuine
+                ethical reasoning but accessible to diverse learners. Countless
+                iterations with educators and students helped us find that sweet
+                spot.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>What's next for SimulateAI?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                2025 roadmap includes: custom scenario builder, advanced
+                analytics dashboard, mobile app, multilingual support, and
+                partnerships with major curricula. We're also exploring VR
+                ethics simulations and AI-generated discussion prompts for
+                personalized learning.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>Can I donate or contribute scenarios?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                Yes! We welcome donations through our
+                <a href="donate.html">support page</a> and collaborate with
+                educators on scenario development. Email
+                <a href="mailto:research@simulateai.io"
+                  >research@simulateai.io</a
+                >
+                to discuss contributing your ethical dilemmas or real-world case
+                studies.
+              </p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- Troubleshooting Section -->
+      <section id="troubleshooting" class="help-section">
+        <h2>🛠️ Troubleshooting</h2>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>The radar chart won't load</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                First, refresh the page. If the issue persists, check that
+                <code>cdn.jsdelivr.net</code> is not blocked by your district
+                firewall (Chart.js loads from that CDN). Whitelisting the domain
+                usually resolves the problem. Contact IT if you need help with
+                firewall settings.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>Students can't access assigned scenarios</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                Verify that students are logged in with the correct accounts
+                linked to your classroom. Check that the assignment is published
+                and hasn't expired. You can force-refresh class data from
+                Educator Tools → <strong>Dashboard</strong> →
+                <strong>Sync Classroom</strong>.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>Downloads from Educator Tools aren't working</h3>
+              <span class="coming-soon">Coming Soon</span>
+            </summary>
+            <div class="faq-content">
+              <p>
+                <strong>🚧 Coming Soon!</strong> Enhanced download functionality
+                with better error handling is in development. Currently, check
+                your browser's download settings and popup blocker. Some
+                district firewalls block downloads from external sites. Try
+                downloading with a personal device/network first, then transfer
+                files to your school computer if needed.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>The site is loading slowly</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                SimulateAI is optimized for speed, but school networks can vary.
+                Try clearing your browser cache, using Chrome or Edge for best
+                performance, and ensuring you have a stable internet connection.
+                Contact us if specific pages consistently load slowly.
+              </p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- Contact Support Section -->
+      <section id="contact" class="help-section">
+        <h2>📩 Contact Support</h2>
+
+        <p>
+          If your question isn't answered above, we're here to help! Choose the
+          best contact method for your needs:
+        </p>
+
+        <div class="contact-grid">
+          <div class="contact-card">
+            <h3>📧 Email Support</h3>
+            <p>General questions, account issues, and educator assistance</p>
+            <p>
+              <strong>Response time:</strong> Within 24 hours (M-F, 9 AM - 5 PM
+              ET)
+            </p>
+            <a href="mailto:research@simulateai.io" class="help-button"
+              >Email Support</a
+            >
+          </div>
+
+          <div class="contact-card">
+            <h3>💬 Community Slack</h3>
+            <p>Real-time help from our team and fellow educators</p>
+            <p>
+              <strong>Active hours:</strong> 9 AM - 6 PM ET, plus community
+              support
+            </p>
+            <a
+              href="https://simulateai.slack.com/"
+              class="help-button secondary"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Join Slack Community</a
+            >
+          </div>
+
+          <div class="contact-card">
+            <h3>🎫 Support Ticket</h3>
+            <p>Bug reports, feature requests, and technical issues</p>
+            <p>
+              <strong>Response time:</strong> 1-3 business days depending on
+              priority
+            </p>
+            <a href="#" class="help-button warning">Submit Ticket</a>
+          </div>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>How do I report a bug or request a feature?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                Use our support ticket system for detailed bug reports. Include
+                your browser, operating system, and steps to reproduce the
+                issue. For feature requests, explain your educational use case
+                and how it would benefit your students.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>
+              <h3>Do you offer training or professional development?</h3>
+            </summary>
+            <div class="faq-content">
+              <p>
+                Yes! We offer webinars, workshops, and custom district training.
+                Visit our
+                <a href="educator-tools.html#professional-development"
+                  >Professional Development</a
+                >
+                section for on-demand resources, or contact us for custom
+                training tailored to your needs.
+              </p>
+            </div>
+          </details>
+        </div>
+      </section>
+    </main>
+
+    <!-- Professional Footer will be inserted here -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Professional Footer Component -->
+    <script
+      type="module"
+      src="src/js/components/professional-footer.js"
+    ></script>
+
+    <!-- Back to Top Component -->
+    <script type="module" src="src/js/components/back-to-top.js"></script>
+
+    <!-- Shared Navigation Component -->
+    <script type="module">
+      // Ensure the page is fully loaded before initializing navigation
+      setTimeout(() => {
+        import("./src/js/components/shared-navigation.js");
+      }, 100);
+    </script>
+
+    <!-- Search Functionality -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+          anchor.addEventListener("click", function (e) {
+            const href = this.getAttribute("href");
+            if (!href || href === "#") return;
+
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+              target.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

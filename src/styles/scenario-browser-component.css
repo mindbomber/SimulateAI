@@ -1,0 +1,856 @@
+/**
+ * Copyright 2025 Armando Sori
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Scenario Browser Component Styles
+ * Styles for the ScenarioBrowser JavaScript component
+ * Includes scenario cards, search controls, filters, and grid layout
+ * 
+ * Note: This file contains styles extracted from category-grid.css
+ * for the ScenarioBrowser component specifically.
+ */
+
+/* ===== SCENARIO GRID LAYOUT ===== */
+.scenarios-grid {
+  display: flex;
+  overflow: auto hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: var(--spacing-2);
+  gap: var(--spacing-6);
+}
+
+.scenarios-grid::-webkit-scrollbar {
+  display: none;
+}
+
+/* ===== SCENARIO CARDS IN GRID VIEW ===== */
+.scenarios-grid[data-view="scenario"] .scenario-card {
+  max-width: none;
+  width: 100%;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 0;
+  cursor: pointer;
+}
+
+.scenarios-grid[data-view="scenario"] .scenario-card .scenario-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-4);
+  box-sizing: border-box;
+}
+
+.scenarios-grid[data-view="scenario"] .scenario-card .scenario-title {
+  margin-bottom: var(--spacing-3);
+  line-height: 1.3;
+  min-height: 2.6em;
+}
+
+.scenarios-grid[data-view="scenario"] .scenario-card .scenario-description {
+  flex: 1;
+  margin-bottom: var(--spacing-4);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+  min-height: 4.2em;
+}
+
+.scenarios-grid[data-view="scenario"] .scenario-card .scenario-footer {
+  margin-top: auto;
+  padding-top: var(--spacing-2);
+}
+
+/* ===== SCENARIO CARD WRAPPER WITH HOVER EFFECTS ===== */
+.scenario-card-wrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.scenario-card-wrapper:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgb(0 0 0 / 12%);
+}
+
+/* ===== HOVER CATEGORY HEADER ===== */
+.scenario-hover-category-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background: rgb(255 255 255 / 98%);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 15%);
+  border: 1px solid var(--color-gray-200);
+  border-bottom: none;
+  transform: translateY(-100%);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  opacity: 0;
+  transition:
+    transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    opacity 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+    box-shadow 0.3s ease-out;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.scenario-card-wrapper:hover .scenario-hover-category-header,
+.scenario-card-wrapper:focus-within .scenario-hover-category-header {
+  transform: translateY(0);
+  opacity: 1;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 20%);
+  pointer-events: auto;
+}
+
+/* ===== SCENARIO CONTROLS TOOLBAR ===== */
+.scenario-controls-toolbar {
+  display: none;
+  align-items: center;
+  gap: var(--spacing-4);
+  padding: var(--spacing-4) 0 var(--spacing-6) 0;
+  margin-bottom: var(--spacing-2);
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.scenarios-grid[data-view="scenario"] .scenario-controls-toolbar {
+  display: flex;
+}
+
+/* ===== SEARCH CONTAINER - MOVED TO scenario-browser.css ===== */
+/* Search container styles consolidated to scenario-browser.css for single source of truth */
+/* .search-container styles now handled by .scenario-controls-toolbar .search-container */
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: var(--spacing-3);
+  width: 18px;
+  height: 18px;
+  color: var(--color-gray-400);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.scenario-controls-toolbar .search-input {
+  width: 100%;
+  padding: var(--spacing-3) var(--spacing-10) var(--spacing-3) 2.75rem;
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  background: var(--color-white);
+  transition: all var(--transition-base);
+  box-sizing: border-box;
+}
+
+.scenario-controls-toolbar .search-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.scenario-controls-toolbar .search-input::placeholder {
+  color: var(--color-gray-500);
+}
+
+.search-clear {
+  position: absolute;
+  right: var(--spacing-3);
+  width: 18px;
+  height: 18px;
+  color: var(--color-gray-400);
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-base);
+  z-index: 2;
+}
+
+.search-clear:hover {
+  color: var(--color-gray-600);
+  background: var(--color-gray-100);
+}
+
+/* ===== SEARCH AUTOCOMPLETE DROPDOWN ===== */
+.search-autocomplete-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-300);
+  border-top: none;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 1px;
+}
+
+.search-autocomplete-item {
+  padding: var(--spacing-3);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  border-bottom: 1px solid var(--color-gray-100);
+}
+
+.search-autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.search-autocomplete-item:hover {
+  background: var(--color-gray-50);
+}
+
+.search-autocomplete-item.highlighted {
+  background: var(--color-primary-50);
+  color: var(--color-primary-700);
+}
+
+/* ===== CONTROLS GROUP - MOVED TO scenario-browser.css ===== */
+/* Controls group styles consolidated to scenario-browser.css for single source of truth */
+/* .controls-group styles now handled by .scenario-controls-toolbar .controls-group */
+
+/* ===== FILTER CONTAINERS - MOVED TO scenario-browser.css ===== */
+/* Filter container styles consolidated to scenario-browser.css for single source of truth */
+/* .filter-container, .sort-container styles now handled by .scenario-controls-toolbar selectors */
+
+/* ===== FILTER AND SORT BUTTONS ===== */
+.filter-btn,
+.sort-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-4);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  color: var(--color-gray-700);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+}
+
+.filter-btn:hover,
+.sort-btn:hover {
+  border-color: var(--color-gray-400);
+  background: var(--color-gray-50);
+}
+
+.filter-btn:focus,
+.sort-btn:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.filter-btn[aria-expanded="true"],
+.sort-btn[aria-expanded="true"] {
+  border-color: var(--color-primary);
+  background: var(--color-primary-50);
+  color: var(--color-primary-700);
+}
+
+.filter-icon,
+.sort-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--color-gray-500);
+  transition: transform var(--transition-fast);
+}
+
+.filter-btn[aria-expanded="true"] .filter-icon,
+.sort-btn[aria-expanded="true"] .sort-icon {
+  transform: rotate(180deg);
+}
+
+/* ===== FILTER DROPDOWN ===== */
+.filter-dropdown,
+.sort-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 100;
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
+  min-width: 200px;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: var(--spacing-1);
+  /* Critical display properties for dropdown functionality */
+  display: block !important;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: all var(--transition-fast);
+  /* Ensure dropdowns are interactive when visible */
+  pointer-events: none;
+}
+
+/* Override JavaScript inline styles when dropdowns should be hidden */
+.filter-dropdown[style*="display: none"],
+.sort-dropdown[style*="display: none"] {
+  display: block !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.filter-btn[aria-expanded="true"] + .filter-dropdown,
+.sort-btn[aria-expanded="true"] + .sort-dropdown {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0);
+  pointer-events: auto !important;
+}
+
+/* Handle JavaScript inline style overrides for visible dropdowns */
+.filter-btn[aria-expanded="true"] + .filter-dropdown[style*="display: block"],
+.sort-btn[aria-expanded="true"] + .sort-dropdown[style*="display: block"] {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0);
+  pointer-events: auto !important;
+}
+
+/* Debug: Alternative CSS selectors to show dropdowns */
+.filter-btn.active + .filter-dropdown,
+.sort-btn.active + .sort-dropdown,
+.filter-btn:focus + .filter-dropdown,
+.sort-btn:focus + .sort-dropdown {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0);
+  pointer-events: auto !important;
+}
+
+/* Emergency override: Show dropdowns on hover for testing */
+.scenario-controls-toolbar .filter-container:hover .filter-dropdown,
+.scenario-controls-toolbar .sort-container:hover .sort-dropdown {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0);
+  pointer-events: auto !important;
+}
+
+/* ===== FILTER OPTIONS ===== */
+.filter-option,
+.sort-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-3);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  border-bottom: 1px solid var(--color-gray-100);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-700);
+}
+
+.filter-option:last-child,
+.sort-option:last-child {
+  border-bottom: none;
+}
+
+.filter-option:hover,
+.sort-option:hover {
+  background: var(--color-gray-50);
+}
+
+.scenario-controls-toolbar .filter-option.active,
+.scenario-controls-toolbar .sort-option.active {
+  background: var(--color-primary-50);
+  color: var(--color-primary-700);
+}
+
+.scenario-controls-toolbar .filter-option .option-text,
+.scenario-controls-toolbar .sort-option .option-text {
+  flex: 1;
+}
+
+.scenario-controls-toolbar .filter-option .check-icon,
+.scenario-controls-toolbar .sort-option .check-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--color-primary);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.filter-option.active .check-icon,
+.sort-option.active .check-icon {
+  opacity: 1;
+}
+
+/* ===== CLEAR ALL CONTAINER ===== */
+.clear-all-container {
+  position: relative;
+  margin-left: var(--spacing-2);
+}
+
+.clear-all-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-4);
+  border: 1px solid var(--color-red-300);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  color: var(--color-red-600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+}
+
+.clear-all-btn:hover {
+  border-color: var(--color-red-400);
+  background: var(--color-red-50);
+  color: var(--color-red-700);
+}
+
+.clear-all-btn:focus {
+  outline: none;
+  border-color: var(--color-red-500);
+  box-shadow: 0 0 0 3px var(--color-red-100);
+}
+
+.clear-all-btn:active {
+  background: var(--color-red-100);
+  transform: translateY(1px);
+}
+
+.clear-all-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--color-red-500);
+  transition: color var(--transition-fast);
+}
+
+.clear-all-btn:hover .clear-all-icon {
+  color: var(--color-red-600);
+}
+
+.clear-all-text {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+}
+
+/* ===== TAG CHIPS ===== */
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  padding: var(--spacing-1) var(--spacing-3);
+  background: var(--color-primary-100);
+  color: var(--color-primary-700);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.tag-chip:hover {
+  background: var(--color-primary-200);
+  color: var(--color-primary-800);
+}
+
+.tag-chip.active {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.tag-chip-remove {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-200);
+  color: var(--color-primary-700);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.tag-chip:hover .tag-chip-remove {
+  background: var(--color-primary-300);
+  color: var(--color-primary-800);
+}
+
+.tag-chip.active .tag-chip-remove {
+  background: rgb(255 255 255 / 20%);
+  color: var(--color-white);
+}
+
+/* ===== ACTIVE FILTERS DISPLAY ===== */
+.active-filters {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-4);
+  flex-wrap: wrap;
+}
+
+.active-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  background: var(--color-gray-100);
+  color: var(--color-gray-700);
+  border-radius: var(--radius-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.active-filter-remove {
+  width: 16px;
+  height: 16px;
+  color: var(--color-gray-500);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.active-filter-remove:hover {
+  color: var(--color-gray-700);
+}
+
+/* ===== RESULTS COUNT AND LOAD MORE ===== */
+.results-count {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+  margin-bottom: var(--spacing-4);
+}
+
+.load-more-container {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-6);
+}
+
+.load-more-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-6);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.load-more-btn:hover {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.load-more-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== NO RESULTS STATE ===== */
+.no-results {
+  text-align: center;
+  padding: var(--spacing-12) var(--spacing-4);
+  color: var(--color-gray-600);
+}
+
+.no-results-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-700);
+  margin-bottom: var(--spacing-2);
+}
+
+.no-results-message {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+/* Large screens - optimize search width */
+@media (width >= 769px) {
+  .scenarios-grid[data-view="scenario"] .scenario-controls-toolbar {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .scenarios-grid[data-view="scenario"]
+    .scenario-controls-toolbar
+    .search-container {
+    flex: 1 !important;
+    min-width: 250px !important;
+    max-width: 450px !important;
+    width: 100% !important;
+  }
+
+  .scenarios-grid[data-view="scenario"]
+    .scenario-controls-toolbar
+    .search-input-wrapper {
+    width: 100% !important;
+    min-width: 250px !important;
+    flex: 1 !important;
+    flex-grow: 1 !important;
+    flex-shrink: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .scenarios-grid[data-view="scenario"]
+    .scenario-controls-toolbar
+    .search-input {
+    width: 100% !important;
+    min-width: 250px !important;
+    flex: 1 !important;
+    flex-grow: 1 !important;
+    flex-shrink: 0 !important;
+    box-sizing: border-box !important;
+    max-width: none !important;
+  }
+}
+
+@media (width >= 1024px) {
+  .scenarios-grid[data-view="scenario"]
+    .scenario-controls-toolbar
+    .search-container {
+    min-width: 300px !important;
+    max-width: 550px !important;
+  }
+
+  .scenarios-grid[data-view="scenario"]
+    .scenario-controls-toolbar
+    .search-input-wrapper {
+    min-width: 300px !important;
+  }
+
+  .scenarios-grid[data-view="scenario"]
+    .scenario-controls-toolbar
+    .search-input {
+    min-width: 300px !important;
+  }
+}
+
+@media (width >= 1200px) {
+  .scenarios-grid[data-view="scenario"]
+    .scenario-controls-toolbar
+    .search-container {
+    min-width: 350px !important;
+    max-width: 650px !important;
+  }
+
+  .scenarios-grid[data-view="scenario"]
+    .scenario-controls-toolbar
+    .search-input-wrapper {
+    min-width: 350px !important;
+  }
+
+  .scenarios-grid[data-view="scenario"]
+    .scenario-controls-toolbar
+    .search-input {
+    min-width: 350px !important;
+  }
+}
+
+/* Mobile adjustments */
+@media (width <= 768px) {
+  .scenario-controls-toolbar {
+    flex-direction: column;
+    gap: var(--spacing-3);
+    align-items: stretch;
+  }
+
+  .search-container {
+    order: 1;
+    max-width: none;
+  }
+
+  .controls-group {
+    order: 2;
+    justify-content: space-between;
+  }
+
+  .clear-all-container {
+    margin-left: 0;
+  }
+
+  .search-autocomplete-dropdown {
+    max-height: 150px;
+  }
+}
+
+/* ===== TOUCH DEVICE SUPPORT ===== */
+@media (hover: none) and (pointer: coarse) {
+  .scenario-card-wrapper:active .scenario-hover-category-header,
+  .scenario-card-wrapper:focus .scenario-hover-category-header {
+    transform: translateY(0);
+    opacity: 1;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 20%);
+    pointer-events: auto;
+  }
+}
+
+/* ===== DARK THEME SUPPORT ===== */
+[data-theme="dark"] .scenario-hover-category-header {
+  background: rgb(31 41 55 / 98%);
+  border-color: var(--color-gray-600);
+}
+
+[data-theme="dark"] .scenario-controls-toolbar .search-input {
+  background: var(--color-gray-800);
+  border-color: var(--color-gray-600);
+  color: var(--color-gray-100);
+}
+
+[data-theme="dark"] .scenario-controls-toolbar .search-input:focus {
+  border-color: var(--color-primary-400);
+  box-shadow: 0 0 0 3px var(--color-primary-900);
+}
+
+[data-theme="dark"] .scenario-controls-toolbar .search-input::placeholder {
+  color: var(--color-gray-400);
+}
+
+[data-theme="dark"] .filter-btn,
+[data-theme="dark"] .sort-btn {
+  background: var(--color-gray-800);
+  border-color: var(--color-gray-600);
+  color: var(--color-gray-200);
+}
+
+[data-theme="dark"] .filter-btn:hover,
+[data-theme="dark"] .sort-btn:hover {
+  background: var(--color-gray-700);
+  border-color: var(--color-gray-500);
+}
+
+[data-theme="dark"] .filter-dropdown,
+[data-theme="dark"] .sort-dropdown {
+  background: var(--color-gray-800);
+  border-color: var(--color-gray-600);
+}
+
+[data-theme="dark"] .filter-option,
+[data-theme="dark"] .sort-option {
+  color: var(--color-gray-200);
+  border-bottom-color: var(--color-gray-700);
+}
+
+[data-theme="dark"] .filter-option:hover,
+[data-theme="dark"] .sort-option:hover {
+  background: var(--color-gray-700);
+}
+
+[data-theme="dark"] .search-autocomplete-dropdown {
+  background: var(--color-gray-800);
+  border-color: var(--color-gray-600);
+}
+
+[data-theme="dark"] .search-autocomplete-item {
+  color: var(--color-gray-200);
+  border-bottom-color: var(--color-gray-700);
+}
+
+[data-theme="dark"] .search-autocomplete-item:hover {
+  background: var(--color-gray-700);
+}
+
+/* ===== ACCESSIBILITY ===== */
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .scenario-card-wrapper,
+  .scenario-hover-category-header,
+  .filter-dropdown,
+  .sort-dropdown,
+  .search-autocomplete-dropdown {
+    transition-duration: 0.01ms !important;
+  }
+
+  .scenario-card-wrapper:hover {
+    transform: none !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .scenario-controls-toolbar .search-input,
+  .filter-btn,
+  .sort-btn {
+    border-width: 2px;
+  }
+
+  .scenario-hover-category-header {
+    border-width: 2px;
+  }
+}
+
+/* ===============================================
+   SCENARIO BROWSER COMPONENT CONSOLIDATION COMPLETE
+   ===============================================
+   
+   This file contains ALL styles for the ScenarioBrowser component:
+   
+   ✅ Scenario grid layout and view modes
+   ✅ Scenario card styling and hover effects
+   ✅ Hover category headers with animations
+   ✅ Search input with autocomplete dropdown
+   ✅ Filter and sort controls with dropdowns
+   ✅ Tag chips and active filters display
+   ✅ Clear all functionality
+   ✅ Load more and pagination controls
+   ✅ No results state
+   ✅ Dark theme support
+   ✅ Responsive design for all screen sizes
+   ✅ Touch device support
+   ✅ Accessibility features
+   
+   This establishes scenario-browser-component.css as the dedicated stylesheet
+   for the ScenarioBrowser JavaScript component, extracted from category-grid.css.
+*/

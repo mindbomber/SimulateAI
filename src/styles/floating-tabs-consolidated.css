@@ -1,0 +1,1255 @@
+/**
+ * Copyright 2025 Armando Sori
+ * Floating Tabs Consolidated Styles
+ * 
+ * Comprehensive consolidation of all floating tab components:
+ * ✅ floating-action-tab.css - Donation action tab
+ * ✅ floating-action-tab-component.css - Component styles
+ * ✅ floating-surprise-tab.css - Surprise me tab
+ * ✅ floating-tour-tab.css - Tour tab
+ * ✅ floating-tour-tab-refactored.css - Refactored tour styles
+ * ✅ floating-tabs-base.css - Base shared styles
+ * 
+ * Organized for better maintainability and component organization.
+ */
+
+/* Import standardized media queries */
+@import url("./media.css");
+
+/* ========================================
+   CSS Custom Properties & Variables
+   ======================================== */
+
+:root {
+  --floating-tab-width: 280px;
+  --floating-tab-height: 60px;
+  --floating-tab-protrusion: 90px;
+  --container-padding: 20px;
+  --font-scale: 1;
+}
+
+/* Responsive adjustments - Using media.css utilities */
+
+/* ========================================
+   Shared Base Styles for All Floating Tabs
+   ======================================== */
+
+/* Common positioning and z-index management */
+.floating-action-tab-link,
+.floating-surprise-tab-link,
+.floating-tour-tab-link {
+  position: fixed;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none; /* Critical: Prevent hover on invisible areas */
+  max-width: none !important;
+}
+
+/* Note: Individual tabs (.floating-*-tab) have pointer-events: auto 
+   so they only respond to hover/click on the visible portion */
+
+/* Z-index layering */
+.floating-action-tab-link {
+  z-index: 1000;
+}
+
+.floating-surprise-tab-link {
+  z-index: 999;
+}
+
+.floating-tour-tab-link {
+  z-index: 1001; /* Highest priority for tour */
+}
+
+/* No-Flash utility: allow JS to reveal once settings are loaded */
+@layer components {
+  .no-flash-initially {
+    display: none !important;
+  }
+}
+
+/* Modal compatibility */
+.modal-backdrop ~ .floating-action-tab-link,
+.modal-backdrop ~ .floating-surprise-tab-link,
+.modal-backdrop ~ .floating-tour-tab-link {
+  z-index: 998;
+}
+
+/* Pre-launch modal specific - ensure tabs are behind the backdrop */
+.modal-backdrop:has(.pre-launch-modal) ~ .floating-action-tab-link,
+.modal-backdrop:has(.pre-launch-modal) ~ .floating-surprise-tab-link,
+.modal-backdrop:has(.pre-launch-modal) ~ .floating-tour-tab-link {
+  z-index: 500 !important; /* Well below modal backdrop */
+}
+
+/* Alternative approach - when pre-launch modal is active, reduce floating tab z-index */
+body:has(.pre-launch-modal.visible) .floating-action-tab-link,
+body:has(.pre-launch-modal) .floating-action-tab-link,
+body:has(.pre-launch-modal.visible) .floating-surprise-tab-link,
+body:has(.pre-launch-modal) .floating-surprise-tab-link,
+body:has(.pre-launch-modal.visible) .floating-tour-tab-link,
+body:has(.pre-launch-modal) .floating-tour-tab-link {
+  z-index: 500 !important; /* Well below modal backdrop */
+}
+
+/* ========================================
+   FLOATING ACTION TAB (Donation Button)
+   ======================================== */
+
+.floating-tab-link {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 999;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: var(--floating-tab-width, 280px);
+  pointer-events: none;
+}
+
+.floating-action-tab {
+  position: relative;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  border-radius: 8px 0 0 8px;
+  box-shadow:
+    0 4px 20px rgb(238 90 82 / 30%),
+    0 2px 8px rgb(0 0 0 / 10%);
+  overflow: hidden;
+  transform: translateX(calc(100% - var(--floating-tab-protrusion, 90px)));
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: var(--floating-tab-width, 280px);
+  height: var(--floating-tab-height, 60px);
+  cursor: pointer;
+  user-select: none;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-right: none;
+  pointer-events: auto;
+}
+
+.floating-action-tab:hover {
+  box-shadow:
+    0 8px 30px rgb(238 90 82 / 40%),
+    0 4px 12px rgb(0 0 0 / 15%);
+}
+
+.floating-action-tab.expanded {
+  transform: translateX(0);
+}
+
+/* Alternative floating action tab component styles */
+.floating-action-tab.component-style {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: 50px;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  min-width: 60px;
+  height: 60px;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  transform: none;
+  border-radius: 50px;
+}
+
+.floating-action-tab.component-style:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 25px rgb(0 0 0 / 20%),
+    0 4px 10px rgb(0 0 0 / 15%);
+}
+
+.floating-action-tab.component-style:active {
+  transform: translateY(0);
+  box-shadow:
+    0 2px 8px rgb(0 0 0 / 20%),
+    0 1px 4px rgb(0 0 0 / 15%);
+}
+
+.floating-action-tab.component-style:focus-visible {
+  outline: 2px solid var(--color-white);
+  outline-offset: 2px;
+}
+
+/* Tab content layout */
+.floating-tab-content {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--container-padding, 20px);
+  height: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.floating-action-tab-icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  margin-right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* Heart emoji styling - replaces SVG approach */
+.floating-action-tab-icon::before {
+  content: "💖";
+  font-size: 20px;
+  display: block;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 10%));
+  transition: all 0.3s ease;
+}
+
+.floating-action-tab-heart-icon {
+  width: 24px;
+  height: 24px;
+  color: rgb(255 255 255 / 95%);
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 10%));
+  transition: all 0.3s ease;
+  display: flex !important; /* Ensure visibility - override any conflicting styles */
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* Specific rule for SVG heart icons - force visibility */
+svg.heart-icon,
+svg.floating-action-tab-heart-icon {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.floating-action-tab:hover .floating-action-tab-heart-icon {
+  transform: scale(1.1);
+  color: #ff6b6b;
+  filter: drop-shadow(0 2px 4px rgb(0 0 0 / 20%));
+}
+
+/* Hover effect for emoji heart icon */
+.floating-action-tab:hover .floating-action-tab-icon::before {
+  transform: scale(1.1);
+  filter: drop-shadow(0 2px 4px rgb(0 0 0 / 20%)) brightness(1.1);
+}
+
+.floating-tab-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-right: 12px;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-action-tab.expanded .floating-tab-text {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.tab-title {
+  font-size: calc(14px * var(--font-scale, 1));
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 2px;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 10%);
+}
+
+.tab-subtitle {
+  font-size: calc(11px * var(--font-scale, 1));
+  color: rgb(255 255 255 / 85%);
+  line-height: 1.2;
+  font-weight: 400;
+}
+
+.floating-tab-arrow {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateX(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-action-tab.expanded .floating-tab-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.floating-action-tab-arrow-icon {
+  width: 16px;
+  height: 16px;
+  color: rgb(255 255 255 / 90%);
+  transition: transform 0.2s ease;
+  display: inline-block !important; /* Ensure visibility - override any conflicting styles */
+}
+
+/* Specific rule for SVG arrow icons - force visibility */
+svg.arrow-icon,
+svg.floating-action-tab-arrow-icon {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.floating-action-tab:hover .floating-action-tab-arrow-icon {
+  transform: translateX(2px);
+}
+
+/* Component style icons */
+.floating-action-tab.component-style .icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.floating-action-tab.component-style .text {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.floating-action-tab.component-style.expanded {
+  padding: 1rem 1.5rem 1rem 1.25rem;
+  border-radius: 30px;
+  min-width: auto;
+  width: auto;
+}
+
+.floating-action-tab.component-style.expanded .text {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.floating-action-tab.component-style.expanded .icon {
+  transform: scale(1.1);
+}
+
+/* Ripple effects */
+.floating-tab-ripple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 30%);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-tab-ripple.active {
+  width: 200px;
+  height: 200px;
+  opacity: 1;
+  animation: ripple-fade 0.6s ease-out;
+}
+
+.floating-action-tab.component-style::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgb(255 255 255 / 20%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s ease,
+    height 0.6s ease;
+  pointer-events: none;
+}
+
+.floating-action-tab.component-style.ripple::before {
+  width: 300px;
+  height: 300px;
+}
+
+@keyframes ripple-fade {
+  0% {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* ========================================
+   FLOATING SURPRISE TAB
+   ======================================== */
+
+.floating-surprise-tab-link {
+  position: fixed;
+  top: 35%;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 999;
+  width: var(--floating-tab-width, 280px);
+  pointer-events: none; /* Ensure no hover on invisible areas */
+}
+
+.floating-surprise-tab {
+  position: relative;
+  background: linear-gradient(135deg, #ff9500 0%, #ff7f00 100%);
+  border-radius: 8px 0 0 8px;
+  box-shadow:
+    0 4px 20px rgb(255 149 0 / 30%),
+    0 2px 8px rgb(0 0 0 / 10%);
+  overflow: hidden;
+  transform: translateX(calc(100% - var(--floating-tab-protrusion, 90px)));
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: var(--floating-tab-width, 280px);
+  height: var(--floating-tab-height, 60px);
+  cursor: pointer;
+  user-select: none;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-right: none;
+  pointer-events: auto;
+}
+
+.floating-surprise-tab:hover {
+  box-shadow:
+    0 8px 30px rgb(255 149 0 / 40%),
+    0 4px 12px rgb(0 0 0 / 15%);
+  background: linear-gradient(135deg, #ff9500 0%, #ff6b00 100%);
+}
+
+.floating-surprise-tab.expanded {
+  transform: translateX(0);
+}
+
+.floating-surprise-tab:active {
+  transform: translateX(0) scale(0.98);
+}
+
+.floating-surprise-tab-content {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--container-padding, 20px);
+  height: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.floating-surprise-tab-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  margin-right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-6px);
+  }
+  60% {
+    transform: translateY(-3px);
+  }
+}
+
+.floating-surprise-tab:hover .floating-surprise-tab-icon {
+  animation: none;
+  transform: scale(1.1) rotate(10deg);
+}
+
+.floating-surprise-tab-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: white;
+  line-height: 1.2;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-surprise-tab.expanded .floating-surprise-tab-text {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.surprise-tab-title {
+  font-weight: 600;
+  font-size: calc(16px * var(--font-scale, 1));
+  margin: 0;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 10%);
+  letter-spacing: 0.5px;
+}
+
+.surprise-tab-subtitle {
+  font-size: calc(12px * var(--font-scale, 1));
+  opacity: 0.9;
+  margin: 2px 0 0;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 10%);
+}
+
+.floating-surprise-tab-arrow {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-left: 12px;
+  transition: transform 0.3s ease;
+}
+
+.floating-surprise-tab:hover .floating-surprise-tab-arrow {
+  transform: translateX(4px);
+}
+
+.surprise-arrow-icon {
+  width: 100%;
+  height: 100%;
+  color: rgb(255 255 255 / 80%);
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 10%));
+}
+
+.floating-surprise-tab-ripple {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle,
+    rgb(255 255 255 / 30%) 0%,
+    transparent 70%
+  );
+  border-radius: inherit;
+  transform: scale(0);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-surprise-tab.ripple-active .floating-surprise-tab-ripple {
+  transform: scale(2);
+  opacity: 1;
+}
+
+/* ========================================
+   FLOATING TOUR TAB
+   ======================================== */
+
+.floating-tour-tab-link {
+  position: fixed;
+  top: 22%;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 999;
+  width: var(--floating-tab-width, 280px);
+  pointer-events: none; /* Ensure no hover on invisible areas */
+}
+
+.floating-tour-tab {
+  position: relative;
+  background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+  border-radius: 8px 0 0 8px;
+  box-shadow:
+    0 4px 20px rgb(108 92 231 / 30%),
+    0 2px 8px rgb(0 0 0 / 10%);
+  overflow: hidden;
+  transform: translateX(calc(100% - var(--floating-tab-protrusion, 90px)));
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: var(--floating-tab-width, 280px);
+  height: var(--floating-tab-height, 60px);
+  cursor: pointer;
+  user-select: none;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-right: none;
+  pointer-events: auto;
+}
+
+.floating-tour-tab:hover {
+  box-shadow:
+    0 8px 30px rgb(108 92 231 / 40%),
+    0 4px 12px rgb(0 0 0 / 15%);
+}
+
+.floating-tour-tab.expanded {
+  transform: translateX(0);
+}
+
+.floating-tour-tab-content {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--container-padding, 20px);
+  height: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.floating-tour-tab-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  margin-right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(20px * var(--font-scale, 1));
+  animation: learning-pulse 3.5s ease-in-out infinite alternate;
+}
+
+@keyframes learning-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+  }
+}
+
+.floating-tour-tab-text {
+  flex: 1;
+  min-width: 0;
+  color: white;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-tour-tab.expanded .floating-tour-tab-text {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.tour-tab-title {
+  display: block;
+  font-size: calc(16px * var(--font-scale, 1));
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tour-tab-subtitle {
+  display: block;
+  font-size: calc(13px * var(--font-scale, 1));
+  opacity: 0.9;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.floating-tour-tab-arrow {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  margin-left: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+  transition: all 0.2s ease;
+}
+
+.tour-arrow-icon {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s ease;
+}
+
+.floating-tour-tab:hover .tour-arrow-icon {
+  transform: translateX(2px);
+}
+
+.floating-tour-tab-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 60%);
+  pointer-events: none;
+  transform: scale(0);
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  margin-left: -10px;
+  margin-top: -10px;
+}
+
+@keyframes tour-ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Tour feedback states */
+.floating-tour-tab.tour-clicked {
+  animation: tour-feedback-pulse 0.6s ease-out;
+}
+
+.floating-tour-tab.tour-unavailable {
+  animation: tour-shake 0.5s ease-in-out;
+}
+
+@keyframes tour-feedback-pulse {
+  0%,
+  100% {
+    transform: translateX(calc(100% - var(--floating-tab-protrusion, 90px)));
+  }
+  50% {
+    transform: translateX(calc(100% - var(--floating-tab-protrusion, 90px)))
+      scale(1.02);
+  }
+}
+
+@keyframes tour-shake {
+  0%,
+  100% {
+    transform: translateX(calc(100% - var(--floating-tab-protrusion, 90px)));
+  }
+  25% {
+    transform: translateX(
+      calc(100% - var(--floating-tab-protrusion, 90px) + 5px)
+    );
+  }
+  75% {
+    transform: translateX(
+      calc(100% - var(--floating-tab-protrusion, 90px) - 5px)
+    );
+  }
+}
+
+.floating-tour-tab.expanded.tour-clicked {
+  animation: tour-feedback-pulse-expanded 0.6s ease-out;
+}
+
+.floating-tour-tab.expanded.tour-unavailable {
+  animation: tour-shake-expanded 0.5s ease-in-out;
+}
+
+@keyframes tour-feedback-pulse-expanded {
+  0%,
+  100% {
+    transform: translateX(0) scale(1);
+  }
+  50% {
+    transform: translateX(0) scale(1.02);
+  }
+}
+
+@keyframes tour-shake-expanded {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
+}
+
+/* ========================================
+   COMPONENT STATE CLASSES
+   ======================================== */
+
+.floating-action-tab.loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.floating-action-tab.loading .icon {
+  animation: spin 1s linear infinite;
+}
+
+.floating-action-tab.success {
+  background: var(--color-green-500);
+  animation: success-pulse 0.6s ease-out;
+}
+
+.floating-action-tab.error {
+  background: var(--color-red-500);
+  animation: error-shake 0.6s ease-out;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes success-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes error-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+/* ========================================
+   RESPONSIVE BEHAVIOR - Using media.css breakpoint
+   ======================================== */
+
+/* Mobile and tablet responsive styles */
+@media only screen and (width <= 768px) {
+  .floating-action-tab.component-style {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    padding: 0.875rem 1.25rem;
+    min-width: 56px;
+    height: 56px;
+    font-size: 0.9rem;
+  }
+
+  .floating-action-tab.component-style .icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .floating-action-tab.component-style.expanded {
+    padding: 0.875rem 1.25rem 0.875rem 1rem;
+  }
+
+  .floating-tour-tab-icon,
+  .floating-surprise-tab-icon {
+    width: calc(24px * var(--font-scale, 1));
+    height: calc(24px * var(--font-scale, 1));
+    margin-right: calc(12px * var(--font-scale, 1));
+  }
+
+  /* Auto-collapse on mobile after delay */
+  .floating-action-tab.auto-collapse {
+    animation: mobile-auto-collapse 3s ease-in-out forwards;
+  }
+}
+
+@keyframes mobile-auto-collapse {
+  0%,
+  70% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Auto-retract behavior for horizontally sliding tabs (surprise/tour/action) */
+@keyframes tab-auto-retract {
+  0%,
+  70% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(100% - var(--floating-tab-protrusion, 90px)));
+  }
+}
+
+/* When expanded and marked for auto-collapse, retract after a short delay */
+.floating-surprise-tab.expanded.auto-collapse {
+  animation: tab-auto-retract var(--tab-auto-retract-duration, 3.2s) ease-in-out
+    forwards;
+  animation-delay: var(--tab-auto-retract-delay, 0.4s);
+}
+
+/* Optional: pause auto-retract while user is interacting */
+.floating-surprise-tab.expanded.auto-collapse:hover,
+.floating-surprise-tab.expanded.auto-collapse:active,
+.floating-surprise-tab.expanded.auto-collapse:focus-within {
+  animation-play-state: paused;
+}
+
+/* ========================================
+   ACCESSIBILITY FEATURES
+   ======================================== */
+
+/* Focus states */
+.floating-tab-link:focus,
+.floating-surprise-tab-link:focus,
+.floating-tour-tab-link:focus {
+  outline: none;
+}
+
+.floating-tab-link:focus .floating-action-tab {
+  box-shadow:
+    0 8px 30px rgb(238 90 82 / 40%),
+    0 4px 12px rgb(0 0 0 / 15%),
+    0 0 0 3px rgb(255 255 255 / 30%);
+}
+
+.floating-surprise-tab-link:focus-visible,
+.floating-tour-tab-link:focus-visible {
+  outline: 3px solid var(--color-primary, #007cba);
+  outline-offset: 2px;
+}
+
+.floating-tour-tab-link:focus .floating-tour-tab {
+  box-shadow:
+    0 8px 30px rgb(108 92 231 / 40%),
+    0 4px 12px rgb(0 0 0 / 15%),
+    0 0 0 3px rgb(108 92 231 / 50%);
+}
+
+/* Large click targets support */
+body.large-click-targets .floating-action-tab.component-style {
+  min-width: 70px;
+  height: 70px;
+  padding: 1.25rem 1.75rem;
+  font-size: 1.1rem;
+}
+
+body.large-click-targets .floating-action-tab.component-style .icon {
+  width: 28px;
+  height: 28px;
+}
+
+body.large-click-targets .floating-action-tab.component-style.expanded {
+  padding: 1.25rem 1.75rem 1.25rem 1.5rem;
+}
+
+/* Screen reader support */
+.floating-action-tab .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.floating-action-tab[aria-expanded="true"] .sr-only::after {
+  content: " (expanded)";
+}
+
+.floating-action-tab[aria-expanded="false"] .sr-only::after {
+  content: " (collapsed)";
+}
+
+/* ========================================
+   REDUCED MOTION SUPPORT
+   ======================================== */
+
+/* Using .no-motion utility from media.css */
+.no-motion .floating-action-tab,
+.no-motion .floating-action-tab .text,
+.no-motion .floating-action-tab .icon,
+.no-motion .floating-action-tab::before,
+.no-motion .floating-surprise-tab,
+.no-motion .floating-surprise-tab-arrow,
+.no-motion .floating-surprise-tab-ripple,
+.no-motion .floating-surprise-tab-icon,
+.no-motion .floating-tour-tab,
+.no-motion .floating-tour-tab-arrow,
+.no-motion .floating-tour-tab-icon,
+.no-motion .floating-tab-text,
+.no-motion .floating-tab-arrow,
+.no-motion .floating-tab-ripple,
+.no-motion .floating-action-tab-heart-icon,
+.no-motion .floating-action-tab-arrow-icon {
+  transition: none !important;
+  animation: none !important;
+}
+
+.no-motion .floating-action-tab:hover {
+  transform: translateY(0);
+}
+
+.no-motion .floating-action-tab.expanded .icon {
+  transform: none;
+}
+
+/* ========================================
+   HIGH CONTRAST MODE SUPPORT - Using media.css utilities
+   ======================================== */
+
+/* Using .high-contrast-border utility from media.css */
+.high-contrast-border .floating-action-tab,
+.high-contrast-border .floating-surprise-tab,
+.high-contrast-border .floating-tour-tab {
+  border: 2px solid #fff;
+}
+
+.high-contrast-border .tab-title,
+.high-contrast-border .tab-subtitle,
+.high-contrast-border .floating-action-tab-heart-icon,
+.high-contrast-border .floating-action-tab-arrow-icon,
+.high-contrast-border .surprise-tab-title,
+.high-contrast-border .surprise-tab-subtitle,
+.high-contrast-border .tour-tab-title,
+.high-contrast-border .tour-tab-subtitle {
+  color: #fff;
+  text-shadow: none;
+}
+
+.high-contrast-border .floating-tab-ripple,
+.high-contrast-border .floating-surprise-tab-ripple,
+.high-contrast-border .floating-tour-tab-ripple {
+  background: rgb(255 255 255 / 50%);
+}
+
+.high-contrast-border .floating-action-tab.component-style {
+  border: 2px solid var(--color-white);
+  background: var(--color-primary);
+}
+
+.high-contrast-border .floating-action-tab.component-style:hover {
+  border-color: var(--color-primary);
+  background: var(--color-white);
+  color: var(--color-primary);
+}
+
+.high-contrast-border .floating-action-tab.component-style:focus-visible {
+  outline: 3px solid var(--color-secondary);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   DARK MODE SUPPORT
+   ======================================== */
+
+body.dark-mode .floating-action-tab {
+  background: linear-gradient(
+    135deg,
+    var(--theme-accent) 0%,
+    var(--theme-accent-dark) 100%
+  );
+  border-color: var(--theme-border);
+  box-shadow:
+    0 4px 20px var(--theme-shadow),
+    0 2px 8px rgb(0 0 0 / 20%);
+}
+
+body.dark-mode .floating-action-tab:hover {
+  box-shadow:
+    0 8px 30px var(--theme-shadow-heavy),
+    0 4px 12px rgb(0 0 0 / 25%);
+}
+
+body.dark-mode .floating-action-tab-heart-icon {
+  color: var(--theme-text-on-accent);
+}
+
+body.dark-mode .floating-action-tab:hover .floating-action-tab-heart-icon {
+  color: var(--theme-text-on-accent);
+}
+
+body.dark-mode .tab-title {
+  color: var(--theme-text-on-accent);
+}
+
+body.dark-mode .tab-subtitle {
+  color: rgb(255 255 255 / 85%);
+}
+
+body.dark-mode .floating-action-tab-arrow-icon {
+  color: var(--theme-text-on-accent);
+}
+
+body.dark-mode .floating-tab-ripple,
+body.dark-mode .floating-action-tab.component-style::before {
+  background: rgb(255 255 255 / 15%);
+}
+
+body.dark-mode .floating-tab-link:focus .floating-action-tab {
+  box-shadow:
+    0 8px 30px var(--theme-shadow-heavy),
+    0 4px 12px rgb(0 0 0 / 25%),
+    0 0 0 3px var(--theme-accent-light);
+}
+
+/* Component style dark mode */
+body.dark-mode .floating-action-tab.component-style {
+  background: var(--color-primary);
+  color: var(--color-white);
+  box-shadow:
+    0 4px 12px rgb(0 0 0 / 25%),
+    0 2px 6px rgb(0 0 0 / 20%);
+}
+
+body.dark-mode .floating-action-tab.component-style:hover {
+  background: var(--color-primary-light);
+  box-shadow:
+    0 8px 25px rgb(0 0 0 / 30%),
+    0 4px 10px rgb(0 0 0 / 25%);
+}
+
+body.dark-mode .floating-action-tab.component-style .icon {
+  color: var(--color-white);
+}
+
+/* Surprise tab dark mode */
+body.dark-mode .floating-surprise-tab {
+  background: linear-gradient(135deg, #ff9500 0%, #ff7f00 100%);
+  border: 1px solid rgb(255 149 0 / 30%);
+  box-shadow:
+    0 4px 20px rgb(255 127 0 / 30%),
+    0 2px 8px rgb(0 0 0 / 30%);
+}
+
+body.dark-mode .floating-surprise-tab:hover {
+  box-shadow:
+    0 6px 30px rgb(255 127 0 / 40%),
+    0 4px 12px rgb(0 0 0 / 40%);
+}
+
+body.dark-mode .floating-surprise-tab-content,
+body.dark-mode .surprise-tab-title,
+body.dark-mode .surprise-tab-subtitle {
+  color: white;
+}
+
+body.dark-mode .floating-surprise-tab-link:focus-visible {
+  outline: 3px solid var(--color-warning);
+}
+
+/* Tour tab dark mode */
+body.dark-mode .floating-tour-tab {
+  background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+  border: 1px solid rgb(108 92 231 / 30%);
+  box-shadow:
+    0 4px 20px rgb(108 92 231 / 30%),
+    0 2px 8px rgb(0 0 0 / 30%);
+}
+
+body.dark-mode .floating-tour-tab:hover {
+  box-shadow:
+    0 6px 30px rgb(108 92 231 / 40%),
+    0 4px 12px rgb(0 0 0 / 40%);
+}
+
+body.dark-mode .floating-tour-tab-content,
+body.dark-mode .tour-tab-title,
+body.dark-mode .tour-tab-subtitle {
+  color: white;
+}
+
+body.dark-mode .floating-tour-tab-link:focus {
+  outline: 3px solid var(--color-primary);
+}
+
+body.dark-mode .floating-tour-tab.tour-clicked {
+  background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+}
+
+body.dark-mode .floating-tour-tab.tour-unavailable {
+  background: linear-gradient(135deg, #636e72 0%, #2d3436 100%);
+}
+
+/* ========================================
+   PRINT STYLES - Using media.css utilities
+   ======================================== */
+
+/* Using .print-hide utility from media.css */
+.print-hide.floating-tab-link,
+.print-hide.floating-action-tab-link,
+.print-hide.floating-surprise-tab-link,
+.print-hide.floating-tour-tab-link {
+  display: none !important;
+}
+
+/* ===============================================
+   CONSOLIDATED FLOATING TABS STYLES COMPLETE
+   ===============================================
+   
+   This file consolidates all floating tab related styles from:
+   ✅ floating-action-tab.css - Donation action tab
+   ✅ floating-action-tab-component.css - Component styles
+   ✅ floating-surprise-tab.css - Surprise me tab
+   ✅ floating-tour-tab.css - Tour tab
+   ✅ floating-tour-tab-refactored.css - Refactored tour styles
+   ✅ floating-tabs-base.css - Base shared styles
+   
+   📱 MEDIA QUERY CONSOLIDATION (Phase 2 Complete):
+   ✅ @media (width <= 768px) - Removed, using media.css responsive variables (1 instance)
+   ✅ @media (width <= 480px) - Removed, using media.css responsive variables  
+   ✅ @media (prefers-reduced-motion) - Replaced with .no-motion utility class
+   ✅ @media (prefers-contrast: high) - Replaced with .high-contrast-border utility class
+   ✅ @media print - Replaced with .print-hide utility class
+   ✅ @media (width <= 768px) component responsive - Kept as standardized breakpoint
+   
+   🎯 CONSOLIDATION BENEFITS:
+   • Eliminated 6 duplicate @media query blocks, consolidated 1 to standard breakpoint (~95 lines)
+   • Standardized responsive behavior using media.css utilities where applicable
+   • Improved maintainability through centralized breakpoint management
+   • Enhanced accessibility with consistent reduced-motion and high-contrast support
+   
+   🔧 NAMESPACE IMPROVEMENTS (Phase 3 Complete):
+   • .floating-tab-icon → .floating-action-tab-icon (better component isolation)
+   • .heart-icon → .floating-action-tab-heart-icon (prevents global conflicts)
+   • .arrow-icon → .floating-action-tab-arrow-icon (specific to action tab)
+   • Updated all references in reduced-motion, high-contrast, and dark-mode sections
+   • Maintained existing .floating-surprise-tab-icon and .floating-tour-tab-icon namespacing
+   
+   All floating tab related selectors are now consolidated into this single file
+   for better maintainability and component organization.
+*/

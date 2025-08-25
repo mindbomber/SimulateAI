@@ -1,0 +1,865 @@
+/**
+ * Hero Demo Styles
+ * Styling for the interactive demo simulation in the hero section
+ * Enhanced with media.css responsive integration
+ */
+
+/* Import media.css for responsive variables */
+@import url("./media.css");
+
+/* Hero Demo Container - MOVED TO hero-consolidated.css for semantic ownership */
+/* .hero-demo-container styles moved to hero-consolidated.css */
+
+.demo-header {
+  text-align: center;
+  margin-bottom: var(--container-padding, 16px);
+}
+
+.demo-title {
+  font-size: calc(1.5rem * var(--font-scale, 1));
+  font-weight: 700;
+  color: var(--color-gray-900);
+  margin: 0 0 calc(0.5rem * var(--font-scale, 1));
+}
+
+.demo-subtitle {
+  color: var(--color-gray-600);
+  margin: 0;
+  font-size: calc(0.95rem * var(--font-scale, 1));
+}
+
+/* Demo Content Layout */
+.demo-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--container-padding, 2rem);
+  align-items: start;
+}
+
+/* Mobile layout handled by media.css device-specific variables */
+
+/* Scenario Panel */
+.scenario-panel {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 5%);
+}
+
+.scenario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.scenario-counter {
+  font-size: 0.85rem;
+  color: var(--color-primary);
+  font-weight: 600;
+  background: rgb(0 124 186 / 10%);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+}
+
+/* Scenario component styles consolidated to scenario-modal.css for component ownership */
+/* .scenario-title styles moved to scenario-modal.css */
+
+.scenario-question {
+  font-size: 1rem;
+  color: var(--color-gray-700);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+/* Choice Buttons */
+.scenario-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  position: relative; /* For popover positioning */
+}
+
+.choice-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 1rem 1.25rem;
+  background: white;
+  border: 2px solid var(--color-gray-200);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  position: relative; /* For popover positioning */
+}
+
+.choice-btn:hover {
+  border-color: var(--color-primary);
+  background: rgb(0 124 186 / 2%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgb(0 124 186 / 15%);
+}
+
+.choice-btn:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgb(0 124 186 / 20%);
+}
+
+.choice-btn.selected {
+  border-color: var(--color-primary);
+  background: rgb(0 124 186 / 10%);
+  transform: none;
+}
+
+.choice-btn.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.choice-text {
+  color: var(--color-gray-800);
+  font-weight: 500;
+}
+
+.choice-arrow {
+  color: var(--color-primary);
+  font-weight: bold;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.choice-btn:hover .choice-arrow,
+.choice-btn.selected .choice-arrow {
+  opacity: 1;
+}
+
+/* Feedback Section - Now as Popover */
+.scenario-feedback {
+  position: absolute;
+  top: -1rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100%);
+  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+  border: 1px solid rgb(59 130 246 / 15%);
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow:
+    0 20px 40px rgb(0 0 0 / 10%),
+    0 8px 16px rgb(59 130 246 / 10%),
+    inset 0 1px 0 rgb(255 255 255 / 80%);
+  z-index: 1000;
+  min-width: 340px;
+  max-width: 420px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+}
+
+.scenario-feedback.visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(-100%) translateY(-0.75rem) scale(1);
+}
+
+/* Demo Feedback Popover Styles */
+.demo-feedback-popover {
+  position: absolute;
+  bottom: 100%;
+  left: 50%; /* Default center position, will be adjusted by JavaScript */
+  transform: translateX(-50%);
+  margin-bottom: 1rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.demo-feedback-popover.show {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(-5px);
+}
+
+.demo-feedback-popover .popover-content {
+  background: rgb(255 255 255 / 98%);
+  color: #2d3748;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgb(0 0 0 / 15%);
+  min-width: 280px;
+  max-width: 400px;
+  position: relative;
+  border: 1px solid rgb(102 126 234 / 20%);
+}
+
+.demo-feedback-popover .popover-content h5 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #667eea;
+}
+
+.demo-feedback-popover .popover-content p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #4a5568;
+}
+
+/* Popover Arrow (pointing downward) */
+.demo-feedback-popover .popover-arrow {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid rgb(255 255 255 / 98%);
+}
+
+/* Arrow shadow effect */
+.demo-feedback-popover .popover-arrow::before {
+  content: "";
+  position: absolute;
+  top: -9px;
+  left: -9px;
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 9px solid rgb(102 126 234 / 20%);
+  z-index: -1;
+}
+
+/* Ensure demo controls container has relative positioning for popover */
+/* Hero Demo Controls - MOVED TO hero-consolidated.css for semantic ownership */
+/* .hero-demo-controls styles moved to hero-consolidated.css */
+
+.demo-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  max-width: 700px;
+  margin: 0 auto;
+  position: relative; /* Added for popover positioning */
+}
+
+/* Popover Backdrop for Mobile */
+.feedback-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgb(0 0 0 / 10%);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(2px);
+}
+
+.feedback-backdrop.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Demo Actions - Positioned in bottom right corner */
+.demo-actions {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  z-index: 100;
+}
+
+.demo-actions .btn {
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+}
+
+.demo-actions .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 15%);
+}
+
+.demo-actions .btn-primary {
+  background: var(--color-primary, #3b82f6);
+  color: white;
+  border: none;
+}
+
+.demo-actions .btn-primary:hover {
+  background: var(--color-primary-dark, #2563eb);
+}
+
+.demo-actions .btn-secondary {
+  background: white;
+  color: var(--color-gray-700, #374151);
+  border: 1px solid var(--color-gray-300, #d1d5db);
+}
+
+.demo-actions .btn-secondary:hover {
+  background: var(--color-gray-50, #f9fafb);
+  border-color: var(--color-gray-400, #9ca3af);
+}
+
+/* ====================================
+   HERO RADAR DEMO STYLES  
+   ================================== */
+
+/* Hero Radar Demo Section - Consolidated to radar-chart.css */
+/* .hero-radar-demo styles moved to radar-chart.css for component ownership */
+
+/* .hero-radar-demo h3 styles moved to radar-chart.css for component ownership */
+
+/* .hero-radar-demo p styles moved to radar-chart.css for component ownership */
+
+/* Demo Controls Grid for Better Layout */
+/* Hero Demo Controls - MOVED TO hero-consolidated.css for semantic ownership */
+/* .hero-demo-controls styles moved to hero-consolidated.css */
+
+.demo-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Hero Radar Container - Consolidated to radar-chart.css */
+/* .hero-radar-container styles moved to radar-chart.css for component ownership */
+
+/* ACCORDION STYLES MOVED TO hero-consolidated.css for semantic ownership */
+/* .radar-instructions-accordion and .ethics-glossary-accordion styles moved to hero-consolidated.css */
+/* These accordions are used in hero sections (app.html lines 514, 564) and belong with hero components */
+
+/* Accordion Styles for Instructions - MOVED TO hero-consolidated.css */
+.radar-instructions-accordion {
+  max-width: 600px;
+  margin: 1.5rem auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
+}
+
+.radar-instructions-accordion .accordion-item {
+  border: none;
+  border-radius: 0;
+}
+
+.radar-instructions-accordion .accordion-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  outline: none;
+  font-weight: 600;
+}
+
+.radar-instructions-accordion .accordion-header:hover {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  transform: translateY(-1px);
+}
+
+.radar-instructions-accordion .accordion-header:focus {
+  outline: 2px solid rgb(255 255 255 / 50%);
+  outline-offset: -2px;
+}
+
+.radar-instructions-accordion .accordion-icon {
+  font-size: 0.875rem;
+  transition: transform 0.3s ease;
+  min-width: 12px;
+}
+
+.radar-instructions-accordion .accordion-icon.expanded {
+  transform: rotate(90deg);
+}
+
+.radar-instructions-accordion .accordion-title {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.radar-instructions-accordion .accordion-content {
+  background: white;
+  max-height: 500px;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.radar-instructions-accordion .accordion-content.collapsed {
+  max-height: 0;
+}
+
+.radar-instructions-accordion .accordion-content-inner {
+  padding: 1.5rem;
+  border-top: 1px solid rgb(102 126 234 / 10%);
+  text-align: left;
+}
+
+.radar-instructions-accordion .accordion-content-inner p {
+  color: #4a5568;
+  margin: 0 0 1rem;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.radar-instructions-accordion .accordion-content-inner ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+
+.radar-instructions-accordion .accordion-content-inner li {
+  color: #4a5568;
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.radar-instructions-accordion .accordion-content-inner li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: #667eea;
+  font-weight: bold;
+}
+
+.radar-instructions-accordion .accordion-content-inner li strong {
+  color: #2d3748;
+  font-weight: 600;
+}
+
+/* Demo Feedback Enhancement */
+#hero-demo-feedback {
+  background: rgb(102 126 234 / 5%);
+  border: 1px solid rgb(102 126 234 / 10%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  text-align: left;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+}
+
+#hero-demo-feedback.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#hero-demo-feedback h5 {
+  color: #667eea;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+}
+
+#hero-demo-feedback p {
+  color: #4a5568;
+  margin: 0;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+/* Responsive design handled by media.css variables */
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .choice-btn {
+    border-width: 3px;
+  }
+
+  .choice-btn:focus {
+    box-shadow: 0 0 0 4px rgb(0 124 186 / 50%);
+  }
+
+  .meter-fill {
+    border: 2px solid currentcolor;
+  }
+
+  .scenario-feedback {
+    border-width: 2px;
+    box-shadow: 0 8px 25px rgb(0 0 0 / 30%);
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .choice-btn,
+  .meter-fill,
+  .score-change,
+  .scenario-feedback,
+  .feedback-backdrop {
+    transition: none;
+    animation: none;
+  }
+
+  .choice-btn:hover {
+    transform: none;
+  }
+
+  .scenario-feedback.visible {
+    transform: translateX(-50%) translateY(-100%) translateY(-0.5rem);
+  }
+
+  /* Mobile and tablet responsive adjustments - Aligned with media.css */
+  @media only screen and (width <= 768px) {
+    .scenario-feedback.visible {
+      transform: translateY(-100%)
+        translateY(calc(-0.5rem * var(--font-scale, 1)));
+    }
+  }
+}
+
+/* Import demo button styles from ethics-analysis.css for consistency */
+/* Hero Demo Button Styles - MOVED TO hero-consolidated.css for semantic ownership */
+/* .hero-demo-controls .demo-btn styles moved to hero-consolidated.css */
+
+/* Ethics Glossary Accordion Styles - MOVED TO hero-consolidated.css */
+.ethics-glossary-accordion {
+  max-width: 600px;
+  margin: 1.5rem auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
+}
+
+.ethics-glossary-accordion .accordion-item {
+  border: none;
+  border-radius: 0;
+}
+
+.ethics-glossary-accordion .accordion-header {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  outline: none;
+  font-weight: 600;
+}
+
+.ethics-glossary-accordion .accordion-header:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-1px);
+}
+
+.ethics-glossary-accordion .accordion-header:focus {
+  outline: 2px solid rgb(255 255 255 / 50%);
+  outline-offset: -2px;
+}
+
+.ethics-glossary-accordion .accordion-icon {
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+  color: rgb(255 255 255 / 90%);
+}
+
+.ethics-glossary-accordion.open .accordion-icon {
+  transform: rotate(90deg);
+}
+
+.ethics-glossary-accordion .accordion-title {
+  font-size: 1rem;
+  margin: 0;
+  flex: 1;
+}
+
+.ethics-glossary-accordion .accordion-content {
+  background: white;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  max-height: 0;
+  opacity: 0;
+}
+
+.ethics-glossary-accordion .accordion-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
+.ethics-glossary-accordion .accordion-content-inner {
+  padding: 1.5rem;
+}
+
+/* Glossary Grid Styles for Accordion */
+.ethics-glossary-accordion .glossary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.ethics-glossary-accordion .glossary-item {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 8px;
+  padding: 1rem;
+  border-left: 4px solid #10b981;
+}
+
+.ethics-glossary-accordion .glossary-item h4 {
+  margin: 0 0 0.5rem;
+  color: #1a202c;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.ethics-glossary-accordion .glossary-item p {
+  margin: 0;
+  color: #4a5568;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.ethics-glossary-accordion .glossary-note {
+  background: linear-gradient(135deg, #fef7cd 0%, #fef3c7 100%);
+  border-radius: 8px;
+  padding: 1rem;
+  border-left: 4px solid #f59e0b;
+}
+
+.ethics-glossary-accordion .glossary-note p {
+  margin: 0;
+  color: #78350f;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Mobile responsiveness for glossary accordion - Aligned with media.css */
+@media only screen and (width <= 768px) {
+  .ethics-glossary-accordion .glossary-grid {
+    grid-template-columns: 1fr;
+    gap: calc(1rem * var(--font-scale, 1));
+  }
+
+  .ethics-glossary-accordion .glossary-item {
+    padding: var(--container-padding, 16px);
+  }
+
+  .ethics-glossary-accordion .glossary-item h4 {
+    font-size: calc(1rem * var(--font-scale, 1));
+  }
+
+  .ethics-glossary-accordion .glossary-item p {
+    font-size: calc(0.85rem * var(--font-scale, 1));
+  }
+}
+
+/* Dark mode support for hero demo - MOVED TO hero-consolidated.css for semantic ownership */
+/* body.dark-mode .hero-demo-container styles moved to hero-consolidated.css */
+
+body.dark-mode .demo-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .demo-subtitle {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .scenario-panel {
+  background: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-border);
+  box-shadow: 0 4px 12px var(--theme-shadow);
+}
+
+body.dark-mode .scenario-counter {
+  color: var(--theme-accent);
+  background: rgb(var(--theme-accent-rgb), 0.1);
+}
+
+/* Scenario component dark mode styles consolidated to scenario-modal.css for component ownership */
+/* body.dark-mode .scenario-title styles moved to scenario-modal.css */
+
+body.dark-mode .scenario-question {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .choice-btn {
+  background: var(--theme-bg-tertiary);
+  border-color: var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .choice-btn:hover {
+  border-color: var(--theme-accent);
+  background: rgb(var(--theme-accent-rgb), 0.1);
+  box-shadow: 0 4px 12px var(--theme-shadow);
+}
+
+body.dark-mode .choice-btn:focus {
+  border-color: var(--theme-accent);
+  box-shadow: 0 0 0 3px rgb(var(--theme-accent-rgb), 0.2);
+}
+
+body.dark-mode .choice-btn.selected {
+  border-color: var(--theme-accent);
+  background: rgb(var(--theme-accent-rgb), 0.2);
+}
+
+body.dark-mode .choice-text {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .choice-arrow {
+  color: var(--theme-accent);
+}
+
+body.dark-mode .scenario-feedback {
+  background: linear-gradient(
+    135deg,
+    var(--theme-bg-secondary) 0%,
+    var(--theme-bg-tertiary) 100%
+  );
+  border-color: var(--theme-border);
+  box-shadow: 0 8px 25px var(--theme-shadow);
+}
+
+body.dark-mode .demo-feedback-popover .popover-content {
+  background: var(--theme-bg-secondary);
+  color: var(--theme-text-primary);
+  border: 1px solid var(--theme-border);
+}
+
+body.dark-mode .demo-feedback-popover .popover-content h5 {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .demo-feedback-popover .popover-content p {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .demo-actions .btn {
+  background: var(--theme-bg-tertiary);
+  border-color: var(--theme-border);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .demo-actions .btn:hover {
+  background: var(--theme-bg-quaternary);
+  border-color: var(--theme-accent);
+}
+
+body.dark-mode .demo-actions .btn-primary {
+  background: var(--theme-accent);
+  border-color: var(--theme-accent);
+  color: var(--theme-text-on-accent);
+}
+
+body.dark-mode .demo-actions .btn-primary:hover {
+  background: var(--theme-accent-dark);
+  border-color: var(--theme-accent-dark);
+}
+
+/* Hero radar demo dark mode styles consolidated to radar-chart.css */
+/* body.dark-mode .hero-radar-demo styles moved to radar-chart.css */
+/* body.dark-mode .hero-radar-demo h3 styles moved to radar-chart.css */
+/* body.dark-mode .hero-radar-demo p styles moved to radar-chart.css */
+/* body.dark-mode .hero-radar-container styles moved to radar-chart.css */
+
+body.dark-mode .radar-instructions-accordion .accordion-item {
+  background: var(--theme-bg-tertiary);
+  border-color: var(--theme-border);
+}
+
+body.dark-mode .radar-instructions-accordion .accordion-header {
+  background: var(--theme-bg-quaternary);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .radar-instructions-accordion .accordion-header:hover {
+  background: rgb(var(--theme-accent-rgb), 0.1);
+}
+
+body.dark-mode .radar-instructions-accordion .accordion-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .radar-instructions-accordion .accordion-content-inner p {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .radar-instructions-accordion .accordion-content-inner li {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode
+  .radar-instructions-accordion
+  .accordion-content-inner
+  li
+  strong {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .ethics-glossary-accordion .accordion-item {
+  background: var(--theme-bg-tertiary);
+  border-color: var(--theme-border);
+}
+
+body.dark-mode .ethics-glossary-accordion .accordion-header {
+  background: var(--theme-bg-quaternary);
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .ethics-glossary-accordion .accordion-title {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .ethics-glossary-accordion .glossary-item {
+  background: var(--theme-bg-quaternary);
+  border-color: var(--theme-border);
+}
+
+body.dark-mode .ethics-glossary-accordion .glossary-item h4 {
+  color: var(--theme-text-primary);
+}
+
+body.dark-mode .ethics-glossary-accordion .glossary-item p {
+  color: var(--theme-text-secondary);
+}
+
+body.dark-mode .ethics-glossary-accordion .glossary-note {
+  background: rgb(var(--theme-warning-rgb), 0.1);
+  border-color: var(--theme-warning);
+}
+
+body.dark-mode .ethics-glossary-accordion .glossary-note p {
+  color: var(--theme-warning);
+}

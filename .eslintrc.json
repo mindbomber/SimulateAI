@@ -1,0 +1,79 @@
+{
+  "extends": ["eslint:recommended"],
+  "env": {
+    "browser": true,
+    "es2022": true,
+    "node": true
+  },
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-console": "warn",
+    "no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }
+    ],
+    "prefer-const": "error",
+    "no-var": "error",
+    "prefer-arrow-callback": "error",
+    "arrow-spacing": "error",
+    "no-duplicate-imports": "error",
+    "no-useless-constructor": "error",
+    "prefer-template": "error",
+    "template-curly-spacing": "error",
+    "object-shorthand": "error",
+    "prefer-destructuring": [
+      "error",
+      {
+        "array": false,
+        "object": true
+      }
+    ],
+    "no-magic-numbers": [
+      "warn",
+      {
+        "ignore": [0, 1, -1, 2, 10, 100, 1000],
+        "ignoreArrayIndexes": true,
+        "ignoreDefaultValues": true
+      }
+    ],
+    "consistent-return": "error",
+    "no-implicit-globals": "error",
+    "prefer-rest-params": "error",
+    "prefer-spread": "error",
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": ["firebase/*"],
+            "message": "Import Firebase SDK only inside src/js/services/. Use DataHandler/FirebaseService elsewhere."
+          }
+        ]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["src/js/services/**/*.js"],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "globals": {
+    "SimulationEngine": "readonly",
+    "EthicsSimulation": "readonly",
+    "UI": "readonly",
+    "AccessibilityManager": "readonly",
+    "StorageManager": "readonly",
+    "AnalyticsManager": "readonly",
+    "Helpers": "readonly"
+  }
+}

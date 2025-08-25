@@ -1,0 +1,1633 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="page-id" content="educator-tools" />
+    <title>SimulateAI Educator Tools - Complete Teaching Resources</title>
+    <meta
+      name="description"
+      content="Comprehensive educator resources including ISTE-aligned curriculum kits, assessment tools, and professional development for integrating AI ethics into your classroom."
+    />
+    <!-- SEO and Social Meta -->
+    <meta property="og:title" content="SimulateAI Educator Tools" />
+    <meta
+      property="og:description"
+      content="Everything you need to integrate AI ethics education into your classroom"
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://simulateai.com/educator-tools.html"
+    />
+
+    <!-- Accessibility -->
+    <meta
+      name="accessibility-features"
+      content="keyboard-navigation,skip-links,high-contrast,large-text,screen-reader-support"
+    />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="src/styles/main.css" />
+    <link rel="stylesheet" href="src/styles/shared-navigation.css" />
+    <link rel="stylesheet" href="src/styles/accessibility.css" />
+
+    <!-- Educator Tools Specific Styles -->
+    <style>
+      :root {
+        --educator-primary: #4c7fff;
+        --educator-dark: #0b0f19;
+        --educator-light: #f5f7fa;
+        --educator-card-bg: #ffffff;
+        --educator-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+        --educator-border-radius: 1rem;
+        --educator-success: #22c55e;
+        --educator-warning: #f59e0b;
+        --educator-info: #3b82f6;
+      }
+
+      .educator-wrapper {
+        max-width: 1000px;
+        margin: 2rem auto;
+        padding: 2rem 1rem;
+        background: var(--educator-light);
+        border-radius: var(--educator-border-radius);
+      }
+
+      .educator-hero {
+        text-align: center;
+        margin-bottom: 3rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 2rem;
+        border-radius: var(--educator-border-radius);
+      }
+
+      .educator-hero h1 {
+        font-size: clamp(2.5rem, 5vw + 1rem, 4rem);
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .educator-hero p {
+        font-size: 1.3rem;
+        line-height: 1.6;
+        max-width: 700px;
+        margin: 0 auto;
+        opacity: 0.95;
+      }
+
+      .educator-nav {
+        background: var(--educator-card-bg);
+        border-radius: var(--educator-border-radius);
+        padding: 1.5rem;
+        margin-bottom: 3rem;
+        box-shadow: var(--educator-shadow);
+      }
+
+      .educator-nav ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .educator-nav li {
+        flex-shrink: 0;
+      }
+
+      .educator-nav a {
+        color: var(--educator-primary);
+        font-weight: 600;
+        text-decoration: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 2rem;
+        transition: all 0.3s ease;
+        border: 2px solid var(--educator-primary);
+        background: transparent;
+        white-space: nowrap;
+        display: inline-block;
+      }
+
+      .educator-nav a:hover,
+      .educator-nav a:focus {
+        background: var(--educator-primary);
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      .educator-section {
+        background: var(--educator-card-bg);
+        border-radius: var(--educator-border-radius);
+        padding: 2.5rem;
+        margin-bottom: 3rem;
+        box-shadow: var(--educator-shadow);
+      }
+
+      .educator-section h2 {
+        color: var(--educator-primary);
+        font-size: 2.2rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+      }
+
+      .educator-section p {
+        line-height: 1.7;
+        color: var(--educator-dark);
+        font-size: 1.1rem;
+      }
+
+      .educator-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+      }
+
+      .educator-card {
+        background: var(--educator-card-bg);
+        border-radius: var(--educator-border-radius);
+        padding: 2rem;
+        box-shadow: var(--educator-shadow);
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        min-height: 400px;
+      }
+
+      .educator-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(
+          90deg,
+          var(--educator-primary),
+          var(--educator-success)
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .educator-card:hover::before {
+        opacity: 1;
+      }
+
+      .educator-card:hover {
+        border-color: rgba(76, 127, 255, 0.2);
+        transform: translateY(-6px);
+        box-shadow: 0 12px 30px rgba(76, 127, 255, 0.15);
+      }
+
+      .educator-card h3 {
+        color: var(--educator-primary);
+        margin-top: 0;
+        margin-bottom: 1.2rem;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 2px solid rgba(76, 127, 255, 0.1);
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+
+      .educator-card p {
+        flex: 0 0 auto;
+        margin-bottom: 1rem;
+        line-height: 1.6;
+      }
+
+      .educator-card ul {
+        flex: 1;
+        padding-left: 0;
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 200px;
+      }
+
+      .educator-card .checklist {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+      }
+
+      .educator-card li {
+        margin-bottom: 0.5rem;
+        line-height: 1.5;
+      }
+
+      .grade-badge {
+        background: var(--educator-success);
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 1rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-left: auto;
+      }
+
+      .coming-soon-badge {
+        background: var(--educator-warning);
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-left: auto;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        opacity: 0.9;
+      }
+
+      .educator-button {
+        display: inline-block;
+        padding: 0.8rem 2rem;
+        background: var(--educator-primary);
+        color: white;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        text-align: center;
+        margin-top: auto;
+      }
+
+      .educator-button:hover,
+      .educator-button:focus {
+        background: #3a5acc;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(76, 127, 255, 0.3);
+      }
+
+      .educator-button.secondary {
+        background: var(--educator-info);
+      }
+
+      .educator-button.success {
+        background: var(--educator-success);
+      }
+
+      .educator-button.warning {
+        background: var(--educator-warning);
+      }
+
+      .highlight-box {
+        background: linear-gradient(
+          135deg,
+          rgba(76, 127, 255, 0.1),
+          rgba(76, 127, 255, 0.05)
+        );
+        border-left: 4px solid var(--educator-primary);
+        padding: 1.5rem 2rem;
+        margin: 2rem 0;
+        border-radius: 0 var(--educator-border-radius)
+          var(--educator-border-radius) 0;
+      }
+
+      .highlight-box h3 {
+        color: var(--educator-primary);
+        margin-top: 0;
+      }
+
+      .checklist {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .checklist li {
+        position: relative;
+        padding: 1rem 1rem 1rem 3rem;
+        margin-bottom: 0.8rem;
+        line-height: 1.6;
+        background: rgba(76, 127, 255, 0.03);
+        border-radius: 0.8rem;
+        border-left: 4px solid var(--educator-success);
+        transition: all 0.2s ease;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        min-height: 3rem;
+      }
+
+      .checklist li:last-child {
+        margin-bottom: 0;
+      }
+
+      .checklist li:hover {
+        background: rgba(76, 127, 255, 0.08);
+        transform: translateX(2px);
+      }
+
+      .checklist li::before {
+        content: "✓";
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--educator-success);
+        font-weight: bold;
+        background: rgba(34, 197, 94, 0.15);
+        width: 1.8rem;
+        height: 1.8rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        border: 2px solid var(--educator-success);
+      }
+
+      .checklist a {
+        color: var(--educator-primary);
+        text-decoration: none;
+        font-weight: 600;
+        border-bottom: 1px solid transparent;
+        transition: border-color 0.2s ease;
+      }
+
+      .checklist a:hover {
+        border-bottom-color: var(--educator-primary);
+      }
+
+      .timeline {
+        border-left: 4px solid var(--educator-primary);
+        margin-left: 1rem;
+        padding-left: 2rem;
+        position: relative;
+      }
+
+      .timeline-item {
+        position: relative;
+        margin-bottom: 2rem;
+      }
+
+      .timeline-item::before {
+        content: "";
+        position: absolute;
+        left: -2.5rem;
+        top: 0.5rem;
+        width: 1rem;
+        height: 1rem;
+        background: var(--educator-primary);
+        border-radius: 50%;
+        box-shadow: 0 0 0 4px var(--educator-card-bg);
+      }
+
+      .timeline-item h3 {
+        color: var(--educator-primary);
+        margin-top: 0;
+        margin-bottom: 0.5rem;
+      }
+
+      .tip-callout {
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        border: 2px solid var(--educator-warning);
+        padding: 1.5rem;
+        border-radius: var(--educator-border-radius);
+        margin: 2rem 0;
+      }
+
+      .tip-callout h4 {
+        color: #92400e;
+        margin-top: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .educator-wrapper {
+          margin: 1rem;
+          padding: 1rem;
+        }
+
+        .educator-hero {
+          padding: 2rem 1rem;
+        }
+
+        .educator-nav ul {
+          flex-direction: column;
+          align-items: center;
+          gap: 0.8rem;
+        }
+
+        .educator-nav a {
+          padding: 0.7rem 1.2rem;
+          font-size: 0.9rem;
+        }
+
+        .educator-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    </style>
+
+    <!-- Icons and Favicons -->
+    <link rel="icon" type="image/svg+xml" href="src/assets/icons/favicon.svg" />
+    <link rel="icon" type="image/png" href="src/assets/icons/favicon.png" />
+  </head>
+
+  <body class="educator-tools-page" data-page-id="educator-tools">
+    <!-- Skip to content for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- ARIA live regions for announcements -->
+    <div
+      id="aria-live-polite"
+      aria-live="polite"
+      aria-atomic="true"
+      class="sr-only"
+    ></div>
+    <div
+      id="aria-live-assertive"
+      aria-live="assertive"
+      aria-atomic="true"
+      class="sr-only"
+    ></div>
+
+    <!-- Enhanced Header -->
+    <div id="navigation-container">
+      <!-- Shared navigation will be injected here -->
+    </div>
+
+    <!-- Main Content -->
+    <main id="main-content" class="educator-wrapper">
+      <!-- Hero Section -->
+      <header class="educator-hero">
+        <h1>🎓 Educator Tools & Resources</h1>
+        <p>
+          Everything you need to integrate
+          <strong>AI ethics education</strong> into your classroom— ISTE-aligned
+          lesson plans, assessment frameworks, and professional development
+          opportunities.
+          <em>Transform how students think about technology and society.</em>
+        </p>
+      </header>
+
+      <!-- In-page Navigation -->
+      <nav class="educator-nav" aria-label="Educator Tools sections">
+        <ul>
+          <li><a href="#educational-demo">Live Demo</a></li>
+          <li><a href="#quickstart">Quick Start Guide</a></li>
+          <li><a href="#curriculum">Curriculum Kits</a></li>
+          <li><a href="#assessment">Assessment Tools</a></li>
+          <li>
+            <a href="#professional-development">Professional Development</a>
+          </li>
+          <li><a href="#community">Community & Support</a></li>
+        </ul>
+      </nav>
+
+      <!-- Educational Context Demo -->
+      <section id="educational-demo" class="educator-section">
+        <h2>🔬 Live Educational Context Demo with Digital Science Lab</h2>
+        <p>
+          Experience SimulateAI's comprehensive educational infrastructure
+          including our <strong>Digital Science Lab</strong> component. Select a
+          scenario topic and difficulty to see curriculum alignment, assessment
+          tools, virtual lab stations, and hands-on experiments automatically
+          generated.
+        </p>
+
+        <div class="highlight-box">
+          <h3>✨ Featured: Digital Science Lab Integration</h3>
+          <p>Our Digital Science Lab provides:</p>
+          <ul>
+            <li>
+              <strong>Virtual Lab Stations:</strong> Bias Analysis, Ethics
+              Decision Labs, Impact Analysis Centers, and Solution Design
+              Workshops
+            </li>
+            <li>
+              <strong>Guided Experiments:</strong> Step-by-step bias detection,
+              stakeholder impact simulations, and real-world case studies
+            </li>
+            <li>
+              <strong>Collaborative Tools:</strong> Digital whiteboards, peer
+              review systems, and AI-assisted discussion facilitators
+            </li>
+            <li>
+              <strong>Assessment Methods:</strong> Portfolio-based evaluation,
+              performance assessments, and peer learning systems
+            </li>
+          </ul>
+        </div>
+
+        <div class="educator-card">
+          <h3>🎯 Interactive Educational Context Generator</h3>
+          <div style="margin: 1.5rem 0">
+            <label
+              for="scenario-tags"
+              style="display: block; margin-bottom: 0.5rem; font-weight: 600"
+              >Scenario Tags:</label
+            >
+            <select
+              id="scenario-tags"
+              style="
+                padding: 0.5rem;
+                border-radius: 0.5rem;
+                border: 2px solid #ddd;
+                margin-right: 1rem;
+              "
+            >
+              <option value="ethics,fairness">Ethics & Fairness</option>
+              <option value="bias,algorithmic-bias,discrimination">
+                Bias & Transparency
+              </option>
+              <option value="privacy,autonomy,surveillance,data-protection">
+                Privacy & Autonomy
+              </option>
+              <option value="beneficence,sustainability,social-impact">
+                Beneficence & Sustainability
+              </option>
+              <option value="education,scenarios">Educational Scenarios</option>
+              <option value="open-ended,real-world,societal-implications">
+                Open-ended Exploration
+              </option>
+              <option value="decision-making,responsibility,moral-calculus">
+                Decision Making & Responsibility
+              </option>
+              <option value="justice,equality,human-rights">
+                Justice & Human Rights
+              </option>
+              <option value="transparency,explainability,accountability">
+                Transparency & Accountability
+              </option>
+            </select>
+
+            <label
+              for="difficulty-level"
+              style="display: block; margin: 1rem 0 0.5rem 0; font-weight: 600"
+              >Difficulty Level:</label
+            >
+            <select
+              id="difficulty-level"
+              style="
+                padding: 0.5rem;
+                border-radius: 0.5rem;
+                border: 2px solid #ddd;
+              "
+            >
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+
+            <button
+              id="generate-context"
+              class="educator-button"
+              style="margin-top: 1rem; display: block"
+              disabled
+            >
+              🔄 Loading Educational Modules...
+            </button>
+          </div>
+
+          <div
+            id="educational-results"
+            style="
+              display: none;
+              margin-top: 2rem;
+              padding: 1.5rem;
+              background: rgba(76, 127, 255, 0.05);
+              border-radius: 0.8rem;
+            "
+          >
+            <h4 style="color: var(--educator-primary); margin-top: 0">
+              📋 Generated Educational Context:
+            </h4>
+            <div id="curriculum-results"></div>
+            <div id="assessment-results"></div>
+            <div id="lab-stations-results"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quick Start Guide -->
+      <section id="quickstart" class="educator-section">
+        <h2>🚀 Quick Start Guide</h2>
+        <p>
+          Get up and running with SimulateAI in your classroom with this
+          step-by-step checklist. Perfect for first-time users who want to start
+          teaching AI ethics immediately.
+        </p>
+
+        <div class="educator-grid">
+          <div class="educator-card">
+            <h3>📋 Implementation Checklist</h3>
+            <ul class="checklist">
+              <li>Create your free Educator account (Google/Microsoft SSO)</li>
+              <li>
+                Download your first <a href="#curriculum">Curriculum Kit</a>
+              </li>
+              <li>
+                Review the <a href="ethics-guide.html">Ethics Guide</a> radar
+                chart section
+              </li>
+              <li>Run a test scenario with a pilot class</li>
+              <li>Use assessment rubrics for student reflection</li>
+            </ul>
+          </div>
+
+          <div class="educator-card">
+            <h3>⏱️ Implementation Timeline</h3>
+            <div class="timeline">
+              <div class="timeline-item">
+                <h4>Week 1: Explore</h4>
+                <p>
+                  Run one scenario as a class demo. Use think-pair-share to
+                  unpack decisions.
+                </p>
+              </div>
+              <div class="timeline-item">
+                <h4>Week 2-3: Apply</h4>
+                <p>
+                  Students work in pairs on subject-specific scenarios. Collect
+                  radar screenshots.
+                </p>
+              </div>
+              <div class="timeline-item">
+                <h4>Week 4+: Create</h4>
+                <p>
+                  Students design ethical dilemmas, swap with peers, evaluate
+                  using rubrics.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tip-callout">
+          <h4>🎯 Pro Tip</h4>
+          <p>
+            Keep your first implementation low-stakes! Let students explore
+            without grading outcomes. Focus discussions on <em>why</em> their
+            radar charts look different and what that teaches us about ethical
+            reasoning.
+          </p>
+        </div>
+      </section>
+
+      <!-- Curriculum Kits -->
+      <section id="curriculum" class="educator-section">
+        <h2>📚 Standards-Aligned Curriculum Kits</h2>
+        <p>
+          Ready-to-use lesson packages mapped to
+          <strong>ISTE Standards for Students</strong>, Common Core, and Next
+          Generation Science Standards. Each kit includes slide decks, teacher
+          guides, student worksheets, and extension activities.
+        </p>
+
+        <div class="educator-grid">
+          <div class="educator-card">
+            <h3>
+              🛡️ Digital Citizenship & AI Ethics
+              <span class="grade-badge">Grades 9-12</span>
+            </h3>
+            <ul>
+              <li>
+                <strong>3 x 50-minute lessons</strong> with scenario-based
+                debates
+              </li>
+              <li>
+                <strong>Cross-curricular links</strong> to ELA & Social Studies
+              </li>
+              <li>
+                <strong>ISTE Alignment:</strong> Digital Citizen (1.2),
+                Knowledge Constructor (3.3)
+              </li>
+              <li>
+                <strong>Includes:</strong> Slide deck, rubrics, extension
+                projects
+              </li>
+            </ul>
+            <a
+              href="src/assets/downloads/ai-ethics-citizenship-kit.zip"
+              class="educator-button"
+              download
+            >
+              📥 Download Pack
+            </a>
+          </div>
+
+          <div class="educator-card">
+            <h3>
+              📊 Data Literacy & Bias Detection
+              <span class="grade-badge">Grades 7-10</span>
+            </h3>
+            <ul>
+              <li><strong>Hands-on analysis</strong> of real-world datasets</li>
+              <li>
+                <strong>Infographic design</strong> and presentation tasks
+              </li>
+              <li><strong>DOK Level 3</strong> critical thinking prompts</li>
+              <li>
+                <strong>STEM Integration:</strong> Math, Science, Computer
+                Science
+              </li>
+            </ul>
+            <a
+              href="src/assets/downloads/data-bias-kit.zip"
+              class="educator-button"
+              download
+            >
+              📥 Download Pack
+            </a>
+          </div>
+
+          <div class="educator-card">
+            <h3>
+              💻 Creative Computing with Ethics
+              <span class="grade-badge">Grades 5-8</span>
+            </h3>
+            <ul>
+              <li>
+                <strong>Block-coding challenges</strong> with ethical
+                storytelling
+              </li>
+              <li>
+                <strong>Focus dimensions:</strong> Beneficence & Sustainability
+              </li>
+              <li>
+                <strong>Optional extensions:</strong> Micro:bit and Arduino
+                projects
+              </li>
+              <li>
+                <strong>Maker Space Integration:</strong> Design thinking
+                process
+              </li>
+            </ul>
+            <a
+              href="src/assets/downloads/creative-computing.zip"
+              class="educator-button"
+              download
+            >
+              📥 Download Pack
+            </a>
+          </div>
+
+          <div class="educator-card">
+            <h3>
+              🌍 Global Perspectives on AI
+              <span class="grade-badge">Grades 6-12</span>
+            </h3>
+            <ul>
+              <li>
+                <strong>International case studies</strong> from 5 different
+                countries
+              </li>
+              <li>
+                <strong>Cultural sensitivity</strong> in ethical reasoning
+              </li>
+              <li>
+                <strong>Language Arts integration</strong> with research
+                projects
+              </li>
+              <li><strong>Model UN simulation</strong> for advanced classes</li>
+            </ul>
+            <a
+              href="src/assets/downloads/educator_guide_resources.zip"
+              class="educator-button"
+              download
+            >
+              📥 Download Pack
+            </a>
+          </div>
+
+          <div class="educator-card">
+            <h3>
+              ⚖️ Ethics in Emerging Technologies
+              <span class="grade-badge">Grades 11-12</span>
+            </h3>
+            <ul>
+              <li>
+                <strong>Advanced scenarios:</strong> Gene editing, quantum
+                computing, space colonization
+              </li>
+              <li>
+                <strong>Philosophy connections:</strong> Kant, Mill, Aristotle
+                applications
+              </li>
+              <li>
+                <strong>College prep:</strong> Academic writing and citation
+                skills
+              </li>
+              <li>
+                <strong>Capstone project:</strong> Student-designed ethical
+                framework
+              </li>
+            </ul>
+            <a
+              href="src/assets/downloads/assessment_tools.zip"
+              class="educator-button"
+              download
+            >
+              📥 Download Pack
+            </a>
+          </div>
+
+          <div class="educator-card">
+            <h3>
+              🎨 Arts & Humanities Integration
+              <span class="grade-badge">Grades 4-8</span>
+            </h3>
+            <ul>
+              <li>
+                <strong>Creative expression:</strong> Art, music, drama, and
+                writing
+              </li>
+              <li>
+                <strong>Storytelling focus:</strong> Ethics through narrative
+              </li>
+              <li>
+                <strong>Multiple intelligences:</strong> Visual, auditory,
+                kinesthetic learning
+              </li>
+              <li>
+                <strong>Community connections:</strong> Local artist
+                collaborations
+              </li>
+            </ul>
+            <a
+              href="src/assets/downloads/creative-computing.zip"
+              class="educator-button"
+              download
+            >
+              📥 Download Pack
+            </a>
+          </div>
+        </div>
+
+        <div class="highlight-box">
+          <h3>📋 Quality Assurance</h3>
+          <p>
+            Every curriculum kit undergoes peer review by practicing K-12
+            educators and our ethics advisory board. We ensure alignment to ISTE
+            Standards, age-appropriate content, and practical classroom
+            implementation. All materials are tested in real classrooms before
+            release.
+          </p>
+        </div>
+
+        <div class="highlight-box">
+          <h3>🤖 Powered by Educational AI</h3>
+          <p>
+            Our curriculum kits are enhanced by SimulateAI's educational
+            functions that automatically:
+          </p>
+          <ul style="margin: 1rem 0; padding-left: 2rem">
+            <li>
+              <strong>Map content to curriculum standards</strong> (CSTA, NGSS,
+              NCSS) based on scenario tags
+            </li>
+            <li>
+              <strong>Generate appropriate assessment tools</strong> based on
+              difficulty level and learning objectives
+            </li>
+            <li>
+              <strong>Recommend lab stations and activities</strong> that match
+              your educational goals
+            </li>
+            <li>
+              <strong>Create scenario templates</strong> for custom ethical
+              dilemmas in your subject area
+            </li>
+          </ul>
+          <p>
+            Try the
+            <a
+              href="#educational-demo"
+              style="color: var(--educator-primary); font-weight: 600"
+              >Live Demo</a
+            >
+            above to see how these functions work with different topics and
+            difficulty levels.
+          </p>
+        </div>
+      </section>
+
+      <!-- Assessment Tools -->
+      <section id="assessment" class="educator-section">
+        <h2>📝 Assessment & Evaluation Tools</h2>
+        <p>
+          Authentic assessment instruments that capture critical thinking,
+          collaboration, and ethical reasoning. Move beyond multiple-choice to
+          evaluate real understanding and growth.
+        </p>
+
+        <div class="educator-grid">
+          <div class="educator-card">
+            <h3>📊 Ethical Reasoning Rubric</h3>
+            <p>
+              Comprehensive 4-level analytic rubric aligned to all eight
+              SimulateAI dimensions. Includes both formative and summative
+              versions with clear performance indicators.
+            </p>
+            <a
+              href="src/assets/downloads/ethical-reasoning-rubric.pdf"
+              class="educator-button secondary"
+              download
+            >
+              📄 Download Rubric
+            </a>
+          </div>
+
+          <div class="educator-card">
+            <h3>🤔 Reflection Journal Prompts</h3>
+            <p>
+              15 scaffolded reflection prompts designed to guide metacognition
+              after each scenario. Supports different learning styles and
+              English language proficiency levels.
+            </p>
+            <a
+              href="src/assets/downloads/reflection-journal-prompts.pdf"
+              class="educator-button secondary"
+              download
+            >
+              📝 Download Prompts
+            </a>
+          </div>
+
+          <div class="educator-card">
+            <h3>👥 Peer Review Protocol</h3>
+            <p>
+              Transform simulations into structured Socratic seminars, gallery
+              walks, or collaborative discussions. Includes facilitation guides
+              and conversation starters.
+            </p>
+            <a
+              href="src/assets/downloads/peer-review-protocol.pdf"
+              class="educator-button secondary"
+              download
+            >
+              🗣️ Download Protocol
+            </a>
+          </div>
+
+          <div class="educator-card">
+            <h3>📈 Portfolio Assessment Guide</h3>
+            <p>
+              Framework for collecting and evaluating student work over time.
+              Includes digital portfolio templates and self-assessment tools for
+              student ownership of learning.
+            </p>
+            <a
+              href="src/assets/downloads/portfolio-assessment-guide.pdf"
+              class="educator-button secondary"
+              download
+            >
+              📁 Download Guide
+            </a>
+          </div>
+        </div>
+
+        <div class="tip-callout">
+          <h4>💡 Assessment Strategy</h4>
+          <p>
+            Use the rubric as a <strong>formative checkpoint</strong> after each
+            scenario, then combine journal prompts with portfolio assessment for
+            a comprehensive summative evaluation. This approach captures both
+            process and growth over time.
+          </p>
+        </div>
+
+        <div class="highlight-box">
+          <h3>⚙️ Smart Assessment Matching</h3>
+          <p>
+            SimulateAI's <code>getAssessmentTools()</code> function
+            automatically recommends the most appropriate assessment instruments
+            based on:
+          </p>
+          <ul style="margin: 1rem 0; padding-left: 2rem">
+            <li>
+              <strong>Beginner Level:</strong> Reflection prompts and individual
+              activities
+            </li>
+            <li>
+              <strong>Intermediate Level:</strong> Collaborative assessments and
+              small-group work
+            </li>
+            <li>
+              <strong>Advanced Level:</strong> Project assessments and
+              cross-curricular integration
+            </li>
+          </ul>
+          <p>
+            This ensures that assessment complexity matches student readiness
+            and learning objectives.
+            <a
+              href="#educational-demo"
+              style="color: var(--educator-primary); font-weight: 600"
+              >Try the demo</a
+            >
+            to see different assessment tools for each difficulty level.
+          </p>
+        </div>
+      </section>
+
+      <!-- Professional Development -->
+      <section id="professional-development" class="educator-section">
+        <h2>🎓 Professional Development</h2>
+        <p>
+          Comprehensive training opportunities to build your confidence and
+          expertise in teaching AI ethics. Earn certificates, micro-credentials,
+          and connect with fellow educators.
+        </p>
+
+        <div class="educator-grid">
+          <div class="educator-card">
+            <h3>
+              🎥 On-Demand Webinar Series
+              <span class="coming-soon-badge">Coming Soon</span>
+            </h3>
+            <p>
+              45-minute tutorials covering implementation strategies, classroom
+              management, and advanced pedagogical techniques. Certificate of
+              completion included.
+            </p>
+            <ul>
+              <li>
+                <strong>Webinar 1:</strong> Introduction to AI Ethics Education
+              </li>
+              <li>
+                <strong>Webinar 2:</strong> Facilitating Ethical Discussions
+              </li>
+              <li>
+                <strong>Webinar 3:</strong> Assessment & Evaluation Strategies
+              </li>
+              <li>
+                <strong>Webinar 4:</strong> Advanced Implementation Techniques
+              </li>
+            </ul>
+            <a href="#" class="educator-button warning">🎬 Watch Series</a>
+          </div>
+
+          <div class="educator-card">
+            <h3>
+              🏆 Micro-Credential Badge
+              <span class="coming-soon-badge">Coming Soon</span>
+            </h3>
+            <p>
+              Showcase your expertise with a verifiable digital badge. Complete
+              our 8-hour course, submit a lesson artifact, and join our
+              certified educator network.
+            </p>
+            <ul>
+              <li>
+                <strong>Module 1:</strong> Foundations of AI Ethics (2 hours)
+              </li>
+              <li>
+                <strong>Module 2:</strong> Classroom Implementation (3 hours)
+              </li>
+              <li><strong>Module 3:</strong> Assessment & Growth (2 hours)</li>
+              <li><strong>Module 4:</strong> Capstone Project (1 hour)</li>
+            </ul>
+            <a href="#" class="educator-button warning">🎯 Start Badge Path</a>
+          </div>
+
+          <div class="educator-card">
+            <h3>
+              👨‍🏫 Live Workshop Series
+              <span class="coming-soon-badge">Coming Soon</span>
+            </h3>
+            <p>
+              Monthly interactive workshops with SimulateAI experts and master
+              teachers. Small group sessions, Q&A, and hands-on practice with
+              immediate feedback.
+            </p>
+            <ul>
+              <li><strong>Format:</strong> 90 minutes, max 20 participants</li>
+              <li><strong>Schedule:</strong> 2nd Saturday of each month</li>
+              <li>
+                <strong>Focus:</strong> Practical implementation challenges
+              </li>
+              <li><strong>Bonus:</strong> Peer networking and collaboration</li>
+            </ul>
+            <a href="#" class="educator-button warning"
+              >📅 Register for Workshop</a
+            >
+          </div>
+
+          <div class="educator-card">
+            <h3>
+              🎯 Custom District Training
+              <span class="coming-soon-badge">Coming Soon</span>
+            </h3>
+            <p>
+              Tailored professional development for your school or district. We
+              work with your team to create customized training that fits your
+              specific needs and timeline.
+            </p>
+            <ul>
+              <li><strong>On-site or virtual</strong> delivery options</li>
+              <li><strong>Flexible scheduling</strong> to fit your calendar</li>
+              <li><strong>Customized content</strong> for your grade levels</li>
+              <li><strong>Follow-up support</strong> and coaching included</li>
+            </ul>
+            <a
+              href="mailto:research@simulateai.io"
+              class="educator-button warning"
+              >✉️ Request Custom Training</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- Community & Support -->
+      <section id="community" class="educator-section">
+        <h2>🤝 Community & Support</h2>
+        <p>
+          Join our thriving educator community, access ongoing support, and help
+          shape the future of AI ethics education. Your voice and experience
+          matter in this important work.
+        </p>
+
+        <div class="educator-grid">
+          <div class="educator-card">
+            <h3>💬 Educator Slack Community</h3>
+            <p>
+              Connect with 500+ educators worldwide. Share lesson plans, get
+              implementation advice, and participate in monthly challenges.
+              Early access to new features and scenarios.
+            </p>
+            <a
+              href="https://simulateai.slack.com/"
+              class="educator-button"
+              target="_blank"
+              rel="noopener noreferrer"
+              >🚀 Join Slack Community</a
+            >
+          </div>
+
+          <div class="educator-card">
+            <h3>💡 Feature Request & Feedback</h3>
+            <p>
+              Help us improve SimulateAI with your classroom insights. Request
+              new scenarios, suggest features, and vote on our development
+              roadmap. We iterate based on educator needs.
+            </p>
+            <a href="#" class="educator-button">📝 Submit Feedback</a>
+          </div>
+
+          <div class="educator-card">
+            <h3>📚 Help Center & Documentation</h3>
+            <p>
+              Comprehensive guides, video tutorials, troubleshooting tips, and
+              FAQs. Everything you need to become a SimulateAI expert, available
+              24/7.
+            </p>
+            <a href="#" class="educator-button">🆘 Visit Help Center</a>
+          </div>
+
+          <div class="educator-card">
+            <h3>🏢 District Partnerships</h3>
+            <p>
+              Large-scale implementation support, volume pricing, LMS
+              integration, and dedicated account management for districts and
+              educational organizations.
+            </p>
+            <a href="mailto:research@simulateai.io" class="educator-button"
+              >🤝 Explore Partnerships</a
+            >
+          </div>
+        </div>
+
+        <div class="highlight-box">
+          <h3>🌟 Educator Spotlight Program</h3>
+          <p>
+            Share your success stories, innovative implementations, and student
+            outcomes with our community. Featured educators receive recognition,
+            free professional development credits, and early access to new
+            resources.
+            <a href="mailto:research@simulateai.io"
+              >Nominate yourself or a colleague!</a
+            >
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Professional Footer will be inserted here -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Professional Footer Component -->
+    <script
+      type="module"
+      src="src/js/components/professional-footer.js"
+    ></script>
+
+    <!-- Back to Top Component -->
+    <script type="module" src="src/js/components/back-to-top.js"></script>
+
+    <!-- Shared Navigation Component -->
+    <script type="module">
+      // Ensure the page is fully loaded before initializing navigation
+      setTimeout(() => {
+        import("./src/js/components/shared-navigation.js");
+      }, 100);
+    </script>
+
+    <!-- Educational Context Demo Script -->
+    <script type="module">
+      // Import educational modules
+      import EducatorToolkit from "./src/js/core/educator-toolkit.js";
+      import DigitalScienceLab from "./src/js/core/digital-science-lab.js";
+      import ScenarioGenerator from "./src/js/core/scenario-generator.js";
+
+      class EducatorToolsDemo {
+        constructor() {
+          this.educatorToolkit = null;
+          this.digitalScienceLab = null;
+          this.scenarioGenerator = null;
+          this.init();
+        }
+
+        async init() {
+          try {
+            // Initialize educational modules
+            this.educatorToolkit = new EducatorToolkit();
+            this.digitalScienceLab = new DigitalScienceLab();
+            this.scenarioGenerator = new ScenarioGenerator();
+
+            // Connect modules
+            this.educatorToolkit.setScenarioGenerator(this.scenarioGenerator);
+            this.digitalScienceLab.setEducatorToolkit(this.educatorToolkit);
+
+            // Set up event listeners
+            this.setupEventListeners();
+
+            console.log("Educational modules loaded successfully for demo");
+          } catch (error) {
+            console.error("Failed to initialize educational modules:", error);
+
+            // Set up fallback demo data
+            this.setupFallbackDemo();
+            this.showError(
+              "Educational modules failed to load. Using demo data instead.",
+            );
+          }
+        }
+
+        setupFallbackDemo() {
+          // Create mock educational functions for demo purposes
+          this.educatorToolkit = {
+            getCurriculumAlignment: (tags) => {
+              const mockCurriculum = [
+                {
+                  standard: "CSTA",
+                  code: "2-IC-21",
+                  description:
+                    "Discuss issues of bias and accessibility in the design of existing technologies",
+                },
+                {
+                  standard: "NGSS",
+                  practice: "Engaging in Argument from Evidence",
+                  description:
+                    "Use evidence to construct and support arguments about ethical implications",
+                },
+              ];
+              return tags.includes("ethics") || tags.includes("fairness")
+                ? mockCurriculum
+                : [];
+            },
+            getAssessmentTools: (difficulty) => {
+              const mockTools = {
+                beginner: [
+                  {
+                    name: "Reflection Prompts",
+                    description: "Guided questions for individual reflection",
+                  },
+                  {
+                    name: "Individual Activities",
+                    description: "Self-paced learning exercises",
+                  },
+                ],
+                intermediate: [
+                  {
+                    name: "Collaborative Assessments",
+                    description: "Group-based evaluation activities",
+                  },
+                  {
+                    name: "Small Group Activities",
+                    description: "Team problem-solving exercises",
+                  },
+                ],
+                advanced: [
+                  {
+                    name: "Project Assessments",
+                    description: "Comprehensive project-based evaluations",
+                  },
+                  {
+                    name: "Cross-curricular Activities",
+                    description: "Integrated subject area projects",
+                  },
+                ],
+              };
+              return mockTools[difficulty] || [];
+            },
+          };
+
+          this.digitalScienceLab = {
+            getRelevantStations: (tags) => {
+              const mockStations = [
+                {
+                  name: "Bias Analysis Station",
+                  purpose: "Investigate how bias enters and affects AI systems",
+                },
+                {
+                  name: "Ethics Decision Lab",
+                  purpose:
+                    "Explore ethical frameworks and their application to AI",
+                },
+              ];
+              return tags.length > 0 ? mockStations : [];
+            },
+          };
+
+          this.setupEventListeners();
+          console.log("Fallback demo data initialized");
+        }
+
+        setupEventListeners() {
+          const generateButton = document.getElementById("generate-context");
+          if (generateButton) {
+            generateButton.addEventListener("click", () =>
+              this.generateEducationalContext(),
+            );
+
+            // Enable the button and update text
+            generateButton.disabled = false;
+            generateButton.innerHTML = "🎲 Generate Educational Context";
+          }
+        }
+
+        generateEducationalContext() {
+          const tagsSelect = document.getElementById("scenario-tags");
+          const difficultySelect = document.getElementById("difficulty-level");
+          const resultsContainer = document.getElementById(
+            "educational-results",
+          );
+
+          if (!tagsSelect || !difficultySelect || !resultsContainer) {
+            console.error("Demo elements not found");
+            this.showError(
+              "Demo interface elements not found. Please refresh the page.",
+            );
+            return;
+          }
+
+          const tags = tagsSelect.value.split(",").map((tag) => tag.trim());
+          const difficulty = difficultySelect.value;
+
+          console.log("Generating educational context for:", {
+            tags,
+            difficulty,
+          });
+
+          try {
+            let curriculum = null;
+            let assessments = null;
+            let labStations = null;
+
+            // Get educational context using the same functions as the main app
+            if (this.educatorToolkit) {
+              curriculum = this.educatorToolkit.getCurriculumAlignment(tags);
+              // Pass tags to assessment tools for enhanced content-specific assessments
+              assessments = this.educatorToolkit.getAssessmentTools(
+                difficulty,
+                tags,
+              );
+              console.log("EducatorToolkit results:", {
+                curriculum,
+                assessments,
+                tagCount: tags.length,
+              });
+            } else {
+              console.error("EducatorToolkit not initialized");
+            }
+
+            if (this.digitalScienceLab) {
+              labStations = this.digitalScienceLab.getRelevantStations(tags);
+
+              // Also get age-appropriate experiments
+              const experiments =
+                this.digitalScienceLab.getExperimentsForLevel(difficulty);
+
+              // Get age adaptations for the demo
+              const ageAdaptations =
+                this.digitalScienceLab.createAgeAdaptations();
+
+              console.log("DigitalScienceLab results:", {
+                labStations,
+                experiments: experiments?.length || 0,
+                ageAdaptations: Object.keys(ageAdaptations),
+              });
+
+              // Add experiments to the results for display
+              if (experiments && experiments.length > 0) {
+                labStations = labStations || [];
+                // Add experiment information to display
+                experiments.forEach((exp) => {
+                  labStations.push({
+                    name: `Experiment: ${exp.title}`,
+                    purpose: `${exp.difficulty} level experiment`,
+                    duration: exp.duration,
+                    description: `Hands-on experiment: ${exp.title}`,
+                    category: "experiment",
+                  });
+                });
+              }
+            } else {
+              console.error("DigitalScienceLab not initialized");
+            }
+
+            // Display results
+            this.displayResults({ curriculum, assessments, labStations });
+
+            // Show results container
+            resultsContainer.style.display = "block";
+            resultsContainer.scrollIntoView({
+              behavior: "smooth",
+              block: "nearest",
+            });
+          } catch (error) {
+            console.error("Error generating educational context:", error);
+            this.showError(
+              `Error generating educational context: ${error.message}. Please try again.`,
+            );
+          }
+        }
+
+        displayResults({ curriculum, assessments, labStations }) {
+          const curriculumResults =
+            document.getElementById("curriculum-results");
+          const assessmentResults =
+            document.getElementById("assessment-results");
+          const labStationsResults = document.getElementById(
+            "lab-stations-results",
+          );
+
+          // Display curriculum alignment
+          if (curriculumResults) {
+            if (
+              curriculum &&
+              Array.isArray(curriculum) &&
+              curriculum.length > 0
+            ) {
+              curriculumResults.innerHTML = `
+                <h5 style="color: var(--educator-primary); margin: 1rem 0 0.5rem 0;">📚 Curriculum Alignment:</h5>
+                <ul style="margin-left: 1rem;">
+                  ${curriculum.map((item) => `<li><strong>${item.standard} ${item.code || ""}:</strong> ${item.description}</li>`).join("")}
+                </ul>
+              `;
+            } else {
+              curriculumResults.innerHTML = `
+                <h5 style="color: var(--educator-primary); margin: 1rem 0 0.5rem 0;">📚 Curriculum Alignment:</h5>
+                <p style="margin-left: 1rem; color: #666;">No specific curriculum alignments found for these tags.</p>
+              `;
+            }
+          }
+
+          // Display assessment tools
+          if (assessmentResults) {
+            if (
+              assessments &&
+              Array.isArray(assessments) &&
+              assessments.length > 0
+            ) {
+              assessmentResults.innerHTML = `
+                <h5 style="color: var(--educator-primary); margin: 1rem 0 0.5rem 0;">📝 Assessment Tools:</h5>
+                <ul style="margin-left: 1rem;">
+                  ${assessments
+                    .map((tool) => {
+                      if (tool && tool.name) {
+                        return `<li><strong>${tool.name}:</strong> ${tool.description || "Assessment tool for measuring student understanding"}</li>`;
+                      } else if (tool && tool.type) {
+                        return `<li><strong>${tool.type}:</strong> ${tool.tools ? tool.tools.length + " assessment instruments" : "Various assessment tools"}</li>`;
+                      } else {
+                        return `<li><strong>Assessment Tool:</strong> Available for this difficulty level</li>`;
+                      }
+                    })
+                    .join("")}
+                </ul>
+              `;
+            } else {
+              assessmentResults.innerHTML = `
+                <h5 style="color: var(--educator-primary); margin: 1rem 0 0.5rem 0;">📝 Assessment Tools:</h5>
+                <p style="margin-left: 1rem; color: #666;">No assessment tools configured for this difficulty level.</p>
+              `;
+            }
+          }
+
+          // Display lab stations
+          if (labStationsResults) {
+            if (
+              labStations &&
+              Array.isArray(labStations) &&
+              labStations.length > 0
+            ) {
+              labStationsResults.innerHTML = `
+                <h5 style="color: var(--educator-primary); margin: 1rem 0 0.5rem 0;">🔬 Recommended Lab Stations:</h5>
+                <ul style="margin-left: 1rem;">
+                  ${labStations
+                    .map((station) => {
+                      if (station && station.name) {
+                        return `<li><strong>${station.name}:</strong> ${station.purpose || station.description || "Interactive learning station"}</li>`;
+                      } else {
+                        return `<li><strong>Lab Station:</strong> Available for these topics</li>`;
+                      }
+                    })
+                    .join("")}
+                </ul>
+              `;
+            } else {
+              labStationsResults.innerHTML = `
+                <h5 style="color: var(--educator-primary); margin: 1rem 0 0.5rem 0;">🔬 Recommended Lab Stations:</h5>
+                <p style="margin-left: 1rem; color: #666;">No lab stations found for these tags.</p>
+              `;
+            }
+          }
+
+          // Log the actual data for debugging
+          console.log("Educational Context Results:", {
+            curriculum,
+            assessments,
+            labStations,
+            curriculumType: typeof curriculum,
+            assessmentsType: typeof assessments,
+            labStationsType: typeof labStations,
+          });
+        }
+
+        showError(message) {
+          const resultsContainer = document.getElementById(
+            "educational-results",
+          );
+          if (resultsContainer) {
+            resultsContainer.innerHTML = `
+              <div style="color: #dc2626; padding: 1rem; background: #fee2e2; border-radius: 0.5rem; border: 1px solid #fca5a5;">
+                <strong>⚠️ Error:</strong> ${message}
+              </div>
+            `;
+            resultsContainer.style.display = "block";
+          }
+        }
+      }
+
+      // Initialize when DOM is ready
+      document.addEventListener("DOMContentLoaded", () => {
+        new EducatorToolsDemo();
+      });
+    </script>
+
+    <!-- Smooth scrolling for anchor links -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+          anchor.addEventListener("click", function (e) {
+            const href = this.getAttribute("href");
+            if (!href || href === "#") return;
+
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+              target.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

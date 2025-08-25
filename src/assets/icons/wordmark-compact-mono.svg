@@ -1,0 +1,27 @@
+<!-- SimulateAI Compact Wordmark - Monochrome -->
+<!-- Copyright 2025 Armando Sori - Licensed under Apache License, Version 2.0 -->
+<svg width="200" height="40" viewBox="0 0 200 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SimulateAI Compact Wordmark Monochrome">
+  <defs>
+    <!-- Monochrome gradient for text -->
+    <linearGradient id="textGradientMono" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#000"/>
+      <stop offset="50%" style="stop-color:#333"/>
+      <stop offset="100%" style="stop-color:#555"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- SimulateAI Compact Wordmark -->
+  <g transform="translate(10, 20)">
+    <!-- Main brand text -->
+    <text x="0" y="6" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, sans-serif" 
+          font-size="24" font-weight="600" fill="url(#textGradientMono)" letter-spacing="-0.5px">
+      Simulate<tspan fill="#000" font-weight="700">AI</tspan>
+    </text>
+    
+    <!-- Tagline -->
+    <text x="0" y="18" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, sans-serif" 
+          font-size="8" font-weight="400" fill="#666" letter-spacing="0.4px" opacity="0.7">
+      AI ETHICS EDUCATION
+    </text>
+  </g>
+</svg>

@@ -1,0 +1,73 @@
+# Security Configuration
+# This file configures automated security protection for the repository
+
+# Files and patterns that should NEVER be committed
+SECURITY_PATTERNS = [
+    # Firebase API Keys
+    "AIzaSy[A-Za-z0-9_-]{35}",
+    
+    # Stripe Keys
+    "pk_live_[A-Za-z0-9]{99,}",
+    "sk_live_[A-Za-z0-9]{99,}",
+    "rk_live_[A-Za-z0-9]{99,}",
+    
+    # Webhook Secrets
+    "whsec_[A-Za-z0-9]{32,}",
+    
+    # Generic secrets (40+ character hex strings)
+    "[a-f0-9]{40,}",
+    
+    # Database URLs
+    "https://.*\.firebaseio\.com",
+    "mongodb://.*:.*@",
+    "postgresql://.*:.*@"
+]
+
+# Safe patterns that should be ignored
+SAFE_PATTERNS = [
+    "example",
+    "template", 
+    "placeholder",
+    "your_.*_here",
+    "_here",
+    "test",
+    "mock",
+    "dummy",
+    "sample"
+]
+
+# Required .gitignore patterns
+REQUIRED_GITIGNORE = [
+    ".env",
+    ".env.local",
+    ".env.production",
+    ".env.development.local",
+    ".env.test.local",
+    ".env.production.local",
+    "node_modules",
+    "*.log",
+    ".firebase",
+    "firebase-debug.log",
+    "functions/node_modules",
+    "functions/package-lock.json",
+    "dist"
+]
+
+# Files to always scan
+SCAN_EXTENSIONS = [
+    ".js",
+    ".html", 
+    ".json",
+    ".ts",
+    ".jsx",
+    ".tsx"
+]
+
+# Directories to skip
+SKIP_DIRECTORIES = [
+    "node_modules",
+    ".git",
+    "dist",
+    ".next",
+    "coverage"
+]

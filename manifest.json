@@ -1,0 +1,85 @@
+{
+  "name": "SimulateAI: Ethical Research Lab",
+  "short_name": "SimulateAI",
+  "description": "Interactive AI ethics simulations and research platform for exploring complex ethical scenarios in artificial intelligence.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#667eea",
+  "theme_color": "#667eea",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-US",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/src/assets/icons/favicon.svg",
+      "sizes": "32x32 64x64 128x128 192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/src/assets/icons/logo-square.svg",
+      "sizes": "64x64",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/src/assets/icons/logo-square.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/src/assets/icons/logo-square.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    }
+  ],
+  "categories": ["education", "research", "ethics", "artificial-intelligence"],
+  "shortcuts": [
+    {
+      "name": "New Simulation",
+      "short_name": "New Sim",
+      "description": "Start a new AI ethics simulation",
+      "url": "/index.html#new-simulation",
+      "icons": [
+        {
+          "src": "./src/assets/icons/Square Icon_192_x_192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Research Dashboard",
+      "short_name": "Research",
+      "description": "View research insights and analytics",
+      "url": "/firebase-analytics-dashboard.html",
+      "icons": [
+        {
+          "src": "./src/assets/icons/Square Icon_192_x_192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Ethics Explorer",
+      "short_name": "Ethics",
+      "description": "Explore ethical frameworks and principles",
+      "url": "/index.html#ethics-explorer",
+      "icons": [
+        {
+          "src": "./src/assets/icons/Square Icon_192_x_192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
+}

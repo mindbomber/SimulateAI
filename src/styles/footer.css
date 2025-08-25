@@ -1,0 +1,782 @@
+/*
+Professional Footer Component CSS - Dedicated styling for professional-footer.js
+Copyright 2025 Armando Sori
+
+This file contains all styles for the JavaScript footer component to maintain
+separation of concerns and improve maintainability.
+*/
+
+@layer components {
+  /* =============================================================================
+   PROFESSIONAL FOOTER COMPONENT
+   ============================================================================= */
+
+  /* ===== ENHANCED GENERAL FOOTER SUPPORT ===== */
+  /* Consolidated from main.css and shared-navigation.css for complete footer coverage */
+
+  /* General footer base styles - consolidated from main.css */
+  .footer {
+    background: var(--color-gray-900);
+    color: var(--color-gray-100);
+    margin-top: var(--spacing-20);
+  }
+
+  /* Footer sections grid - consolidated from main.css */
+  .footer-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-12);
+    margin-bottom: var(--spacing-12);
+  }
+
+  .footer-section {
+    padding: var(--spacing-6);
+  }
+
+  .footer-section-title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-white);
+    margin-bottom: var(--spacing-4);
+    border-bottom: 2px solid var(--color-primary);
+    padding-bottom: var(--spacing-2);
+    display: inline-block;
+  }
+
+  .footer-section-content {
+    color: var(--color-gray-300);
+    line-height: var(--line-height-relaxed);
+  }
+
+  .footer-section-content p {
+    margin-bottom: var(--spacing-3);
+    font-size: var(--font-size-sm);
+  }
+
+  .footer-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--spacing-4) 0;
+  }
+
+  .footer-list li {
+    padding: var(--spacing-1) 0;
+    font-size: var(--font-size-sm);
+    position: relative;
+    padding-left: var(--spacing-4);
+  }
+
+  .footer-list li::before {
+    content: "•";
+    color: var(--color-primary);
+    position: absolute;
+    left: 0;
+    top: var(--spacing-1);
+  }
+
+  .footer-link {
+    color: var(--color-primary-light);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .footer-link:hover,
+  .footer-link:focus {
+    color: var(--color-white);
+    text-decoration: underline;
+  }
+
+  .contact-info {
+    margin-top: var(--spacing-4);
+    padding: var(--spacing-4);
+    border-top: 1px solid var(--color-gray-700);
+    background: var(--color-gray-800);
+    border-radius: var(--border-radius-md);
+    color: var(--color-gray-300);
+  }
+
+  .contact-info p {
+    margin-bottom: var(--spacing-2);
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-300);
+  }
+
+  /* ===== MEGA MENU FOOTER COMPONENTS ===== */
+  /* Consolidated from main.css and shared-navigation.css */
+
+  .mega-menu-footer {
+    text-align: center;
+    padding-top: var(--spacing-4);
+    border-top: 1px solid var(--color-gray-200);
+  }
+
+  .mega-menu-view-all {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: var(--font-weight-medium);
+    padding: var(--spacing-2) var(--spacing-4);
+    border-radius: var(--radius-base);
+    transition: all var(--transition-fast);
+    display: inline-block;
+    min-height: var(--touch-target-min, 44px);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mega-menu-view-all:hover {
+    background: var(--color-gray-50);
+    transform: translateX(2px);
+  }
+
+  /* Responsive mega menu footer */
+  @media (width <= 768px) {
+    .mega-menu-footer {
+      padding-top: calc(0.75rem * var(--font-scale, 1));
+      padding: var(--spacing-3) var(--spacing-3) var(--spacing-4)
+        var(--spacing-3);
+      border-top: 1px solid var(--color-gray-200);
+      margin-top: var(--spacing-3);
+      box-sizing: border-box;
+    }
+
+    .mega-menu-view-all {
+      padding: calc(0.5rem * var(--font-scale, 1))
+        calc(1rem * var(--font-scale, 1));
+      font-weight: 500;
+      border-radius: 6px;
+      transition: background-color 0.2s ease;
+      display: inline-flex;
+      /* Mobile specific styles */
+      display: block;
+      width: calc(100% - var(--spacing-2));
+      margin: 0 auto;
+      text-align: center;
+      padding: var(--spacing-3) var(--spacing-4);
+      background: var(--color-primary);
+      color: var(--color-white);
+      text-decoration: none;
+      font-weight: var(--font-weight-medium);
+      border-radius: var(--radius-base);
+      transition: all var(--transition-fast);
+      font-size: var(--font-size-base);
+      box-sizing: border-box;
+    }
+  }
+
+  @media (width <= 480px) {
+    .mega-menu-footer {
+      padding: var(--spacing-3);
+    }
+
+    .mega-menu-view-all {
+      padding: var(--spacing-2) var(--spacing-3);
+      font-size: var(--font-size-sm);
+    }
+  }
+
+  /* ===== PROFESSIONAL FOOTER COMPONENT (MAIN) ===== */
+
+  /* Ensure body allows footer to extend full width */
+  body {
+    overflow-x: hidden; /* Prevent horizontal scroll while allowing full-width footer */
+  }
+
+  /* Professional Footer Styles - Clean Full Width */
+  .professional-footer {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    color: white;
+    position: relative;
+    margin-top: 60px;
+
+    /* Clean full width without complex calculations */
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+    padding: 0;
+    border: none;
+
+    /* Simple positioning for natural layout */
+    display: block;
+    clear: both;
+    height: auto; /* Allow natural sizing to content */
+  }
+
+  .footer-wave {
+    position: absolute;
+    top: -50px;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" fill="%232c3e50"></path></svg>')
+      no-repeat;
+    background-size: cover;
+  }
+
+  .professional-footer .footer-content {
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 60px 20px 0 !important; /* Match page sections with consistent 20px padding */
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .footer-main {
+    display: grid;
+    grid-template-columns: minmax(200px, min(350px, 30vw)) 1fr; /* Responsive brand column + sections column */
+    gap: clamp(1rem, var(--container-padding, 60px), 4vw); /* Responsive gap */
+    margin-bottom: 0;
+    width: 100%;
+    box-sizing: border-box;
+    align-items: start; /* Align grid items to top */
+    overflow-x: hidden; /* Prevent horizontal overflow */
+  }
+
+  /* Brand section takes minimum space needed, sections take remaining */
+  .footer-brand {
+    max-width: min(350px, 30vw); /* Never exceed 30% of viewport width */
+    min-width: min(200px, 25vw); /* Responsive minimum width */
+    width: 100%; /* Take full available grid column space */
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--container-padding, 15px);
+    overflow-wrap: break-word; /* Prevent text overflow */
+  }
+
+  .footer-sections {
+    width: 100%; /* Take full available grid column space */
+    display: flex;
+    flex-wrap: nowrap; /* Force single row - never wrap */
+    justify-content: space-between; /* Distribute evenly */
+    align-items: flex-start; /* Align sections to top */
+    gap: clamp(1rem, 2vw, 2rem); /* Simple responsive gap */
+    box-sizing: border-box;
+    margin-bottom: 0;
+    min-width: 0; /* Prevents flex item from overflowing */
+    overflow-x: hidden; /* Hide horizontal overflow instead of scroll */
+  }
+
+  /* =============================================================================
+   BRAND SECTION
+   ============================================================================= */
+
+  .brand-logo {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0; /* Remove margin - parent flex gap handles spacing */
+  }
+
+  .brand-logo a {
+    display: inline-block;
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease;
+    border-radius: 8px;
+    outline: none;
+  }
+
+  .brand-logo a:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+
+  .brand-logo a:focus {
+    outline: 2px solid #3498db;
+    outline-offset: 4px;
+  }
+
+  .brand-logo-img {
+    height: clamp(50px, 8vw, 80px); /* Responsive height based on viewport */
+    width: auto;
+    max-width: clamp(
+      200px,
+      30vw,
+      320px
+    ); /* Responsive width based on viewport */
+    object-fit: contain;
+    filter: brightness(1.1); /* Slightly brighten for dark footer background */
+    display: block; /* Ensure no gaps around image */
+  }
+
+  .brand-tagline {
+    color: #bdc3c7;
+    margin-bottom: 0; /* Remove margin - parent flex gap handles spacing */
+    line-height: 1.5;
+    font-size: 1rem;
+  }
+
+  .brand-stats {
+    display: flex;
+    gap: var(--container-padding, 20px);
+    margin-top: 0; /* Remove margin - parent flex gap handles spacing */
+    justify-content: flex-start;
+  }
+
+  .stat-item {
+    text-align: center;
+  }
+
+  .stat-number {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #3498db;
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+    color: #95a5a6;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* =============================================================================
+   NAVIGATION SECTIONS
+   ============================================================================= */
+
+  .footer-section {
+    flex: 1; /* Equal width columns */
+    max-width: 33.333%; /* Enforce 3 columns */
+    min-width: 200px; /* Minimum width for readability */
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-wrap: break-word; /* Prevent text overflow */
+  }
+
+  /* Footer section titles - specific to footer content */
+  .footer .section-title,
+  .footer-content .section-title {
+    flex-shrink: 0; /* Prevent title from shrinking */
+    font-size: calc(1.1rem * var(--font-scale, 1));
+    font-weight: 600;
+    margin-bottom: 0; /* Remove margin - parent flex gap handles spacing */
+    color: #ecf0f1;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 8px;
+    display: inline-block;
+  }
+
+  .section-links {
+    flex: 1 1 auto; /* Take remaining space in section */
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--container-padding, 12px);
+  }
+
+  .section-links li {
+    margin-bottom: 0; /* Remove margin - parent flex gap handles spacing */
+  }
+
+  .section-links a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #bdc3c7;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    padding: 5px 0;
+    border-radius: 4px;
+  }
+
+  .section-links a:hover {
+    color: #3498db;
+    transform: translateX(5px);
+  }
+
+  .link-icon {
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+
+  .link-text {
+    font-size: 0.95rem;
+  }
+
+  /* =============================================================================
+   FOOTER BOTTOM
+   ============================================================================= */
+
+  .footer-bottom {
+    border-top: 1px solid #34495e;
+    padding: var(--container-padding, 30px) 0;
+  }
+
+  .footer-bottom-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--container-padding, 20px);
+  }
+
+  .footer-copyright {
+    order: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: var(--container-padding, 15px) 0;
+    border-bottom: 1px solid #34495e;
+    gap: 5px;
+  }
+
+  .footer-social-cert-container {
+    order: 2;
+    display: flex;
+    justify-content: center;
+    gap: var(--container-padding, 40px);
+    align-items: center;
+    flex-wrap: nowrap; /* Keep in one row on desktop */
+  }
+
+  .copyright-text {
+    font-weight: 600;
+    margin: 0;
+    color: #ecf0f1;
+    flex-shrink: 0;
+  }
+
+  .legal-notice {
+    font-size: 0.9rem;
+    color: #95a5a6;
+    margin: 0;
+    flex-shrink: 0;
+  }
+
+  /* =============================================================================
+   SOCIAL LINKS
+   ============================================================================= */
+
+  .footer-social {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .social-label {
+    font-size: 0.9rem;
+    color: #95a5a6;
+    font-weight: 500;
+  }
+
+  .social-links {
+    display: flex;
+    flex-flow: row nowrap; /* One row with three columns */ /* Force single row - never wrap */
+    justify-content: flex-start; /* Align items to start */
+    align-items: center; /* Center items vertically */
+    gap: clamp(
+      0.5rem,
+      var(--container-padding, 15px),
+      3vw
+    ); /* Responsive gap between columns */
+  }
+
+  .social-links a {
+    flex: 1 1 calc(33.333% - clamp(0.5rem, var(--container-padding, 15px), 3vw)); /* Exactly 3 columns */
+    max-width: calc(
+      33.333% - clamp(0.5rem, var(--container-padding, 15px), 3vw)
+    ); /* Enforce 3 columns */
+
+    min-width: clamp(80px, 15vw, 120px); /* Responsive minimum width */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center content within each social link */
+    gap: 6px;
+    color: #bdc3c7;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgb(255 255 255 / 5%);
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    white-space: nowrap; /* Prevent text wrapping within items */
+    overflow: hidden; /* Hide overflow if needed */
+    text-overflow: ellipsis; /* Add ellipsis for long text */
+  }
+
+  .social-links a:hover {
+    background: rgb(52 152 219 / 20%);
+    color: #3498db;
+    transform: translateY(-2px);
+  }
+
+  /* =============================================================================
+   CERTIFICATIONS
+   ============================================================================= */
+
+  .footer-certifications {
+    display: flex;
+    flex-flow: row nowrap; /* One row with three columns */ /* Force single row - never wrap */
+    justify-content: flex-start; /* Align items to start */
+    align-items: center; /* Center items vertically */
+    gap: clamp(
+      0.5rem,
+      var(--container-padding, 20px),
+      3vw
+    ); /* Responsive gap between columns */
+  }
+
+  .certification-item {
+    flex: 1 1 calc(33.333% - clamp(0.5rem, var(--container-padding, 20px), 3vw)); /* Exactly 3 columns */
+    max-width: calc(
+      33.333% - clamp(0.5rem, var(--container-padding, 20px), 3vw)
+    ); /* Enforce 3 columns */
+
+    min-width: clamp(80px, 15vw, 120px); /* Responsive minimum width */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Align content to start */
+    gap: 6px;
+    font-size: 0.85rem;
+    color: #95a5a6;
+    white-space: nowrap; /* Prevent text wrapping within items */
+    overflow: hidden; /* Hide overflow if needed */
+    text-overflow: ellipsis; /* Add ellipsis for long text */
+  }
+
+  .cert-icon {
+    font-size: 0.9rem;
+  }
+
+  /* =============================================================================
+   RESPONSIVE DESIGN USING MEDIA.CSS VARIABLES
+   ============================================================================= */
+
+  /* Mobile responsive adjustments - using media.css breakpoints */
+  @media only screen and (width <= 767px) {
+    .footer-main {
+      display: flex; /* Switch back to flex for mobile stacking */
+      flex-flow: column wrap; /* Stack vertically on mobile only */ /* Allow wrapping on mobile */
+      gap: clamp(1rem, var(--container-padding, 2rem), 4vw);
+      max-width: 100vw; /* Ensure viewport fit */
+      overflow-x: hidden; /* Prevent horizontal overflow */
+    }
+
+    .footer-brand {
+      max-width: 100vw; /* Full viewport width available */
+      min-width: auto; /* Remove minimum constraints */
+      width: 100%; /* Take full width */
+    }
+
+    /* Keep 3-column layout but make sections smaller */
+    .footer-sections {
+      width: 100%; /* Full width available */
+      gap: 1rem; /* Simple gap for mobile */
+    }
+
+    .footer-section {
+      flex: 1; /* Equal width columns on mobile */
+      max-width: 33.333%; /* Still 3 columns on mobile */
+      min-width: 120px; /* Minimum for readability */
+    }
+
+    .footer-bottom-content {
+      flex-direction: column;
+      text-align: center;
+      gap: var(--container-padding, 1rem);
+    }
+
+    .footer-social-cert-container {
+      flex-direction: column;
+      gap: var(--container-padding, 1rem);
+    }
+
+    .brand-stats {
+      justify-content: center;
+    }
+
+    /* Content sizing handled naturally by flexbox */
+    .professional-footer .footer-content {
+      min-height: 500px; /* Keep content min-height for layout stability */
+    }
+
+    .footer-bottom {
+      min-height: 120px; /* More space for stacked social/cert elements */
+    }
+  }
+
+  /* Small mobile devices - using media.css device detection */
+  @media only screen and (width <= 479px) {
+    .professional-footer .footer-content {
+      padding: 40px 20px 0; /* Use consistent 20px padding instead of variable */
+      min-height: 600px; /* Keep content min-height for very small screens */
+    }
+
+    /* Stack columns vertically on very small screens */
+    .footer-sections {
+      flex-direction: column; /* Stack vertically */
+      gap: 2rem; /* More space between stacked sections */
+    }
+
+    .footer-section {
+      flex: none; /* Remove flex sizing */
+      max-width: 100%; /* Full width when stacked */
+      min-width: auto; /* No minimum width constraint */
+    }
+
+    .social-links {
+      flex-wrap: nowrap; /* Keep single row even on small mobile */
+      justify-content: center;
+      gap: clamp(
+        0.25rem,
+        var(--container-padding, 10px),
+        2vw
+      ); /* Smaller responsive gap */
+    }
+
+    .social-links a {
+      min-width: clamp(
+        60px,
+        12vw,
+        100px
+      ); /* Smaller minimum for very small screens */
+
+      font-size: 0.8rem; /* Slightly smaller text for mobile */
+      padding: 6px 8px; /* Reduced padding for mobile */
+    }
+
+    .footer-certifications {
+      align-items: center;
+      gap: clamp(
+        0.25rem,
+        var(--container-padding, 10px),
+        2vw
+      ); /* Smaller gap for small screens */
+    }
+
+    .certification-item {
+      min-width: clamp(
+        60px,
+        12vw,
+        100px
+      ); /* Smaller minimum for very small screens */
+
+      font-size: 0.75rem; /* Slightly smaller text for mobile */
+    }
+
+    .footer-bottom {
+      min-height: 140px; /* Extra space for wrapped social links */
+    }
+
+    /* Use media.css font scaling for small devices */
+    .footer .section-title,
+    .footer-content .section-title {
+      font-size: calc(1rem * var(--font-scale, 0.9));
+    }
+
+    .brand-name {
+      font-size: calc(1.5rem * var(--font-scale, 0.9));
+    }
+
+    .brand-logo-img {
+      height: clamp(
+        40px,
+        6vw,
+        60px
+      ); /* Smaller but still responsive for mobile */
+      max-width: clamp(
+        160px,
+        25vw,
+        240px
+      ); /* Proportionally smaller max-width for mobile */
+    }
+  }
+
+  /* Tablet responsive adjustments */
+  @media only screen and (width >= 768px) and (width <= 1279px) {
+    .professional-footer .footer-content {
+      padding: 50px 20px 0; /* Use consistent 20px padding */
+      min-height: 350px; /* Keep content min-height for tablet layout */
+    }
+
+    .footer-brand {
+      min-width: 200px; /* Smaller minimum width on tablets */
+      max-width: 280px; /* Slightly smaller max width */
+    }
+
+    .footer-bottom {
+      min-height: 90px; /* Slightly reduced for tablet */
+    }
+
+    /* Gap handled automatically by media.css --container-padding */
+  }
+
+  /* Desktop responsive adjustments */
+  @media only screen and (width >= 1280px) {
+    .professional-footer .footer-content {
+      padding: 60px 20px 0; /* Use consistent 20px padding */
+      min-height: 400px; /* Keep content min-height for desktop layout */
+    }
+
+    .footer-bottom {
+      min-height: 100px; /* Desktop footer bottom height */
+    }
+
+    /* Gap handled automatically by media.css --container-padding */
+  }
+
+  /* =============================================================================
+   ACCESSIBILITY ENHANCEMENTS
+   ============================================================================= */
+
+  /* Focus management */
+  .professional-footer a:focus {
+    outline: 2px solid #3498db;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .professional-footer {
+      background: #000;
+      border-top: 2px solid #fff;
+    }
+
+    .footer .section-title,
+    .footer-content .section-title {
+      border-bottom-color: #fff;
+    }
+
+    .section-links a:hover {
+      background: rgb(255 255 255 / 10%);
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .section-links a,
+    .social-links a {
+      transition: none;
+    }
+
+    .section-links a:hover {
+      transform: none;
+    }
+
+    .social-links a:hover {
+      transform: none;
+    }
+  }
+
+  /* =============================================================================
+   PERFORMANCE OPTIMIZATIONS
+   ============================================================================= */
+
+  /* GPU acceleration for smooth animations */
+  .section-links a,
+  .social-links a {
+    transform: translateZ(0);
+    will-change: transform, color;
+  }
+
+  /* Prevent layout shifts - heights are handled responsively in media queries */
+  .footer-bottom {
+    min-height: 100px; /* Base height for footer bottom section */
+  }
+} /* End @layer components */

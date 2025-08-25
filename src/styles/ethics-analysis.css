@@ -1,0 +1,517 @@
+/**
+ * Ethics Analysis Section Styles
+ * Styling for the radar chart explanation and glossary section
+ */
+
+/* Ethics Analysis Section */
+.ethics-analysis-section {
+  padding: 6rem 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  position: relative;
+}
+
+/* Demo radar container styles consolidated to radar-chart.css for component ownership */
+/* .demo-radar-container styles moved to radar-chart.css */
+/* .demo-radar-container:hover styles moved to radar-chart.css */
+
+.ethics-analysis-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    #667eea 0%,
+    #764ba2 25%,
+    #f093fb 50%,
+    #f5576c 75%,
+    #4facfe 100%
+  );
+}
+
+.ethics-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.ethics-explanation {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.ethics-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgb(0 0 0 / 8%);
+  border: 1px solid rgb(255 255 255 / 80%);
+  transition: all 0.3s ease;
+}
+
+.ethics-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgb(0 0 0 / 12%);
+}
+
+.ethics-card h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.ethics-card p {
+  color: #4a5568;
+  line-height: 1.6;
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* Ethics Glossary */
+.ethics-glossary {
+  background: white;
+  padding: 3rem;
+  border-radius: 20px;
+  box-shadow: 0 12px 40px rgb(0 0 0 / 10%);
+  border: 1px solid rgb(255 255 255 / 80%);
+}
+
+.ethics-glossary h3 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #1a202c;
+  margin: 0 0 2rem;
+  text-align: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glossary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.glossary-item {
+  padding: 1.5rem;
+  background: rgb(102 126 234 / 3%);
+  border-radius: 12px;
+  border: 1px solid rgb(102 126 234 / 10%);
+  transition: all 0.3s ease;
+}
+
+.glossary-item:hover {
+  background: rgb(102 126 234 / 6%);
+  border-color: rgb(102 126 234 / 20%);
+  transform: translateY(-2px);
+}
+
+.glossary-item h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0 0 0.75rem;
+}
+
+.glossary-item p {
+  color: #4a5568;
+  line-height: 1.5;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.glossary-note {
+  background: rgb(245 158 11 / 10%);
+  border: 1px solid rgb(245 158 11 / 20%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+.glossary-note p {
+  color: #92400e;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.glossary-note strong {
+  color: #78350f;
+}
+
+/* Interactive Radar Chart Demo */
+.radar-demo-section {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border: 2px solid #cbd5e0;
+  border-radius: 16px;
+  padding: 2rem;
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.radar-demo-section h4 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.radar-demo-section p {
+  color: #4a5568;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.demo-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.demo-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgb(79 70 229 / 25%);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 10%);
+}
+
+.demo-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 15%),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.demo-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgb(79 70 229 / 35%);
+  background: linear-gradient(135deg, #4338ca 0%, #5b21b6 100%);
+}
+
+.demo-btn:hover::before {
+  left: 100%;
+}
+
+.demo-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgb(79 70 229 / 25%);
+}
+
+/* Special styling for the reset button */
+.demo-btn.reset-btn {
+  background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
+  box-shadow: 0 2px 8px rgb(107 114 128 / 25%);
+}
+
+.demo-btn.reset-btn:hover {
+  background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
+  box-shadow: 0 4px 16px rgb(107 114 128 / 35%);
+}
+
+.demo-btn.reset-btn::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 20%),
+    transparent
+  );
+}
+
+.demo-radar-container {
+  max-width: 500px;
+  margin: 0 auto 2rem;
+  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow:
+    0 4px 12px rgb(0 0 0 / 8%),
+    0 1px 3px rgb(0 0 0 / 5%);
+  border: 1px solid rgb(226 232 240 / 80%);
+  transition: all 0.3s ease;
+}
+
+.demo-radar-container:hover {
+  box-shadow:
+    0 8px 20px rgb(0 0 0 / 12%),
+    0 2px 6px rgb(0 0 0 / 8%);
+  transform: translateY(-2px);
+  border-color: rgb(156 163 175 / 60%);
+}
+
+.demo-feedback {
+  background: rgb(102 126 234 / 5%);
+  border: 1px solid rgb(102 126 234 / 10%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  text-align: left;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+}
+
+.demo-feedback.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.demo-feedback h5 {
+  color: #667eea;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+}
+
+.demo-feedback p {
+  color: #4a5568;
+  margin: 0;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+/* Radar Instructions */
+.radar-instructions {
+  background: rgb(255 255 255 / 90%);
+  border: 1px solid rgb(102 126 234 / 20%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem auto;
+  max-width: 600px;
+  text-align: left;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 5%);
+}
+
+.radar-instructions h5 {
+  color: #667eea;
+  font-weight: 700;
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.radar-instructions p {
+  color: #4a5568;
+  margin: 0 0 1rem;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.radar-instructions p:last-child {
+  margin-bottom: 0;
+}
+
+.radar-instructions ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+
+.radar-instructions li {
+  color: #4a5568;
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.radar-instructions li::before {
+  content: "▸";
+  color: #667eea;
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.radar-instructions strong {
+  color: #2d3748;
+  font-weight: 600;
+}
+
+/* Responsive Design */
+@media (width <= 768px) {
+  .ethics-analysis-section {
+    padding: 4rem 0;
+  }
+
+  .ethics-content {
+    padding: 0 1rem;
+  }
+
+  .ethics-explanation {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .ethics-card {
+    padding: 1.5rem;
+  }
+
+  .ethics-glossary {
+    padding: 2rem;
+  }
+
+  .glossary-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .radar-demo-section {
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .demo-controls {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .demo-btn {
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .demo-radar-container {
+    padding: 1rem;
+  }
+
+  .radar-instructions {
+    padding: 1.25rem;
+    margin: 1rem auto;
+  }
+
+  .radar-instructions h5 {
+    font-size: 1rem;
+  }
+
+  .radar-instructions p,
+  .radar-instructions li {
+    font-size: 0.9rem;
+  }
+}
+
+@media (width <= 480px) {
+  .ethics-analysis-section {
+    padding: 3rem 0;
+  }
+
+  .ethics-card {
+    padding: 1.25rem;
+  }
+
+  .ethics-card h3 {
+    font-size: 1.1rem;
+  }
+
+  .ethics-glossary {
+    padding: 1.5rem;
+  }
+
+  .ethics-glossary h3 {
+    font-size: 1.5rem;
+  }
+
+  .glossary-item {
+    padding: 1.25rem;
+  }
+
+  .radar-demo-section {
+    padding: 1.25rem;
+  }
+
+  .radar-demo-section h4 {
+    font-size: 1.25rem;
+  }
+
+  .demo-btn {
+    padding: 0.6rem 1.25rem;
+    font-size: 0.85rem;
+  }
+
+  .radar-instructions {
+    padding: 1rem;
+    margin: 1rem auto;
+  }
+
+  .radar-instructions h5 {
+    font-size: 0.95rem;
+  }
+
+  .radar-instructions p,
+  .radar-instructions li {
+    font-size: 0.85rem;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .ethics-card {
+    border-width: 2px;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
+  }
+
+  .glossary-item {
+    border-width: 2px;
+  }
+
+  .glossary-note {
+    border-width: 2px;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .ethics-card,
+  .glossary-item {
+    transition: none;
+  }
+
+  .ethics-card:hover,
+  .glossary-item:hover {
+    transform: none;
+  }
+}

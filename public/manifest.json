@@ -1,0 +1,68 @@
+{
+  "name": "SimulateAI - AI Ethics Education Platform",
+  "short_name": "SimulateAI",
+  "description": "Interactive AI ethics simulations for educators and learners",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a73e8",
+  "theme_color": "#1a73e8",
+  "orientation": "any",
+  "scope": "/",
+  "lang": "en",
+  "gcm_sender_id": "52924445915",
+  "icons": [
+    {
+      "src": "/assets/favicon-CIUnw1SG.svg",
+      "sizes": "32x32",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "research", "ethics", "artificial-intelligence"],
+  "shortcuts": [
+    {
+      "name": "Ethics Simulations",
+      "short_name": "Simulations",
+      "description": "Launch AI ethics simulations",
+      "url": "/#simulations",
+      "icons": [
+        {
+          "src": "/src/assets/icons/logo-square.svg",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Educator Tools",
+      "short_name": "Educator",
+      "description": "Access educator resources and tools",
+      "url": "/#educator",
+      "icons": [
+        {
+          "src": "/src/assets/icons/logo-square.svg",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+simulateai",
+      "url": "/?action=%s"
+    }
+  ]
+}

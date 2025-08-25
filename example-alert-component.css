@@ -1,0 +1,343 @@
+/**
+ * Example: New Alert Component using CSS Layers
+ * Copyright 2025 Armando Sori
+ * 
+ * This file demonstrates proper CSS layers usage for new components
+ * Layer: components
+ * Dependencies: design-tokens.css, main.css
+ */
+
+@layer components {
+  /* ====================================
+     Alert Component Base Styles
+     ==================================== */
+
+  .alert {
+    /* Use design tokens for consistency */
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-3);
+    padding: var(--spacing-4);
+    margin-bottom: var(--spacing-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-base);
+    background: var(--color-surface);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+
+    /* Animation using design tokens */
+    transition: var(--transition-base);
+  }
+
+  /* Alert icon */
+  .alert__icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    margin-top: 2px; /* Align with text baseline */
+  }
+
+  /* Alert content */
+  .alert__content {
+    flex: 1;
+    min-width: 0; /* Prevent overflow */
+  }
+
+  .alert__title {
+    margin: 0 0 var(--spacing-1) 0;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text);
+  }
+
+  .alert__message {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+
+  /* Alert close button */
+  .alert__close {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    margin: -4px -4px 0 0; /* Extend touch target */
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: var(--transition-fast);
+  }
+
+  .alert__close:hover {
+    background: var(--color-surface-hover);
+    color: var(--color-text);
+  }
+
+  .alert__close:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  /* ====================================
+     Alert Variants (Semantic Colors)
+     ==================================== */
+
+  /* Success Alert */
+  .alert--success {
+    background: var(
+      --color-success-bg,
+      color-mix(in srgb, var(--color-success) 10%, transparent)
+    );
+    border-color: var(--color-success-border, var(--color-success));
+    color: var(--color-success-text, var(--color-success-dark));
+  }
+
+  .alert--success .alert__icon {
+    color: var(--color-success);
+  }
+
+  /* Warning Alert */
+  .alert--warning {
+    background: var(
+      --color-warning-bg,
+      color-mix(in srgb, var(--color-warning) 10%, transparent)
+    );
+    border-color: var(--color-warning-border, var(--color-warning));
+    color: var(--color-warning-text, var(--color-warning-dark));
+  }
+
+  .alert--warning .alert__icon {
+    color: var(--color-warning);
+  }
+
+  /* Error Alert */
+  .alert--error {
+    background: var(
+      --color-error-bg,
+      color-mix(in srgb, var(--color-error) 10%, transparent)
+    );
+    border-color: var(--color-error-border, var(--color-error));
+    color: var(--color-error-text, var(--color-error-dark));
+  }
+
+  .alert--error .alert__icon {
+    color: var(--color-error);
+  }
+
+  /* Info Alert */
+  .alert--info {
+    background: var(
+      --color-info-bg,
+      color-mix(in srgb, var(--color-info) 10%, transparent)
+    );
+    border-color: var(--color-info-border, var(--color-info));
+    color: var(--color-info-text, var(--color-info-dark));
+  }
+
+  .alert--info .alert__icon {
+    color: var(--color-info);
+  }
+
+  /* ====================================
+     Alert Sizes
+     ==================================== */
+
+  .alert--small {
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--font-size-sm);
+  }
+
+  .alert--small .alert__icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .alert--large {
+    padding: var(--spacing-5) var(--spacing-6);
+    font-size: var(--font-size-lg);
+  }
+
+  .alert--large .alert__icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* ====================================
+     Alert States
+     ==================================== */
+
+  /* Dismissible alert animation */
+  .alert--dismissible {
+    animation: alertSlideIn 0.3s ease-out;
+  }
+
+  .alert--dismissing {
+    animation: alertSlideOut 0.2s ease-in forwards;
+  }
+
+  /* Compact alert (no icon, minimal padding) */
+  .alert--compact {
+    padding: var(--spacing-2) var(--spacing-3);
+    gap: var(--spacing-2);
+  }
+
+  .alert--compact .alert__icon {
+    display: none;
+  }
+
+  /* Borderless alert */
+  .alert--borderless {
+    border: none;
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* ====================================
+     Alert Animations
+     ==================================== */
+
+  @keyframes alertSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes alertSlideOut {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+      max-height: 200px;
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-10px);
+      max-height: 0;
+      margin-bottom: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+  }
+
+  /* ====================================
+     Responsive Behavior
+     ==================================== */
+
+  @media (width <= 768px) {
+    .alert {
+      padding: var(--spacing-3);
+      gap: var(--spacing-2);
+    }
+
+    .alert--large {
+      padding: var(--spacing-4);
+    }
+
+    /* Stack content vertically on very small screens */
+    @media (width <= 480px) {
+      .alert {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .alert__close {
+        align-self: flex-end;
+        margin: var(--spacing-1) 0 0 0;
+      }
+    }
+  }
+
+  /* ====================================
+     Accessibility Enhancements
+     ==================================== */
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .alert {
+      border-width: 2px;
+    }
+
+    .alert--success {
+      border-color: var(--color-success);
+    }
+
+    .alert--warning {
+      border-color: var(--color-warning);
+    }
+
+    .alert--error {
+      border-color: var(--color-error);
+    }
+
+    .alert--info {
+      border-color: var(--color-info);
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .alert--dismissible {
+      animation: none;
+    }
+
+    .alert--dismissing {
+      animation: none;
+      display: none;
+    }
+
+    .alert__close {
+      transition: none;
+    }
+  }
+
+  /* Focus-visible support for better keyboard navigation */
+  .alert__close:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  .alert__close:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+/* ====================================
+   Alert Container (Layout Layer Integration)
+   ==================================== */
+
+/* This would typically go in a layout file, but shown here for completeness */
+/*
+@layer layout {
+  .alert-container {
+    position: fixed;
+    top: var(--spacing-4);
+    right: var(--spacing-4);
+    z-index: var(--z-alerts, 1050);
+    max-width: 400px;
+    width: 100%;
+    pointer-events: none;
+  }
+  
+  .alert-container .alert {
+    pointer-events: auto;
+    margin-bottom: var(--spacing-3);
+  }
+  
+  @media (width <= 768px) {
+    .alert-container {
+      top: var(--spacing-2);
+      right: var(--spacing-2);
+      left: var(--spacing-2);
+      max-width: none;
+    }
+  }
+}
+*/

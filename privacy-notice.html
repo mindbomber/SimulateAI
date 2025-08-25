@@ -1,0 +1,1086 @@
+<!--
+Copyright 2025 Armando Sori
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#1a73e8" />
+    <meta name="color-scheme" content="light" />
+    <title>Privacy Notice - SimulateAI</title>
+    <meta
+      name="description"
+      content="Privacy Notice for SimulateAI Educational Platform - Learn how we protect your data and respect your privacy"
+    />
+
+    <!-- Google Analytics is initialized via centralized service (no inline gtag to avoid double-init) -->
+
+    <!-- Early theme-preload shim: apply correct theme before CSS to prevent FOUC -->
+    <style id="theme-preload-style">
+      html.theme-preload,
+      html.theme-preload * {
+        transition: none !important;
+      }
+    </style>
+    <script>
+      (function () {
+        try {
+          var val = null;
+          try {
+            val = localStorage.getItem("simulateai_theme_preference");
+          } catch (_) {}
+          if (!val) {
+            try {
+              val =
+                localStorage.getItem("simulateai_theme") ||
+                localStorage.getItem("theme");
+            } catch (_) {}
+          }
+          var prefersDark = false;
+          try {
+            prefersDark =
+              window.matchMedia &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches;
+          } catch (_) {}
+          var theme =
+            val === "dark" || val === "light" || val === "system"
+              ? val === "system"
+                ? prefersDark
+                  ? "dark"
+                  : "light"
+                : val
+              : prefersDark
+                ? "dark"
+                : "light";
+
+          document.documentElement.classList.add("theme-preload");
+          document.documentElement.style.colorScheme = theme;
+
+          var apply = function () {
+            var b = document.body;
+            if (!b) return;
+            b.classList.remove("theme-dark", "theme-light", "dark-mode");
+            if (theme === "dark") {
+              b.classList.add("theme-dark", "dark-mode");
+            } else {
+              b.classList.add("theme-light");
+            }
+          };
+
+          if (document.body) {
+            apply();
+          } else {
+            document.addEventListener("DOMContentLoaded", apply, {
+              once: true,
+            });
+          }
+
+          window.addEventListener(
+            "load",
+            function () {
+              document.documentElement.classList.remove("theme-preload");
+            },
+            { once: true },
+          );
+        } catch (e) {}
+      })();
+    </script>
+    <meta
+      name="keywords"
+      content="privacy policy, data protection, GDPR compliance, educational privacy, FERPA, COPPA"
+    />
+    <meta name="author" content="SimulateAI Educational Platform" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Privacy Notice - SimulateAI" />
+    <meta
+      property="og:description"
+      content="Privacy Notice for SimulateAI Educational Platform - Learn how we protect your data and respect your privacy"
+    />
+    <meta
+      property="og:url"
+      content="https://www.SimulateAI.io/privacy-notice.html"
+    />
+
+    <!-- Accessibility -->
+    <meta
+      name="accessibility-features"
+      content="keyboard-navigation,skip-links,high-contrast,large-text,screen-reader-support"
+    />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="src/styles/main.css" />
+    <link rel="stylesheet" href="src/styles/accessibility.css" />
+    <link rel="stylesheet" href="src/styles/layout-components.css" />
+    <link rel="stylesheet" href="src/styles/advanced-ui-components.css" />
+    <link rel="stylesheet" href="src/styles/shared-navigation.css" />
+    <link rel="stylesheet" href="src/styles/settings-menu.css" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="src/assets/icons/favicon.svg" />
+    <link rel="icon" type="image/png" href="src/assets/icons/favicon.png" />
+
+    <!-- Centralized analytics initializer -->
+    <script type="module" src="src/js/user-tracking-init.js"></script>
+  </head>
+
+  <body data-page-id="privacy-notice">
+    <!-- Skip to content for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- ARIA live regions for announcements -->
+    <div
+      id="aria-live-polite"
+      aria-live="polite"
+      aria-atomic="true"
+      class="sr-only"
+    ></div>
+    <div
+      id="aria-live-assertive"
+      aria-live="assertive"
+      aria-atomic="true"
+      class="sr-only"
+    ></div>
+
+    <!-- Shared navigation will be injected here -->
+    <div id="navigation-container"></div>
+
+    <!-- Main Content -->
+    <main id="main-content" class="main-content" role="main">
+      <div class="privacy-container">
+        <!-- Page Header -->
+        <section class="privacy-header">
+          <h1 class="privacy-title">Privacy Notice</h1>
+          <p class="privacy-subtitle">
+            How SimulateAI protects your privacy and handles your data
+          </p>
+          <div class="last-updated">
+            <strong>Last Updated:</strong> January 2025
+          </div>
+        </section>
+
+        <!-- Quick Summary -->
+        <section class="privacy-section">
+          <h2 class="section-title">🔒 Privacy at a Glance</h2>
+          <div class="privacy-highlights">
+            <div class="highlight-card">
+              <h3>🎯 What We Collect</h3>
+              <ul>
+                <li>Educational progress and scenario completion data</li>
+                <li>Account information (if you sign in)</li>
+                <li>Anonymous usage analytics for platform improvement</li>
+              </ul>
+            </div>
+
+            <div class="highlight-card">
+              <h3>🛡️ How We Protect It</h3>
+              <ul>
+                <li>All data encrypted in transit and at rest</li>
+                <li>No data sharing with third parties for marketing</li>
+                <li>GDPR, FERPA, and COPPA compliant practices</li>
+              </ul>
+            </div>
+
+            <div class="highlight-card">
+              <h3>👤 Your Rights</h3>
+              <ul>
+                <li>Access, correct, or delete your data anytime</li>
+                <li>Export your learning progress data</li>
+                <li>Use the platform anonymously without signing in</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Detailed Privacy Information -->
+        <section class="privacy-section">
+          <h2 class="section-title">📋 Detailed Privacy Information</h2>
+
+          <!-- Data Collection -->
+          <div class="privacy-accordion">
+            <div class="accordion-item">
+              <button
+                class="accordion-header"
+                aria-expanded="false"
+                onclick="toggleAccordion(this)"
+              >
+                <span class="accordion-icon">▶</span>
+                <span class="accordion-title">What Information We Collect</span>
+              </button>
+              <div class="accordion-content collapsed">
+                <div class="accordion-content-inner">
+                  <h4>Educational Data</h4>
+                  <p>
+                    When you use SimulateAI, we collect information about your
+                    learning journey to provide personalized experiences:
+                  </p>
+                  <ul>
+                    <li>
+                      <strong>Scenario Progress:</strong> Which scenarios you've
+                      completed and your choices within them
+                    </li>
+                    <li>
+                      <strong>Ethics Radar Data:</strong> Your ethical decision
+                      patterns and reasoning frameworks
+                    </li>
+                    <li>
+                      <strong>Learning Analytics:</strong> Time spent on
+                      scenarios, replay patterns, and exploration paths
+                    </li>
+                    <li>
+                      <strong>Achievement Data:</strong> Badges earned,
+                      milestones reached, and learning objectives completed
+                    </li>
+                  </ul>
+
+                  <h4>Account Information (Optional)</h4>
+                  <p>
+                    If you choose to create an account or sign in with
+                    third-party services:
+                  </p>
+                  <ul>
+                    <li>
+                      <strong>Authentication Data:</strong> Email address,
+                      display name, and profile picture (from sign-in providers)
+                    </li>
+                    <li>
+                      <strong>User Preferences:</strong> Settings like
+                      accessibility options, theme choices, and notification
+                      preferences
+                    </li>
+                    <li>
+                      <strong>Sync Data:</strong> Information to synchronize
+                      your progress across multiple devices
+                    </li>
+                  </ul>
+
+                  <h4>Technical Information</h4>
+                  <p>
+                    We automatically collect some technical information to
+                    ensure the platform works properly:
+                  </p>
+                  <ul>
+                    <li>
+                      <strong>Device Information:</strong> Browser type,
+                      operating system, screen resolution (for responsive
+                      design)
+                    </li>
+                    <li>
+                      <strong>Usage Analytics:</strong> Which features are used
+                      most, error reports, performance metrics
+                    </li>
+                    <li>
+                      <strong>Security Logs:</strong> Failed login attempts,
+                      suspicious activity patterns
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Data Usage -->
+            <div class="accordion-item">
+              <button
+                class="accordion-header"
+                aria-expanded="false"
+                onclick="toggleAccordion(this)"
+              >
+                <span class="accordion-icon">▶</span>
+                <span class="accordion-title">How We Use Your Information</span>
+              </button>
+              <div class="accordion-content collapsed">
+                <div class="accordion-content-inner">
+                  <h4>Educational Purposes</h4>
+                  <ul>
+                    <li>
+                      <strong>Personalized Learning:</strong> Tailor scenario
+                      recommendations based on your interests and progress
+                    </li>
+                    <li>
+                      <strong>Progress Tracking:</strong> Save your achievements
+                      and learning milestones across sessions
+                    </li>
+                    <li>
+                      <strong>Adaptive Content:</strong> Adjust difficulty and
+                      content based on your engagement patterns
+                    </li>
+                    <li>
+                      <strong>Assessment Support:</strong> Provide educators
+                      with anonymized learning analytics (with consent)
+                    </li>
+                  </ul>
+
+                  <h4>Platform Improvement</h4>
+                  <ul>
+                    <li>
+                      <strong>Feature Development:</strong> Understand which
+                      features help learning and which need improvement
+                    </li>
+                    <li>
+                      <strong>Bug Fixes:</strong> Identify and resolve technical
+                      issues to improve user experience
+                    </li>
+                    <li>
+                      <strong>Accessibility Enhancement:</strong> Ensure the
+                      platform works for users with diverse needs
+                    </li>
+                    <li>
+                      <strong>Educational Research:</strong> Anonymized analysis
+                      to improve AI ethics education methods
+                    </li>
+                  </ul>
+
+                  <h4>Communication</h4>
+                  <ul>
+                    <li>
+                      <strong>Essential Updates:</strong> Important changes to
+                      privacy policies or platform functionality
+                    </li>
+                    <li>
+                      <strong>Educational Resources:</strong> New scenarios,
+                      educator tools, and learning materials (opt-in only)
+                    </li>
+                    <li>
+                      <strong>Technical Support:</strong> Respond to help
+                      requests and troubleshoot issues
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Data Sharing -->
+            <div class="accordion-item">
+              <button
+                class="accordion-header"
+                aria-expanded="false"
+                onclick="toggleAccordion(this)"
+              >
+                <span class="accordion-icon">▶</span>
+                <span class="accordion-title"
+                  >Data Sharing and Third Parties</span
+                >
+              </button>
+              <div class="accordion-content collapsed">
+                <div class="accordion-content-inner">
+                  <h4>We Do NOT Share Data For:</h4>
+                  <ul>
+                    <li>❌ Marketing or advertising purposes</li>
+                    <li>❌ Commercial data brokers or data mining</li>
+                    <li>❌ Social media targeting or profiling</li>
+                    <li>❌ Any non-educational commercial purposes</li>
+                  </ul>
+
+                  <h4>Limited Data Sharing (Educational Purposes Only)</h4>
+                  <ul>
+                    <li>
+                      <strong>Educational Institutions:</strong> With explicit
+                      consent, we may share aggregated, anonymized learning
+                      analytics with your school or educator
+                    </li>
+                    <li>
+                      <strong>Third-Party Services:</strong> We use trusted
+                      educational technology providers for authentication
+                      (Firebase), analytics (Google Analytics for Education),
+                      and content delivery
+                    </li>
+                    <li>
+                      <strong>Legal Requirements:</strong> We may disclose
+                      information if required by law or to protect user safety
+                    </li>
+                  </ul>
+
+                  <h4>Data Processing Partners</h4>
+                  <p>
+                    These trusted partners help us provide educational services:
+                  </p>
+                  <ul>
+                    <li>
+                      <strong>Google Firebase:</strong> Secure authentication
+                      and data storage (GDPR and COPPA compliant)
+                    </li>
+                    <li>
+                      <strong>Google Analytics for Education:</strong>
+                      Privacy-enhanced analytics without advertising features
+                    </li>
+                    <li>
+                      <strong>Cloudflare:</strong> Content delivery and security
+                      protection
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Data Security -->
+            <div class="accordion-item">
+              <button
+                class="accordion-header"
+                aria-expanded="false"
+                onclick="toggleAccordion(this)"
+              >
+                <span class="accordion-icon">▶</span>
+                <span class="accordion-title">How We Protect Your Data</span>
+              </button>
+              <div class="accordion-content collapsed">
+                <div class="accordion-content-inner">
+                  <h4>Technical Security Measures</h4>
+                  <ul>
+                    <li>
+                      <strong>Encryption:</strong> All data is encrypted in
+                      transit (TLS 1.3) and at rest (AES-256)
+                    </li>
+                    <li>
+                      <strong>Access Controls:</strong> Strict authentication
+                      and authorization for data access
+                    </li>
+                    <li>
+                      <strong>Regular Security Audits:</strong> Periodic
+                      security assessments and vulnerability testing
+                    </li>
+                    <li>
+                      <strong>Incident Response:</strong> Documented procedures
+                      for security breach response
+                    </li>
+                  </ul>
+
+                  <h4>Organizational Security</h4>
+                  <ul>
+                    <li>
+                      <strong>Staff Training:</strong> Regular privacy and
+                      security training for all team members
+                    </li>
+                    <li>
+                      <strong>Data Minimization:</strong> We only collect data
+                      necessary for educational purposes
+                    </li>
+                    <li>
+                      <strong>Retention Limits:</strong> Data is automatically
+                      deleted according to retention schedules
+                    </li>
+                    <li>
+                      <strong>Regular Backups:</strong> Secure, encrypted
+                      backups to prevent data loss
+                    </li>
+                  </ul>
+
+                  <h4>Compliance Standards</h4>
+                  <ul>
+                    <li>
+                      <strong>GDPR:</strong> Full compliance with European data
+                      protection regulations
+                    </li>
+                    <li>
+                      <strong>FERPA:</strong> Adherence to U.S. educational
+                      privacy standards
+                    </li>
+                    <li>
+                      <strong>COPPA:</strong> Special protections for users
+                      under 13 years old
+                    </li>
+                    <li>
+                      <strong>ISO 27001:</strong> Information security
+                      management best practices
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Your Rights -->
+            <div class="accordion-item">
+              <button
+                class="accordion-header"
+                aria-expanded="false"
+                onclick="toggleAccordion(this)"
+              >
+                <span class="accordion-icon">▶</span>
+                <span class="accordion-title">Your Privacy Rights</span>
+              </button>
+              <div class="accordion-content collapsed">
+                <div class="accordion-content-inner">
+                  <h4>Data Access and Control</h4>
+                  <ul>
+                    <li>
+                      <strong>Access:</strong> Request a copy of all data we
+                      have about you
+                    </li>
+                    <li>
+                      <strong>Correction:</strong> Update or correct inaccurate
+                      information
+                    </li>
+                    <li>
+                      <strong>Deletion:</strong> Request complete removal of
+                      your data (see our
+                      <a href="data-deletion.html">Data Deletion page</a>)
+                    </li>
+                    <li>
+                      <strong>Portability:</strong> Export your data in a
+                      machine-readable format
+                    </li>
+                  </ul>
+
+                  <h4>Communication Preferences</h4>
+                  <ul>
+                    <li>
+                      <strong>Opt-out:</strong> Unsubscribe from educational
+                      newsletters and updates
+                    </li>
+                    <li>
+                      <strong>Notification Settings:</strong> Control which
+                      types of communications you receive
+                    </li>
+                    <li>
+                      <strong>Marketing Withdrawal:</strong> Stop promotional
+                      communications while keeping essential updates
+                    </li>
+                  </ul>
+
+                  <h4>Special Rights for Minors</h4>
+                  <ul>
+                    <li>
+                      <strong>Parental Consent:</strong> Parents can request
+                      deletion of their child's data
+                    </li>
+                    <li>
+                      <strong>Enhanced Protections:</strong> Additional privacy
+                      safeguards for users under 18
+                    </li>
+                    <li>
+                      <strong>Educational Oversight:</strong> Schools and
+                      educators can manage student data on their behalf
+                    </li>
+                  </ul>
+
+                  <h4>How to Exercise Your Rights</h4>
+                  <div class="contact-options">
+                    <div class="contact-method">
+                      <h5>🌐 Online Request</h5>
+                      <p>
+                        Use our
+                        <a href="data-deletion.html"
+                          >Data Deletion Request Form</a
+                        >
+                        for quick processing
+                      </p>
+                    </div>
+                    <div class="contact-method">
+                      <h5>📧 Email Support</h5>
+                      <p>
+                        Contact us at
+                        <a href="mailto:research@simulateai.io"
+                          >research@simulateai.io</a
+                        >
+                      </p>
+                    </div>
+                    <div class="contact-method">
+                      <h5>🎓 Educational Institutions</h5>
+                      <p>
+                        Educators can contact
+                        <a href="mailto:research@simulateai.io"
+                          >research@simulateai.io</a
+                        >
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Contact and Updates -->
+        <section class="privacy-section">
+          <h2 class="section-title">📞 Contact Us About Privacy</h2>
+          <div class="contact-grid">
+            <div class="contact-card">
+              <h3>Privacy Questions</h3>
+              <p>General privacy inquiries and data protection questions</p>
+              <a href="mailto:research@simulateai.io" class="btn btn-outline"
+                >research@simulateai.io</a
+              >
+            </div>
+
+            <div class="contact-card">
+              <h3>Data Requests</h3>
+              <p>Access, correction, or deletion of your personal data</p>
+              <a href="data-deletion.html" class="btn btn-primary"
+                >Submit Request</a
+              >
+            </div>
+
+            <div class="contact-card">
+              <h3>Educational Partners</h3>
+              <p>Schools, districts, and educational institutions</p>
+              <a href="mailto:research@simulateai.io" class="btn btn-outline"
+                >research@simulateai.io</a
+              >
+            </div>
+          </div>
+        </section>
+
+        <!-- Policy Updates -->
+        <section class="privacy-section">
+          <h2 class="section-title">📝 Policy Updates</h2>
+          <div class="updates-info">
+            <p>
+              We may update this Privacy Notice to reflect changes in our
+              practices or applicable laws. When we make significant changes:
+            </p>
+            <ul>
+              <li>
+                We'll notify you via email (if you've provided one) at least 30
+                days before changes take effect
+              </li>
+              <li>We'll display a prominent notice on the platform</li>
+              <li>
+                For educational institutions, we'll provide advance notice to
+                administrators
+              </li>
+              <li>
+                The "Last Updated" date at the top of this page will be revised
+              </li>
+            </ul>
+            <p>
+              Your continued use of SimulateAI after changes take effect
+              indicates your acceptance of the updated Privacy Notice.
+            </p>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Footer will be inserted by professional-footer.js -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Scripts -->
+    <!-- Professional Footer Component -->
+    <script
+      type="module"
+      src="src/js/components/professional-footer.js"
+    ></script>
+    <script>
+      // Accordion functionality
+      function toggleAccordion(button) {
+        const isExpanded = button.getAttribute("aria-expanded") === "true";
+        const content = button.nextElementSibling;
+        const icon = button.querySelector(".accordion-icon");
+
+        // Toggle state
+        button.setAttribute("aria-expanded", !isExpanded);
+        content.classList.toggle("collapsed");
+        icon.textContent = isExpanded ? "▶" : "▼";
+
+        // Scroll to top of accordion item if opening
+        if (!isExpanded) {
+          setTimeout(() => {
+            button.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          }, 300);
+        }
+      }
+
+      // Keyboard support for accordion
+      document.addEventListener("keydown", function (event) {
+        if (event.target.classList.contains("accordion-header")) {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            toggleAccordion(event.target);
+          }
+        }
+      });
+
+      // Add smooth scrolling for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute("href"));
+          if (target) {
+            target.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          }
+        });
+      });
+    </script>
+
+    <style>
+      /* Privacy-specific styles - Override all navigation height issues */
+      #navigation-container {
+        /* Reset any inherited styles for navigation */
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        line-height: normal !important;
+        font-size: initial !important;
+        height: auto !important;
+      }
+
+      /* Force navigation component height constraints */
+      #navigation-container .header {
+        height: auto !important;
+        max-height: 80px !important;
+        min-height: 60px !important;
+        overflow: visible !important;
+      }
+
+      #navigation-container .header-container {
+        height: auto !important;
+        max-height: 80px !important;
+        min-height: 60px !important;
+        padding: 0.75rem 1rem !important;
+        align-items: center !important;
+        overflow: visible !important;
+      }
+
+      /* Fix nav groups from stretching vertically */
+      #navigation-container .nav-group {
+        height: auto !important;
+        max-height: 50px !important;
+        min-height: auto !important;
+        align-items: center !important;
+        flex-shrink: 0 !important;
+        display: flex !important;
+      }
+
+      #navigation-container .nav-group .nav-list {
+        height: auto !important;
+        max-height: 50px !important;
+        align-items: center !important;
+        display: flex !important;
+      }
+
+      #navigation-container .nav-link {
+        height: auto !important;
+        max-height: 40px !important;
+        padding: 0.5rem 0.75rem !important;
+        white-space: nowrap !important;
+        line-height: 1.4 !important;
+        display: flex !important;
+        align-items: center !important;
+      }
+
+      /* Fix specific problematic nav groups */
+      #navigation-container .nav-group-primary,
+      #navigation-container .nav-group-about,
+      #navigation-container .nav-group-actions {
+        height: auto !important;
+        max-height: 50px !important;
+        min-height: auto !important;
+      }
+
+      /* Fix dropdown menu positioning and prevent corruption */
+      #navigation-container .dropdown-menu {
+        position: absolute !important;
+        top: 100% !important;
+        left: 0 !important;
+        right: auto !important;
+        max-height: 300px !important;
+        min-height: auto !important;
+        height: auto !important;
+        overflow-y: auto !important;
+        z-index: 1050 !important;
+        display: none !important;
+      }
+
+      #navigation-container .dropdown-menu.open {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+      }
+
+      #navigation-container .settings-menu {
+        position: absolute !important;
+        top: 100% !important;
+        right: 0 !important;
+        left: auto !important;
+        max-height: 400px !important;
+        min-height: auto !important;
+        height: auto !important;
+        overflow-y: auto !important;
+        z-index: 1050 !important;
+        display: none !important;
+      }
+
+      #navigation-container .settings-menu[style*="display: block"] {
+        display: block !important;
+      }
+
+      /* Ensure dropdowns work properly */
+      #navigation-container .nav-item-dropdown {
+        position: relative !important;
+        height: auto !important;
+        max-height: 50px !important;
+      }
+
+      /* Fix logo and title height */
+      #navigation-container .logo {
+        height: auto !important;
+        max-height: 50px !important;
+        align-items: center !important;
+      }
+
+      #navigation-container .logo-image {
+        height: 40px !important;
+        width: 40px !important;
+      }
+
+      #navigation-container .site-title {
+        height: auto !important;
+        line-height: 1.2 !important;
+      }
+
+      /* Force main navigation to not stretch */
+      #navigation-container .main-nav {
+        height: auto !important;
+        max-height: 50px !important;
+        align-items: center !important;
+      }
+
+      .privacy-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        line-height: 1.6;
+      }
+
+      .privacy-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
+      }
+
+      .privacy-title {
+        font-size: 2.5rem;
+        color: #1a73e8;
+        margin-bottom: 0.5rem;
+      }
+
+      .privacy-subtitle {
+        font-size: 1.2rem;
+        color: #666;
+        margin-bottom: 1rem;
+      }
+
+      .last-updated {
+        color: #888;
+        font-size: 0.9rem;
+      }
+
+      .privacy-section {
+        margin-bottom: 3rem;
+      }
+
+      .section-title {
+        font-size: 1.8rem;
+        color: #333;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid #1a73e8;
+        padding-bottom: 0.5rem;
+      }
+
+      .privacy-highlights {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .highlight-card {
+        background: #fff;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid #1a73e8;
+      }
+
+      .highlight-card h3 {
+        margin-bottom: 1rem;
+        color: #1a73e8;
+      }
+
+      .highlight-card ul {
+        margin: 0;
+        padding-left: 1.2rem;
+      }
+
+      .highlight-card li {
+        margin-bottom: 0.5rem;
+      }
+
+      .privacy-accordion {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .accordion-item {
+        border-bottom: 1px solid #ddd;
+      }
+
+      .accordion-item:last-child {
+        border-bottom: none;
+      }
+
+      .accordion-header {
+        width: 100%;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border: none;
+        text-align: left;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        font-size: 1.1rem;
+        font-weight: 600;
+        transition: background-color 0.2s;
+      }
+
+      .accordion-header:hover {
+        background: #e9ecef;
+      }
+
+      .accordion-header:focus {
+        outline: 2px solid #1a73e8;
+        outline-offset: -2px;
+      }
+
+      .accordion-icon {
+        margin-right: 1rem;
+        color: #1a73e8;
+        font-size: 0.8rem;
+        transition: transform 0.2s;
+      }
+
+      .accordion-content {
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+      }
+
+      .accordion-content.collapsed {
+        max-height: 0;
+      }
+
+      .accordion-content:not(.collapsed) {
+        max-height: 2000px;
+      }
+
+      .accordion-content-inner {
+        padding: 1.5rem;
+      }
+
+      .accordion-content-inner h4 {
+        color: #1a73e8;
+        margin-top: 1.5rem;
+        margin-bottom: 0.8rem;
+      }
+
+      .accordion-content-inner h4:first-child {
+        margin-top: 0;
+      }
+
+      .contact-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+      }
+
+      .contact-card {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+
+      .contact-card h3 {
+        color: #1a73e8;
+        margin-bottom: 1rem;
+      }
+
+      .contact-card p {
+        margin-bottom: 1.5rem;
+        color: #666;
+      }
+
+      .contact-options {
+        display: grid;
+        gap: 1.5rem;
+        margin-top: 1rem;
+      }
+
+      .contact-method {
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 6px;
+      }
+
+      .contact-method h5 {
+        margin-bottom: 0.5rem;
+        color: #1a73e8;
+      }
+
+      .updates-info {
+        background: #f8f9fa;
+        padding: 2rem;
+        border-radius: 8px;
+        border-left: 4px solid #28a745;
+      }
+
+      .updates-info ul {
+        margin: 1rem 0;
+      }
+
+      .updates-info li {
+        margin-bottom: 0.5rem;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .privacy-container {
+          padding: 1rem;
+        }
+
+        .privacy-title {
+          font-size: 2rem;
+        }
+
+        .privacy-highlights {
+          grid-template-columns: 1fr;
+        }
+
+        .accordion-header {
+          padding: 1rem;
+          font-size: 1rem;
+        }
+
+        .accordion-content-inner {
+          padding: 1rem;
+        }
+      }
+    </style>
+
+    <!-- Shared Navigation Component -->
+    <script type="module" src="src/js/components/shared-navigation.js"></script>
+    <script type="module" src="src/js/components/settings-manager.js"></script>
+  </body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null",
+    "classrooms": {
+      "$classroomId": {
+        ".read": "auth != null",
+        ".write": "auth != null && (newData.child('instructorId').val() == auth.uid || root.child('classrooms').child($classroomId).child('roster').child(auth.uid).exists())",
+        "roster": {
+          "$studentId": {
+            ".read": "auth != null",
+            ".write": "auth != null && ($studentId == auth.uid || data.parent().parent().child('instructorId').val() == auth.uid)"
+          }
+        },
+        "studentChoices": {
+          "$studentId": {
+            ".read": "auth != null",
+            ".write": "auth != null && ($studentId == auth.uid || data.parent().parent().child('instructorId').val() == auth.uid)"
+          }
+        },
+        "sessionStatus": {
+          ".read": "auth != null",
+          ".write": "auth != null && data.parent().child('instructorId').val() == auth.uid"
+        }
+      }
+    }
+  }
+}

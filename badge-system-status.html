@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🎯 Badge System Status Check</title>
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+      .status-card {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        margin-bottom: 20px;
+      }
+      .status-header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .status-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        margin: 10px 0;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #28a745;
+      }
+      .status-item.error {
+        border-left-color: #dc3545;
+        background: #f8d7da;
+      }
+      .status-item.warning {
+        border-left-color: #ffc107;
+        background: #fff3cd;
+      }
+      .status-icon {
+        font-size: 24px;
+        margin-right: 10px;
+      }
+      .status-text {
+        flex: 1;
+      }
+      .test-btn {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .test-btn:hover {
+        background: #0056b3;
+      }
+      .console-output {
+        background: #2d3748;
+        color: #e2e8f0;
+        padding: 20px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 12px;
+        margin-top: 20px;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="status-card">
+      <div class="status-header">
+        <h1>🎯 Badge System Status Check</h1>
+        <p>Verifying the deferred badge system implementation</p>
+      </div>
+
+      <div id="status-checks">
+        <div class="status-item">
+          <span class="status-icon">⏳</span>
+          <div class="status-text">
+            <strong>Checking system status...</strong><br />
+            <small>Initializing badge system verification</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="console-output" id="console-output">
+        <div>[Status] Starting badge system verification...</div>
+      </div>
+    </div>
+
+    <script>
+      function log(message, type = "info") {
+        const console = document.getElementById("console-output");
+        const timestamp = new Date().toLocaleTimeString();
+        const line = document.createElement("div");
+        line.innerHTML = `[${timestamp}] ${message}`;
+        console.appendChild(line);
+        console.scrollTop = console.scrollHeight;
+      }
+
+      function updateStatus(checks) {
+        const container = document.getElementById("status-checks");
+        container.innerHTML = checks
+          .map(
+            (check) => `
+                <div class="status-item ${check.status}">
+                    <span class="status-icon">${check.icon}</span>
+                    <div class="status-text">
+                        <strong>${check.title}</strong><br>
+                        <small>${check.description}</small>
+                    </div>
+                    ${check.action ? `<button class="test-btn" onclick="${check.action}">${check.actionText}</button>` : ""}
+                </div>
+            `,
+          )
+          .join("");
+      }
+
+      async function checkBadgeSystem() {
+        log("🔍 Checking if main app is loaded...");
+
+        const checks = [];
+
+        // Check 1: App availability
+        if (typeof window.app !== "undefined") {
+          checks.push({
+            icon: "✅",
+            title: "Main App Loaded",
+            description: "SimulateAI app instance is available",
+            status: "success",
+          });
+          log("✅ Main app instance found");
+        } else {
+          checks.push({
+            icon: "❌",
+            title: "Main App Not Loaded",
+            description:
+              "SimulateAI app instance not found - load app.html first",
+            status: "error",
+          });
+          log("❌ Main app instance not found");
+        }
+
+        // Check 2: MainGrid availability
+        if (typeof window.app !== "undefined" && window.app.mainGrid) {
+          checks.push({
+            icon: "✅",
+            title: "MainGrid Component Available",
+            description: "Main grid component is loaded and accessible",
+            status: "success",
+          });
+          log("✅ MainGrid component found");
+        } else {
+          checks.push({
+            icon: "❌",
+            title: "MainGrid Component Missing",
+            description: "MainGrid component not accessible",
+            status: "error",
+          });
+          log("❌ MainGrid component not found");
+        }
+
+        // Check 3: Deferred badge method availability
+        if (
+          typeof window.app !== "undefined" &&
+          window.app.mainGrid &&
+          typeof window.app.mainGrid.getDeferredBadgeStatus === "function"
+        ) {
+          checks.push({
+            icon: "✅",
+            title: "Deferred Badge System Available",
+            description: "getDeferredBadgeStatus method is implemented",
+            status: "success",
+            action: "testDeferredBadges()",
+            actionText: "Test",
+          });
+          log("✅ Deferred badge system methods found");
+        } else {
+          checks.push({
+            icon: "❌",
+            title: "Deferred Badge System Missing",
+            description: "getDeferredBadgeStatus method not found",
+            status: "error",
+          });
+          log("❌ Deferred badge system methods not found");
+        }
+
+        // Check 4: Debug function availability
+        if (typeof window.getDeferredBadgeStatus === "function") {
+          checks.push({
+            icon: "✅",
+            title: "Debug Function Available",
+            description: "Global getDeferredBadgeStatus function is accessible",
+            status: "success",
+            action: "testGlobalDebug()",
+            actionText: "Test",
+          });
+          log("✅ Global debug function found");
+        } else {
+          checks.push({
+            icon: "❌",
+            title: "Debug Function Missing",
+            description: "Global getDeferredBadgeStatus function not found",
+            status: "error",
+          });
+          log("❌ Global debug function not found");
+        }
+
+        // Check 5: Event listener status
+        if (
+          typeof window.app !== "undefined" &&
+          window.app.mainGrid &&
+          window.app.mainGrid.deferredBadges
+        ) {
+          checks.push({
+            icon: "✅",
+            title: "Badge Queue Initialized",
+            description: "Deferred badge queue (Map) is available",
+            status: "success",
+          });
+          log("✅ Badge queue initialized");
+        } else {
+          checks.push({
+            icon: "⚠️",
+            title: "Badge Queue Unknown",
+            description: "Cannot verify if badge queue is initialized",
+            status: "warning",
+          });
+          log("⚠️ Badge queue status unknown");
+        }
+
+        updateStatus(checks);
+        log("🎯 Badge system verification complete");
+      }
+
+      function testDeferredBadges() {
+        log("🧪 Testing deferred badge status...");
+        try {
+          const status = window.app.mainGrid.getDeferredBadgeStatus();
+          log(`📊 Deferred badge status: ${JSON.stringify(status, null, 2)}`);
+
+          if (status.totalDeferred === 0) {
+            log("ℹ️ No badges currently deferred - this is normal");
+          } else {
+            log(
+              `🎯 Found ${status.totalDeferred} scenarios with deferred badges`,
+            );
+            status.scenarios.forEach((scenario) => {
+              log(
+                `   - Scenario ${scenario.scenarioId}: ${scenario.badgeCount} badges`,
+              );
+            });
+          }
+        } catch (error) {
+          log(`❌ Error testing deferred badges: ${error.message}`);
+        }
+      }
+
+      function testGlobalDebug() {
+        log("🧪 Testing global debug function...");
+        try {
+          const status = window.getDeferredBadgeStatus();
+          log(`📊 Global debug result: ${JSON.stringify(status, null, 2)}`);
+        } catch (error) {
+          log(`❌ Error testing global debug: ${error.message}`);
+        }
+      }
+
+      // Auto-check on load
+      setTimeout(checkBadgeSystem, 1000);
+
+      // Listen for badge-related events
+      document.addEventListener("scenarioReflectionCompleted", (event) => {
+        log(
+          `🎯 EVENT: scenarioReflectionCompleted - ${event.detail.scenarioId}`,
+        );
+      });
+
+      log("🚀 Badge system status checker initialized");
+      log("💡 Load app.html in another tab for full functionality testing");
+    </script>
+  </body>
+</html>

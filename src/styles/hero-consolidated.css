@@ -1,0 +1,2201 @@
+/*
+ * Hero Consolidated Styles
+ * Copyright 2025 Armando Sori - Licensed under Apache License, Version 2.0
+ * 
+ * Consolidated hero styles from multiple files to reduce CSS processing complexity
+ * Uses CSS layers for better cascade management
+ * Enhanced with media.css responsive integration
+ * 
+ * NOTE: .hero-radar-chart styles moved here from radar-chart.css for true hero consolidation
+ * This ensures all hero-related components are in one place and follow the same architecture
+ */
+
+/* Import media.css for responsive variables */
+@import url("./media.css");
+
+/* ================================
+   HERO ANIMATIONS
+   ================================ */
+
+/* Subtle gradient shift animation - enhanced smoothness */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 50% 25%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  75% {
+    background-position: 50% 75%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Enhanced hero entrance animations with smooth easing */
+@keyframes heroContentEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.96);
+  }
+  60% {
+    opacity: 0.8;
+    transform: translateY(-2px) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes heroElementEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  40% {
+    opacity: 0.6;
+    transform: translateY(-3px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes heroSimulationEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  60% {
+    opacity: 0.7;
+    transform: translateY(-2px) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ================================
+   HERO BASE STYLES
+   ================================ */
+
+/* ================================
+   CSS LAYERS FOUNDATION
+   ================================ */
+
+/* NOTE: All loaded state animations now consolidated within @layer utilities */
+
+@layer components {
+  /* Uniform CTA sizing (desktop) */
+  @media (min-width: 1024px) {
+    .hero-actions .primary-actions-row .btn,
+    .hero-actions #test-scenario-modal {
+      min-width: 210px;
+      min-height: 44px;
+      padding: var(--spacing-3) var(--spacing-6);
+      border-radius: var(--radius-pill, 9999px);
+      font-weight: 600;
+      letter-spacing: 0.025em;
+    }
+    /* Ensure hero-local test button sizing beats earlier !important rules */
+    .hero-actions #test-scenario-modal {
+      padding: var(--spacing-3) var(--spacing-6) !important;
+      border-radius: var(--radius-pill, 9999px) !important;
+    }
+  }
+
+  /* Test Scenario as outline/ghost to de-emphasize */
+  #test-scenario-modal {
+    border: 2px solid color-mix(in oklab, var(--color-primary) 40%, transparent);
+    background: transparent;
+    color: var(--color-primary);
+    transition:
+      transform 160ms ease,
+      box-shadow 160ms ease,
+      background-color 160ms ease,
+      border-color 160ms ease;
+  }
+  #test-scenario-modal:hover {
+    background: color-mix(in oklab, var(--color-primary) 10%, transparent);
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgb(0 0 0 / 12%);
+  }
+  #test-scenario-modal:active {
+    transform: translateY(0);
+  }
+
+  /* Hero-local overrides so outline wins over prior !important */
+  .hero-actions #test-scenario-modal {
+    background: transparent !important;
+    color: var(--color-primary) !important;
+    border: 2px solid color-mix(in oklab, var(--color-primary) 40%, transparent) !important;
+  }
+  .hero-actions #test-scenario-modal:hover {
+    background: color-mix(
+      in oklab,
+      var(--color-primary) 10%,
+      transparent
+    ) !important;
+    border-color: var(--color-primary) !important;
+  }
+
+  /* Primary elevation */
+  .hero-actions .btn.btn-primary {
+    box-shadow: 0 10px 24px rgb(0 0 0 / 18%);
+    transition:
+      transform 160ms ease,
+      box-shadow 160ms ease,
+      background-color 160ms ease;
+  }
+  .hero-actions .btn.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px rgb(0 0 0 / 22%);
+  }
+  .hero-actions .btn.btn-primary:active {
+    transform: translateY(0);
+  }
+
+  /* Focus visibility for all hero buttons */
+  .hero-actions .btn:focus-visible,
+  #test-scenario-modal:focus-visible {
+    outline: 0;
+    box-shadow:
+      0 0 0 2px var(--color-white),
+      0 0 0 4px var(--color-primary);
+  }
+
+  /* Emoji alignment and spacing in classroom row */
+  .classroom-actions-group .btn {
+    min-height: 44px;
+    gap: 0.5rem;
+    line-height: 1.1;
+  }
+
+  /* Dark-mode overrides for hero buttons live in css-layers.css @layer overrides */
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-actions .btn,
+    #test-scenario-modal {
+      transition: none;
+      transform: none !important;
+    }
+  }
+  /* ===== BASE HERO COMPONENT ===== */
+  /* Enhanced full-width hero with subtle gradient and perfect centering */
+  .hero {
+    /* Subtle multi-stop gradient background */
+    background: linear-gradient(
+      135deg,
+      #02377e 0%,
+      #042875 20%,
+      #3b82f6 40%,
+      #60a5fa 60%,
+      #93c5fd 80%,
+      #dbeafe 100%
+    );
+    color: var(--color-white, #ffffff);
+
+    /* Full viewport width to eliminate side whitespace */
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+
+    /* Perfect centering setup */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    /* Enhanced spacing and dimensions */
+    padding: calc(var(--spacing-2xl, 4rem) * 1.5) var(--spacing-lg, 2rem);
+    min-height: 65vh;
+    font-size: calc(1rem * var(--font-scale, 1));
+    overflow: hidden;
+
+    /* Add subtle texture overlay with smooth animation */
+    background-size: 400% 400%;
+    animation: gradientShift 20s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+
+    /* Performance optimizations for smooth 3D transforms and animations */
+    transform-style: preserve-3d;
+    will-change: transform, opacity;
+  }
+
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      rgb(255 255 255 / 10%) 0%,
+      rgb(255 255 255 / 5%) 50%,
+      rgb(0 0 0 / 5%) 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Subtle grid pattern overlay for light mode visual enhancement */
+  /* Creates a delicate 90px grid using CSS gradients for modern design appeal */
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgb(255 255 255 / 10%) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(255 255 255 / 10%) 1px, transparent 1px);
+    background-size: 90px 90px;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0.6;
+  }
+
+  .hero > * {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Enhanced hero content container for perfect centering */
+  .hero-content {
+    max-width: min(900px, 90vw);
+    width: 100%;
+    margin: 0 auto;
+    padding: var(--spacing-xl, 3rem) var(--spacing-lg, 2rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: var(--spacing-lg, 2rem);
+    /* Ensure content appears above grid pattern */
+    position: relative;
+    z-index: 3;
+  }
+
+  /* ===== HERO CONTENT COMPONENTS ===== */
+  /* Hero content alignment - smooth entrance animations */
+  .hero .hero-content {
+    text-align: center;
+    /* Initial state for entrance animation */
+    opacity: 0;
+    transform: translateY(40px) scale(0.96);
+    animation: heroContentEnter 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+      forwards;
+    animation-delay: 0.2s;
+    /* Performance optimization for smooth animations */
+    will-change: transform, opacity;
+  }
+
+  .hero .hero-content h1 {
+    font-size: calc(2.5rem * var(--font-scale, 1));
+    /* Individual animation for title */
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    animation: heroElementEnter 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+      forwards;
+    animation-delay: 0.3s;
+    /* Performance optimization */
+    will-change: transform, opacity;
+  }
+
+  .hero .hero-content p {
+    font-size: calc(1.125rem * var(--font-scale, 1));
+    /* Individual animation for description */
+    opacity: 0;
+    transform: translateY(25px) scale(0.96);
+    animation: heroElementEnter 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+      forwards;
+    animation-delay: 0.4s;
+    /* Performance optimization */
+    will-change: transform, opacity;
+  }
+
+  /* ===== HERO SIMULATION COMPONENTS ===== */
+  /* Hero simulation container - fully responsive */
+  .hero .hero-simulation {
+    background: rgb(255 255 255 / 10%);
+    border-radius: var(--radius-xl, 16px);
+    padding: calc(var(--container-padding, 16px) * 0.75);
+    backdrop-filter: blur(10px);
+    max-width: none;
+    width: 100%;
+    min-height: calc(300px + (var(--container-padding, 16px) * 2));
+    height: auto;
+    position: relative;
+    overflow: visible;
+    z-index: 1;
+    /* Initial state for entrance animation */
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+    animation: heroSimulationEnter 0.6s ease-out forwards;
+    animation-delay: 0.5s;
+    /* Performance optimization */
+    will-change: transform, opacity;
+  }
+
+  /* Demo container with improved integration */
+  .hero .hero-demo-container,
+  #app .hero-demo-container {
+    background: linear-gradient(
+      135deg,
+      rgb(255 255 255 / 95%) 0%,
+      rgb(248 250 252 / 95%) 100%
+    );
+    border-radius: 16px;
+    padding: calc(var(--container-padding, 16px) * 0.75);
+    box-shadow: 0 10px 25px rgb(0 0 0 / 10%);
+    border: 1px solid rgb(255 255 255 / 30%);
+    backdrop-filter: blur(10px);
+    max-width: 100%;
+    margin: 0 auto;
+    height: 100%;
+    min-height: calc(300px + var(--container-padding, 16px));
+    position: relative;
+    overflow: visible;
+    z-index: 2;
+    font-size: calc(1rem * var(--font-scale, 1));
+  }
+
+  /* Hero Content Container */
+  .hero-content {
+    max-width: var(--hero-content-max-width, 800px);
+    margin: 0 auto;
+    text-align: center;
+    padding: var(--spacing-lg, 2rem);
+  }
+
+  /* Enhanced Hero Typography for perfect centering */
+  .hero-title {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: var(--font-weight-bold, 700);
+    line-height: var(--hero-title-line-height, 1.2);
+    margin: 0;
+    color: inherit;
+    text-shadow: 0 2px 8px rgb(0 0 0 / 20%);
+    text-align: center;
+    max-width: 100%;
+
+    /* Enhanced text styling */
+    letter-spacing: -0.02em;
+    word-spacing: 0.1em;
+
+    /* Animation */
+    opacity: 0;
+    transform: translateY(25px);
+    animation: heroElementEnter 0.7s ease-out forwards;
+    animation-delay: 0.3s;
+  }
+
+  .hero-description {
+    font-size: clamp(1.125rem, 2.5vw, 1.375rem);
+    line-height: var(--hero-description-line-height, 1.6);
+    margin: 0;
+    color: var(--color-gray-700, #374151);
+    text-align: center;
+    max-width: min(700px, 90%);
+
+    /* Professional enhancement */
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    word-spacing: 0.05em;
+
+    /* Subtle blue gradient background for better contrast */
+    background: linear-gradient(
+      135deg,
+      rgb(147 197 253 / 85%) 0%,
+      rgb(96 165 250 / 80%) 50%,
+      rgb(59 130 246 / 75%) 100%
+    );
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius-lg, 12px);
+    padding: var(--spacing-lg, 2rem) var(--spacing-xl, 3rem);
+
+    /* Animation */
+    opacity: 0;
+    transform: translateY(20px);
+    animation: heroElementEnter 0.7s ease-out forwards;
+    animation-delay: 0.5s;
+  }
+
+  /* Enhanced Hero Actions for perfect centering */
+  .hero-actions {
+    display: flex;
+    gap: var(--spacing-lg, 2rem);
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+
+    /* Smooth animation */
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+    will-change: transform, opacity;
+    animation: heroElementEnter 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    animation-delay: 0.9s;
+  }
+
+  .hero-actions .btn {
+    font-size: var(--btn-font-size, 1.125rem);
+    font-weight: 600;
+    padding: var(--btn-padding, 1rem 2.5rem);
+    min-width: var(--btn-min-width, 180px);
+    border-radius: 50px;
+    box-shadow: 0 8px 20px rgb(0 0 0 / 20%);
+    transition: all var(--transition-duration, 0.3s)
+      var(--transition-easing, ease);
+    text-transform: none;
+    letter-spacing: 0.025em;
+  }
+
+  .hero-actions .btn:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 12px 30px rgb(0 0 0 / 25%);
+  }
+
+  .hero-actions .btn:active {
+    transform: translateY(-1px) scale(0.98);
+  }
+
+  /* Support research section centering */
+  .support-research-section {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+  }
+
+  /* ================================
+     ENHANCED RESPONSIVE DESIGN
+     ================================ */
+
+  /* Mobile optimizations */
+  @media (max-width: 768px) {
+    .hero {
+      min-height: 50vh;
+      padding: var(--spacing-xl, 3rem) var(--spacing-md, 1.5rem);
+    }
+
+    .hero-content {
+      padding: var(--spacing-lg, 2rem) var(--spacing-md, 1.5rem);
+      gap: var(--spacing-md, 1.5rem);
+    }
+
+    .hero-actions {
+      gap: var(--spacing-md, 1.5rem);
+    }
+
+    .hero-actions .btn {
+      min-width: 160px;
+      padding: 0.875rem 2rem;
+      font-size: 1rem;
+    }
+  }
+
+  /* Small mobile optimizations */
+  @media (max-width: 480px) {
+    .hero {
+      min-height: 45vh;
+      padding: var(--spacing-lg, 2rem) var(--spacing-sm, 1rem);
+    }
+
+    .hero-content {
+      padding: var(--spacing-md, 1.5rem) var(--spacing-sm, 1rem);
+      gap: var(--spacing-sm, 1rem);
+    }
+
+    .hero-actions {
+      flex-direction: column;
+      gap: var(--spacing-sm, 1rem);
+    }
+
+    .hero-actions .btn {
+      width: 100%;
+      max-width: 280px;
+    }
+  }
+
+  /* Tablet optimizations */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .hero {
+      min-height: 60vh;
+    }
+
+    .hero-content {
+      max-width: min(800px, 85vw);
+    }
+  }
+
+  /* Large screen optimizations */
+  @media (min-width: 1200px) {
+    .hero {
+      min-height: 70vh;
+    }
+
+    .hero-content {
+      max-width: min(1000px, 80vw);
+    }
+  }
+
+  /* ===== STANDALONE HERO COMPONENTS ===== */
+  /* Moved from main.css for complete consolidation */
+
+  .hero-title {
+    font-size: calc(2.5rem * var(--font-scale, 1));
+    font-weight: var(--font-weight-bold, 700);
+    line-height: var(--line-height-tight, 1.25);
+    margin-bottom: calc(var(--spacing-6, 1.5rem) * var(--font-scale, 1));
+    /* Individual animation for standalone hero title */
+    opacity: 0;
+    transform: translateY(25px);
+    animation: heroElementEnter 0.7s ease-out forwards;
+    animation-delay: 0.3s;
+  }
+
+  .hero-description {
+    font-size: calc(1.125rem * var(--font-scale, 1));
+    line-height: var(--line-height-relaxed, 1.75);
+    margin-bottom: calc(var(--spacing-8, 2rem) * var(--font-scale, 1));
+    color: var(--color-gray-800, #424242);
+    /* Individual animation for standalone hero description */
+    opacity: 0;
+    transform: translateY(20px);
+    animation: heroElementEnter 0.7s ease-out forwards;
+    animation-delay: 0.5s;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: calc(var(--spacing-4, 1rem) * var(--font-scale, 1));
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: calc(var(--spacing-6, 1.5rem) * var(--font-scale, 1));
+    /* Individual animation for hero actions */
+    opacity: 0;
+    transform: translateY(15px);
+    animation: heroElementEnter 0.6s ease-out forwards;
+    animation-delay: 0.8s;
+  }
+
+  .hero-simulation {
+    background: var(--color-gray-50, #fafafa);
+    border: 1px solid var(--color-gray-200, #eee);
+    border-radius: var(--radius-xl, 16px);
+    padding: calc(var(--spacing-6, 1.5rem) * var(--font-scale, 1));
+  }
+
+  .simulation-preview {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ===== STANDALONE HERO DEMO COMPONENTS ===== */
+  /* Enhanced styles from hero-demo.css for complete consolidation */
+
+  .hero-demo-container {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-radius: calc(16px * var(--font-scale, 1));
+    padding: var(--container-padding, 16px);
+    box-shadow: 0 10px 25px rgb(0 0 0 / 10%);
+    border: 1px solid rgb(255 255 255 / 20%);
+    max-width: 100%;
+    margin: 0 auto;
+    position: relative; /* For absolute positioning of actions */
+  }
+}
+
+@layer layout {
+  /* ================================
+     CONTAINER RESPONSIVE STYLES
+     ================================ */
+
+  .layout-container-responsive {
+    width: 100%;
+    max-width: var(--container-max-width, 1600px);
+    margin: 0 auto;
+    padding-left: var(--container-padding-x, 1.5rem);
+    padding-right: var(--container-padding-x, 1.5rem);
+  }
+
+  /* ===== HERO-SPECIFIC CONTAINER RESPONSIVE STYLES ===== */
+  /* Moved from media.css for true hero consolidation */
+  /* Override container constraints for full-width hero */
+
+  .hero.layout-container-responsive {
+    /* Override container max-width and margins for full-width */
+    max-width: none !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+
+    /* Remove gradient animation for responsive layout containers */
+    animation: none !important;
+
+    /* Ensure hero section adapts to all viewport sizes */
+    padding: calc(var(--spacing-2xl, 4rem) * 1.5) var(--spacing-lg, 2rem);
+    /* Minimum padding for very small screens */
+    padding: max(calc(var(--spacing-2xl, 4rem) * 1.5), 3rem)
+      max(var(--spacing-lg, 2rem), 1rem);
+    /* Responsive typography scaling */
+    font-size: calc(1rem * var(--font-scale, 1));
+    /* Prevent content overflow */
+    overflow-x: hidden;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+  }
+}
+
+/* ================================
+   RESPONSIVE BREAKPOINTS
+   ================================ */
+
+/* Ultra Small Screens (320px and below) - Legacy mobile devices */
+@media only screen and (width <= 320px) {
+  .hero.layout-container-responsive {
+    /* Maintain full-width on ultra-small screens */
+    width: 100vw !important;
+    margin-left: calc(50% - 50vw) !important;
+    max-width: none !important;
+    /* Reduce hero padding on ultra-small screens */
+    padding: 2rem 1rem;
+    min-height: 280px; /* Smaller minimum height */
+  }
+}
+
+/* Mobile Extra Small (360px+) - Samsung Galaxy S21 - Aligned with media.css */
+@media only screen and (width >= 360px) {
+  .hero {
+    padding: calc(var(--container-padding, 16px) * 2)
+      var(--container-padding, 16px);
+    min-height: calc(300px * var(--font-scale, 1));
+  }
+
+  .hero-title {
+    font-size: calc(2rem * var(--font-scale, 1));
+  }
+
+  .hero-description {
+    font-size: calc(1rem * var(--font-scale, 1));
+  }
+
+  .layout-container-responsive {
+    padding-left: var(--container-padding, 16px);
+    padding-right: var(--container-padding, 16px);
+  }
+
+  /* Hero-specific heading adjustments for small screens */
+  .hero.layout-container-responsive .text-responsive-heading {
+    font-size: calc(
+      1.375rem * var(--font-scale, 1)
+    ); /* Hero headings slightly larger */
+  }
+}
+
+/* Mobile Small (375px+) - iPhone SE - Aligned with media.css */
+@media only screen and (width >= 375px) {
+  .hero {
+    padding: calc(var(--container-padding, 16px) * 2.5)
+      var(--container-padding, 16px);
+  }
+
+  .hero-title {
+    font-size: calc(2.25rem * var(--font-scale, 1));
+  }
+
+  .layout-container-responsive {
+    padding-left: var(--container-padding, 16px);
+    padding-right: var(--container-padding, 16px);
+  }
+}
+
+/* Mobile Large (428px+) - iPhone 12 Pro Max - Aligned with media.css */
+@media only screen and (width >= 428px) {
+  .hero {
+    padding: calc(var(--container-padding, 18px) * 3)
+      var(--container-padding, 18px);
+    min-height: calc(350px * var(--font-scale, 1));
+  }
+
+  .hero-title {
+    font-size: calc(2.5rem * var(--font-scale, 1));
+  }
+
+  .hero-description {
+    font-size: calc(1.125rem * var(--font-scale, 1));
+  }
+
+  /* Responsive demo controls grid - maintain 4 columns (scoped to hero) */
+  .hero .demo-controls-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: calc(0.75rem * var(--font-scale, 1)); /* Responsive gap */
+  }
+
+  /* Mobile popover adjustments */
+  .hero .demo-feedback-popover {
+    width: calc(280px * var(--font-scale, 1)); /* Responsive width */
+    min-height: calc(100px * var(--font-scale, 1));
+    font-size: calc(0.8rem * var(--font-scale, 1));
+  }
+
+  /* Enhanced hero radar demo sizing for mobile large */
+}
+
+/* Tablet Small (768px+) - iPad Mini - Aligned with media.css */
+@media only screen and (width >= 768px) {
+  .hero {
+    /* Grid layout for desktop - content on left, simulation on right */
+    grid-template-columns: 1fr 1fr;
+    gap: calc(var(--container-padding, 20px) * 0.75);
+    padding: calc(var(--container-padding, 20px) * 1.25)
+      var(--container-padding, 20px);
+    min-height: 600px;
+  }
+
+  .hero .hero-content {
+    text-align: center; /* Consistent centering */
+  }
+
+  .hero .hero-simulation {
+    padding: calc(var(--container-padding, 20px) * 0.75);
+    min-height: calc(350px + (var(--container-padding, 20px) * 1.5));
+  }
+
+  .hero-title {
+    font-size: calc(3rem * var(--font-scale, 1));
+  }
+
+  .hero-description {
+    font-size: calc(1.25rem * var(--font-scale, 1));
+  }
+
+  .layout-container-responsive {
+    padding-left: var(--container-padding, 20px);
+    padding-right: var(--container-padding, 20px);
+  }
+
+  /* Keep 4-column grid on tablet and up */
+  .hero .demo-controls-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: calc(1rem * var(--font-scale, 1)); /* Responsive gap */
+  }
+
+  /* Tablet popover adjustments */
+  .hero .demo-feedback-popover {
+    width: calc(320px * var(--font-scale, 1)); /* Responsive width */
+    min-height: calc(120px * var(--font-scale, 1));
+    font-size: calc(0.875rem * var(--font-scale, 1));
+  }
+
+  /* Enhanced hero radar demo sizing for tablet */
+}
+
+/* Desktop Small (1024px+) - Standard Laptop - Aligned with media.css */
+@media only screen and (width >= 1024px) {
+  .hero {
+    /* Maintain 2-column layout with improved spacing */
+    grid-template-columns: 1fr 1fr;
+    gap: calc(var(--container-padding, 20px) * 1.25);
+    padding: calc(var(--container-padding, 20px) * 1.75)
+      var(--container-padding, 20px);
+    min-height: 750px;
+  }
+
+  .hero .hero-content {
+    text-align: center; /* Center-align on larger screens */
+  }
+
+  .hero .hero-simulation {
+    padding: calc(var(--container-padding, 20px) * 1.25);
+    min-height: calc(400px + (var(--container-padding, 20px) * 2));
+  }
+
+  .hero-title {
+    font-size: calc(3.5rem * var(--font-scale, 1));
+  }
+
+  .hero-description {
+    font-size: calc(1.375rem * var(--font-scale, 1));
+  }
+
+  .layout-container-responsive {
+    padding-left: calc(var(--container-padding, 20px) * 1.5);
+    padding-right: calc(var(--container-padding, 20px) * 1.5);
+  }
+
+  /* Desktop popover adjustments */
+  .hero .demo-feedback-popover {
+    width: calc(350px * var(--font-scale, 1)); /* Larger on desktop */
+    min-height: calc(140px * var(--font-scale, 1));
+    font-size: calc(0.9375rem * var(--font-scale, 1));
+  }
+}
+
+/* Laptop Small (1280px+) - MacBook Air 13" - Aligned with media.css */
+@media only screen and (width >= 1280px) {
+  .hero {
+    /* Enhanced desktop layout with more spacing */
+    grid-template-columns: 1fr 1fr;
+    gap: calc(var(--container-padding, 32px) * 1.5);
+    padding: calc(var(--container-padding, 32px) * 2)
+      var(--container-padding, 32px);
+    min-height: 800px;
+  }
+
+  .hero .hero-content {
+    text-align: center; /* Center-align for desktop experience */
+  }
+
+  .hero .hero-simulation {
+    padding: calc(var(--container-padding, 32px) * 1.5);
+    min-height: calc(450px + (var(--container-padding, 32px) * 2));
+  }
+
+  .hero-title {
+    font-size: calc(3.5rem * var(--font-scale, 1));
+  }
+
+  .hero-description {
+    font-size: calc(1.375rem * var(--font-scale, 1));
+  }
+
+  .layout-container-responsive {
+    padding-left: var(--container-padding, 32px);
+    padding-right: var(--container-padding, 32px);
+  }
+
+  /* Enhanced hero radar demo sizing for laptop */
+}
+
+/* Desktop Full HD (1920px+) - Aligned with media.css */
+@media only screen and (width >= 1920px) {
+  .hero {
+    /* Maximum desktop layout with generous spacing */
+    grid-template-columns: 1fr 1fr;
+    gap: calc(var(--container-padding, 48px) * 2);
+    padding: calc(var(--container-padding, 48px) * 2.5)
+      var(--container-padding, 48px);
+    min-height: 900px;
+  }
+
+  .hero .hero-content {
+    text-align: left; /* Left-align for maximum desktop experience */
+  }
+
+  .hero .hero-simulation {
+    padding: calc(var(--container-padding, 48px) * 2);
+    min-height: calc(500px + (var(--container-padding, 48px) * 2.5));
+  }
+
+  .hero-title {
+    font-size: calc(4rem * var(--font-scale, 1));
+  }
+
+  .hero-description {
+    font-size: calc(1.5rem * var(--font-scale, 1));
+  }
+
+  .layout-container-responsive {
+    max-width: calc(1600px * var(--font-scale, 1));
+    padding-left: var(--container-padding, 48px);
+    padding-right: var(--container-padding, 48px);
+  }
+
+  /* Enhanced hero radar demo sizing for desktop full HD */
+}
+
+/* ================================
+   HERO ACTIONS LAYOUT STABILITY (Desktop)
+   ================================ */
+/*
+  Goal: Prevent hero action buttons from unpredictably wrapping between rows on reload.
+  Approach:
+  - Disable wrapping and max-width constraints on desktop breakpoints
+  - Ensure group of classroom buttons is a flex row with consistent gap
+  - Give the debug test button a consistent min-width to match other buttons
+  - Prevent flex items from shrinking (avoids jitter when fonts load)
+*/
+@layer components {
+  @media only screen and (min-width: 1024px) {
+    .hero-actions {
+      flex-wrap: nowrap;
+      max-width: none;
+    }
+
+    .hero-actions > * {
+      flex-shrink: 0;
+    }
+
+    /* Keep the two classroom buttons together with proper spacing */
+    .hero-actions .classroom-actions-group {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md, 1.5rem);
+      white-space: nowrap;
+    }
+
+    /* Align test button sizing with other hero buttons */
+    .hero-actions #test-scenario-modal {
+      min-width: var(--btn-min-width, 180px);
+    }
+  }
+}
+
+/* New: structured two-row layout inside .hero-actions */
+@layer components {
+  .hero-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero-actions .primary-actions-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-lg, 2rem);
+  }
+
+  .hero-actions .classroom-actions-group {
+    margin-top: var(--spacing-md, 1.5rem);
+  }
+}
+
+@layer components {
+  @media (max-width: 768px) {
+    .hero-actions .primary-actions-row {
+      flex-wrap: wrap;
+      gap: var(--spacing-md, 1.5rem);
+    }
+  }
+}
+
+/* ================================
+   ORIENTATION-SPECIFIC ADJUSTMENTS
+   ================================ */
+
+/* Landscape mobile adjustments for hero */
+@media only screen and (width <= 667px) and (orientation: landscape) {
+  .hero.layout-container-responsive {
+    /* Maintain full-width in landscape mobile */
+    width: 100vw !important;
+    margin-left: calc(50% - 50vw) !important;
+    max-width: none !important;
+    /* Adjust hero for landscape mobile */
+    padding: 2rem 1.5rem;
+    min-height: 200px; /* Smaller height in landscape */
+  }
+}
+
+/* ================================
+   ORIENTATION SUGGESTION MESSAGE
+   ================================ */
+
+/* Polite orientation suggestion for mobile devices (scoped to hero) */
+.hero .orientation-suggestion {
+  display: none;
+  position: relative;
+  background: var(--orientation-bg, rgb(74 158 255 / 10%));
+  border: 2px solid var(--orientation-border, rgb(74 158 255 / 30%));
+  border-radius: var(--border-radius-md, 8px);
+  padding: var(--spacing-md, 1rem);
+  margin: var(--spacing-md, 1rem) auto var(--spacing-lg, 2rem);
+  max-width: 400px;
+  text-align: center;
+  color: var(--orientation-text, rgb(255 255 255 / 90%));
+  font-size: var(--font-size-sm, 0.875rem);
+  line-height: 1.4;
+  backdrop-filter: blur(10px);
+  animation: gentle-pulse 3s infinite;
+}
+
+.hero .orientation-suggestion .rotate-icon {
+  display: inline-block;
+  font-size: 1.2em;
+  margin-right: 0.5rem;
+  animation: gentle-rotate 2s infinite ease-in-out;
+}
+
+.hero .orientation-suggestion .message-text {
+  display: block;
+  margin-top: 0.25rem;
+}
+
+/* Gentle animations for the orientation suggestion */
+@keyframes gentle-pulse {
+  0%,
+  100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes gentle-rotate {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(5deg);
+  }
+  75% {
+    transform: rotate(-5deg);
+  }
+}
+
+/* Show orientation suggestion on mobile portrait mode */
+@media only screen and (max-width: 768px) and (orientation: portrait) {
+  .hero .orientation-suggestion {
+    display: block;
+  }
+}
+
+/* Hide on landscape or larger screens */
+@media only screen and (min-width: 769px),
+  only screen and (max-width: 768px) and (orientation: landscape) {
+  .hero .orientation-suggestion {
+    display: none;
+  }
+}
+
+/* Dark mode styling for orientation suggestion */
+body.dark-mode .hero .orientation-suggestion {
+  background: var(--orientation-bg-dark, rgb(74 158 255 / 15%));
+  border-color: var(--orientation-border-dark, rgb(74 158 255 / 40%));
+  color: var(--orientation-text-dark, #ffffff);
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .orientation-suggestion,
+  .orientation-suggestion .rotate-icon {
+    animation: none;
+  }
+}
+
+/* Dark mode overrides for hero are centralized in css-layers.css @layer overrides */
+
+/* ================================
+   ACCESSIBILITY - REDUCED MOTION SUPPORT
+   ================================ */
+
+/* Respect reduced motion preferences - disable animations for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .hero .hero-content,
+  .hero .hero-content h1,
+  .hero .hero-content p,
+  .hero .hero-simulation,
+  .hero-title,
+  .hero-description,
+  .hero-actions,
+  .hero-radar-demo,
+  .hero-radar-demo h3,
+  .hero-radar-demo p {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ================================
+   HERO RADAR DEMO - CONSOLIDATED WITH CSS LAYERS
+   ================================ */
+
+@layer components {
+  /* ===== BASE HERO RADAR DEMO COMPONENT ===== */
+  .hero-radar-demo {
+    /* Layout & Positioning */
+    position: relative;
+    width: 95%;
+    max-width: 1400px;
+    min-height: 800px;
+    margin: var(--spacing-xl, 6rem) auto;
+    padding: var(--spacing-xl, 6rem) var(--spacing-lg, 4rem);
+
+    /* Visual Design */
+    background: var(--demo-background, rgb(255 255 255 / 10%));
+    border: 3px solid var(--demo-border, rgb(255 255 255 / 20%));
+    border-radius: var(--border-radius-lg, 16px);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 20px 50px rgb(0 0 0 / 15%);
+
+    /* Typography */
+    text-align: center;
+    color: var(--hero-demo-text-color, rgb(255 255 255 / 90%));
+
+    /* State & Animation */
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transition: all var(--transition-duration, 0.3s)
+      cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hero-radar-demo:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgb(0 0 0 / 15%);
+  }
+
+  .hero-radar-demo:focus-visible {
+    outline: 2px solid var(--demo-focus, #4a90e2);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgb(74 144 226 / 20%);
+  }
+
+  .hero-radar-demo:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
+  }
+
+  /* ===== HERO RADAR DEMO TYPOGRAPHY ===== */
+  .hero-radar-demo h3 {
+    font-size: clamp(1.75rem, 5vw, 2.25rem);
+    font-weight: 700;
+    color: var(--hero-demo-title-color, inherit);
+    margin: 0 0 1rem;
+
+    /* Gradient text effect */
+    background: linear-gradient(
+      135deg,
+      var(--gradient-primary-start, #667eea) 0%,
+      var(--gradient-primary-end, #764ba2) 100%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    /* Animation readiness */
+    opacity: 1;
+    transform: translateY(0);
+    transition: all var(--transition-duration, 0.3s) ease-out;
+  }
+
+  .hero-radar-demo p {
+    color: var(--hero-demo-text-color, rgb(255 255 255 / 90%));
+    font-size: clamp(1rem, 3.5vw, 1.25rem);
+    line-height: 1.6;
+    max-width: 700px;
+    margin: 0 auto var(--spacing-xl, 3rem);
+
+    /* Animation readiness */
+    opacity: 1;
+    transform: translateY(0);
+    transition: all var(--transition-duration, 0.3s) ease-out;
+  }
+
+  /* ===== HERO RADAR CONTAINER ===== */
+  .hero-radar-container {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    min-height: 600px;
+    margin: 0 auto var(--spacing-xl, 4rem);
+    padding: var(--spacing-xl, 3rem);
+    background: var(--demo-container-background, rgb(255 255 255 / 80%));
+    border: 2px solid var(--demo-container-border, rgb(255 255 255 / 30%));
+    border-radius: var(--border-radius-lg, 12px);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 15%);
+  }
+
+  /* ===== HERO RADAR CHART COMPONENT ===== */
+  /* Hero-specific radar chart styling - moved from radar-chart.css for true consolidation */
+  .hero-radar-chart {
+    position: relative;
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 1rem;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: -4px 4px 8px rgb(0 0 0 / 12%);
+    transition: none;
+    border: none;
+  }
+
+  .hero-radar-chart:hover {
+    transform: none;
+    box-shadow: -4px 4px 8px rgb(0 0 0 / 16%);
+  }
+
+  .hero-radar-chart canvas {
+    border-radius: 0;
+    background: rgb(255 255 255 / 95%);
+    backdrop-filter: blur(10px);
+  }
+
+  /* Hero radar chart theme integration */
+  .hero-radar-chart.theme-light {
+    background-color: var(--radar-theme-light-background, #fff);
+    border-color: var(--radar-theme-light-border, #e2e8f0);
+    color: var(--radar-theme-light-text, #333);
+  }
+
+  .hero-radar-chart.theme-dark {
+    background-color: var(--radar-theme-dark-background, #1a1a1a);
+    border-color: var(--radar-theme-dark-border, #444);
+    color: var(--radar-theme-dark-text, #fff);
+  }
+
+  .hero-radar-chart.theme-high-contrast {
+    background-color: var(--radar-theme-high-contrast-background, #000);
+    border-color: var(--radar-theme-high-contrast-border, #fff);
+    color: var(--radar-theme-high-contrast-text, #fff);
+  }
+
+  /* ===== DEMO CONTROLS COMPONENTS ===== */
+  .hero-demo-controls {
+    position: relative;
+    margin-bottom: 2rem;
+  }
+
+  .hero-demo-controls .demo-controls-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    max-width: 700px;
+    margin: 0 auto;
+    position: relative; /* For popover positioning */
+  }
+
+  /* Enhanced demo button styling from hero-demo.css */
+  .hero-demo-controls .demo-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+    color: white;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgb(79 70 229 / 25%);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgb(255 255 255 / 10%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .hero-demo-controls .demo-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(255 255 255 / 15%),
+      transparent
+    );
+    transition: left 0.5s ease;
+  }
+
+  .hero-demo-controls .demo-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgb(79 70 229 / 35%);
+    background: linear-gradient(135deg, #4338ca 0%, #5b21b6 100%);
+  }
+
+  .hero-demo-controls .demo-btn:hover::before {
+    left: 100%;
+  }
+
+  .hero-demo-controls .demo-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgb(79 70 229 / 25%);
+  }
+
+  /* Active/Selected state for demo buttons */
+  .hero-demo-controls .demo-btn.active {
+    background: linear-gradient(135deg, #1e40af 0%, #3730a3 100%);
+    box-shadow: 0 4px 16px rgb(30 64 175 / 40%);
+    transform: translateY(-1px);
+    border: 2px solid rgb(255 255 255 / 30%);
+  }
+
+  .hero-demo-controls .demo-btn.active::before {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(255 255 255 / 25%),
+      transparent
+    );
+  }
+
+  .hero-demo-controls .demo-btn.active:hover {
+    background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%);
+    box-shadow: 0 6px 20px rgb(30 64 175 / 45%);
+  }
+
+  /* Demo Feedback Popover moved below accordion styles to satisfy stylelint no-descending-specificity */
+
+  /* ===== HERO ACCORDION COMPONENTS - Moved from hero-demo.css ===== */
+
+  /* Radar Instructions Accordion - Used in hero sections */
+  .radar-instructions-accordion {
+    max-width: 600px;
+    margin: 1.5rem auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
+  }
+
+  .radar-instructions-accordion .accordion-item {
+    border: none;
+    border-radius: 0;
+  }
+
+  .radar-instructions-accordion .accordion-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    outline: none;
+    font-weight: 600;
+  }
+
+  .radar-instructions-accordion .accordion-header:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    transform: translateY(-1px);
+  }
+
+  .radar-instructions-accordion .accordion-header:focus {
+    outline: 2px solid rgb(255 255 255 / 50%);
+    outline-offset: -2px;
+  }
+
+  .radar-instructions-accordion .accordion-icon {
+    font-size: 0.875rem;
+    transition: transform 0.3s ease;
+    min-width: 12px;
+  }
+
+  .radar-instructions-accordion .accordion-icon.expanded {
+    transform: rotate(90deg);
+  }
+
+  .radar-instructions-accordion .accordion-title {
+    font-size: 1rem;
+    margin: 0;
+  }
+
+  .radar-instructions-accordion .accordion-content {
+    background: white;
+    max-height: 500px;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .radar-instructions-accordion .accordion-content.collapsed {
+    max-height: 0;
+  }
+
+  .radar-instructions-accordion .accordion-content-inner {
+    padding: 1.5rem;
+    border-top: 1px solid rgb(102 126 234 / 10%);
+    text-align: left;
+  }
+
+  .radar-instructions-accordion .accordion-content-inner p {
+    color: #4a5568;
+    margin: 0 0 1rem;
+    line-height: 1.6;
+    font-size: 0.95rem;
+  }
+
+  .radar-instructions-accordion .accordion-content-inner ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+  }
+
+  .radar-instructions-accordion .accordion-content-inner li {
+    color: #4a5568;
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .radar-instructions-accordion .accordion-content-inner li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: #667eea;
+    font-weight: bold;
+  }
+
+  .radar-instructions-accordion .accordion-content-inner li strong {
+    color: #2d3748;
+    font-weight: 600;
+  }
+
+  /* Ethics Glossary Accordion - Used in hero sections */
+  .ethics-glossary-accordion {
+    max-width: 600px;
+    margin: 1.5rem auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
+  }
+
+  .ethics-glossary-accordion .accordion-item {
+    border: none;
+    border-radius: 0;
+  }
+
+  .ethics-glossary-accordion .accordion-header {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    outline: none;
+    font-weight: 600;
+  }
+
+  .ethics-glossary-accordion .accordion-header:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-1px);
+  }
+
+  .ethics-glossary-accordion .accordion-header:focus {
+    outline: 2px solid rgb(255 255 255 / 50%);
+    outline-offset: -2px;
+  }
+
+  .ethics-glossary-accordion .accordion-icon {
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+    color: rgb(255 255 255 / 90%);
+  }
+
+  .ethics-glossary-accordion.open .accordion-icon {
+    transform: rotate(90deg);
+  }
+
+  .ethics-glossary-accordion .accordion-title {
+    font-size: 1rem;
+    margin: 0;
+    flex: 1;
+  }
+
+  .ethics-glossary-accordion .accordion-content {
+    background: white;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    max-height: 0;
+    opacity: 0;
+  }
+
+  .ethics-glossary-accordion .accordion-content.collapsed {
+    max-height: 0;
+    opacity: 0;
+  }
+
+  .ethics-glossary-accordion .accordion-content-inner {
+    padding: 1.5rem;
+  }
+
+  /* Glossary Grid Styles for Ethics Accordion */
+  .ethics-glossary-accordion .glossary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .ethics-glossary-accordion .glossary-item {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-radius: 8px;
+    padding: 1rem;
+    border-left: 4px solid #10b981;
+  }
+
+  .ethics-glossary-accordion .glossary-item h4 {
+    margin: 0 0 0.5rem;
+    color: #1a202c;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .ethics-glossary-accordion .glossary-item p {
+    margin: 0;
+    color: #4a5568;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .ethics-glossary-accordion .glossary-note {
+    background: linear-gradient(135deg, #fef7cd 0%, #fef3c7 100%);
+    border-radius: 8px;
+    padding: 1rem;
+    border-left: 4px solid #f59e0b;
+  }
+
+  .ethics-glossary-accordion .glossary-note p {
+    margin: 0;
+    color: #78350f;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  /* Demo Feedback Popover - Enhanced from hero-demo.css (scoped to hero) */
+  .hero .demo-feedback-popover {
+    position: absolute;
+    bottom: 100%;
+    left: 50%; /* Default center position, will be adjusted by JavaScript */
+    transform: translateX(-50%);
+    margin-bottom: 1rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    pointer-events: none;
+  }
+
+  .hero .demo-feedback-popover.show,
+  .hero .demo-feedback-popover.visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(-5px);
+  }
+
+  .hero .demo-feedback-popover .popover-content {
+    background: rgb(255 255 255 / 98%);
+    color: #2d3748;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgb(0 0 0 / 15%);
+    min-width: 280px;
+    max-width: 400px;
+    position: relative;
+    border: 1px solid rgb(102 126 234 / 20%);
+  }
+
+  .hero .demo-feedback-popover .popover-content h5 {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #667eea;
+  }
+
+  .hero .demo-feedback-popover .popover-content p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #4a5568;
+  }
+
+  .hero .demo-feedback-popover .pattern-emphasis {
+    font-size: var(--font-size-xs, 0.75rem);
+    color: var(--popover-accent, #e3f2fd);
+    border-top: 1px solid rgb(255 255 255 / 20%);
+    padding-top: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  /* Popover Arrow (pointing downward) with enhanced shadow */
+  .hero .demo-feedback-popover .popover-arrow {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid rgb(255 255 255 / 98%);
+  }
+
+  /* Arrow border for professional look */
+  .hero .demo-feedback-popover .popover-arrow::before {
+    content: "";
+    position: absolute;
+    top: -9px;
+    left: -9px;
+    width: 0;
+    height: 0;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-top: 9px solid rgb(102 126 234 / 20%);
+    z-index: -1;
+  }
+}
+
+@layer layout {
+  /* ===== RESPONSIVE HERO RADAR DEMO LAYOUT ===== */
+
+  /* Mobile Extra Small (360px+) */
+  @media only screen and (width >= 360px) {
+    .hero-radar-demo {
+      width: 98%;
+      min-height: 500px;
+      padding: calc(var(--spacing-xl, 3rem) * var(--font-scale, 1))
+        calc(var(--spacing-lg, 2rem) * var(--font-scale, 1));
+      margin: calc(var(--spacing-xl, 3rem) * var(--font-scale, 1)) auto;
+    }
+
+    .hero-radar-container {
+      max-width: 100%;
+      min-height: 400px;
+      padding: calc(var(--spacing-lg, 2rem) * var(--font-scale, 1));
+    }
+
+    .hero-radar-chart {
+      padding: 1rem;
+      max-width: 100%;
+      margin: 0.5rem auto;
+    }
+  }
+
+  /* Mobile Large (428px+) */
+  @media only screen and (width >= 428px) {
+    .hero-radar-demo {
+      width: 96%;
+      min-height: calc(600px * var(--font-scale, 1));
+      padding: calc(var(--spacing-xl, 4rem) * var(--font-scale, 1))
+        calc(var(--spacing-xl, 3rem) * var(--font-scale, 1));
+    }
+
+    .hero-radar-container {
+      max-width: calc(800px * var(--font-scale, 1));
+      min-height: calc(480px * var(--font-scale, 1));
+    }
+
+    .hero-radar-chart {
+      padding: 1rem;
+      border-radius: 0;
+    }
+  }
+
+  /* Tablet Small (768px+) */
+  @media only screen and (width >= 768px) {
+    .hero-radar-demo {
+      width: 94%;
+      min-height: calc(750px * var(--font-scale, 1));
+      padding: calc(var(--spacing-xl, 5rem) * var(--font-scale, 1))
+        calc(var(--spacing-xl, 4rem) * var(--font-scale, 1));
+    }
+
+    .hero-radar-container {
+      max-width: calc(1000px * var(--font-scale, 1));
+      min-height: calc(580px * var(--font-scale, 1));
+    }
+  }
+
+  /* Laptop Small (1280px+) */
+  @media only screen and (width >= 1280px) {
+    .hero-radar-demo {
+      width: 92%;
+      min-height: calc(900px * var(--font-scale, 1));
+      padding: calc(var(--spacing-xl, 6rem) * var(--font-scale, 1))
+        calc(var(--spacing-xl, 5rem) * var(--font-scale, 1));
+    }
+
+    .hero-radar-container {
+      max-width: calc(1200px * var(--font-scale, 1));
+      min-height: calc(700px * var(--font-scale, 1));
+    }
+  }
+
+  /* Desktop Full HD (1920px+) */
+  @media only screen and (width >= 1920px) {
+    .hero-radar-demo {
+      width: 90%;
+      min-height: calc(1000px * var(--font-scale, 1));
+      padding: calc(var(--spacing-xl, 8rem) * var(--font-scale, 1))
+        calc(var(--spacing-xl, 6rem) * var(--font-scale, 1));
+    }
+
+    .hero-radar-container {
+      max-width: calc(1400px * var(--font-scale, 1));
+      min-height: calc(800px * var(--font-scale, 1));
+    }
+  }
+}
+
+@layer utilities {
+  /* ===== ANIMATION & STATE UTILITIES ===== */
+
+  /* Note: Individual CSS animations handle hero entrance effects */
+  /* Each element has its own animation: heroContentEnter, heroElementEnter, heroSimulationEnter */
+  /* No html.loaded overrides needed - animations work automatically on page load */
+
+  /* Hero radar demo loaded animations - consolidated */
+  html.loaded .hero-radar-demo {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity var(--transition-duration, 0.8s) ease-out
+        var(--transition-delay, 0.2s),
+      transform var(--transition-duration, 0.8s) ease-out
+        var(--transition-delay, 0.2s);
+    animation-play-state: running;
+  }
+
+  html.loaded .hero-radar-demo h3 {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity var(--transition-duration, 0.6s) ease-out
+        var(--transition-delay, 0.4s),
+      transform var(--transition-duration, 0.6s) ease-out
+        var(--transition-delay, 0.4s);
+  }
+
+  html.loaded .hero-radar-demo p {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity var(--transition-duration, 0.6s) ease-out
+        var(--transition-delay, 0.6s),
+      transform var(--transition-duration, 0.6s) ease-out
+        var(--transition-delay, 0.6s);
+  }
+
+  /* Animation utilities */
+  .hero-radar-demo.pulse {
+    animation: hero-radar-pulse 2s infinite;
+  }
+
+  .hero-radar-demo.fade-in {
+    animation: hero-radar-fade-in 0.6s ease-out;
+  }
+
+  /* Keyframe animations */
+  @keyframes hero-radar-pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgb(74 144 226 / 40%);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgb(74 144 226 / 0%);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgb(74 144 226 / 0%);
+    }
+  }
+
+  @keyframes hero-radar-fade-in {
+    0% {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* ===== UTILITY CLASSES ===== */
+  .hero.hero-minimal {
+    padding: var(--hero-minimal-padding, 2rem 0);
+    min-height: var(--hero-minimal-height, 200px);
+    background: var(--hero-minimal-background, transparent);
+  }
+
+  .hero.hero-compact {
+    padding: var(--hero-compact-padding, 1.5rem 0);
+    min-height: var(--hero-compact-height, 150px);
+  }
+
+  .hero.hero-full-height {
+    min-height: 100vh;
+    padding: var(--hero-full-height-padding, 0);
+  }
+
+  /* Focus Styles */
+  .demo-btn:focus-visible,
+  .hero-actions .btn:focus-visible {
+    outline: 3px solid var(--focus-color, #4285f4);
+    outline-offset: 2px;
+  }
+}
+
+@layer overrides {
+  /* Dark Mode - Demo Components (kept here as they are hero-demo specific) */
+  .dark-mode .demo-btn {
+    border-color: var(--demo-btn-border-dark, rgb(255 255 255 / 20%));
+    background: var(--demo-btn-background-dark, rgb(255 255 255 / 5%));
+  }
+
+  .dark-mode .hero-demo-container {
+    background: linear-gradient(
+      135deg,
+      var(--theme-bg-secondary) 0%,
+      var(--theme-bg-tertiary) 100%
+    );
+    border-color: var(--theme-border);
+    box-shadow: 0 10px 25px var(--theme-shadow);
+  }
+
+  /* Dark Mode - Enhanced Popover Styles */
+  .dark-mode .hero .demo-feedback-popover .popover-content {
+    background: var(--theme-bg-secondary);
+    color: var(--theme-text-primary);
+    border: 1px solid var(--theme-border);
+  }
+
+  .dark-mode .hero .demo-feedback-popover .popover-content h5 {
+    color: var(--theme-text-primary);
+  }
+
+  .dark-mode .hero .demo-feedback-popover .popover-content p {
+    color: var(--theme-text-secondary);
+  }
+
+  .dark-mode .hero .demo-feedback-popover .popover-arrow {
+    border-top-color: var(--theme-bg-secondary);
+  }
+
+  .dark-mode .hero .demo-feedback-popover .popover-arrow::before {
+    border-top-color: var(--theme-border);
+  }
+
+  .dark-mode .demo-title {
+    color: #fff;
+  }
+
+  .dark-mode .demo-subtitle {
+    color: #b3b3b3;
+  }
+
+  .dark-mode .scenario-panel {
+    background: rgb(0 0 0 / 30%);
+    border: 1px solid rgb(255 255 255 / 10%);
+    color: #fff;
+  }
+
+  .dark-mode .scenario-counter {
+    background: rgb(255 255 255 / 10%);
+    color: #fff;
+    border: 1px solid rgb(255 255 255 / 20%);
+  }
+
+  .dark-mode .scenario-question {
+    color: #fff;
+  }
+
+  .dark-mode .choice-btn {
+    background: rgb(255 255 255 / 10%);
+    border: 2px solid rgb(255 255 255 / 20%);
+    color: #fff;
+  }
+
+  .dark-mode .choice-btn:hover {
+    background: rgb(255 255 255 / 15%);
+    border-color: rgb(255 255 255 / 30%);
+    transform: translateY(-2px);
+  }
+
+  .dark-mode .choice-btn:focus {
+    outline: 2px solid #4a9eff;
+    outline-offset: 2px;
+  }
+
+  .dark-mode .choice-btn.selected {
+    background: rgb(74 158 255 / 30%);
+    border-color: #4a9eff;
+  }
+
+  .dark-mode .choice-text {
+    color: #fff;
+  }
+
+  .dark-mode .choice-arrow {
+    color: rgb(255 255 255 / 70%);
+  }
+
+  .dark-mode .scenario-feedback {
+    background: rgb(0 0 0 / 80%);
+    border: 1px solid rgb(255 255 255 / 20%);
+    color: #fff;
+  }
+
+  .dark-mode .hero .demo-feedback-popover {
+    background: rgb(0 0 0 / 90%);
+    border: 1px solid rgb(255 255 255 / 10%);
+    box-shadow: 0 8px 32px rgb(0 0 0 / 50%);
+  }
+
+  /* Dark Mode - Accordion Components (moved from hero-demo.css) */
+  .dark-mode .radar-instructions-accordion .accordion-header {
+    background: linear-gradient(
+      135deg,
+      rgb(98 0 234 / 80%) 0%,
+      rgb(147 51 234 / 80%) 100%
+    );
+    border-color: rgb(147 51 234 / 60%);
+  }
+
+  .dark-mode .radar-instructions-accordion .accordion-header:hover {
+    background: linear-gradient(
+      135deg,
+      rgb(98 0 234 / 90%) 0%,
+      rgb(147 51 234 / 90%) 100%
+    );
+    border-color: rgb(147 51 234 / 80%);
+  }
+
+  .dark-mode .radar-instructions-accordion .accordion-content {
+    background: rgb(30 30 30 / 95%);
+    border-color: rgb(147 51 234 / 30%);
+    color: var(--theme-text-primary);
+  }
+
+  .dark-mode .ethics-glossary-accordion .accordion-header {
+    background: linear-gradient(
+      135deg,
+      rgb(16 185 129 / 80%) 0%,
+      rgb(5 150 105 / 80%) 100%
+    );
+    border-color: rgb(16 185 129 / 60%);
+  }
+
+  .dark-mode .ethics-glossary-accordion .accordion-header:hover {
+    background: linear-gradient(
+      135deg,
+      rgb(16 185 129 / 90%) 0%,
+      rgb(5 150 105 / 90%) 100%
+    );
+    border-color: rgb(16 185 129 / 80%);
+  }
+
+  .dark-mode .ethics-glossary-accordion .accordion-content {
+    background: rgb(30 30 30 / 95%);
+    border-color: rgb(16 185 129 / 30%);
+    color: var(--theme-text-primary);
+  }
+
+  .dark-mode .glossary-grid .glossary-term {
+    background: rgb(40 40 40 / 90%);
+    border-color: rgb(16 185 129 / 30%);
+  }
+
+  .dark-mode .glossary-grid .glossary-term strong {
+    color: #10b981;
+  }
+
+  .dark-mode .hero .demo-feedback-popover .popover-content {
+    color: #fff;
+  }
+
+  .dark-mode .hero .demo-feedback-popover .popover-content h5 {
+    color: #ffffff;
+  }
+
+  .dark-mode .hero .demo-feedback-popover .popover-content p {
+    color: #ccc;
+  }
+
+  .dark-mode .hero .demo-feedback-popover .pattern-emphasis {
+    color: #b3d9ff;
+    border-top-color: rgb(255 255 255 / 10%);
+  }
+
+  .dark-mode .demo-actions .btn {
+    background: rgb(255 255 255 / 10%);
+    border: 1px solid rgb(255 255 255 / 20%);
+    color: #fff;
+  }
+
+  .dark-mode .demo-actions .btn:hover {
+    background: rgb(255 255 255 / 15%);
+    border-color: rgb(255 255 255 / 30%);
+  }
+
+  .dark-mode .demo-actions .btn-primary {
+    background: #4a9eff;
+    border-color: #4a9eff;
+    color: #fff;
+  }
+
+  .dark-mode .demo-actions .btn-primary:hover {
+    background: #3a8eef;
+    border-color: #3a8eef;
+  }
+
+  .dark-mode .demo-actions .btn-secondary {
+    background: rgb(255 255 255 / 10%);
+    border: 1px solid rgb(255 255 255 / 30%);
+    color: #fff;
+  }
+
+  .dark-mode .demo-actions .btn-secondary:hover {
+    background: rgb(255 255 255 / 20%);
+    border-color: rgb(255 255 255 / 40%);
+  }
+
+  /* Dark Mode - Hero Radar Demo */
+  .dark-mode .hero-radar-demo {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    border-color: var(--demo-border-dark, #444);
+    color: var(--demo-text-dark, #fff);
+  }
+
+  .dark-mode .hero-radar-demo h3 {
+    color: var(--demo-title-dark, #fff);
+    background: linear-gradient(135deg, #6bb4ff 0%, #9d4edd 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .dark-mode .hero-radar-demo p {
+    color: var(--demo-text-secondary-dark, #ccc);
+  }
+
+  .dark-mode .hero-radar-container {
+    background: var(--demo-container-background-dark, rgb(45 45 45 / 80%));
+    border-color: var(--demo-container-border-dark, #444);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 40%);
+  }
+
+  /* Dark mode support for hero radar chart */
+  body.dark-mode .hero-radar-chart {
+    background: transparent;
+    border-color: none;
+    color: var(--radar-theme-dark-text, #ffffff);
+  }
+
+  body.dark-mode .hero-radar-chart:hover {
+    box-shadow: -4px 4px 8px rgb(255 255 255 / 8%);
+  }
+
+  /* Dark mode support for hero radar chart canvas */
+  body.dark-mode .hero-radar-chart canvas {
+    background: #333;
+    backdrop-filter: blur(10px);
+  }
+
+  /* Theme-dark support for hero radar chart */
+  body.theme-dark .hero-radar-chart {
+    background: transparent;
+    border-color: none;
+    color: var(--radar-theme-dark-text, #ffffff);
+  }
+
+  body.theme-dark .hero-radar-chart:hover {
+    box-shadow: -4px 4px 8px rgb(255 255 255 / 8%);
+  }
+
+  /* Theme-dark support for hero radar chart canvas */
+  body.theme-dark .hero-radar-chart canvas {
+    background: #333;
+    backdrop-filter: blur(10px);
+  }
+
+  /* Accessibility overrides */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-radar-demo,
+    .hero-radar-demo:hover {
+      transition: none;
+      animation: none;
+      transform: none;
+    }
+
+    .hero-radar-demo.pulse,
+    .hero-radar-demo.fade-in {
+      animation: none;
+    }
+
+    html.loaded .hero-radar-demo,
+    html.loaded .hero-radar-demo h3,
+    html.loaded .hero-radar-demo p {
+      transition: none;
+      animation: none;
+    }
+  }
+
+  /* High contrast mode */
+  @media (prefers-contrast: high) {
+    .hero {
+      background: var(--hero-background-high-contrast, #000000);
+      color: var(--hero-text-high-contrast, #ffffff);
+    }
+
+    .hero-radar-demo {
+      border-width: 3px;
+      font-weight: var(--font-weight-bold, 700);
+    }
+
+    .demo-btn {
+      border-width: 3px;
+      font-weight: var(--font-weight-bold, 700);
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    .hero-radar-demo {
+      display: none;
+    }
+  }
+
+  /* ================================
+     ACCESSIBILITY SUPPORT
+     ================================ */
+
+  /* High contrast mode adjustments for hero */
+  @media (prefers-contrast: high) {
+    /* Target the actual elements for faster transitions */
+    .hero .hero-content,
+    .hero .hero-content h1,
+    .hero .hero-content p,
+    .hero .hero-simulation,
+    .hero-title,
+    .hero-description,
+    .hero-actions {
+      animation-duration: 0.3s !important; /* Faster animations for high contrast */
+    }
+  }
+
+  /* Reduced motion preferences for hero */
+  @media (prefers-reduced-motion: reduce) {
+    /* Disable all hero keyframe animations for motion sensitivity */
+    .hero,
+    .hero-content,
+    .hero-content h1,
+    .hero-content p,
+    .hero-simulation,
+    .hero-title,
+    .hero-description,
+    .hero-actions {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+}
+
+/* ================================
+   END OF LAYERED CSS ARCHITECTURE
+   ================================ */

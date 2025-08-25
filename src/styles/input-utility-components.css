@@ -1,0 +1,691 @@
+/**
+ * Input and Utility Components Styles
+ * CSS styles for ColorPicker, DateTimePicker, NumberInput, Accordion, Drawer, and SearchBox
+ */
+
+@layer components {
+  /* =============================================================================
+   COLOR PICKER COMPONENT
+   ============================================================================= */
+
+  .color-picker {
+    display: inline-block;
+    position: relative;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .color-picker-preview {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #dee2e6;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .color-picker-preview::after {
+    content: "▼";
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    font-size: 10px;
+  }
+
+  .color-picker-popup {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
+    padding: 16px;
+    z-index: 1000;
+    min-width: 280px;
+  }
+
+  .color-picker-wheel {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    margin: 0 auto 16px;
+    position: relative;
+    background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red);
+  }
+
+  .color-picker-sliders {
+    margin-bottom: 16px;
+  }
+
+  .color-picker-slider {
+    width: 100%;
+    height: 20px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .color-picker-presets {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+    margin-top: 16px;
+  }
+
+  .color-picker-preset {
+    width: 24px;
+    height: 24px;
+    border: 1px solid #dee2e6;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+  }
+
+  .color-picker-preset:hover {
+    transform: scale(1.1);
+  }
+
+  /* =============================================================================
+   DATE TIME PICKER COMPONENT
+   ============================================================================= */
+
+  .datetime-picker {
+    display: inline-block;
+    position: relative;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .datetime-picker-input {
+    width: 200px;
+    height: 40px;
+    padding: 8px 40px 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+  }
+
+  .datetime-picker-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgb(0 123 255 / 25%);
+  }
+
+  .datetime-picker-input::after {
+    content: "📅";
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .datetime-picker-popup {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
+    z-index: 1000;
+    min-width: 320px;
+  }
+
+  .datetime-picker-header {
+    background: #007bff;
+    color: white;
+    padding: 12px 16px;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .datetime-picker-nav {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+
+  .datetime-picker-nav:hover {
+    background: rgb(255 255 255 / 10%);
+  }
+
+  .datetime-picker-calendar {
+    padding: 16px;
+  }
+
+  .datetime-picker-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  .datetime-picker-weekday {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6c757d;
+    padding: 8px 4px;
+  }
+
+  .datetime-picker-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+
+  .datetime-picker-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+  }
+
+  .datetime-picker-day:hover {
+    background: #e9ecef;
+  }
+
+  .datetime-picker-day.selected {
+    background: #007bff;
+    color: white;
+  }
+
+  .datetime-picker-day.today {
+    background: #ffc107;
+    font-weight: bold;
+  }
+
+  .datetime-picker-day.disabled {
+    color: #adb5bd;
+    cursor: not-allowed;
+  }
+
+  .datetime-picker-time {
+    padding: 16px;
+    border-top: 1px solid #dee2e6;
+  }
+
+  .datetime-picker-clock {
+    width: 160px;
+    height: 160px;
+    margin: 0 auto;
+    position: relative;
+    border: 2px solid #dee2e6;
+    border-radius: 50%;
+  }
+
+  /* =============================================================================
+   NUMBER INPUT COMPONENT
+   ============================================================================= */
+
+  .number-input {
+    display: inline-block;
+    position: relative;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .number-input-field {
+    width: 150px;
+    height: 40px;
+    padding: 8px 32px 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+    background: white;
+    text-align: left;
+  }
+
+  .number-input-field:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgb(0 123 255 / 25%);
+  }
+
+  .number-input-field:disabled {
+    background: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+  }
+
+  .number-input-controls {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 24px;
+    border-left: 1px solid #ced4da;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .number-input-control {
+    flex: 1;
+    background: #f8f9fa;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #6c757d;
+    transition: background-color 0.2s ease;
+  }
+
+  .number-input-control:hover {
+    background: #e9ecef;
+  }
+
+  .number-input-control:first-child {
+    border-bottom: 1px solid #ced4da;
+  }
+
+  /* =============================================================================
+   ACCORDION COMPONENT
+   ============================================================================= */
+
+  .accordion {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .accordion-item {
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  .accordion-item:last-child {
+    border-bottom: none;
+  }
+
+  .accordion-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    user-select: none;
+  }
+
+  .accordion-header:hover {
+    background: #e9ecef;
+  }
+
+  .accordion-header.active {
+    background: #e9ecef;
+  }
+
+  .accordion-header.disabled {
+    background: #f8f9fa;
+    color: #6c757d;
+    cursor: not-allowed;
+  }
+
+  .accordion-icon {
+    margin-right: 12px;
+    font-size: 12px;
+    transition: transform 0.2s ease;
+  }
+
+  .accordion-icon.expanded {
+    transform: rotate(90deg);
+  }
+
+  .accordion .accordion-title {
+    flex: 1;
+    font-weight: 500;
+    font-size: 14px;
+  }
+
+  .accordion-content {
+    padding: 16px;
+    background: white;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .accordion-content.collapsed {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  /* =============================================================================
+   DRAWER COMPONENT
+   ============================================================================= */
+
+  .drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgb(0 0 0 / 50%);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .drawer-overlay.visible {
+    opacity: 1;
+  }
+
+  .drawer {
+    position: fixed;
+    background: white;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
+    z-index: 1001;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .drawer.left {
+    top: 0;
+    left: 0;
+    height: 100%;
+    transform: translateX(-100%);
+  }
+
+  .drawer.left.open {
+    transform: translateX(0);
+  }
+
+  .drawer.right {
+    top: 0;
+    right: 0;
+    height: 100%;
+    transform: translateX(100%);
+  }
+
+  .drawer.right.open {
+    transform: translateX(0);
+  }
+
+  .drawer.top {
+    top: 0;
+    left: 0;
+    width: 100%;
+    transform: translateY(-100%);
+  }
+
+  .drawer.top.open {
+    transform: translateY(0);
+  }
+
+  .drawer.bottom {
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    transform: translateY(100%);
+  }
+
+  .drawer.bottom.open {
+    transform: translateY(0);
+  }
+
+  .drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #dee2e6;
+    background: #f8f9fa;
+  }
+
+  .drawer-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .drawer-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #6c757d;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+
+  .drawer-close:hover {
+    background: #e9ecef;
+  }
+
+  .drawer-content {
+    padding: 20px;
+    overflow-y: auto;
+    max-height: calc(100% - 80px);
+  }
+
+  /* =============================================================================
+   SEARCH BOX COMPONENT
+   ============================================================================= */
+
+  .search-box {
+    display: inline-block;
+    position: relative;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .search-box-input {
+    width: 300px;
+    height: 40px;
+    padding: 8px 80px 8px 40px;
+    border: 1px solid #ced4da;
+    border-radius: 20px;
+    font-size: 14px;
+    background: white;
+    transition: all 0.2s ease;
+  }
+
+  .search-box-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgb(0 123 255 / 25%);
+  }
+
+  .search-box-input:disabled {
+    background: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+  }
+
+  .search-box-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #6c757d;
+  }
+
+  .search-box-clear {
+    position: absolute;
+    right: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+  }
+
+  .search-box-clear:hover {
+    background: #e9ecef;
+  }
+
+  .search-box-button {
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    bottom: 4px;
+    background: #007bff;
+    border: none;
+    border-radius: 16px;
+    color: white;
+    cursor: pointer;
+    padding: 0 16px;
+    font-size: 12px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+  }
+
+  .search-box-button:hover {
+    background: #0056b3;
+  }
+
+  .search-box-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .search-box-suggestion {
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    border-bottom: 1px solid #f8f9fa;
+    transition: background-color 0.2s ease;
+  }
+
+  .search-box-suggestion:hover,
+  .search-box-suggestion.selected {
+    background: #f8f9fa;
+  }
+
+  .search-box-suggestion:last-child {
+    border-bottom: none;
+  }
+
+  /* =============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================= */
+
+  @media (width <= 768px) {
+    .datetime-picker-popup,
+    .color-picker-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90vw;
+      max-width: 400px;
+    }
+
+    .drawer.left,
+    .drawer.right {
+      width: 90vw;
+      max-width: 400px;
+    }
+
+    .search-box-input {
+      width: 250px;
+    }
+
+    .number-input-field {
+      width: 120px;
+    }
+  }
+
+  /* =============================================================================
+   ACCESSIBILITY ENHANCEMENTS
+   ============================================================================= */
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .color-picker-preview,
+    .datetime-picker-input,
+    .number-input-field,
+    .search-box-input {
+      border-width: 2px;
+    }
+
+    .accordion-header {
+      border: 1px solid;
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .color-picker-preset,
+    .datetime-picker-day,
+    .number-input-control,
+    .accordion-header,
+    .drawer,
+    .drawer-overlay,
+    .search-box-input,
+    .search-box-suggestion {
+      transition: none;
+    }
+
+    .accordion-icon {
+      transition: none;
+    }
+  }
+
+  /* Focus indicators for keyboard navigation */
+  .color-picker-preview:focus,
+  .datetime-picker-input:focus,
+  .number-input-field:focus,
+  .accordion-header:focus,
+  .drawer-close:focus,
+  .search-box-input:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+  }
+} /* End @layer components */

@@ -1,0 +1,1685 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="page-id" content="ethics-guide" />
+    <title>
+      SimulateAI Ethics Guide - Understanding Ethical Decision Making
+    </title>
+    <meta
+      name="description"
+      content="Learn about our ethical impact analysis framework, understand the eight ethical dimensions, and master the radar chart visualization tool."
+    />
+
+    <!-- SEO and Social Meta -->
+    <meta property="og:title" content="SimulateAI Ethics Guide" />
+    <meta
+      property="og:description"
+      content="Understanding Ethical Decision Making through Interactive Analysis"
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://simulateai.com/ethics-guide.html"
+    />
+
+    <!-- Accessibility -->
+    <meta
+      name="accessibility-features"
+      content="keyboard-navigation,skip-links,high-contrast,large-text,screen-reader-support"
+    />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="src/styles/main.css" />
+    <link rel="stylesheet" href="src/styles/shared-navigation.css" />
+    <link rel="stylesheet" href="src/styles/accessibility.css" />
+
+    <!-- Ethics Guide Specific Styles -->
+    <style>
+      :root {
+        --ethics-primary: #4c7fff;
+        --ethics-dark: #0b0f19;
+        --ethics-light: #f5f7fa;
+        --ethics-card-bg: #ffffff;
+        --ethics-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+        --ethics-border-radius: 1rem;
+      }
+
+      .ethics-wrapper {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 2rem 1rem;
+        background: var(--ethics-light);
+        border-radius: var(--ethics-border-radius);
+      }
+
+      .ethics-hero {
+        text-align: center;
+        margin-bottom: 3rem;
+      }
+
+      .ethics-hero h1 {
+        font-size: clamp(2rem, 4vw + 1rem, 3rem);
+        color: var(--ethics-primary);
+        margin-bottom: 1rem;
+      }
+
+      .ethics-hero p {
+        font-size: 1.2rem;
+        line-height: 1.6;
+        color: var(--ethics-dark);
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .ethics-nav {
+        background: var(--ethics-card-bg);
+        border-radius: var(--ethics-border-radius);
+        padding: 1.5rem;
+        margin-bottom: 3rem;
+        box-shadow: var(--ethics-shadow);
+      }
+
+      .ethics-nav ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        justify-content: center;
+      }
+
+      .ethics-nav a {
+        color: var(--ethics-primary);
+        font-weight: 600;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        transition: background-color 0.3s ease;
+      }
+
+      .ethics-nav a:hover,
+      .ethics-nav a:focus {
+        background-color: rgba(76, 127, 255, 0.1);
+        text-decoration: underline;
+      }
+
+      .ethics-section {
+        background: var(--ethics-card-bg);
+        border-radius: var(--ethics-border-radius);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--ethics-shadow);
+      }
+
+      .ethics-section h2 {
+        color: var(--ethics-primary);
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .ethics-section p,
+      .ethics-section li {
+        line-height: 1.6;
+        color: var(--ethics-dark);
+      }
+
+      .ethics-section ul {
+        padding-left: 1.5rem;
+      }
+
+      .ethics-section ul li {
+        margin-bottom: 0.5rem;
+      }
+
+      .ethics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+      }
+
+      .ethics-card {
+        background: var(--ethics-card-bg);
+        border-radius: var(--ethics-border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--ethics-shadow);
+        border: 2px solid transparent;
+        transition:
+          border-color 0.3s ease,
+          transform 0.3s ease;
+      }
+
+      .ethics-card:hover {
+        border-color: var(--ethics-primary);
+        transform: translateY(-2px);
+      }
+
+      .ethics-card h3 {
+        color: var(--ethics-primary);
+        margin-top: 0;
+        margin-bottom: 1rem;
+        font-size: 1.3rem;
+      }
+
+      .ethics-card p {
+        margin: 0;
+        color: var(--ethics-dark);
+      }
+
+      .ethics-card details summary {
+        cursor: pointer;
+        font-weight: 600;
+        color: var(--ethics-primary);
+        margin-bottom: 0.5rem;
+      }
+
+      .ethics-card details[open] summary {
+        margin-bottom: 1rem;
+      }
+
+      .chart-container {
+        position: relative;
+        min-height: 400px;
+        margin: 2rem 0;
+        padding: 1rem;
+        background: var(--ethics-card-bg);
+        border-radius: var(--ethics-border-radius);
+        box-shadow: var(--ethics-shadow);
+      }
+
+      .cta-button {
+        display: inline-block;
+        margin-top: 1.5rem;
+        padding: 1rem 2rem;
+        background: var(--ethics-primary);
+        color: white;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        font-weight: 600;
+        transition:
+          background-color 0.3s ease,
+          transform 0.3s ease;
+      }
+
+      .cta-button:hover,
+      .cta-button:focus {
+        background: #3a5acc;
+        transform: translateY(-2px);
+      }
+
+      .ethics-footer {
+        text-align: center;
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(76, 127, 255, 0.2);
+        color: #666;
+      }
+
+      .highlight-box {
+        background: rgba(76, 127, 255, 0.1);
+        border-left: 4px solid var(--ethics-primary);
+        padding: 1rem 1.5rem;
+        margin: 1.5rem 0;
+        border-radius: 0 0.5rem 0.5rem 0;
+      }
+
+      /* Ethics Table Styles */
+      .ethics-table-container {
+        overflow-x: auto;
+        margin: 2rem 0;
+        border-radius: var(--ethics-border-radius);
+        box-shadow: var(--ethics-shadow);
+      }
+
+      .ethics-dimensions-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--ethics-card-bg);
+      }
+
+      .ethics-dimensions-table th,
+      .ethics-dimensions-table td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid rgba(76, 127, 255, 0.1);
+      }
+
+      .ethics-dimensions-table th {
+        background: rgba(76, 127, 255, 0.1);
+        color: var(--ethics-primary);
+        font-weight: 600;
+      }
+
+      .ethics-dimensions-table tr:hover {
+        background: rgba(76, 127, 255, 0.05);
+      }
+
+      /* Framework Cards */
+      .frameworks-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+      }
+
+      .framework-card {
+        background: var(--ethics-card-bg);
+        border-radius: var(--ethics-border-radius);
+        overflow: hidden;
+        box-shadow: var(--ethics-shadow);
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+      }
+
+      .framework-card:hover {
+        border-color: var(--ethics-primary);
+        transform: translateY(-3px);
+      }
+
+      .framework-header {
+        background: linear-gradient(135deg, var(--ethics-primary), #3a5acc);
+        color: white;
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .framework-header h3 {
+        margin: 0;
+        font-size: 1.4rem;
+      }
+
+      .framework-badge {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.3rem 0.8rem;
+        border-radius: 1rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      .framework-content {
+        padding: 1.5rem;
+      }
+
+      .framework-content p {
+        margin-bottom: 1rem;
+      }
+
+      .framework-content ul {
+        padding-left: 1.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .framework-content li {
+        margin-bottom: 0.5rem;
+      }
+
+      .framework-example {
+        background: rgba(76, 127, 255, 0.1);
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-top: 1rem;
+        font-style: italic;
+      }
+
+      /* Learning Pathways */
+      .pathways-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 2rem;
+        margin: 2rem 0;
+      }
+
+      .pathway-level {
+        background: var(--ethics-card-bg);
+        border-radius: var(--ethics-border-radius);
+        overflow: hidden;
+        box-shadow: var(--ethics-shadow);
+        border-left: 5px solid var(--ethics-primary);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      .level-header {
+        background: linear-gradient(135deg, #f8f9ff, #e8f2ff);
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .level-number {
+        width: 3rem;
+        height: 3rem;
+        background: var(--ethics-primary);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+      }
+
+      .level-header h3 {
+        margin: 0;
+        flex: 1;
+        color: var(--ethics-primary);
+      }
+
+      .level-badge {
+        padding: 0.3rem 0.8rem;
+        border-radius: 1rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: white;
+      }
+
+      .level-badge.beginner { background: #22c55e; }
+      .level-badge.intermediate { background: #f59e0b; }
+      .level-badge.advanced { background: #ef4444; }
+      .level-badge.expert { background: #8b5cf6; }
+
+      .level-content {
+        padding: 1.5rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .gamification-badge {
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        border: 2px solid #f59e0b;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-top: auto;
+        font-weight: 600;
+      }
+
+      /* Contributor Pledge */
+      .pledge-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin: 2rem 0;
+      }
+
+      .pledge-card {
+        background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+        border: 2px solid var(--ethics-primary);
+        border-radius: var(--ethics-border-radius);
+        padding: 2rem;
+      }
+
+      .pledge-card h3 {
+        color: var(--ethics-primary);
+        margin-top: 0;
+        text-align: center;
+      }
+
+      .pledge-items {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .pledge-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .pledge-icon {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+      }
+
+      .pledge-item p {
+        margin: 0;
+      }
+
+      .pledge-guidelines {
+        background: var(--ethics-card-bg);
+        border-radius: var(--ethics-border-radius);
+        padding: 2rem;
+        box-shadow: var(--ethics-shadow);
+      }
+
+      .pledge-guidelines h3 {
+        color: var(--ethics-primary);
+        margin-top: 0;
+      }
+
+      .pledge-guidelines ul {
+        padding-left: 1.5rem;
+      }
+
+      .pledge-guidelines li {
+        margin-bottom: 0.8rem;
+      }
+
+      /* Ethics Quiz Styles */
+      .ethics-quiz-section {
+        background: 
+          repeating-linear-gradient(
+            transparent,
+            transparent 94px,
+            #d63447 95px,
+            #d63447 96px,
+            transparent 97px
+          ),
+          repeating-linear-gradient(
+            white,
+            white 24px,
+            #e7eff8 25px
+          );
+        border-left: 5px solid #343434;
+        border-radius: var(--ethics-border-radius);
+        padding: 3rem 2rem;
+        margin: 3rem 0;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        position: relative;
+      }
+
+      .ethics-quiz-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(247, 250, 255, 0.95) 100%);
+        border-radius: var(--ethics-border-radius);
+        z-index: 1;
+      }
+
+      .ethics-quiz-section > * {
+        position: relative;
+        z-index: 2;
+      }
+
+      .ethics-quiz-section h2 {
+        color: var(--ethics-primary);
+        text-align: center;
+        margin-bottom: 1rem;
+        font-size: 2.2rem;
+        font-family: 'Georgia', serif;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      }
+
+      .quiz-intro {
+        text-align: center;
+        font-size: 1.2rem;
+        margin-bottom: 2.5rem;
+        color: var(--ethics-dark);
+        line-height: 1.6;
+        font-style: italic;
+      }
+
+      .quiz-container {
+        max-width: 700px;
+        margin: 0 auto;
+      }
+
+      .quiz-question {
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 0.8rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 2px solid rgba(76, 127, 255, 0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        backdrop-filter: blur(5px);
+      }
+
+      .quiz-question h3 {
+        color: var(--ethics-primary);
+        margin-bottom: 1rem;
+        font-size: 1.3rem;
+        font-family: 'Georgia', serif;
+      }
+
+      .quiz-question p {
+        color: var(--ethics-dark);
+        line-height: 1.6;
+        margin-bottom: 1.2rem;
+      }
+
+      .quiz-options {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+
+      .quiz-option {
+        background: white;
+        color: var(--ethics-dark);
+        border: 2px solid #e7eff8;
+        border-radius: 0.5rem;
+        padding: 1rem 1.5rem;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        font-weight: 500;
+        line-height: 1.5;
+        font-family: inherit;
+      }
+
+      .quiz-option:hover {
+        background: #f8fafe;
+        border-color: var(--ethics-primary);
+        transform: translateX(8px);
+        box-shadow: 0 3px 10px rgba(76, 127, 255, 0.2);
+      }
+
+      .quiz-option.selected {
+        background: var(--ethics-primary);
+        color: white;
+        border-color: var(--ethics-primary);
+        transform: translateX(8px);
+        box-shadow: 0 4px 12px rgba(76, 127, 255, 0.3);
+      }
+
+      .quiz-results {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 0.8rem;
+        padding: 2rem;
+        margin-top: 2rem;
+        text-align: center;
+        border: 2px solid var(--ethics-primary);
+        box-shadow: 0 4px 15px rgba(76, 127, 255, 0.2);
+        display: none;
+      }
+
+      .quiz-results.show {
+        display: block;
+        animation: fadeInUp 0.5s ease;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .quiz-score {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        color: var(--ethics-primary);
+      }
+
+      .quiz-message {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        color: var(--ethics-dark);
+      }
+
+      .quiz-restart-btn {
+        background: var(--ethics-primary);
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.8rem 2rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .quiz-restart-btn:hover {
+        background: #3a5acc;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(76, 127, 255, 0.3);
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .ethics-wrapper {
+          margin: 1rem;
+          padding: 1rem;
+        }
+
+        .ethics-nav ul {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .ethics-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .frameworks-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .pledge-container {
+          grid-template-columns: 1fr;
+        }
+
+        .level-header {
+          flex-direction: column;
+          text-align: center;
+          gap: 0.5rem;
+        }
+
+        .pathways-container {
+          grid-template-columns: 1fr;
+          grid-template-rows: auto;
+        }
+
+        .ethics-dimensions-table {
+          font-size: 0.9rem;
+        }
+
+        .ethics-dimensions-table th,
+        .ethics-dimensions-table td {
+          padding: 0.5rem;
+        }
+      }
+    </style>
+
+    <!-- Icons and Favicons -->
+    <link rel="icon" type="image/svg+xml" href="src/assets/icons/favicon.svg" />
+    <link rel="icon" type="image/png" href="src/assets/icons/favicon.png" />
+
+    <!-- Chart.js for radar demonstration -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"
+      defer
+    ></script>
+  </head>
+
+  <body class="ethics-guide-page" data-page-id="ethics-guide">
+    <!-- Skip to content for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- ARIA live regions for announcements -->
+    <div
+      id="aria-live-polite"
+      aria-live="polite"
+      aria-atomic="true"
+      class="sr-only"
+    ></div>
+    <div
+      id="aria-live-assertive"
+      aria-live="assertive"
+      aria-atomic="true"
+      class="sr-only"
+    ></div>
+
+    <!-- Enhanced Header -->
+    <div id="navigation-container">
+      <!-- Shared navigation will be injected here -->
+    </div>
+
+    <!-- Main Content -->
+    <main id="main-content" class="ethics-wrapper">
+      <!-- Hero Section -->
+      <header class="ethics-hero">
+        <h1>SimulateAI Ethics Guide</h1>
+        <p>
+          Welcome! This page unpacks <strong>how our radar chart works</strong>,
+          what each ethical dimension means, and how to get the most out of
+          every simulation. Learn to navigate complex ethical decisions with
+          confidence.
+        </p>
+      </header>
+
+      <!-- In-page Navigation -->
+      <nav class="ethics-nav" aria-label="Ethics Guide sections">
+        <ul>
+          <li><a href="#radar-analysis">Radar Chart Analysis</a></li>
+          <li><a href="#ethical-dimensions">Ethical Dimensions</a></li>
+          <li><a href="#philosophical-frameworks">Philosophical Frameworks</a></li>
+          <li><a href="#learning-pathways">Learning Pathways</a></li>
+          <li><a href="#contributor-ethics">Contributor Ethics</a></li>
+          <li><a href="#ethics-quiz">Ethics Quiz</a></li>
+          <li><a href="#practical-application">Practical Application</a></li>
+        </ul>
+      </nav>
+
+      <!-- Radar Chart Section -->
+      <section id="radar-analysis" class="ethics-section">
+        <h2>Understanding Ethical Impact Analysis <span>🌐</span></h2>
+
+        <p>
+          Our interactive radar chart <em>visualizes</em> the ripple-effects of
+          your choices across <strong>eight ethical dimensions</strong>. Rather
+          than labeling answers "right" or "wrong," it highlights trade-offs so
+          you can debate, iterate, and learn.
+        </p>
+
+        <ul>
+          <li>
+            🎯 <strong>Real-Time Ethics Visualization</strong> — see scores
+            update instantly as you make decisions
+          </li>
+          <li>
+            📊 <strong>Multi-Dimensional Analysis</strong> — notice how boosting
+            privacy might reduce transparency, or vice-versa
+          </li>
+          <li>
+            🔍 <strong>Educational Discovery</strong> — there's no perfect
+            shape; use the chart to compare ethical frameworks in context
+          </li>
+          <li>
+            ⚖️ <strong>Balanced Decision Making</strong> — understand the
+            ethical implications of your choices before implementing them
+          </li>
+        </ul>
+
+        <div class="chart-container">
+          <canvas
+            id="radarDemo"
+            aria-label="Interactive radar chart showing ethical impact across eight dimensions"
+          ></canvas>
+        </div>
+
+        <div class="highlight-box">
+          <p>
+            <strong>What am I looking at?</strong> Each axis represents one
+            ethical dimension (see below). A larger area along an axis indicates
+            a stronger positive impact in that domain. Scenarios rarely maximize
+            all axes; ethical reasoning is about <em>balancing</em> them
+            thoughtfully.
+          </p>
+        </div>
+      </section>
+
+    <!-- Ethical Dimensions Glossary -->
+    <section id="ethical-dimensions" class="ethics-section">
+      <h2>Ethical Dimensions Overview <span>📚</span></h2>
+      <p>
+        The ethical radar chart in SimulateAI visualizes how choices impact eight interrelated ethical dimensions. 
+        Understanding these helps users interpret trade-offs and explore richer decision-making. Each dimension 
+        interacts with others, creating complex ethical landscapes that mirror real-world decision-making.
+      </p>
+
+      <!-- Dimensions Table -->
+      <div class="ethics-table-container">
+        <table class="ethics-dimensions-table">
+          <thead>
+            <tr>
+              <th>Dimension</th>
+              <th>Description</th>
+              <th>Key Considerations</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Autonomy</strong></td>
+              <td>Respect for individuals' decision-making and control over their lives</td>
+              <td>Informed consent, freedom of choice, self-determination</td>
+            </tr>
+            <tr>
+              <td><strong>Fairness</strong></td>
+              <td>Promotion of justice, equity, and non-discrimination</td>
+              <td>Distributional justice, procedural fairness, equal opportunity</td>
+            </tr>
+            <tr>
+              <td><strong>Privacy</strong></td>
+              <td>Protection of personal boundaries and data</td>
+              <td>Data collection, storage, sharing, personal control</td>
+            </tr>
+            <tr>
+              <td><strong>Transparency</strong></td>
+              <td>Openness in actions, data, and reasoning</td>
+              <td>Accessible information, clear communication, honest disclosure</td>
+            </tr>
+            <tr>
+              <td><strong>Accountability</strong></td>
+              <td>Responsibility for decisions and consequences</td>
+              <td>Clear ownership, oversight mechanisms, remedies for problems</td>
+            </tr>
+            <tr>
+              <td><strong>Well-being</strong></td>
+              <td>Positive outcomes for individual and societal health</td>
+              <td>Maximizing benefits, minimizing harm, stakeholder welfare</td>
+            </tr>
+            <tr>
+              <td><strong>Sustainability</strong></td>
+              <td>Long-term viability and environmental stewardship</td>
+              <td>Resource consumption, environmental impact, future generations</td>
+            </tr>
+            <tr>
+              <td><strong>Inclusivity</strong></td>
+              <td>Recognition and integration of diverse perspectives</td>
+              <td>Cultural sensitivity, accessibility, representation</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="highlight-box">
+        <h3>📘 Real-World Example</h3>
+        <p>
+          <strong>Scenario:</strong> Implementing facial recognition in a school
+        </p>
+        <ul>
+          <li><strong>High Accountability:</strong> Enhanced oversight and security monitoring</li>
+          <li><strong>Moderate Transparency:</strong> Clear policies but complex technical implementation</li>
+          <li><strong>Low Privacy:</strong> Continuous biometric surveillance of students</li>
+          <li><strong>Ambiguous Inclusivity:</strong> Depends on training data bias and cultural considerations</li>
+        </ul>
+        <p>This example shows how a single decision can have varied impacts across dimensions, requiring careful consideration of trade-offs.</p>
+      </div>
+
+      <div class="ethics-grid">
+        <div class="ethics-card">
+          <details open>
+            <summary>
+              <h3>Fairness</h3>
+            </summary>
+            <p>
+              Treats all individuals and groups equitably, ensuring unbiased
+              and just outcomes for everyone involved. Considers
+              distributional justice, procedural fairness, and equal
+              opportunity regardless of background or identity.
+            </p>
+          </details>
+        </div>
+
+        <div class="ethics-card">
+          <details>
+            <summary>
+              <h3>Sustainability</h3>
+            </summary>
+            <p>
+              Supports long-term ecological and social well-being, considering
+              environmental and societal impacts. Evaluates resource
+              consumption, environmental footprint, and intergenerational
+              responsibility.
+            </p>
+          </details>
+        </div>
+
+        <div class="ethics-card">
+          <details>
+            <summary>
+              <h3>Autonomy</h3>
+            </summary>
+            <p>
+              Respects individual control and self-determination, preserving
+              people's ability to make their own choices. Emphasizes informed
+              consent, freedom of choice, and resistance to coercion or
+              manipulation.
+            </p>
+          </details>
+        </div>
+
+        <div class="ethics-card">
+          <details>
+            <summary>
+              <h3>Beneficence</h3>
+            </summary>
+            <p>
+              Promotes well-being and prevents harm, actively working to
+              benefit individuals and communities. Focuses on maximizing
+              positive outcomes while minimizing negative consequences for all
+              stakeholders.
+            </p>
+          </details>
+        </div>
+
+        <div class="ethics-card">
+          <details>
+            <summary>
+              <h3>Transparency</h3>
+            </summary>
+            <p>
+              Provides openness in decision-making processes, ensuring clarity
+              about how and why decisions are made. Includes accessible
+              information, clear communication, and honest disclosure of
+              relevant factors.
+            </p>
+          </details>
+        </div>
+
+        <div class="ethics-card">
+          <details>
+            <summary>
+              <h3>Accountability</h3>
+            </summary>
+            <p>
+              Ensures clear responsibility for decisions, with mechanisms for
+              oversight and consequences for actions. Establishes who is
+              responsible, how they can be held accountable, and what remedies
+              exist for problems.
+            </p>
+          </details>
+        </div>
+
+        <div class="ethics-card">
+          <details>
+            <summary>
+              <h3>Privacy</h3>
+            </summary>
+            <p>
+              Protects personal information and data rights, safeguarding
+              individual confidentiality and control over personal data.
+              Considers data collection, storage, sharing, and the right to
+              control one's personal information.
+            </p>
+          </details>
+        </div>
+
+        <div class="ethics-card">
+          <details>
+            <summary>
+              <h3>Proportionality</h3>
+            </summary>
+            <p>
+              Balances benefits against severity of impact, ensuring responses
+              are appropriate to the situation's scale and context. Evaluates
+              whether the means justify the ends and if the response matches
+              the magnitude of the issue.
+            </p>
+          </details>
+        </div>
+      </div>
+
+      <div class="highlight-box">
+        <p>
+          <strong>Important:</strong> These dimensions often interact or even
+          conflict with each other. Ethical practice is the art of balancing
+          them thoughtfully within specific contexts and constraints.
+        </p>
+    </section>
+
+    <!-- Philosophical Frameworks Section -->
+    <section id="philosophical-frameworks" class="ethics-section">
+      <h2>Framework Tagging & Comparative Ethics <span>🎯</span></h2>
+      <p>
+        Users can explore or remix scenarios by applying major philosophical frameworks. 
+        This layered lens allows ethical reasoning to move beyond "right/wrong" and into 
+        <em>why</em> and <em>for whom</em> different approaches matter.
+      </p>
+
+      <div class="frameworks-grid">
+        <div class="framework-card">
+          <div class="framework-header">
+            <h3>🛡️ Virtue Ethics</h3>
+            <span class="framework-badge">Character-Based</span>
+          </div>
+          <div class="framework-content">
+            <p><strong>Core Question:</strong> What kind of character or virtues does this decision encourage?</p>
+            <p><strong>Focus:</strong> The moral character of the decision-maker and the virtues they embody</p>
+            <ul>
+              <li><strong>Compassion:</strong> Does this action show care for others' wellbeing?</li>
+              <li><strong>Courage:</strong> Does this require moral bravery to do what's right?</li>
+              <li><strong>Humility:</strong> Does this acknowledge limitations and seek wisdom?</li>
+              <li><strong>Justice:</strong> Does this reflect fairness and respect for rights?</li>
+            </ul>
+            <div class="framework-example">
+              <strong>Example:</strong> A teacher choosing to report suspected abuse demonstrates courage and compassion, 
+              even if the immediate consequences are uncertain.
+            </div>
+          </div>
+        </div>
+
+        <div class="framework-card">
+          <div class="framework-header">
+            <h3>⚖️ Utilitarianism</h3>
+            <span class="framework-badge">Outcome-Based</span>
+          </div>
+          <div class="framework-content">
+            <p><strong>Core Question:</strong> Which option leads to the greatest overall benefit or least harm for the most people?</p>
+            <p><strong>Focus:</strong> Maximizing aggregate well-being and minimizing suffering</p>
+            <ul>
+              <li><strong>Consequences:</strong> What are the likely outcomes for all affected parties?</li>
+              <li><strong>Scale:</strong> How many people are helped vs. harmed?</li>
+              <li><strong>Intensity:</strong> How significant are the benefits and harms?</li>
+              <li><strong>Distribution:</strong> Are benefits and burdens fairly shared?</li>
+            </ul>
+            <div class="framework-example">
+              <strong>Example:</strong> Implementing a vaccine mandate may restrict individual freedom but could 
+              prevent widespread illness and save lives in the broader population.
+            </div>
+          </div>
+        </div>
+
+        <div class="framework-card">
+          <div class="framework-header">
+            <h3>📋 Deontology</h3>
+            <span class="framework-badge">Duty-Based</span>
+          </div>
+          <div class="framework-content">
+            <p><strong>Core Question:</strong> Are we upholding duties, rights, or rules regardless of outcomes?</p>
+            <p><strong>Focus:</strong> Universal moral principles and categorical imperatives</p>
+            <ul>
+              <li><strong>Universalizability:</strong> Could this action become a universal law?</li>
+              <li><strong>Human Dignity:</strong> Does this treat people as ends in themselves?</li>
+              <li><strong>Rights:</strong> Does this respect fundamental human rights?</li>
+              <li><strong>Duties:</strong> Does this fulfill moral obligations (honesty, promise-keeping)?</li>
+            </ul>
+            <div class="framework-example">
+              <strong>Example:</strong> Refusing to lie to protect someone, even if the lie would prevent harm, 
+              because honesty is a fundamental duty that should never be violated.
+            </div>
+          </div>
+        </div>
+
+        <div class="framework-card">
+          <div class="framework-header">
+            <h3>💝 Care Ethics</h3>
+            <span class="framework-badge">Relationship-Based</span>
+          </div>
+          <div class="framework-content">
+            <p><strong>Core Question:</strong> How do we maintain and nurture relationships while responding to the needs of those who are vulnerable?</p>
+            <p><strong>Focus:</strong> Relationships, interdependence, contextual care, and emotional responsiveness</p>
+            <ul>
+              <li><strong>Relationships:</strong> How does this decision affect bonds between people?</li>
+              <li><strong>Vulnerability:</strong> Who is most at risk and needs protection or support?</li>
+              <li><strong>Context:</strong> What are the specific circumstances and histories involved?</li>
+              <li><strong>Emotional Intelligence:</strong> How do we respond to emotional needs with empathy?</li>
+            </ul>
+            <div class="framework-example">
+              <strong>Example:</strong> A nurse prioritizing extra time with an anxious patient over completing paperwork, 
+              recognizing that emotional care and human connection are as important as administrative efficiency.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="highlight-box">
+        <h3>🔄 Framework Integration in Practice</h3>
+        <p>
+          Rather than choosing just one framework, SimulateAI encourages users to apply all four lenses 
+          to the same scenario. This reveals different ethical dimensions and helps develop more nuanced 
+          moral reasoning. Often, frameworks may conflict—and that's where the real learning happens.
+        </p>
+        <p>
+          <strong>Try this:</strong> Pick any scenario and ask yourself all four questions. Notice how 
+          your reasoning changes and which aspects each framework highlights or overlooks.
+        </p>
+      </div>
+    </section>
+
+    <!-- Learning Pathways Section -->
+    <section id="learning-pathways" class="ethics-section">
+      <h2>Learning Pathways <span>🚀</span></h2>
+      <p>
+        To encourage progressive exploration and growth, SimulateAI outlines four levels of ethical fluency. 
+        Each level builds on the previous, creating a structured path for developing sophisticated ethical reasoning skills.
+      </p>
+
+      <div class="pathways-container">
+        <div class="pathway-level">
+          <div class="level-header">
+            <span class="level-number">1</span>
+            <h3>Radar Explorer</h3>
+            <div class="level-badge beginner">Beginner</div>
+          </div>
+          <div class="level-content">
+            <p><strong>Goal:</strong> Engage with radar chart feedback while making choices</p>
+            <ul>
+              <li>Recognize trade-offs and dimension shifts as you make decisions</li>
+              <li>Observe how different choices affect the radar pattern</li>
+              <li>Complete at least 3 scenarios while paying attention to the radar</li>
+              <li>Notice which dimensions you naturally prioritize</li>
+            </ul>
+            <div class="gamification-badge">
+              🌍 <strong>Badge:</strong> "Ethical Cartographer" - Map all 8 dimensions in at least 3 distinct scenarios
+            </div>
+          </div>
+        </div>
+
+        <div class="pathway-level">
+          <div class="level-header">
+            <span class="level-number">2</span>
+            <h3>Ethical Lens Remixer</h3>
+            <div class="level-badge intermediate">Intermediate</div>
+          </div>
+          <div class="level-content">
+            <p><strong>Goal:</strong> Revisit completed scenarios and tag decisions using philosophical frameworks</p>
+            <ul>
+              <li>Apply virtue ethics, utilitarianism, deontology, and care ethics to past decisions</li>
+              <li>Identify where frameworks agree and disagree</li>
+              <li>Understand how different ethical lenses change your perspective</li>
+              <li>Practice switching between frameworks fluidly</li>
+            </ul>
+            <div class="gamification-badge">
+              🔍 <strong>Badge:</strong> "Framework Synthesist" - Correctly apply all 4 philosophical lenses in reflection prompts
+            </div>
+          </div>
+        </div>
+
+        <div class="pathway-level">
+          <div class="level-header">
+            <span class="level-number">3</span>
+            <h3>Scenario Contributor</h3>
+            <div class="level-badge advanced">Advanced</div>
+          </div>
+          <div class="level-content">
+            <p><strong>Goal:</strong> Design your own scenario with clear ethical tensions</p>
+            <ul>
+              <li>Create scenarios that highlight meaningful ethical dilemmas</li>
+              <li>Include clear context and framework annotations</li>
+              <li>Balance multiple stakeholder perspectives</li>
+              <li>Design choices that create interesting radar patterns</li>
+            </ul>
+            <div class="gamification-badge">
+              ✨ <strong>Badge:</strong> "Scenario Architect" - Successfully publish a well-received ethical scenario
+            </div>
+          </div>
+        </div>
+
+        <div class="pathway-level">
+          <div class="level-header">
+            <span class="level-number">4</span>
+            <h3>Meta-Analyst</h3>
+            <div class="level-badge expert">Expert</div>
+          </div>
+          <div class="level-content">
+            <p><strong>Goal:</strong> Join collaborative research projects analyzing aggregated data</p>
+            <ul>
+              <li>Analyze radar data patterns across age, region, or theme</li>
+              <li>Identify cultural and demographic trends in ethical reasoning</li>
+              <li>Contribute to research on moral psychology and decision-making</li>
+              <li>Lead discussions on ethical education and policy implications</li>
+            </ul>
+            <div class="gamification-badge">
+              🤝 <strong>Badge:</strong> "Moral Dialogue Leader" - Facilitate group discussion or publish an ethical remix
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="highlight-box">
+        <h3>🎮 Gamification & Recognition</h3>
+        <p>
+          Each level includes achievement badges and recognition for meaningful contributions to the SimulateAI 
+          community. These aren't just points—they represent genuine growth in ethical reasoning and leadership.
+        </p>
+      </div>
+    </section>
+
+    <!-- Contributor Ethics Section -->
+    <section id="contributor-ethics" class="ethics-section">
+      <h2>Contributor Ethics Pledge <span>🤝</span></h2>
+      <p>
+        All scenario creators are asked to follow a shared ethical baseline to foster educational integrity 
+        and maintain the quality of SimulateAI's learning environment. This pledge ensures that our platform 
+        remains a space for genuine ethical exploration and growth.
+      </p>
+
+      <div class="pledge-container">
+        <div class="pledge-card">
+          <h3>📜 Contributor Ethics Pledge</h3>
+          <div class="pledge-items">
+            <div class="pledge-item">
+              <span class="pledge-icon">🌐</span>
+              <p><strong>I acknowledge the plurality of ethical frameworks</strong> and respect philosophical disagreement as a source of learning, not conflict.</p>
+            </div>
+            <div class="pledge-item">
+              <span class="pledge-icon">⚖️</span>
+              <p><strong>I avoid moral scoring, deterministic outcomes, or reductive binaries</strong> that oversimplify complex ethical questions.</p>
+            </div>
+            <div class="pledge-item">
+              <span class="pledge-icon">❤️</span>
+              <p><strong>I respect the emotional complexity of lived experiences</strong> and diverse cultural norms in my scenario design.</p>
+            </div>
+            <div class="pledge-item">
+              <span class="pledge-icon">🎓</span>
+              <p><strong>I prioritize clarity, challenge, and learning</strong>—inviting reflection over persuasion or indoctrination.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="pledge-guidelines">
+          <h3>📋 Practical Guidelines</h3>
+          <ul>
+            <li><strong>Context First:</strong> Provide rich background that helps users understand stakeholder perspectives</li>
+            <li><strong>Multiple Viewpoints:</strong> Include diverse voices and consider marginalized communities</li>
+            <li><strong>Authentic Dilemmas:</strong> Create scenarios where there are genuine trade-offs, not obvious "right" answers</li>
+            <li><strong>Cultural Sensitivity:</strong> Be aware of cultural differences in ethical reasoning and avoid stereotypes</li>
+            <li><strong>Educational Focus:</strong> Design scenarios that teach ethical reasoning skills, not specific political positions</li>
+            <li><strong>Respectful Tone:</strong> Use language that invites exploration rather than judgment</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="highlight-box">
+        <h3>🛡️ Community Standards</h3>
+        <p>
+          By following this pledge, contributors help maintain SimulateAI as a trusted educational resource 
+          where users can explore difficult questions in a supportive, intellectually honest environment. 
+          Our review process ensures all scenarios meet these standards before publication.
+        </p>
+      </div>
+    </section>
+
+    <!-- Ethics Quiz Section -->
+    <section id="ethics-quiz" class="ethics-quiz-section">
+      <h2>🖋️ Put Your Ethics to the Test</h2>
+      <p class="quiz-intro">
+        Explore how your instincts align with ethical dimensions using this 5-question quiz.
+      </p>
+      
+      <div class="quiz-container">
+        <div class="quiz-question" data-question="1">
+          <h3>Question 1: AI and Healthcare Privacy</h3>
+          <p>A hospital wants to use AI to predict patient outcomes, but this requires sharing patient data with a tech company. What's your primary concern?</p>
+          <div class="quiz-options">
+            <button class="quiz-option" data-dimension="privacy">Patient privacy and consent must be the top priority</button>
+            <button class="quiz-option" data-dimension="utility">The potential to save lives outweighs privacy concerns</button>
+            <button class="quiz-option" data-dimension="fairness">Ensuring all patient groups benefit equally from the AI</button>
+            <button class="quiz-option" data-dimension="autonomy">Patients should have full control over their data usage</button>
+          </div>
+        </div>
+
+        <div class="quiz-question" data-question="2">
+          <h3>Question 2: Autonomous Vehicle Dilemma</h3>
+          <p>A self-driving car must choose between hitting one person or swerving to hit three people. How should the AI be programmed?</p>
+          <div class="quiz-options">
+            <button class="quiz-option" data-dimension="utility">Minimize total harm - choose the option with fewer casualties</button>
+            <button class="quiz-option" data-dimension="fairness">All lives are equal - the choice should be random</button>
+            <button class="quiz-option" data-dimension="autonomy">The human owner should bear responsibility for such decisions</button>
+            <button class="quiz-option" data-dimension="privacy">Focus on preventing such scenarios entirely through better design</button>
+          </div>
+        </div>
+
+        <div class="quiz-question" data-question="3">
+          <h3>Question 3: AI Job Displacement</h3>
+          <p>An AI system can perform a job faster and cheaper than humans, potentially eliminating 1000 jobs. What should the company prioritize?</p>
+          <div class="quiz-options">
+            <button class="quiz-option" data-dimension="utility">Economic efficiency and competitive advantage</button>
+            <button class="quiz-option" data-dimension="fairness">Worker retraining and gradual transition support</button>
+            <button class="quiz-option" data-dimension="innovation">Technological progress for societal advancement</button>
+            <button class="quiz-option" data-dimension="autonomy">Community impact and local economic stability</button>
+          </div>
+        </div>
+
+        <div class="quiz-question" data-question="4">
+          <h3>Question 4: AI Content Moderation</h3>
+          <p>An AI moderates millions of social media posts daily. It occasionally removes legitimate content while missing some harmful posts. What's most important?</p>
+          <div class="quiz-options">
+            <button class="quiz-option" data-dimension="accuracy">Improving AI accuracy to reduce false positives and negatives</button>
+            <button class="quiz-option" data-dimension="transparency">Making the AI's decision process transparent to users</button>
+            <button class="quiz-option" data-dimension="fairness">Providing robust human review and appeals processes</button>
+            <button class="quiz-option" data-dimension="privacy">Ensuring diverse perspectives in AI training and oversight</button>
+          </div>
+        </div>
+
+        <div class="quiz-question" data-question="5">
+          <h3>Question 5: Predictive Policing AI</h3>
+          <p>Police want to use AI to predict where crimes might occur, but the data reflects historical biases. What's your main concern?</p>
+          <div class="quiz-options">
+            <button class="quiz-option" data-dimension="fairness">Perpetuating and amplifying existing racial and social biases</button>
+            <button class="quiz-option" data-dimension="utility">Whether the system actually reduces crime rates</button>
+            <button class="quiz-option" data-dimension="transparency">Ensuring proper human oversight and accountability</button>
+            <button class="quiz-option" data-dimension="privacy">Protecting constitutional rights and civil liberties</button>
+          </div>
+        </div>
+
+        <div class="quiz-results" id="quiz-results">
+          <div class="quiz-score" id="quiz-score"></div>
+          <div class="quiz-message" id="quiz-message"></div>
+          <button class="quiz-restart-btn" onclick="restartQuiz()">Take Quiz Again</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Practical Application Section -->
+      <section id="practical-application" class="ethics-section">
+        <h2>Ready to Put Theory into Practice?</h2>
+        <p>
+          Jump into a simulation, watch the radar chart evolve as you make
+          decisions, and revisit this guide any time to deepen your analysis.
+          Every choice you make will be reflected across these eight dimensions.
+        </p>
+
+        <div class="highlight-box">
+          <p>
+            <strong>Pro Tip:</strong> Try running the same scenario multiple
+            times with different ethical priorities. Notice how your radar chart
+            changes and what trade-offs emerge. This is where real learning
+            happens!
+          </p>
+        </div>
+
+        <a class="cta-button" href="app.html#categories"
+          >Explore Scenarios 🚀</a
+        >
+        <a class="cta-button" href="index.html" style="margin-left: 1rem"
+          >Return Home</a
+        >
+      </section>
+
+      <!-- Footer -->
+      <footer class="ethics-footer">
+        <p>
+          © 2025 SimulateAI • <a href="#main-content">Back to top</a> •
+          <a href="about.html">Learn More About SimulateAI</a>
+        </p>
+      </footer>
+    </main>
+
+    <!-- Professional Footer will be inserted here -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Professional Footer Component -->
+    <script
+      type="module"
+      src="src/js/components/professional-footer.js"
+    ></script>
+
+    <!-- Back to Top Component -->
+    <script type="module" src="src/js/components/back-to-top.js"></script>
+
+    <!-- Shared Navigation Component -->
+    <script type="module">
+      // Ensure the page is fully loaded before initializing navigation
+      setTimeout(() => {
+        import('./src/js/components/shared-navigation.js');
+      }, 100);
+    </script>
+
+    <!-- Chart.js Demo Script -->
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const ctx = document.getElementById('radarDemo');
+        if (!ctx) return;
+
+        // Example data showing ethical trade-offs
+        new Chart(ctx, {
+          type: 'radar',
+          data: {
+            labels: [
+              'Fairness',
+              'Sustainability',
+              'Autonomy',
+              'Beneficence',
+              'Transparency',
+              'Accountability',
+              'Privacy',
+              'Proportionality',
+            ],
+            datasets: [
+              {
+                label: 'Sample Ethical Decision',
+                data: [75, 45, 80, 65, 60, 85, 40, 70],
+                fill: true,
+                backgroundColor: 'rgba(76, 127, 255, 0.2)',
+                borderColor: 'rgba(76, 127, 255, 1)',
+                borderWidth: 2,
+                tension: 0.3,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              r: {
+                min: 0,
+                max: 100,
+                ticks: {
+                  stepSize: 20,
+                  font: { size: 12 },
+                },
+                grid: {
+                  circular: false,
+                  color: 'rgba(76, 127, 255, 0.1)',
+                },
+                angleLines: {
+                  color: 'rgba(76, 127, 255, 0.2)',
+                },
+                pointLabels: {
+                  font: { size: 14, weight: 'bold' },
+                  color: '#4c7fff',
+                },
+              },
+            },
+            plugins: {
+              legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                  font: { size: 14 },
+                  color: '#0b0f19',
+                },
+              },
+              tooltip: {
+                enabled: true,
+                backgroundColor: 'rgba(76, 127, 255, 0.9)',
+                titleColor: 'white',
+                bodyColor: 'white',
+                borderColor: '#4c7fff',
+                borderWidth: 1,
+              },
+            },
+            interaction: {
+              intersect: false,
+            },
+          },
+        });
+      });
+
+      // Smooth scrolling for anchor links
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+          anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (!href || href === '#') return;
+
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+              target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+              });
+            }
+          });
+        });
+      });
+    </script>
+
+    <!-- Ethics Quiz Script -->
+    <script>
+      let quizAnswers = {};
+      let currentQuestion = 1;
+      const totalQuestions = 5;
+
+      // Initialize quiz
+      document.addEventListener('DOMContentLoaded', function() {
+        setupQuizListeners();
+      });
+
+      function setupQuizListeners() {
+        const quizOptions = document.querySelectorAll('.quiz-option');
+        
+        quizOptions.forEach(option => {
+          option.addEventListener('click', function() {
+            const questionDiv = this.closest('.quiz-question');
+            const questionNum = questionDiv.dataset.question;
+            const dimension = this.dataset.dimension;
+            
+            // Remove previous selection
+            questionDiv.querySelectorAll('.quiz-option').forEach(opt => {
+              opt.classList.remove('selected');
+            });
+            
+            // Add selection to clicked option
+            this.classList.add('selected');
+            
+            // Store answer
+            quizAnswers[questionNum] = dimension;
+            
+            // Check if all questions are answered
+            if (Object.keys(quizAnswers).length === totalQuestions) {
+              setTimeout(() => {
+                showQuizResults();
+              }, 500);
+            }
+          });
+        });
+      }
+
+      function showQuizResults() {
+        // Count dimension preferences
+        const dimensionCounts = {};
+        Object.values(quizAnswers).forEach(dimension => {
+          dimensionCounts[dimension] = (dimensionCounts[dimension] || 0) + 1;
+        });
+
+        // Find dominant dimension(s)
+        const maxCount = Math.max(...Object.values(dimensionCounts));
+        const dominantDimensions = Object.entries(dimensionCounts)
+          .filter(([dim, count]) => count === maxCount)
+          .map(([dim, count]) => dim);
+
+        // Generate results
+        const resultsDiv = document.getElementById('quiz-results');
+        const scoreDiv = document.getElementById('quiz-score');
+        const messageDiv = document.getElementById('quiz-message');
+
+        const results = generateQuizMessage(dominantDimensions, maxCount);
+        
+        scoreDiv.textContent = `${Object.keys(quizAnswers).length}/${totalQuestions} Questions Completed`;
+        messageDiv.innerHTML = results.message;
+        
+        resultsDiv.classList.add('show');
+        resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      function generateQuizMessage(dominantDimensions, maxCount) {
+        const dimensionMessages = {
+          privacy: {
+            title: "Privacy Champion 🛡️",
+            description: "You prioritize data protection and individual privacy rights. You believe technology should serve people while respecting their personal boundaries and consent."
+          },
+          utility: {
+            title: "Utilitarian Thinker ⚖️", 
+            description: "You focus on maximizing overall benefit and minimizing harm. You believe in making decisions that create the greatest good for the greatest number of people."
+          },
+          fairness: {
+            title: "Equity Advocate 🤝",
+            description: "You emphasize fair treatment and equal opportunities for all. You believe systems should be designed to prevent discrimination and promote justice."
+          },
+          autonomy: {
+            title: "Autonomy Defender 🗽",
+            description: "You value individual choice and self-determination. You believe people should maintain control over their own lives and decisions."
+          },
+          responsibility: {
+            title: "Accountability Advocate ⚖️",
+            description: "You emphasize clear responsibility and accountability. You believe in maintaining human oversight and clear chains of responsibility in AI systems."
+          },
+          prevention: {
+            title: "Proactive Problem Solver 🔧",
+            description: "You focus on preventing ethical dilemmas through better design. You believe in addressing root causes rather than managing consequences."
+          },
+          economic: {
+            title: "Economic Realist 💼",
+            description: "You consider economic factors and practical constraints. You believe sustainable solutions must account for economic realities and market forces."
+          },
+          social: {
+            title: "Social Responsibility Champion 🌍",
+            description: "You prioritize social cohesion and community welfare. You believe technology should strengthen rather than disrupt social bonds."
+          },
+          innovation: {
+            title: "Progress Pioneer 🚀",
+            description: "You value technological advancement and innovation. You believe progress can solve many of humanity's challenges."
+          },
+          community: {
+            title: "Community Guardian 🏘️",
+            description: "You focus on local impact and community wellbeing. You believe solutions should consider their effects on real communities and relationships."
+          },
+          accuracy: {
+            title: "Precision Pursuer 🎯",
+            description: "You prioritize technical excellence and system reliability. You believe getting the technology right is fundamental to ethical outcomes."
+          },
+          transparency: {
+            title: "Transparency Advocate 💡",
+            description: "You value open processes and clear communication. You believe people have a right to understand how decisions affecting them are made."
+          },
+          appeals: {
+            title: "Due Process Defender ⚖️",
+            description: "You emphasize procedural fairness and appeal rights. You believe robust review processes are essential for just outcomes."
+          },
+          diversity: {
+            title: "Inclusion Champion 🌈",
+            description: "You value diverse perspectives and inclusive design. You believe better representation leads to better outcomes for everyone."
+          },
+          bias: {
+            title: "Bias Fighter 🛡️",
+            description: "You're deeply concerned about systemic bias and discrimination. You believe addressing historical inequities is crucial for fair AI systems."
+          },
+          effectiveness: {
+            title: "Results-Oriented Thinker 📊",
+            description: "You focus on measurable outcomes and practical effectiveness. You believe solutions should be judged by their real-world impact."
+          },
+          oversight: {
+            title: "Governance Guardian 👁️",
+            description: "You emphasize proper oversight and institutional checks. You believe strong governance structures are essential for responsible AI."
+          },
+          rights: {
+            title: "Rights Protector 📜",
+            description: "You prioritize fundamental rights and civil liberties. You believe constitutional principles must be preserved in the digital age."
+          }
+        };
+
+        if (dominantDimensions.length === 1) {
+          const dimension = dominantDimensions[0];
+          const info = dimensionMessages[dimension] || { 
+            title: "Ethical Thinker 🤔", 
+            description: "You show consistent ethical reasoning patterns." 
+          };
+          
+          return {
+            message: `
+              <h3>${info.title}</h3>
+              <p>${info.description}</p>
+              <p><strong>Your ethical focus:</strong> ${maxCount} out of 5 responses aligned with this dimension.</p>
+              <p>Understanding your ethical intuitions is the first step toward more thoughtful decision-making in complex scenarios.</p>
+            `
+          };
+        } else {
+          return {
+            message: `
+              <h3>Balanced Ethical Reasoner 🌟</h3>
+              <p>You demonstrate balanced ethical reasoning, drawing from multiple ethical frameworks. Your responses show you consider various perspectives when facing ethical dilemmas.</p>
+              <p><strong>Your approach:</strong> You balanced ${dominantDimensions.length} different ethical dimensions equally.</p>
+              <p>This balanced approach often leads to more nuanced and thoughtful ethical decisions in complex real-world scenarios.</p>
+            `
+          };
+        }
+      }
+
+      function restartQuiz() {
+        quizAnswers = {};
+        currentQuestion = 1;
+        
+        // Reset all selections
+        document.querySelectorAll('.quiz-option').forEach(option => {
+          option.classList.remove('selected');
+        });
+        
+        // Hide results
+        document.getElementById('quiz-results').classList.remove('show');
+        
+        // Scroll to first question
+        document.querySelector('.quiz-question').scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }
+    </script>
+  </body>
+</html>

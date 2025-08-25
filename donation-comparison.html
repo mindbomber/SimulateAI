@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Donation Widget Comparison</title>
+    <link rel="stylesheet" href="src/styles/main.css" />
+    <link rel="stylesheet" href="src/styles/enhanced-donation-widget.css" />
+    <link rel="stylesheet" href="src/styles/donor-flair-display.css" />
+    <style>
+      body {
+        padding: 20px;
+        background: #f5f5f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      .comparison-container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .comparison-section {
+        margin: 40px 0;
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+      .section-title {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #2c3e50;
+      }
+      .style-description {
+        text-align: center;
+        color: #6c757d;
+        margin-bottom: 20px;
+      }
+      .benefits-list {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+      }
+      .benefits-list h3 {
+        color: #495057;
+        margin-bottom: 15px;
+      }
+      .benefits-list ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+      .benefits-list li {
+        margin: 8px 0;
+        color: #6c757d;
+      }
+      .note {
+        background: #d1ecf1;
+        border: 1px solid #bee5eb;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 20px 0;
+        color: #0c5460;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="comparison-container">
+      <h1 style="text-align: center; color: #2c3e50; margin-bottom: 10px">
+        🎨 Donation Widget Style Comparison
+      </h1>
+      <p style="text-align: center; color: #6c757d; margin-bottom: 40px">
+        Compare different presentation styles for the donation widget
+      </p>
+
+      <div class="benefits-list">
+        <h3>✨ Accordion Version Benefits</h3>
+        <ul>
+          <li>
+            <strong>Space Efficient:</strong> Collapsed by default, doesn't take
+            up valuable hero space
+          </li>
+          <li>
+            <strong>Progressive Disclosure:</strong> Users can choose when to
+            engage with donation options
+          </li>
+          <li>
+            <strong>Clean Homepage:</strong> Maintains focus on main content
+            while keeping donations accessible
+          </li>
+          <li>
+            <strong>Mobile Friendly:</strong> Reduces vertical scrolling on
+            mobile devices
+          </li>
+          <li>
+            <strong>Visual Appeal:</strong> Gradient header draws attention when
+            users are ready to donate
+          </li>
+          <li>
+            <strong>Better UX:</strong> Users aren't overwhelmed by donation
+            options immediately
+          </li>
+        </ul>
+      </div>
+
+      <!-- Accordion Version -->
+      <div class="comparison-section">
+        <h2 class="section-title">📱 Accordion Style (Recommended)</h2>
+        <p class="style-description">
+          Collapsed by default, expands to show full donation options. Perfect
+          for homepage integration.
+        </p>
+        <div id="accordion-donation-widget"></div>
+      </div>
+
+      <!-- Card Version -->
+      <div class="comparison-section">
+        <h2 class="section-title">🎴 Card Style (Traditional)</h2>
+        <p class="style-description">
+          Always visible with full donation interface. Best for dedicated
+          donation pages.
+        </p>
+        <div id="card-donation-widget"></div>
+      </div>
+
+      <!-- Inline Version -->
+      <div class="comparison-section">
+        <h2 class="section-title">📝 Inline Style (Minimal)</h2>
+        <p class="style-description">
+          Minimal styling for embedding within other content sections.
+        </p>
+        <div id="inline-donation-widget"></div>
+      </div>
+
+      <div class="note">
+        <h4>💡 Implementation Note</h4>
+        <p>
+          The <strong>Accordion Style</strong> is now set as the default for the
+          homepage. This provides the best user experience by:
+        </p>
+        <ul>
+          <li>Keeping the page clean and focused on main content</li>
+          <li>Allowing users to engage with donations when they're ready</li>
+          <li>
+            Providing a beautiful, attention-grabbing header when collapsed
+          </li>
+          <li>Offering full functionality when expanded</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Load Firebase and other dependencies -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-functions-compat.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <!-- Environment configuration -->
+    <script type="module" src="src/js/utils/env-config.js"></script>
+
+    <!-- Firebase service -->
+    <script type="module" src="src/js/core/firebase-service.js"></script>
+
+    <!-- Load donation widget -->
+    <script
+      type="module"
+      src="src/js/components/enhanced-donation-widget.js"
+    ></script>
+
+    <script type="module">
+      // Initialize all three versions for comparison
+      document.addEventListener('DOMContentLoaded', () => {
+        if (window.EnhancedDonationWidget) {
+          // Accordion version (recommended)
+          window.EnhancedDonationWidget.init('accordion-donation-widget', {
+            title: '💖 Support SimulateAI Research',
+            subtitle:
+              'Help us continue developing open-source AI ethics education resources',
+            style: 'accordion',
+            showBenefits: true,
+          });
+
+          // Card version (traditional)
+          window.EnhancedDonationWidget.init('card-donation-widget', {
+            title: '💖 Support SimulateAI Research',
+            subtitle:
+              'Help us continue developing open-source AI ethics education resources',
+            style: 'card',
+            showBenefits: true,
+          });
+
+          // Inline version (minimal)
+          window.EnhancedDonationWidget.init('inline-donation-widget', {
+            title: '💖 Support Research',
+            subtitle: 'Quick donation options',
+            style: 'inline',
+            showBenefits: false,
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

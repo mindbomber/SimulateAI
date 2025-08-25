@@ -1,0 +1,599 @@
+/**
+ * Priority Components Styles
+ * CSS styles for DataTable, NotificationToast, and LoadingSpinner components
+ */
+
+@layer components {
+  /* =============================================================================
+   DATA TABLE STYLES
+   ============================================================================= */
+
+  .data-table {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .data-table-header {
+    background: #f5f5f5;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .data-table-header-cell {
+    padding: 12px 10px;
+    border-right: 1px solid #ccc;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .data-table-header-cell:last-child {
+    border-right: none;
+  }
+
+  .data-table-header-cell:hover {
+    background: #e9ecef;
+  }
+
+  .data-table-sort-indicator {
+    margin-left: 5px;
+    font-size: 10px;
+    color: #666;
+  }
+
+  .data-table-body {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .data-table-row {
+    display: flex;
+    border-bottom: 0.5px solid #e9ecef;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+  }
+
+  .data-table-row:nth-child(even) {
+    background: #fafafa;
+  }
+
+  .data-table-row:hover {
+    background: #f0f0f0;
+  }
+
+  .data-table-row.selected {
+    background: #e3f2fd;
+    border-left: 3px solid #2196f3;
+  }
+
+  .data-table-cell {
+    padding: 10px;
+    border-right: 0.5px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .data-table-cell:last-child {
+    border-right: none;
+  }
+
+  .data-table-pagination {
+    background: #f9f9f9;
+    padding: 10px 15px;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: #666;
+  }
+
+  .data-table-pagination-info {
+    font-weight: 500;
+  }
+
+  .data-table-pagination-controls {
+    display: flex;
+    gap: 5px;
+  }
+
+  .data-table-pagination-button {
+    padding: 5px 12px;
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    transition: all 0.15s ease;
+  }
+
+  .data-table-pagination-button:hover:not(:disabled) {
+    background: #f8f9fa;
+    border-color: #999;
+  }
+
+  .data-table-pagination-button:disabled {
+    background: #f8f9fa;
+    color: #999;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  /* =============================================================================
+   NOTIFICATION TOAST STYLES
+   ============================================================================= */
+
+  .notification-toast {
+    position: fixed;
+    width: 320px;
+    min-height: 80px;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    z-index: 1000;
+    animation: slideInRight 0.3s ease-out;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+
+  .notification-toast:hover {
+    transform: translateX(-5px);
+  }
+
+  .notification-toast.success {
+    background: #e8f5e8;
+    border-left: 4px solid #4caf50;
+    color: #2e7d32;
+  }
+
+  .notification-toast.error {
+    background: #ffebee;
+    border-left: 4px solid #f44336;
+    color: #c62828;
+  }
+
+  .notification-toast.warning {
+    background: #fff3e0;
+    border-left: 4px solid #ff9800;
+    color: #e65100;
+  }
+
+  .notification-toast.info {
+    background: #e3f2fd;
+    border-left: 4px solid #2196f3;
+    color: #1565c0;
+  }
+
+  .notification-toast-content {
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .notification-toast-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .notification-toast-message {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: 500;
+  }
+
+  .notification-toast-dismiss {
+    font-size: 18px;
+    cursor: pointer;
+    opacity: 0.7;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.15s ease;
+  }
+
+  .notification-toast-dismiss:hover {
+    opacity: 1;
+    background: rgb(0 0 0 / 10%);
+  }
+
+  .notification-toast-actions {
+    padding: 0 20px 15px;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  .notification-toast-action {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .notification-toast-action.primary {
+    background: currentcolor;
+    color: white;
+  }
+
+  .notification-toast-action.secondary {
+    background: transparent;
+    color: currentcolor;
+    border: 1px solid currentcolor;
+  }
+
+  .notification-toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: currentcolor;
+    opacity: 0.3;
+    transition: width 0.1s linear;
+  }
+
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  .notification-toast.removing {
+    animation: slideOutRight 0.3s ease-in forwards;
+  }
+
+  @keyframes slideOutRight {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  /* =============================================================================
+   LOADING SPINNER STYLES
+   ============================================================================= */
+
+  .loading-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  .loading-spinner.overlay {
+    position: absolute;
+    inset: 0;
+    background: rgb(255 255 255 / 90%);
+    z-index: 999;
+    backdrop-filter: blur(2px);
+  }
+
+  .loading-spinner-icon {
+    position: relative;
+  }
+
+  .loading-spinner-icon.small {
+    width: 20px;
+    height: 20px;
+  }
+
+  .loading-spinner-icon.medium {
+    width: 40px;
+    height: 40px;
+  }
+
+  .loading-spinner-icon.large {
+    width: 60px;
+    height: 60px;
+  }
+
+  /* Indeterminate spinner */
+  .loading-spinner-indeterminate {
+    border: 3px solid #e0e0e0;
+    border-top: 3px solid #2196f3;
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Determinate progress circle */
+  .loading-spinner-progress {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+
+  .loading-spinner-progress-bg {
+    fill: none;
+    stroke: #e0e0e0;
+    stroke-width: 4;
+  }
+
+  .loading-spinner-progress-fill {
+    fill: none;
+    stroke: #2196f3;
+    stroke-width: 4;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.3s ease;
+  }
+
+  .loading-spinner-message {
+    margin-top: 15px;
+    font-size: 13px;
+    color: #666;
+    text-align: center;
+    font-weight: 500;
+  }
+
+  .loading-spinner-percentage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(90deg);
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .loading-spinner-cancel {
+    margin-top: 20px;
+    padding: 8px 16px;
+    border: 1px solid #f44336;
+    background: #f44336;
+    color: white;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .loading-spinner-cancel:hover {
+    background: #d32f2f;
+    border-color: #d32f2f;
+    transform: translateY(-1px);
+  }
+
+  /* Size variations */
+  .loading-spinner.small .loading-spinner-message {
+    font-size: 11px;
+    margin-top: 10px;
+  }
+
+  .loading-spinner.large .loading-spinner-message {
+    font-size: 15px;
+    margin-top: 20px;
+  }
+
+  .loading-spinner.small .loading-spinner-percentage {
+    font-size: 10px;
+  }
+
+  .loading-spinner.large .loading-spinner-percentage {
+    font-size: 14px;
+  }
+
+  /* =============================================================================
+   ACCESSIBILITY ENHANCEMENTS
+   ============================================================================= */
+
+  /* Focus indicators */
+  .data-table-header-cell:focus,
+  .data-table-row:focus,
+  .notification-toast:focus,
+  .loading-spinner-cancel:focus {
+    outline: 2px solid #2196f3;
+    outline-offset: 2px;
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .data-table {
+      border-color: #000;
+    }
+
+    .data-table-header {
+      background: #000;
+      color: #fff;
+    }
+
+    .data-table-row:hover {
+      background: #000;
+      color: #fff;
+    }
+
+    .notification-toast {
+      border: 2px solid #000;
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .notification-toast,
+    .loading-spinner-indeterminate,
+    .loading-spinner-progress-fill,
+    .data-table-row,
+    .loading-spinner-cancel {
+      animation: none;
+      transition: none;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    .notification-toast,
+    .loading-spinner {
+      display: none;
+    }
+
+    .data-table {
+      border: 1px solid #000;
+    }
+
+    .data-table-pagination {
+      display: none;
+    }
+
+    .data-table-body {
+      max-height: none;
+      overflow: visible;
+    }
+  }
+
+  /* ===== DARK MODE SUPPORT ===== */
+
+  /* Data Table Dark Mode */
+  body.dark-mode .data-table {
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .data-table-header {
+    background: var(--theme-bg-primary);
+    border-bottom: 1px solid var(--theme-border);
+  }
+
+  body.dark-mode .data-table-header-cell {
+    border-right: 1px solid var(--theme-border);
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .data-table-header-cell:hover {
+    background: var(--theme-bg-secondary);
+  }
+
+  body.dark-mode .data-table-row {
+    border-bottom: 1px solid var(--theme-border);
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .data-table-row:nth-child(even) {
+    background: var(--theme-bg-primary);
+  }
+
+  body.dark-mode .data-table-row:hover {
+    background: var(--theme-bg-secondary);
+  }
+
+  body.dark-mode .data-table-row.selected {
+    background: rgb(74 158 255 / 10%);
+    border-color: var(--color-primary);
+  }
+
+  body.dark-mode .data-table-cell {
+    border-right: 1px solid var(--theme-border);
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .data-table-pagination {
+    background: var(--theme-bg-primary);
+    border-top: 1px solid var(--theme-border);
+  }
+
+  body.dark-mode .data-table-pagination-info {
+    color: var(--theme-text-secondary);
+  }
+
+  body.dark-mode .data-table-pagination-button {
+    background: var(--theme-bg-secondary);
+    color: var(--theme-text-primary);
+    border: 1px solid var(--theme-border);
+  }
+
+  body.dark-mode .data-table-pagination-button:hover:not(:disabled) {
+    background: var(--theme-bg-primary);
+    border-color: var(--theme-border-hover);
+  }
+
+  body.dark-mode .data-table-pagination-button:disabled {
+    background: var(--theme-bg-secondary);
+    color: var(--theme-text-muted);
+    border-color: var(--theme-border);
+  }
+
+  /* Loading Spinner Dark Mode */
+  body.dark-mode .loading-spinner {
+    background: var(--theme-bg-secondary);
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .loading-spinner-indeterminate {
+    border-color: var(--theme-border);
+    border-top-color: var(--color-primary);
+  }
+
+  body.dark-mode .loading-spinner-progress-bg {
+    stroke: var(--theme-border);
+  }
+
+  body.dark-mode .loading-spinner-progress-fill {
+    stroke: var(--color-primary);
+  }
+
+  body.dark-mode .loading-spinner-message {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .loading-spinner-percentage {
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .loading-spinner-cancel {
+    background: var(--theme-bg-primary);
+    color: var(--theme-text-primary);
+    border: 1px solid var(--theme-border);
+  }
+
+  body.dark-mode .loading-spinner-cancel:hover {
+    background: var(--theme-bg-secondary);
+    border-color: var(--theme-border-hover);
+  }
+} /* End @layer components */

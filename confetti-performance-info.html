@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Badge Confetti Performance Test</title>
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        margin: 2rem;
+        background: #1a1a1a;
+        color: white;
+      }
+
+      .test-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: #2a2a2a;
+        padding: 2rem;
+        border-radius: 12px;
+      }
+
+      .test-btn {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 0.5rem;
+        font-size: 1rem;
+      }
+
+      .test-btn:hover {
+        background: #2563eb;
+      }
+
+      .performance-info {
+        background: #374151;
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 1rem 0;
+      }
+
+      .reduction-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+      }
+
+      .reduction-table th,
+      .reduction-table td {
+        border: 1px solid #4b5563;
+        padding: 0.75rem;
+        text-align: left;
+      }
+
+      .reduction-table th {
+        background: #374151;
+      }
+
+      .savings {
+        color: #10b981;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🎊 Badge Confetti Performance Optimization</h1>
+
+      <div class="performance-info">
+        <h2>Performance Improvements Made</h2>
+        <p>
+          The confetti system has been optimized to reduce frame drops while
+          maintaining visual appeal.
+        </p>
+
+        <h3>Confetti Particle Reductions:</h3>
+        <table class="reduction-table">
+          <thead>
+            <tr>
+              <th>Wave Type</th>
+              <th>Original Count</th>
+              <th>Optimized Count</th>
+              <th>Reduction</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Wave 1 (Large)</td>
+              <td>15</td>
+              <td>8</td>
+              <td class="savings">-47%</td>
+            </tr>
+            <tr>
+              <td>Wave 2 (Medium)</td>
+              <td>20</td>
+              <td>10</td>
+              <td class="savings">-50%</td>
+            </tr>
+            <tr>
+              <td>Wave 3 (Small)</td>
+              <td>10</td>
+              <td>6</td>
+              <td class="savings">-40%</td>
+            </tr>
+            <tr>
+              <td>Tier 3+ Finale</td>
+              <td>25</td>
+              <td>12</td>
+              <td class="savings">-52%</td>
+            </tr>
+            <tr>
+              <td>Tier 6+ Epic</td>
+              <td>35</td>
+              <td>15</td>
+              <td class="savings">-57%</td>
+            </tr>
+            <tr>
+              <td>Tier 9+ Legendary</td>
+              <td>50</td>
+              <td>20</td>
+              <td class="savings">-60%</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Background Effects Reductions:</h3>
+        <table class="reduction-table">
+          <thead>
+            <tr>
+              <th>Effect Type</th>
+              <th>Original Count</th>
+              <th>Optimized Count</th>
+              <th>Reduction</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Floating Particles</td>
+              <td>15</td>
+              <td>8</td>
+              <td class="savings">-47%</td>
+            </tr>
+            <tr>
+              <td>Category Emoji Bubbles</td>
+              <td>8</td>
+              <td>4</td>
+              <td class="savings">-50%</td>
+            </tr>
+            <tr>
+              <td>Sidekick Emoji Bubbles</td>
+              <td>6</td>
+              <td>3</td>
+              <td class="savings">-50%</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Total Performance Impact:</h3>
+        <ul>
+          <li>
+            <strong>Basic Badge (Tier 1-2):</strong>
+            <span class="savings">~47% fewer particles</span> (45 → 24 total)
+          </li>
+          <li>
+            <strong>Advanced Badge (Tier 3-5):</strong>
+            <span class="savings">~49% fewer particles</span> (70 → 36 total)
+          </li>
+          <li>
+            <strong>Epic Badge (Tier 6-8):</strong>
+            <span class="savings">~52% fewer particles</span> (105 → 51 total)
+          </li>
+          <li>
+            <strong>Legendary Badge (Tier 9+):</strong>
+            <span class="savings">~55% fewer particles</span> (155 → 71 total)
+          </li>
+        </ul>
+      </div>
+
+      <div class="performance-info">
+        <h2>Performance Benefits</h2>
+        <ul>
+          <li>
+            🚀 <strong>Reduced Frame Drops:</strong> Fewer particles mean
+            smoother animations
+          </li>
+          <li>
+            ⚡ <strong>Better Mobile Performance:</strong> Especially important
+            for lower-end devices
+          </li>
+          <li>
+            🔋 <strong>Lower Battery Usage:</strong> Less GPU/CPU intensive
+            rendering
+          </li>
+          <li>
+            ✨ <strong>Maintained Visual Appeal:</strong> Still celebratory but
+            more efficient
+          </li>
+          <li>
+            📱 <strong>Responsive Design:</strong> Better experience across all
+            devices
+          </li>
+        </ul>
+      </div>
+
+      <div class="performance-info">
+        <h2>Technical Notes</h2>
+        <ul>
+          <li>
+            Confetti particles are rendered using JavaScript and CSS animations
+          </li>
+          <li>
+            Higher tier badges still get progressively more impressive effects
+          </li>
+          <li>
+            Background particles and emoji bubbles are also reduced
+            proportionally
+          </li>
+          <li>
+            The timing and sequence of effects remains the same for consistency
+          </li>
+          <li>
+            Users on high-performance devices won't notice visual quality
+            reduction
+          </li>
+        </ul>
+      </div>
+
+      <button class="test-btn" onclick="window.location.href='/app.html'">
+        Test Badge System in App
+      </button>
+      <button class="test-btn" onclick="showPerformanceStats()">
+        Show Performance Stats
+      </button>
+
+      <div
+        id="performance-stats"
+        style="display: none; margin-top: 1rem"
+        class="performance-info"
+      >
+        <h3>Current Performance Metrics</h3>
+        <div id="stats-content"></div>
+      </div>
+    </div>
+
+    <script>
+      function showPerformanceStats() {
+        const statsDiv = document.getElementById("performance-stats");
+        const contentDiv = document.getElementById("stats-content");
+
+        if (statsDiv.style.display === "none") {
+          const stats = {
+            memory: performance.memory
+              ? {
+                  used: Math.round(performance.memory.usedJSHeapSize / 1048576),
+                  total: Math.round(
+                    performance.memory.totalJSHeapSize / 1048576,
+                  ),
+                  limit: Math.round(
+                    performance.memory.jsHeapSizeLimit / 1048576,
+                  ),
+                }
+              : "Not available",
+            navigation: performance.getEntriesByType("navigation")[0],
+            userAgent: navigator.userAgent.includes("Mobile")
+              ? "Mobile Device"
+              : "Desktop Device",
+          };
+
+          let content = "<ul>";
+          if (stats.memory) {
+            content += `<li><strong>Memory Usage:</strong> ${stats.memory.used}MB / ${stats.memory.total}MB (Limit: ${stats.memory.limit}MB)</li>`;
+          }
+          content += `<li><strong>Device Type:</strong> ${stats.userAgent}</li>`;
+          content += `<li><strong>Page Load Time:</strong> ${Math.round(stats.navigation.loadEventEnd - stats.navigation.navigationStart)}ms</li>`;
+          content += "</ul>";
+
+          contentDiv.innerHTML = content;
+          statsDiv.style.display = "block";
+        } else {
+          statsDiv.style.display = "none";
+        }
+      }
+    </script>
+  </body>
+</html>

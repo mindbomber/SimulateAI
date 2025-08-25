@@ -1,0 +1,46 @@
+name: Deploy to GitHub Pages - DISABLED
+
+# This workflow is disabled since we've moved to Firebase Hosting
+# To re-enable, change workflow_dispatch to push/pull_request
+
+on:
+  workflow_dispatch: # Manual trigger only
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          # Set environment variables for build
+          VITE_FIREBASE_API_KEY: AIzaSyAwoc3L-43aXyNjNB9ncGbFm7eE-yn5bFA
+          VITE_FIREBASE_AUTH_DOMAIN: simulateai-research.firebaseapp.com
+          VITE_FIREBASE_PROJECT_ID: simulateai-research
+          VITE_FIREBASE_STORAGE_BUCKET: simulateai-research.firebasestorage.app
+          VITE_FIREBASE_MESSAGING_SENDER_ID: 52924445915
+          VITE_FIREBASE_APP_ID: 1:52924445915:web:dadca1a93bc382403a08fe
+          VITE_FIREBASE_MEASUREMENT_ID: G-XW8H062BMV
+          VITE_STRIPE_PUBLISHABLE_KEY: pk_live_51QQ8VmL5rPJpU6qYkM5YxWyPnlJ6Xy3VeLtCqSw6VFnMFxNgLCbzJ6J5hQd1sWJq6gDqzK8i7XzqKlLcUy0nXsrF00EF4lP9sY
+          VITE_ENVIRONMENT: production
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          cname: # Add your custom domain here if you have one

@@ -1,0 +1,764 @@
+/**
+ * Layout Components CSS
+ * Styles for TabContainer, ProgressStepper, SplitPane, TreeView, and FileUpload components
+ */
+
+@layer components {
+  /* =============================================================================
+   TAB CONTAINER STYLES
+   ============================================================================= */
+
+  .tab-container {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    background-color: #fff;
+    font-family: Arial, sans-serif;
+  }
+
+  .tab-container__header {
+    display: flex;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    overflow-x: auto;
+    min-height: 40px;
+  }
+
+  .tab-container__tab {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    border: none;
+    background-color: transparent;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-size: 12px;
+    color: #333;
+    white-space: nowrap;
+    min-width: 0;
+    flex-shrink: 0;
+    position: relative;
+    transition: all 0.2s ease;
+  }
+
+  .tab-container__tab:hover {
+    background-color: #e9ecef;
+  }
+
+  .tab-container__tab--active {
+    background-color: #fff;
+    border-bottom-color: #007bff;
+    font-weight: bold;
+    color: #007bff;
+  }
+
+  .tab-container__tab--disabled {
+    color: #999;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .tab-container__tab--disabled:hover {
+    background-color: transparent;
+  }
+
+  .tab-container__tab-icon {
+    margin-right: 6px;
+    font-size: 14px;
+  }
+
+  .tab-container__tab-title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tab-container__tab-badge {
+    margin-left: 6px;
+    background-color: #dc3545;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: bold;
+    min-width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tab-container__tab-close {
+    margin-left: 8px;
+    font-size: 14px;
+    color: #666;
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 2px;
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease;
+  }
+
+  .tab-container__tab-close:hover {
+    color: #dc3545;
+    background-color: #f8f9fa;
+  }
+
+  .tab-container__content {
+    flex: 1;
+    padding: 16px;
+    background-color: #fff;
+    overflow: auto;
+  }
+
+  /* =============================================================================
+   PROGRESS STEPPER STYLES
+   ============================================================================= */
+
+  .progress-stepper {
+    display: flex;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    padding: 16px 0;
+  }
+
+  .progress-stepper--vertical {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .progress-stepper__step {
+    display: flex;
+    align-items: center;
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .progress-stepper__step:hover:not(.progress-stepper__step--disabled) {
+    opacity: 0.8;
+  }
+
+  .progress-stepper__step--disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .progress-stepper--vertical .progress-stepper__step {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    padding: 12px 0;
+  }
+
+  .progress-stepper__circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    position: relative;
+    z-index: 10;
+    transition: all 0.3s ease;
+  }
+
+  .progress-stepper__circle--completed {
+    background-color: #28a745;
+    color: #fff;
+    border: 2px solid #28a745;
+  }
+
+  .progress-stepper__circle--active {
+    background-color: #007bff;
+    color: #fff;
+    border: 2px solid #007bff;
+  }
+
+  .progress-stepper__circle--inactive {
+    background-color: #e9ecef;
+    color: #666;
+    border: 2px solid #e9ecef;
+  }
+
+  .progress-stepper__circle--disabled {
+    background-color: #f8f9fa;
+    color: #999;
+    border: 2px solid #e9ecef;
+    opacity: 0.6;
+  }
+
+  .progress-stepper__line {
+    flex: 1;
+    height: 2px;
+    background-color: #e9ecef;
+    position: relative;
+    z-index: 5;
+  }
+
+  .progress-stepper--vertical .progress-stepper__line {
+    width: 2px;
+    height: 40px;
+    margin-left: 14px;
+  }
+
+  .progress-stepper__line--completed {
+    background-color: #28a745;
+  }
+
+  .progress-stepper__content {
+    margin-left: 12px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .progress-stepper--vertical .progress-stepper__content {
+    margin-left: 12px;
+    margin-top: -20px;
+  }
+
+  .progress-stepper__title {
+    font-size: 11px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 2px;
+  }
+
+  .progress-stepper__description {
+    font-size: 10px;
+    color: #666;
+    line-height: 1.3;
+  }
+
+  .progress-stepper__step--active .progress-stepper__title {
+    color: #007bff;
+  }
+
+  /* =============================================================================
+   SPLIT PANE STYLES
+   ============================================================================= */
+
+  .split-pane {
+    display: flex;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .split-pane--vertical {
+    flex-direction: column;
+  }
+
+  .split-pane__pane {
+    overflow: auto;
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+  }
+
+  .split-pane__pane--left,
+  .split-pane__pane--top {
+    border-right: none;
+    border-bottom: none;
+  }
+
+  .split-pane__pane--right,
+  .split-pane__pane--bottom {
+    border-left: none;
+    border-top: none;
+  }
+
+  .split-pane__splitter {
+    background-color: #e9ecef;
+    cursor: col-resize;
+    user-select: none;
+    position: relative;
+    transition: background-color 0.2s ease;
+  }
+
+  .split-pane--vertical .split-pane__splitter {
+    cursor: row-resize;
+  }
+
+  .split-pane__splitter:hover {
+    background-color: #dee2e6;
+  }
+
+  .split-pane__splitter--resizing {
+    background-color: #007bff;
+  }
+
+  .split-pane__splitter-grip {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .split-pane__splitter-grip::before {
+    content: "";
+    width: 2px;
+    height: 16px;
+    background-color: #999;
+    box-shadow:
+      4px 0 0 #999,
+      -4px 0 0 #999;
+  }
+
+  .split-pane--vertical .split-pane__splitter-grip::before {
+    width: 16px;
+    height: 2px;
+    box-shadow:
+      0 4px 0 #999,
+      0 -4px 0 #999;
+  }
+
+  /* =============================================================================
+   TREE VIEW STYLES
+   ============================================================================= */
+
+  .tree-view {
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    overflow: auto;
+    position: relative;
+  }
+
+  .tree-view__node {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+  }
+
+  .tree-view__node:hover {
+    background-color: #f5f5f5;
+  }
+
+  .tree-view__node--selected {
+    background-color: #e3f2fd;
+    color: #007bff;
+  }
+
+  .tree-view__node--disabled {
+    color: #999;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .tree-view__node--disabled:hover {
+    background-color: transparent;
+  }
+
+  .tree-view__expand-icon {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 4px;
+    font-size: 10px;
+    color: #666;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+
+  .tree-view__expand-icon--expanded {
+    transform: rotate(90deg);
+  }
+
+  .tree-view__icon {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 6px;
+    font-size: 14px;
+    color: #666;
+  }
+
+  .tree-view__checkbox {
+    width: 14px;
+    height: 14px;
+    border: 1px solid #999;
+    border-radius: 2px;
+    margin-right: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    transition: all 0.2s ease;
+  }
+
+  .tree-view__checkbox--checked {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+  }
+
+  .tree-view__label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tree-view__scrollbar {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 8px;
+    height: 100%;
+    background-color: #f0f0f0;
+  }
+
+  .tree-view__scrollbar-thumb {
+    background-color: #c0c0c0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .tree-view__scrollbar-thumb:hover {
+    background-color: #a0a0a0;
+  }
+
+  /* =============================================================================
+   FILE UPLOAD STYLES
+   ============================================================================= */
+
+  .file-upload {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 32px;
+    text-align: center;
+    background-color: #f8f9fa;
+    font-family: Arial, sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .file-upload:hover {
+    border-color: #007bff;
+    background-color: #f0f8ff;
+  }
+
+  .file-upload--drag-over {
+    border-color: #007bff;
+    border-style: solid;
+    background-color: #e3f2fd;
+    transform: scale(1.02);
+  }
+
+  .file-upload--disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #f8f9fa;
+  }
+
+  .file-upload--disabled:hover {
+    border-color: #dee2e6;
+    background-color: #f8f9fa;
+    transform: none;
+  }
+
+  .file-upload__icon {
+    font-size: 48px;
+    color: #6c757d;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .file-upload__text {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 16px;
+    line-height: 1.4;
+  }
+
+  .file-upload__button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .file-upload__button:hover {
+    background-color: #0056b3;
+  }
+
+  .file-upload__file-list {
+    margin-top: 16px;
+    text-align: left;
+    max-height: 150px;
+    overflow-y: auto;
+  }
+
+  .file-upload__file-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    font-size: 12px;
+  }
+
+  .file-upload__file-item--error {
+    border-color: #dc3545;
+    background-color: #ffeaea;
+  }
+
+  .file-upload__file-icon {
+    margin-right: 8px;
+    color: #666;
+  }
+
+  .file-upload__file-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .file-upload__file-size {
+    color: #666;
+    margin-left: 8px;
+    margin-right: 8px;
+  }
+
+  .file-upload__file-remove {
+    color: #dc3545;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 2px;
+    transition: background-color 0.2s ease;
+  }
+
+  .file-upload__file-remove:hover {
+    background-color: #f8d7da;
+  }
+
+  .file-upload__progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background-color: #e9ecef;
+  }
+
+  .file-upload__progress-bar {
+    height: 100%;
+    background-color: #007bff;
+    transition: width 0.3s ease;
+  }
+
+  .file-upload__progress-text {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    color: #333;
+    background-color: rgb(255 255 255 / 90%);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  /* =============================================================================
+   ERROR STATES AND VISUAL FEEDBACK
+   ============================================================================= */
+
+  .tab-container--error {
+    border-color: #dc3545;
+  }
+
+  .tab-container__tab--error {
+    border-bottom-color: #dc3545;
+    color: #dc3545;
+  }
+
+  .progress-stepper__step--error .progress-stepper__circle {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: #fff;
+  }
+
+  .tree-view--error {
+    border-color: #dc3545;
+  }
+
+  .file-upload--error {
+    border-color: #dc3545;
+    background-color: #ffeaea;
+  }
+
+  /* Loading states */
+  .tab-container--loading {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .progress-stepper--loading .progress-stepper__circle {
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0.6;
+    }
+  }
+
+  /* Improved disabled states */
+  .tab-container__tab--disabled,
+  .progress-stepper__step--disabled,
+  .tree-view__node--disabled,
+  .file-upload--disabled {
+    filter: grayscale(100%);
+  }
+
+  /* =============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================= */
+
+  @media (width <= 768px) {
+    .tab-container__tab {
+      padding: 6px 12px;
+      font-size: 11px;
+    }
+
+    .progress-stepper__circle {
+      width: 24px;
+      height: 24px;
+      font-size: 10px;
+    }
+
+    .split-pane__splitter {
+      min-width: 8px;
+      min-height: 8px;
+    }
+
+    .tree-view__node {
+      padding: 6px;
+    }
+
+    .file-upload {
+      padding: 20px;
+    }
+
+    .file-upload__icon {
+      font-size: 36px;
+    }
+  }
+
+  /* =============================================================================
+   ACCESSIBILITY IMPROVEMENTS
+   ============================================================================= */
+
+  .tab-container__tab:focus,
+  .progress-stepper__step:focus,
+  .tree-view__node:focus,
+  .file-upload:focus,
+  .file-upload__button:focus,
+  .tree-view__expand-icon:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tab-container__tab,
+    .progress-stepper__circle,
+    .progress-stepper__line,
+    .split-pane__splitter,
+    .tree-view__node,
+    .tree-view__expand-icon,
+    .file-upload,
+    .file-upload__progress-bar,
+    .file-upload__button,
+    .tab-container__tab-close,
+    .tree-view__checkbox {
+      transition: none;
+      animation: none;
+    }
+
+    .file-upload--drag-over {
+      transform: none;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .tab-container,
+    .split-pane__pane,
+    .tree-view,
+    .file-upload {
+      border-width: 2px;
+    }
+
+    .tab-container__tab--active {
+      border-bottom-width: 4px;
+    }
+
+    .progress-stepper__circle {
+      border-width: 3px;
+    }
+
+    .progress-stepper__line {
+      height: 3px;
+    }
+
+    .tree-view__checkbox {
+      border-width: 2px;
+    }
+
+    .file-upload {
+      border-width: 3px;
+    }
+
+    /* Enhanced contrast colors */
+    .tab-container__tab--active {
+      color: #0056b3;
+      border-bottom-color: #0056b3;
+    }
+
+    .progress-stepper__circle--active {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
+
+    .tree-view__node--selected {
+      background-color: #0056b3;
+      color: #fff;
+    }
+  }
+} /* End @layer components */

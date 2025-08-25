@@ -1,0 +1,413 @@
+/**
+ * Consolidated Modal Styles for SimulateAI
+ * Includes: All modal dialogs, pre-launch, post-simulation, scenario, enhanced simulation
+ * Modernized with accessibility, responsive design, and consistent styling
+ */
+
+/* ===== MODAL SYSTEM VARIABLES ===== */
+:root {
+  /* Modal backdrop and container */
+  --modal-backdrop: rgb(0 0 0 / 60%);
+  --modal-background: var(--color-white);
+  --modal-border: var(--color-gray-200);
+  --modal-shadow:
+    0 20px 25px -5px rgb(0 0 0 / 10%), 0 10px 10px -5px rgb(0 0 0 / 4%);
+  --modal-border-radius: var(--radius-lg);
+
+  /* Modal dimensions */
+  --modal-max-width: 90vw;
+  --modal-max-height: 90vh;
+  --modal-width-sm: 400px;
+  --modal-width-md: 600px;
+  --modal-width-lg: 800px;
+  --modal-width-xl: 1000px;
+
+  /* Modal spacing */
+  --modal-padding: var(--spacing-6);
+  --modal-header-padding: var(--spacing-4) var(--spacing-6);
+  --modal-footer-padding: var(--spacing-4) var(--spacing-6);
+  --modal-footer-height: 80px;
+
+  /* Modal animations */
+  --transition-modal: 0.3s ease-out;
+  --animation-modal-in: modalslidein 0.3s ease-out;
+  --animation-modal-out: modalslideout 0.2s ease-in;
+
+  /* Z-index management */
+  --z-modal-backdrop: 999;
+  --z-modal: 1000;
+  --z-modal-header: 1001;
+}
+
+/* ===== MODAL BACKDROP ===== */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--modal-backdrop);
+  z-index: var(--z-modal-backdrop);
+  opacity: 0;
+  transition: opacity var(--transition-modal);
+  pointer-events: none;
+}
+
+.modal-backdrop.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ===== MODAL CONTAINER ===== */
+.modal-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: var(--modal-background);
+  border-radius: var(--modal-border-radius);
+  box-shadow: var(--modal-shadow);
+  z-index: var(--z-modal);
+  max-width: var(--modal-max-width);
+  max-height: var(--modal-max-height);
+  width: var(--modal-width-lg);
+  opacity: 0;
+  transition: all var(--transition-modal);
+  pointer-events: none;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-dialog.visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
+  animation: var(--animation-modal-in);
+}
+
+/* ===== MODAL HEADER ===== */
+.modal-header {
+  padding: var(--modal-header-padding);
+  border-bottom: 1px solid var(--modal-border);
+  background: var(--color-gray-50);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  position: relative;
+  z-index: var(--z-modal-header);
+}
+
+.modal-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-900);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: var(--font-size-xl);
+  color: var(--color-gray-500);
+  cursor: pointer;
+  padding: var(--spacing-2);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.modal-close:hover,
+.modal-close:focus {
+  background: var(--color-gray-200);
+  color: var(--color-gray-700);
+  outline: none;
+}
+
+/* ===== MODAL BODY ===== */
+.modal-body {
+  padding: var(--modal-padding);
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: var(--color-gray-100);
+  border-radius: var(--radius-full);
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: var(--color-gray-300);
+  border-radius: var(--radius-full);
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray-400);
+}
+
+/* ===== MODAL FOOTER ===== */
+.modal-footer {
+  padding: var(--modal-footer-padding);
+  border-top: 1px solid var(--modal-border);
+  background: var(--color-gray-50);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-3);
+  flex-shrink: 0;
+  min-height: var(--modal-footer-height);
+}
+
+/* ===== TAB SYSTEM FOR MODALS ===== */
+.modal-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--modal-border);
+  background: var(--color-white);
+  overflow-x: auto;
+  scroll-behavior: smooth;
+}
+
+.modal-tabs::-webkit-scrollbar {
+  height: 4px;
+}
+
+.modal-tabs::-webkit-scrollbar-track {
+  background: var(--color-gray-100);
+}
+
+.modal-tabs::-webkit-scrollbar-thumb {
+  background: var(--color-gray-300);
+  border-radius: var(--radius-full);
+}
+
+.modal-tab {
+  padding: var(--spacing-3) var(--spacing-4);
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-600);
+  border-bottom: 2px solid transparent;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.modal-tab:hover {
+  color: var(--color-primary);
+  background: var(--color-gray-50);
+}
+
+.modal-tab.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  background: var(--color-white);
+}
+
+.modal-tab:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+/* Tab content container */
+.tab-content {
+  display: none;
+  padding: var(--spacing-4);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* ===== MODAL SIZE VARIANTS ===== */
+.modal-dialog.modal-sm {
+  width: var(--modal-width-sm);
+}
+
+.modal-dialog.modal-md {
+  width: var(--modal-width-md);
+}
+
+.modal-dialog.modal-lg {
+  width: var(--modal-width-lg);
+}
+
+.modal-dialog.modal-xl {
+  width: var(--modal-width-xl);
+}
+
+/* ===== SCENARIO SELECTION GRID ===== */
+.scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-4);
+  margin-top: var(--spacing-4);
+}
+
+.scenario-card {
+  padding: var(--spacing-4);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  position: relative;
+}
+
+.scenario-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.scenario-card.selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+/* Scenario component styles consolidated to scenario-modal.css for component ownership */
+/* .scenario-title styles moved to scenario-modal.css */
+/* .scenario-description styles moved to scenario-modal.css */
+
+/* ===== MODAL ANIMATIONS ===== */
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes modalSlideOut {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (width <= 768px) {
+  .modal-dialog {
+    width: 95vw;
+    max-width: 95vw;
+    margin: var(--spacing-4);
+    max-height: calc(100vh - 2rem);
+  }
+
+  .modal-header {
+    padding: var(--spacing-3) var(--spacing-4);
+  }
+
+  .modal-title {
+    font-size: var(--font-size-lg);
+  }
+
+  .modal-body {
+    padding: var(--spacing-4);
+  }
+
+  .modal-footer {
+    padding: var(--spacing-3) var(--spacing-4);
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+
+  .skip-options {
+    flex-direction: column;
+  }
+
+  .scenario-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-3);
+  }
+}
+
+@media (width <= 480px) {
+  .modal-dialog {
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    border-radius: 0;
+    top: 0;
+    left: 0;
+    transform: none;
+  }
+
+  .modal-dialog.visible {
+    transform: none;
+  }
+}
+
+/* ===== ACCESSIBILITY IMPROVEMENTS ===== */
+.modal-dialog[aria-hidden="true"] {
+  display: none;
+}
+
+.modal-dialog:focus {
+  outline: none;
+}
+
+.modal-header button:focus,
+.modal-tab:focus,
+.scenario-card:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .modal-dialog,
+  .modal-backdrop,
+  .modal-tab,
+  .scenario-card {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .modal-dialog {
+    border: 2px solid var(--color-gray-900);
+  }
+
+  .modal-header,
+  .modal-footer {
+    border-color: var(--color-gray-900);
+  }
+}

@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Guest Mode Classroom Creation Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .section {
+        background: white;
+        margin: 20px 0;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .warning {
+        background: #fff3cd;
+        color: #856404;
+      }
+      .info {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 10px 5px;
+        font-size: 16px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      button:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+      }
+      .log {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        padding: 15px;
+        border-radius: 4px;
+        max-height: 400px;
+        overflow-y: auto;
+        font-family: monospace;
+        font-size: 12px;
+        white-space: pre-wrap;
+      }
+      .form-group {
+        margin: 15px 0;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      input,
+      select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🧪 Guest Mode Classroom Creation Test</h1>
+    <p>Direct test of classroom creation functionality in guest mode</p>
+
+    <div class="section">
+      <h2>1. Service Status</h2>
+      <div id="service-status">
+        <div class="status info">Loading services...</div>
+      </div>
+      <button onclick="checkServices()">Check Services</button>
+    </div>
+
+    <div class="section">
+      <h2>2. Test Classroom Form</h2>
+      <div class="form-group">
+        <label for="test-name">Classroom Name:</label>
+        <input type="text" id="test-name" value="Test Classroom Debug" />
+      </div>
+
+      <div class="form-group">
+        <label for="test-instructor">Instructor Name:</label>
+        <input type="text" id="test-instructor" value="Test Instructor" />
+      </div>
+
+      <div class="form-group">
+        <label>Selected Scenarios (will use sample data):</label>
+        <div id="scenario-info" class="status info">
+          Will use sample scenario data
+        </div>
+      </div>
+
+      <button onclick="testDirectCreation()">
+        Test Direct Classroom Creation
+      </button>
+      <button onclick="testModalCreation()">Test Modal-Based Creation</button>
+      <button onclick="testStepByStep()">🔍 Debug Step-by-Step</button>
+    </div>
+
+    <div class="section">
+      <h2>3. Results</h2>
+      <div id="test-results"></div>
+    </div>
+
+    <div class="section">
+      <h2>4. Debug Log</h2>
+      <div id="debug-log" class="log"></div>
+      <button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <script type="module">
+      let services = {};
+
+      // Enhanced console logging
+      const originalConsole = {
+        log: console.log,
+        warn: console.warn,
+        error: console.error,
+      };
+
+      function logMessage(level, ...args) {
+        const timestamp = new Date().toISOString().split("T")[1].split(".")[0];
+        const message = args
+          .map((arg) =>
+            typeof arg === "object"
+              ? JSON.stringify(arg, null, 2)
+              : String(arg),
+          )
+          .join(" ");
+
+        originalConsole[level](...args);
+
+        const logDiv = document.getElementById("debug-log");
+        const logEntry = document.createElement("div");
+        logEntry.textContent = `[${timestamp}] ${level.toUpperCase()}: ${message}`;
+        logEntry.style.color =
+          level === "error" ? "red" : level === "warn" ? "orange" : "black";
+        logDiv.appendChild(logEntry);
+        logDiv.scrollTop = logDiv.scrollHeight;
+      }
+
+      console.log = (...args) => logMessage("log", ...args);
+      console.warn = (...args) => logMessage("warn", ...args);
+      console.error = (...args) => logMessage("error", ...args);
+
+      window.checkServices = async function () {
+        const statusDiv = document.getElementById("service-status");
+        statusDiv.innerHTML =
+          '<div class="status info">Loading services...</div>';
+
+        try {
+          console.log("🔄 Loading classroom services...");
+
+          // Import services
+          const { default: TeacherClassroomModals } = await import(
+            "./src/js/components/teacher-classroom-modals.js"
+          );
+          const { default: RealtimeClassroomService } = await import(
+            "./src/js/services/realtime-classroom-service.js"
+          );
+          const { default: FirebaseService } = await import(
+            "./src/js/services/firebase-service.js"
+          );
+          const { default: DataHandler } = await import(
+            "./src/js/core/data-handler.js"
+          );
+          const { ETHICAL_CATEGORIES } = await import(
+            "./src/data/categories.js"
+          );
+
+          services.TeacherClassroomModals = TeacherClassroomModals;
+          services.RealtimeClassroomService = RealtimeClassroomService;
+          services.categories = ETHICAL_CATEGORIES;
+
+          // Initialize Firebase and DataHandler
+          console.log("🔄 Initializing Firebase services...");
+          services.firebaseService = new FirebaseService();
+          services.dataHandler = new DataHandler({
+            appName: "SimulateAI",
+            version: "1.80",
+            firebaseService: services.firebaseService,
+          });
+
+          // Initialize classroom modal service with proper dependencies
+          services.classroomModal = new TeacherClassroomModals(
+            services.dataHandler,
+            services.firebaseService,
+          );
+
+          console.log("✅ Services loaded and initialized successfully");
+          console.log(
+            "Firebase service initialized:",
+            !!services.firebaseService,
+          );
+          console.log("DataHandler initialized:", !!services.dataHandler);
+          console.log(
+            "Classroom modal initialized:",
+            !!services.classroomModal,
+          );
+          console.log(
+            "Categories available:",
+            Object.keys(services.categories).length,
+          );
+
+          statusDiv.innerHTML = `
+            <div class="status success">✅ All services loaded and initialized successfully</div>
+            <div class="status info">🔥 Firebase service: ${!!services.firebaseService ? "Initialized" : "Failed"}</div>
+            <div class="status info">📊 DataHandler: ${!!services.dataHandler ? "Initialized" : "Failed"}</div>
+            <div class="status info">🏫 Classroom modal: ${!!services.classroomModal ? "Initialized" : "Failed"}</div>
+            <div class="status info">📚 Categories available: ${Object.keys(services.categories).length}</div>
+          `;
+          return true;
+        } catch (error) {
+          console.error("❌ Service loading failed:", error);
+          statusDiv.innerHTML = `<div class="status error">❌ Service loading failed: ${error.message}</div>`;
+          return false;
+        }
+      };
+
+      window.testDirectCreation = async function () {
+        const resultsDiv = document.getElementById("test-results");
+        resultsDiv.innerHTML =
+          '<div class="status info">🔄 Testing direct classroom creation...</div>';
+
+        try {
+          if (!services.classroomModal) {
+            throw new Error(
+              "Services not loaded. Please check services first.",
+            );
+          }
+
+          console.log("🧪 Starting direct classroom creation test");
+
+          // Initialize in guest mode
+          await services.classroomModal.initialize(true);
+          console.log("✅ Initialized in guest mode");
+          console.log(
+            "Guest instructor:",
+            services.classroomModal.currentInstructor,
+          );
+
+          // Create sample scenario data
+          const sampleScenarios = [
+            {
+              id: "ethics-trolley",
+              title: "Trolley Problem",
+              category: "ethics",
+              order: 0,
+            },
+          ];
+
+          // Prepare classroom data
+          const classroomData = {
+            classroomName: document.getElementById("test-name").value,
+            instructorId: services.classroomModal.currentInstructor.uid,
+            instructorName: document.getElementById("test-instructor").value,
+            selectedScenarios: sampleScenarios,
+          };
+
+          console.log("📊 Classroom data prepared:", classroomData);
+
+          // Create classroom directly through service
+          const result =
+            await services.classroomModal.classroomService.createClassroom(
+              classroomData,
+            );
+
+          console.log("🎉 Direct creation successful:", result);
+
+          resultsDiv.innerHTML = `
+                    <div class="status success">✅ Direct creation successful!</div>
+                    <div class="status info">Classroom ID: ${result.classroomId}</div>
+                    <div class="status info">Classroom Code: ${result.classroomCode}</div>
+                `;
+        } catch (error) {
+          console.error("❌ Direct creation failed:", error);
+          resultsDiv.innerHTML = `<div class="status error">❌ Direct creation failed: ${error.message}</div>`;
+        }
+      };
+
+      window.testModalCreation = async function () {
+        const resultsDiv = document.getElementById("test-results");
+        resultsDiv.innerHTML =
+          '<div class="status info">🔄 Testing modal-based classroom creation...</div>';
+
+        try {
+          if (!services.classroomModal) {
+            throw new Error(
+              "Services not loaded. Please check services first.",
+            );
+          }
+
+          console.log("🧪 Starting modal-based classroom creation test");
+
+          // Add timeout protection to prevent infinite hanging
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(
+              () =>
+                reject(new Error("Modal creation timed out after 10 seconds")),
+              10000,
+            );
+          });
+
+          // Test modal creation with timeout
+          const modalPromise =
+            services.classroomModal.showCreateClassroomModal(true);
+
+          console.log("⏰ Starting modal creation with 10-second timeout...");
+
+          await Promise.race([modalPromise, timeoutPromise]);
+          console.log("✅ Modal opened in guest mode");
+
+          resultsDiv.innerHTML = `
+                    <div class="status success">✅ Modal opened successfully!</div>
+                    <div class="status info">Check the modal that appeared - try creating a classroom through it</div>
+                `;
+        } catch (error) {
+          console.error("❌ Modal creation failed:", error);
+          resultsDiv.innerHTML = `<div class="status error">❌ Modal creation failed: ${error.message}</div>`;
+        }
+      };
+
+      window.testStepByStep = async function () {
+        const resultsDiv = document.getElementById("test-results");
+        resultsDiv.innerHTML =
+          '<div class="status info">🔍 Starting step-by-step debug...</div>';
+
+        try {
+          console.log("🔍 === STEP-BY-STEP DEBUGGING ===");
+
+          // Step 1: Check if service exists
+          console.log("Step 1: Checking service...");
+          if (!services.classroomModal) {
+            throw new Error("Service not loaded");
+          }
+          console.log("✅ Service exists");
+
+          // Step 2: Check if already initialized
+          console.log("Step 2: Checking initialization state...");
+          console.log(
+            "Current initialized state:",
+            services.classroomModal.initialized,
+          );
+
+          // Step 3: Check ETHICAL_CATEGORIES
+          console.log("Step 3: Checking ETHICAL_CATEGORIES...");
+          console.log(
+            "Categories available:",
+            Object.keys(services.categories || {}).length,
+          );
+
+          // Step 4: Test individual methods
+          console.log("Step 4: Testing loadAvailableScenarios...");
+          await services.classroomModal.loadAvailableScenarios();
+          console.log("✅ loadAvailableScenarios completed");
+          console.log(
+            "Available scenarios:",
+            services.classroomModal.availableScenarios?.length || 0,
+          );
+
+          // Step 5: Test scenario grouping
+          console.log("Step 5: Testing groupScenariosByCategory...");
+          const grouped = services.classroomModal.groupScenariosByCategory();
+          console.log("✅ groupScenariosByCategory completed");
+          console.log("Grouped categories:", Object.keys(grouped).length);
+
+          // Step 6: Test content building
+          console.log("Step 6: Testing buildCategoriesContent...");
+          const categoriesContent =
+            services.classroomModal.buildCategoriesContent();
+          console.log("✅ buildCategoriesContent completed");
+          console.log("Content length:", categoriesContent.length);
+
+          // Step 7: Test full content building
+          console.log("Step 7: Testing buildCreateClassroomContent...");
+          const fullContent =
+            services.classroomModal.buildCreateClassroomContent(true);
+          console.log("✅ buildCreateClassroomContent completed");
+          console.log("Full content length:", fullContent.length);
+
+          resultsDiv.innerHTML = `
+            <div class="status success">✅ All steps completed successfully!</div>
+            <div class="status info">Available scenarios: ${services.classroomModal.availableScenarios?.length || 0}</div>
+            <div class="status info">Categories: ${Object.keys(grouped).length}</div>
+          `;
+        } catch (error) {
+          console.error("❌ Step-by-step debug failed:", error);
+          resultsDiv.innerHTML = `<div class="status error">❌ Debug failed at: ${error.message}</div>`;
+        }
+      };
+
+      window.clearLog = function () {
+        document.getElementById("debug-log").innerHTML = "";
+      };
+
+      // Auto-load services on page load
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log("🚀 Test page loaded, checking services...");
+        checkServices();
+      });
+    </script>
+  </body>
+</html>

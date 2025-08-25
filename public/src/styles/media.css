@@ -1,0 +1,976 @@
+/**
+ * Copyright 2025 Armando Sori
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Standardized Media Queries for SimulateAI
+ * Device-specific breakpoints based on popular viewport dimensions
+ * 
+ * Usage:
+ * Import this file and use the defined breakpoints consistently
+ * across all components for unified responsive behavior.
+ */
+
+@layer layout {
+  /* ===== CSS CUSTOM PROPERTIES FOR BREAKPOINTS ===== */
+  :root {
+    /* Default fallback values for all viewports */
+    --container-padding: 16px; /* Safe default for any viewport */
+    --font-scale: 1; /* Standard scaling fallback */
+    --touch-target-min: 44px; /* Accessibility minimum */
+    --device-type: "unknown";
+    --device-category: "unknown";
+
+    /* Mobile Breakpoints */
+    --breakpoint-xs: 360px; /* Samsung Galaxy S21 */
+    --breakpoint-sm: 375px; /* iPhone SE */
+    --breakpoint-md: 390px; /* iPhone 12/13/14 */
+    --breakpoint-lg: 393px; /* Google Pixel 5 */
+    --breakpoint-xl: 428px; /* iPhone 12 Pro Max */
+
+    /* Tablet Breakpoints */
+    --breakpoint-tablet-sm: 768px; /* iPad Mini */
+    --breakpoint-tablet-md: 800px; /* Galaxy Tab S7+ */
+    --breakpoint-tablet-lg: 820px; /* iPad Air 5th Gen */
+    --breakpoint-tablet-xl: 1024px; /* iPad Pro 12.9" */
+
+    /* Laptop/Desktop Breakpoints */
+    --breakpoint-laptop-sm: 1280px; /* MacBook Air 13" */
+    --breakpoint-laptop-md: 1366px; /* Standard HD Laptop */
+    --breakpoint-laptop-lg: 1500px; /* Microsoft Surface Book */
+    --breakpoint-laptop-xl: 1536px; /* MacBook Pro 16" */
+
+    /* Ultra-wide Desktop */
+    --breakpoint-desktop-xl: 1920px; /* Full HD Desktop */
+    --breakpoint-desktop-2k: 2560px; /* 2K Desktop */
+    --breakpoint-desktop-4k: 3840px; /* 4K Desktop */
+  }
+
+  /* ===== MOBILE DEVICES ===== */
+
+  /* Extra small viewports (under 360px) - Legacy or small devices */
+  @media only screen and (width <= 359px) {
+    :root {
+      --device-type: "mobile-xxs";
+      --container-padding: 8px; /* Minimal padding for very small screens */
+      --font-scale: 0.8; /* Smaller text scaling */
+      --touch-target-min: 44px; /* Maintain accessibility standards */
+      --floating-tab-width: 180px;
+      --floating-tab-height: 44px;
+      --floating-tab-protrusion: 24px;
+    }
+  }
+
+  /* Samsung Galaxy S21 (360×800) - Extra small mobile */
+  @media only screen and (width >= 360px) and (width <= 374px) {
+    :root {
+      --device-type: "mobile-xs";
+      --container-padding: 12px;
+      --font-scale: 0.85;
+      --touch-target-min: 44px;
+      --floating-tab-width: 200px;
+      --floating-tab-height: 48px;
+      --floating-tab-protrusion: 30px;
+    }
+  }
+
+  /* iPhone SE (375×667) - Small mobile */
+  @media only screen and (width >= 375px) and (width <= 389px) {
+    :root {
+      --device-type: "mobile-sm";
+      --container-padding: 14px;
+      --font-scale: 0.9;
+      --touch-target-min: 44px;
+      --floating-tab-width: 210px;
+      --floating-tab-height: 50px;
+      --floating-tab-protrusion: 32px;
+    }
+  }
+
+  /* iPhone 12/13/14 & Google Pixel 5 (390-393×844-851) - Modern mobile */
+  @media only screen and (width >= 390px) and (width <= 399px) {
+    :root {
+      --device-type: "mobile-md";
+      --container-padding: 16px;
+      --font-scale: 0.95;
+      --touch-target-min: 44px;
+      --floating-tab-width: 220px;
+      --floating-tab-height: 52px;
+      --floating-tab-protrusion: 34px;
+    }
+  }
+
+  /* iPhone 12 Pro Max (428×926) - Large mobile */
+  @media only screen and (width >= 400px) and (width <= 479px) {
+    :root {
+      --device-type: "mobile-lg";
+      --container-padding: 18px;
+      --font-scale: 1;
+      --touch-target-min: 44px;
+      --floating-tab-width: 240px;
+      --floating-tab-height: 54px;
+      --floating-tab-protrusion: 36px;
+    }
+  }
+
+  /* General mobile fallback (up to 767px) */
+  @media only screen and (width <= 767px) {
+    :root {
+      --device-category: "mobile";
+      --layout-type: "single-column";
+      --nav-type: "bottom-nav";
+      --sidebar-behavior: "overlay";
+    }
+  }
+
+  /* ===== TABLET DEVICES ===== */
+
+  /* iPad Mini & Samsung Galaxy Tab (768-820×1024-1280) - Small tablets */
+  @media only screen and (width >= 768px) and (width <= 820px) {
+    :root {
+      --device-type: "tablet-sm";
+      --container-padding: 20px;
+      --font-scale: 1.05;
+      --touch-target-min: 44px;
+      --floating-tab-width: 260px;
+      --floating-tab-height: 58px;
+      --floating-tab-protrusion: 38px;
+    }
+  }
+
+  /* iPad Air 5th Gen & Large Tablets (821-1023×1180-1366) - Medium tablets */
+  @media only screen and (width >= 821px) and (width <= 1023px) {
+    :root {
+      --device-type: "tablet-md";
+      --container-padding: 24px;
+      --font-scale: 1.1;
+      --touch-target-min: 44px;
+      --floating-tab-width: 270px;
+      --floating-tab-height: 59px;
+      --floating-tab-protrusion: 40px;
+    }
+  }
+
+  /* iPad Pro 12.9" (1024-1279×1366) - Large tablets */
+  @media only screen and (width >= 1024px) and (width <= 1279px) {
+    :root {
+      --device-type: "tablet-lg";
+      --container-padding: 28px;
+      --font-scale: 1.15;
+      --touch-target-min: 44px;
+      --floating-tab-width: 280px;
+      --floating-tab-height: 60px;
+      --floating-tab-protrusion: 42px;
+    }
+  }
+
+  /* General tablet range */
+  @media only screen and (width >= 768px) and (width <= 1279px) {
+    :root {
+      --device-category: "tablet";
+      --layout-type: "two-column";
+      --nav-type: "side-nav";
+      --sidebar-behavior: "collapse";
+    }
+  }
+
+  /* ===== LAPTOP DEVICES ===== */
+
+  /* MacBook Air 13" & Standard HD (1280-1366×768-800) - Compact laptops */
+  @media only screen and (width >= 1280px) and (width <= 1366px) {
+    :root {
+      --device-type: "laptop-sm";
+      --container-padding: 32px;
+      --font-scale: 1;
+      --touch-target-min: 40px;
+      --floating-tab-width: 300px;
+      --floating-tab-height: 62px;
+      --floating-tab-protrusion: 44px;
+    }
+  }
+
+  /* Microsoft Surface Book (1367-1535×1000) - Medium laptops */
+  @media only screen and (width >= 1367px) and (width <= 1535px) {
+    :root {
+      --device-type: "laptop-md";
+      --container-padding: 36px;
+      --font-scale: 1.05;
+      --touch-target-min: 40px;
+      --floating-tab-width: 310px;
+      --floating-tab-height: 63px;
+      --floating-tab-protrusion: 46px;
+    }
+  }
+
+  /* MacBook Pro 16" (1536+×960+) - Large laptops */
+  @media only screen and (width >= 1536px) and (width <= 1919px) {
+    :root {
+      --device-type: "laptop-lg";
+      --container-padding: 40px;
+      --font-scale: 1.1;
+      --touch-target-min: 40px;
+      --floating-tab-width: 320px;
+      --floating-tab-height: 64px;
+      --floating-tab-protrusion: 48px;
+    }
+  }
+
+  /* General laptop range */
+  @media only screen and (width >= 1280px) and (width <= 1919px) {
+    :root {
+      --device-category: "laptop";
+      --layout-type: "multi-column";
+      --nav-type: "top-nav";
+      --sidebar-behavior: "persistent";
+    }
+  }
+
+  /* ===== DESKTOP DEVICES ===== */
+
+  /* Full HD Desktop (1920-2559×1080+) */
+  @media only screen and (width >= 1920px) and (width <= 2559px) {
+    :root {
+      --device-type: "desktop-fhd";
+      --container-padding: 48px;
+      --font-scale: 1.15;
+      --touch-target-min: 40px;
+      --floating-tab-width: 340px;
+      --floating-tab-height: 66px;
+      --floating-tab-protrusion: 50px;
+    }
+  }
+
+  /* 2K Desktop (2560-3839×1440+) */
+  @media only screen and (width >= 2560px) and (width <= 3839px) {
+    :root {
+      --device-type: "desktop-2k";
+      --container-padding: 56px;
+      --font-scale: 1.25;
+      --touch-target-min: 40px;
+      --floating-tab-width: 360px;
+      --floating-tab-height: 68px;
+      --floating-tab-protrusion: 52px;
+    }
+  }
+
+  /* 4K Desktop (3840+×2160+) */
+  @media only screen and (width >= 3840px) {
+    :root {
+      --device-type: "desktop-4k";
+      --container-padding: 64px;
+      --font-scale: 1.4;
+      --touch-target-min: 44px;
+      --floating-tab-width: 400px;
+      --floating-tab-height: 72px;
+      --floating-tab-protrusion: 54px;
+    }
+  }
+
+  /* General desktop range */
+  @media only screen and (width >= 1920px) {
+    :root {
+      --device-category: "desktop";
+      --layout-type: "wide-multi-column";
+      --nav-type: "mega-nav";
+      --sidebar-behavior: "dual-sidebar";
+    }
+  }
+
+  /* ===== ORIENTATION-BASED ADJUSTMENTS ===== */
+
+  /* Portrait orientation adjustments */
+  @media only screen and (orientation: portrait) {
+    :root {
+      --orientation: "portrait";
+      --header-height: 80px;
+      --header-h: 80px;
+      --footer-height: 80px;
+    }
+  }
+
+  /* Landscape orientation adjustments */
+  @media only screen and (orientation: landscape) {
+    :root {
+      --orientation: "landscape";
+      --header-height: 80px;
+      --header-h: 80px;
+      --footer-height: 64px;
+    }
+  }
+
+  /* ===== ACCESSIBILITY & PREFERENCE OVERRIDES ===== */
+
+  /* High contrast mode */
+  @media (prefers-contrast: high) {
+    :root {
+      --accessibility-mode: "high-contrast";
+      --border-width: 2px;
+      --focus-ring-width: 4px;
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --animation-duration: 0ms;
+      --transition-duration: 0ms;
+      --accessibility-mode: "reduced-motion";
+    }
+  }
+
+  /* Increased text size preference */
+  @media (prefers-reduced-data: reduce) {
+    :root {
+      --data-saver-mode: "enabled";
+      --image-quality: "low";
+      --animation-enabled: "false";
+    }
+  }
+
+  /* ===== PRINT STYLES ===== */
+  @media print {
+    :root {
+      --device-type: "print";
+      --color-scheme: "light";
+    }
+
+    /* Hide interactive elements in print */
+    .floating-tab-link,
+    .floating-tour-tab-link,
+    .floating-surprise-tab-link,
+    .floating-action-tab,
+    .floating-surprise-tab,
+    .floating-tour-tab,
+    nav,
+    .sidebar,
+    .modal,
+    .tooltip {
+      display: none !important;
+    }
+  }
+
+  /* ===== COMPONENT-SPECIFIC HELPER CLASSES ===== */
+
+  /* Floating Tab Responsive Utilities */
+  .floating-tab-responsive {
+    width: var(--floating-tab-width);
+    height: var(--floating-tab-height);
+    transform: translateX(calc(100% - var(--floating-tab-protrusion)));
+  }
+
+  @layer utilities {
+    /* Layout Container Responsive Utilities */
+    .layout-container-responsive {
+      padding-left: var(--container-padding);
+      padding-right: var(--container-padding);
+      /* Enhanced responsiveness for container spacing */
+      max-width: 100vw; /* Prevent horizontal overflow */
+      box-sizing: border-box; /* Include padding in width calculations */
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  /* Additional responsive container variants */
+  .layout-container-tight {
+    padding-left: calc(var(--container-padding) * 0.75);
+    padding-right: calc(var(--container-padding) * 0.75);
+  }
+
+  .layout-container-loose {
+    padding-left: calc(var(--container-padding) * 1.5);
+    padding-right: calc(var(--container-padding) * 1.5);
+  }
+
+  /* Font Scale Utilities */
+  .text-responsive {
+    font-size: calc(1rem * var(--font-scale));
+  }
+
+  /* Enhanced responsive text utilities */
+  .text-responsive-small {
+    font-size: calc(0.875rem * var(--font-scale)); /* 14px base */
+  }
+
+  .text-responsive-large {
+    font-size: calc(1.125rem * var(--font-scale)); /* 18px base */
+  }
+
+  .text-responsive-heading {
+    font-size: calc(1.5rem * var(--font-scale)); /* 24px base */
+    line-height: calc(1.2 * var(--font-scale, 1));
+  }
+
+  /* Small viewport text optimization */
+  @media only screen and (width <= 360px) {
+    .text-responsive-heading {
+      font-size: calc(
+        1.25rem * var(--font-scale)
+      ); /* Smaller headings on tiny screens */
+    }
+  }
+
+  /* Touch Target Utilities */
+  .touch-target {
+    min-height: var(--touch-target-min);
+    min-width: var(--touch-target-min);
+  }
+
+  /* ===== RESPONSIVE FLEXBOX UTILITIES ===== */
+
+  /* Basic Flexbox */
+  .flex {
+    display: flex;
+  }
+
+  .inline-flex {
+    display: inline-flex;
+  }
+
+  /* Flex Direction */
+  .flex-row {
+    flex-direction: row;
+  }
+
+  .flex-col {
+    flex-direction: column;
+  }
+
+  .flex-row-reverse {
+    flex-direction: row-reverse;
+  }
+
+  .flex-col-reverse {
+    flex-direction: column-reverse;
+  }
+
+  /* Flex Wrap */
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
+
+  .flex-nowrap {
+    flex-wrap: nowrap;
+  }
+
+  .flex-wrap-reverse {
+    flex-wrap: wrap-reverse;
+  }
+
+  /* Justify Content */
+  .justify-start {
+    justify-content: flex-start;
+  }
+
+  .justify-end {
+    justify-content: flex-end;
+  }
+
+  .justify-center {
+    justify-content: center;
+  }
+
+  .justify-between {
+    justify-content: space-between;
+  }
+
+  .justify-around {
+    justify-content: space-around;
+  }
+
+  .justify-evenly {
+    justify-content: space-evenly;
+  }
+
+  /* Align Items */
+  .items-start {
+    align-items: flex-start;
+  }
+
+  .items-end {
+    align-items: flex-end;
+  }
+
+  .items-center {
+    align-items: center;
+  }
+
+  .items-baseline {
+    align-items: baseline;
+  }
+
+  .items-stretch {
+    align-items: stretch;
+  }
+
+  /* Align Content */
+  .content-start {
+    align-content: flex-start;
+  }
+
+  .content-end {
+    align-content: flex-end;
+  }
+
+  .content-center {
+    align-content: center;
+  }
+
+  .content-between {
+    align-content: space-between;
+  }
+
+  .content-around {
+    align-content: space-around;
+  }
+
+  .content-evenly {
+    align-content: space-evenly;
+  }
+
+  /* Align Self */
+  .self-auto {
+    align-self: auto;
+  }
+
+  .self-start {
+    align-self: flex-start;
+  }
+
+  .self-end {
+    align-self: flex-end;
+  }
+
+  .self-center {
+    align-self: center;
+  }
+
+  .self-stretch {
+    align-self: stretch;
+  }
+
+  .self-baseline {
+    align-self: baseline;
+  }
+
+  /* Flex Grow/Shrink */
+  .flex-1 {
+    flex: 1 1 0%;
+  }
+
+  .flex-auto {
+    flex: 1 1 auto;
+  }
+
+  .flex-initial {
+    flex: 0 1 auto;
+  }
+
+  .flex-none {
+    flex: none;
+  }
+
+  .grow {
+    flex-grow: 1;
+  }
+
+  .grow-0 {
+    flex-grow: 0;
+  }
+
+  .shrink {
+    flex-shrink: 1;
+  }
+
+  .shrink-0 {
+    flex-shrink: 0;
+  }
+
+  /* Gap Utilities (responsive to container-padding) */
+  .gap-xs {
+    gap: calc(var(--container-padding) * 0.25);
+  }
+
+  .gap-sm {
+    gap: calc(var(--container-padding) * 0.5);
+  }
+
+  .gap-md {
+    gap: var(--container-padding);
+  }
+
+  .gap-lg {
+    gap: calc(var(--container-padding) * 1.5);
+  }
+
+  .gap-xl {
+    gap: calc(var(--container-padding) * 2);
+  }
+
+  /* Responsive Flexbox - Mobile First */
+  @media only screen and (width <= 767px) {
+    .mobile\:flex-col {
+      flex-direction: column;
+    }
+
+    .mobile\:flex-wrap {
+      flex-wrap: wrap;
+    }
+
+    .mobile\:justify-center {
+      justify-content: center;
+    }
+
+    .mobile\:items-center {
+      align-items: center;
+    }
+  }
+
+  /* Responsive Flexbox - Tablet */
+  @media only screen and (width >= 768px) and (width <= 1279px) {
+    .tablet\:flex-row {
+      flex-direction: row;
+    }
+
+    .tablet\:justify-between {
+      justify-content: space-between;
+    }
+  }
+
+  /* Responsive Flexbox - Desktop */
+  @media only screen and (width >= 1280px) {
+    .desktop\:flex-row {
+      flex-direction: row;
+    }
+
+    .desktop\:justify-start {
+      justify-content: flex-start;
+    }
+  }
+
+  /* ===== COMMON COMPONENT RESPONSIVE UTILITIES ===== */
+
+  /* Most Frequently Used Breakpoint Classes */
+  .mobile-hide {
+    display: block;
+  }
+
+  .mobile-show {
+    display: none;
+  }
+
+  .tablet-hide {
+    display: block;
+  }
+
+  .tablet-show {
+    display: none;
+  }
+
+  .desktop-hide {
+    display: block;
+  }
+
+  .desktop-show {
+    display: none;
+  }
+
+  /* Apply responsive visibility classes */
+  @media only screen and (width <= 767px) {
+    .mobile-hide {
+      display: none !important;
+    }
+
+    .mobile-show {
+      display: block !important;
+    }
+
+    /* Common mobile adjustments */
+    .mobile\:text-center {
+      text-align: center;
+    }
+
+    .mobile\:full-width {
+      width: 100%;
+    }
+
+    .mobile\:padding-sm {
+      padding: var(--spacing-3);
+    }
+
+    .mobile\:margin-auto {
+      margin: 0 auto;
+    }
+  }
+
+  @media only screen and (width >= 768px) and (width <= 1279px) {
+    .tablet-hide {
+      display: none !important;
+    }
+
+    .tablet-show {
+      display: block !important;
+    }
+
+    /* Common tablet adjustments */
+    .tablet\:two-column {
+      column-count: 2;
+      column-gap: var(--spacing-6);
+    }
+  }
+
+  @media only screen and (width >= 1280px) {
+    .desktop-hide {
+      display: none !important;
+    }
+
+    .desktop-show {
+      display: block !important;
+    }
+
+    /* Common desktop adjustments */
+    .desktop\:three-column {
+      column-count: 3;
+      column-gap: var(--spacing-8);
+    }
+  }
+
+  /* ===== FREQUENTLY USED ACCESSIBILITY UTILITIES ===== */
+
+  /* Reduced motion utilities */
+  @media (prefers-reduced-motion: reduce) {
+    .respect-motion {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+
+    .no-motion {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+
+  /* High contrast utilities */
+  @media (prefers-contrast: high) {
+    .high-contrast-border {
+      border: 2px solid currentColor !important;
+    }
+
+    .high-contrast-text {
+      color: CanvasText !important;
+      background: Canvas !important;
+    }
+
+    .high-contrast-focus:focus {
+      outline: 3px solid Highlight !important;
+      outline-offset: 2px !important;
+    }
+  }
+
+  /* Manual dark mode utilities only - no system preference detection */
+  .dark-mode .auto-dark-bg {
+    background: #1a1a1a;
+    color: #ffffff;
+  }
+
+  .dark-mode .auto-dark-border {
+    border-color: #404040;
+  }
+
+  /* Print utilities */
+  @media print {
+    .print-hide {
+      display: none !important;
+    }
+
+    .print-show {
+      display: block !important;
+    }
+
+    .print-page-break {
+      page-break-after: always;
+    }
+
+    .print-no-break {
+      page-break-inside: avoid;
+    }
+
+    .print-black-text {
+      color: black !important;
+    }
+
+    .print-white-bg {
+      background: white !important;
+    }
+  }
+
+  /* Touch device utilities */
+  @media (hover: none) and (pointer: coarse) {
+    .touch-larger {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    .touch-spacing {
+      margin: 8px;
+    }
+
+    .touch-no-hover:hover {
+      /* Reset hover states on touch devices */
+      background: initial;
+      transform: none;
+      box-shadow: initial;
+    }
+  }
+
+  /* ===== SMALL VIEWPORT SPECIFIC FIXES ===== */
+
+  /* Enhanced mobile support for very small screens */
+  @media only screen and (width <= 320px) {
+    .layout-container-responsive {
+      /* Ultra-minimal padding for tiny screens */
+      padding-left: 6px;
+      padding-right: 6px;
+    }
+
+    .layout-container-tight {
+      padding-left: 4px;
+      padding-right: 4px;
+    }
+  }
+
+  /* Landscape mobile adjustments */
+  @media only screen and (width <= 667px) and (orientation: landscape) {
+    /* Additional landscape adjustments can be added here for general layout containers */
+  }
+
+  /* ===== DEBUGGING UTILITIES (Remove in production) ===== */
+  @media (width >= 1px) {
+    .debug-viewport::before {
+      content: "Device: " var(--device-type, "unknown") " | Category: "
+        var(--device-category, "unknown");
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: rgb(255 0 0 / 80%);
+      color: white;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-family: monospace;
+      z-index: 9999;
+      pointer-events: none;
+    }
+  }
+
+  /* ===== MEDIA QUERY CONSOLIDATION SUMMARY ===== */
+
+  /**
+ * CONSOLIDATION COMPLETED FOR:
+ * 
+ * ✅ category-grid.css (Phase 1) - Removed 4 duplicate media query blocks:
+ *    - @media (prefers-reduced-motion: reduce) → Use .no-motion class
+ *    - @media (prefers-contrast: high) → Use .high-contrast-border class  
+ *    - @media print → Use .print-hide, .print-show, .print-no-break classes
+ *    - @media (width <= 768px) mobile view toggles → Use .mobile-hide/.mobile-show classes
+ * 
+ * ✅ floating-tabs-consolidated.css (Phase 2) - Consolidated 7 media query blocks to 6 utility classes + 1 standard breakpoint:
+ *    - @media (width <= 768px) → Using responsive CSS variables from media.css (1 instance removed, 1 standardized)
+ *    - @media (width <= 480px) → Using responsive CSS variables from media.css (removed)
+ *    - @media (prefers-reduced-motion: reduce) → Use .no-motion class (removed)
+ *    - @media (prefers-contrast: high) → Use .high-contrast-border class (removed)
+ *    - @media print → Use .print-hide class (removed)
+ *    - Component-specific responsive → Kept as standardized @media (width <= 768px) breakpoint
+ * 
+ * ✅ scenario-modal.css (Phase 3) - Consolidated 2 accessibility media queries to utility classes:
+ *    - @media (prefers-reduced-motion: reduce) → Use .no-motion class (removed)
+ *    - @media (prefers-contrast: high) → Use .high-contrast-border class (removed)
+ *    - Component-specific breakpoints → Kept as standardized responsive breakpoints (4 instances)
+ * 
+ * ✅ scenario-card.css (Phase 4) - Consolidated responsive breakpoints to use CSS variables:
+ *    - @media (width >= 1280px) → Removed (desktop is default)
+ *    - @media (width <= 767px) → Enhanced with --container-padding variables
+ *    - @media (width >= 768px) and (width <= 1279px) → Simplified tablet adjustments
+ *    - Hardcoded spacing → Replaced with responsive --container-padding calculations
+ * 
+ * ✅ badge-modal.css (Phase 5) - Consolidated accessibility and enhanced responsive breakpoints:
+ *    - @media (prefers-reduced-motion: reduce) → Use .no-motion utility class (removed)
+ *    - @media (prefers-contrast: high) → Use .high-contrast-border utility class (removed)
+ *    - Enhanced responsive breakpoints with --font-scale and --container-padding variables
+ *    - Proportional scaling for better device-appropriate sizing
+ * 
+ * ✅ scenario-browser.css (Phase 6) - Complete .scenarios-grid consolidation from category-grid.css:
+ *    - Moved all .scenarios-grid styles from category-grid.css to scenario-browser.css
+ *    - Consolidated grid layout, [data-view="scenario"] mode, toolbar controls
+ *    - Unified responsive breakpoints (769px, 1024px, 1200px) with --container-padding
+ *    - Mobile responsive layout (≤768px) with stacked toolbar and full-width search
+ *    - Single source of truth for grid behavior across category-grid.js, scenario-browser.js, ethics-explorer
+ * 
+ * ✅ scenario-card.css (Phase 7) - Enhanced .scenario-card responsive design with CSS variables:
+ *    - Added --font-scale responsive scaling to base .scenario-card selector
+ *    - Enhanced mobile @media (width <= 767px) with responsive border-radius, shadows, transforms
+ *    - Enhanced tablet @media (width >= 768px) and (width <= 1279px) with proportional scaling
+ *    - Better touch interaction on mobile (reduced hover transforms and shadows)
+ *    - Consistent responsive behavior using --container-padding and --font-scale variables
+ * 
+ * ✅ LAYOUT NAMESPACE MIGRATION (Phase 8) - Container utility class organization:
+ *    - Migrated .container-responsive → .layout-container-responsive
+ *    - Migrated .container-responsive-tight → .layout-container-tight  
+ *    - Migrated .container-responsive-loose → .layout-container-loose
+ *    - Updated 4 CSS files, 6 HTML files, 1 JavaScript file (25+ references)
+ *    - Improved CSS architecture with clear namespacing and conflict prevention
+ *    - Enhanced developer experience with semantic utility class names
+ * 
+ * 📈 CONSOLIDATION IMPACT SO FAR:
+ *    - Lines Reduced: ~325 lines total (45 + 95 + 25 + 15 + 25 + 80 + 15 + 25 from all phases)
+ *    - Files Optimized: 11 of 50+ files with media queries (7 consolidated + 4 namespace migrated)
+ *    - Consistency: Standardized responsive behavior across components
+ *    - Maintenance: Centralized media query logic in media.css + component ownership
+ *    - Organization: Namespaced utility classes prevent conflicts and improve clarity
+ * 
+ * 🚀 NEXT FILES TO CONSOLIDATE (Phase 7+):
+ *    - ethics-explorer.css (4+ media queries)
+ *    - enhanced-objects.css (8+ media queries)
+ *    - component-grid.css (5+ media queries)
+ *    - modal-styles.css (4+ media queries)
+ *    - simulation-controls.css (3+ media queries)
+ * 
+ * 💡 USAGE EXAMPLES:
+ * 
+ *    Instead of: @media (width <= 768px) { .element { display: none; } }
+ *    Use: <div class="element mobile-hide">
+ * 
+ *    Instead of: @media (prefers-reduced-motion: reduce) { .element { animation: none; } }
+ *    Use: <div class="element no-motion">
+ * 
+ *    Instead of: @media print { .element { display: none; } }
+ *    Use: <div class="element print-hide">
+ *    
+ *    Instead of: @media (width <= 767px) { .element { padding: 16px; } }
+ *    Use: padding: var(--container-padding); (auto-adjusts per device)
+ *    
+ *    Instead of: @media (width <= 480px) { .element { font-size: 14px; } }
+ *    Use: font-size: calc(1rem * var(--font-scale)); (auto-scales per device)
+ * 
+ * 📊 REMAINING CONSOLIDATION OPPORTUNITIES:
+ *    - 75+ duplicate @media (width <= 768px) across 18+ files (reduced from 100+)
+ *    - 35+ duplicate @media (prefers-reduced-motion: reduce) across 11+ files (reduced from 60+)
+ *    - 20+ duplicate @media (prefers-contrast: high) across 6+ files (reduced from 40+)
+ *    - 18+ duplicate @media print across 5+ files (reduced from 30+)
+ *    
+ * 🎯 PHASE 8 COMPLETE: Layout namespace migration - All .container-responsive utilities now use semantic .layout-container-* naming!
+ */
+} /* End @layer utilities */

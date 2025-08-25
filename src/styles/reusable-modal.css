@@ -1,0 +1,186 @@
+/* Reusable Modal/Dialog Component Styles */
+
+@layer components {
+  .reusable-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgb(0 0 0 / 45%);
+    z-index: 10000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .reusable-modal-backdrop.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .reusable-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.98);
+    background: var(--background-secondary, #fff);
+    color: var(--text-primary, #1f2937);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgb(0 0 0 / 18%);
+    z-index: 10001;
+    min-width: 320px;
+    max-width: 90vw;
+    min-height: 120px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity 0.2s,
+      transform 0.2s;
+  }
+
+  .reusable-modal.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .reusable-modal-header {
+    padding: 20px 24px 12px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .reusable-modal-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .reusable-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #6b7280;
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 2px 8px;
+    transition: background 0.15s;
+  }
+
+  .reusable-modal-close:hover,
+  .reusable-modal-close:focus {
+    background: #f3f4f6;
+    color: #111827;
+    outline: 2px solid #3b82f6;
+  }
+
+  .reusable-modal-body {
+    padding: 16px 24px;
+    flex: 1 1 auto;
+    overflow-y: auto;
+  }
+
+  .reusable-modal-footer {
+    padding: 12px 24px 20px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  @media (width <= 600px) {
+    .reusable-modal {
+      min-width: 0;
+      width: 98vw;
+      max-width: 98vw;
+      padding: 0;
+    }
+
+    .reusable-modal-header,
+    .reusable-modal-body,
+    .reusable-modal-footer {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+  }
+
+  /* ===== DARK MODE SUPPORT ===== */
+  body.dark-mode .reusable-modal-backdrop {
+    background: rgb(0 0 0 / 70%);
+  }
+
+  body.dark-mode .reusable-modal {
+    background: var(--theme-bg-secondary);
+    color: var(--theme-text-primary);
+    border: 1px solid var(--theme-border);
+    box-shadow: 0 12px 40px rgb(0 0 0 / 50%);
+  }
+
+  body.dark-mode .reusable-modal-header {
+    background: var(--theme-bg-primary);
+    border-bottom: 1px solid var(--theme-border);
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .reusable-modal-close {
+    color: var(--theme-text-secondary);
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+  }
+
+  body.dark-mode .reusable-modal-close:hover {
+    color: var(--theme-text-primary);
+    background: var(--theme-bg-primary);
+    border-color: var(--theme-border-hover);
+  }
+
+  body.dark-mode .reusable-modal-body {
+    background: var(--theme-bg-secondary);
+    color: var(--theme-text-primary);
+  }
+
+  body.dark-mode .reusable-modal-footer {
+    background: var(--theme-bg-primary);
+    border-top: 1px solid var(--theme-border);
+  }
+
+  /* Footer buttons */
+  body.dark-mode .reusable-modal-footer .btn {
+    background: var(--theme-bg-secondary);
+    color: var(--theme-text-primary);
+    border: 1px solid var(--theme-border);
+  }
+
+  body.dark-mode .reusable-modal-footer .btn:hover {
+    background: var(--theme-bg-primary);
+    border-color: var(--theme-border-hover);
+  }
+
+  body.dark-mode .reusable-modal-footer .btn.btn-primary {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+  }
+
+  body.dark-mode .reusable-modal-footer .btn.btn-primary:hover {
+    background: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+  }
+
+  body.dark-mode .reusable-modal-footer .btn.btn-secondary {
+    background: var(--theme-bg-secondary);
+    color: var(--theme-text-secondary);
+    border: 1px solid var(--theme-border);
+  }
+
+  body.dark-mode .reusable-modal-footer .btn.btn-secondary:hover {
+    background: var(--theme-bg-primary);
+    color: var(--theme-text-primary);
+    border-color: var(--theme-border-hover);
+  }
+} /* End @layer components */
