@@ -1,0 +1,201 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SimulateAI Content Schema",
+  "description": "Schema for categories, scenarios, and learning labs",
+  "definitions": {
+    "ethicalFramework": {
+      "type": "string",
+      "enum": [
+        "utilitarian",
+        "deontological",
+        "virtue-ethics",
+        "care-ethics",
+        "consequentialism",
+        "duty-ethics",
+        "moral-calculus"
+      ]
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": ["beginner", "intermediate", "advanced"]
+    },
+    "targetAudience": {
+      "type": "string",
+      "enum": ["elementary", "middle", "high", "college", "professional", "general"]
+    },
+    "impactScore": {
+      "type": "integer",
+      "minimum": -2,
+      "maximum": 2
+    },
+    "ethicsMetrics": {
+      "type": "object",
+      "properties": {
+        "fairness": { "$ref": "#/definitions/impactScore" },
+        "sustainability": { "$ref": "#/definitions/impactScore" },
+        "autonomy": { "$ref": "#/definitions/impactScore" },
+        "beneficence": { "$ref": "#/definitions/impactScore" },
+        "transparency": { "$ref": "#/definitions/impactScore" },
+        "accountability": { "$ref": "#/definitions/impactScore" },
+        "privacy": { "$ref": "#/definitions/impactScore" },
+        "proportionality": { "$ref": "#/definitions/impactScore" }
+      },
+      "required": ["fairness", "transparency", "privacy"]
+    },
+    "scenario": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "dilemma": { "type": "string" },
+        "ethicalQuestion": { "type": "string" },
+        "difficulty": { "$ref": "#/definitions/difficulty" },
+        "estimatedTime": { "type": "integer" },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "text": { "type": "string" },
+              "description": { "type": "string" },
+              "impact": { "$ref": "#/definitions/ethicsMetrics" },
+              "pros": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "cons": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["id", "text", "description", "impact"]
+          },
+          "minItems": 2,
+          "maxItems": 4
+        }
+      },
+      "required": ["id", "title", "dilemma", "ethicalQuestion", "options"]
+    },
+    "learningLab": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "overview": { "type": "string" },
+        "learningObjectives": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "phases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "duration": { "type": "string" },
+              "activities": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "resources": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["name", "duration", "activities"]
+          },
+          "minItems": 3,
+          "maxItems": 5
+        },
+        "assessmentRubric": {
+          "type": "object",
+          "properties": {
+            "criteria": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "levels": {
+                    "type": "object",
+                    "properties": {
+                      "exemplary": { "type": "string" },
+                      "proficient": { "type": "string" },
+                      "developing": { "type": "string" },
+                      "beginning": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "educatorResources": {
+          "type": "object",
+          "properties": {
+            "discussionQuestions": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "extensionActivities": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "crossCurricularConnections": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        }
+      },
+      "required": ["id", "title", "overview", "learningObjectives", "phases"]
+    },
+    "category": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "icon": { "type": "string" },
+        "difficulty": { "$ref": "#/definitions/difficulty" },
+        "estimatedTime": { "type": "integer" },
+        "color": { "type": "string" },
+        "philosophicalApproaches": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/ethicalFramework" }
+        },
+        "primaryPhilosophy": { "$ref": "#/definitions/ethicalFramework" },
+        "ethicalFrameworks": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/ethicalFramework" }
+        },
+        "targetAudience": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/targetAudience" }
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "scenarios": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/scenario" },
+          "minItems": 3,
+          "maxItems": 5
+        },
+        "learningLab": { "$ref": "#/definitions/learningLab" }
+      },
+      "required": ["id", "title", "description", "scenarios"]
+    }
+  },
+  "type": "object",
+  "properties": {
+    "categories": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/category" }
+    }
+  },
+  "required": ["categories"]
+}

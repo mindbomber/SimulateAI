@@ -1,0 +1,210 @@
+{
+  "id": "automation-oversight-lab",
+  "title": "Balancing Automation and Human Oversight",
+  "subtitle": "Navigating Authority and Accountability in Human-AI Systems",
+  "categoryId": "automation-oversight",
+  "difficulty": "intermediate",
+  "estimatedTime": 50,
+  "description": "Explore the complex dynamics between human expertise and AI capabilities, learning to design collaborative systems that leverage both artificial and human intelligence effectively and ethically.",
+
+  "learningObjectives": [
+    "Analyze the strengths and limitations of both human and AI decision-making",
+    "Design effective human-AI collaboration frameworks for critical systems",
+    "Evaluate when human oversight should override automated decisions",
+    "Understand the psychological and social impacts of automation on human expertise",
+    "Develop strategies for maintaining human agency in automated environments"
+  ],
+
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Understanding Human-AI Collaboration",
+      "description": "Explore the foundations of effective human-machine partnerships",
+      "activities": [
+        {
+          "type": "comparative-analysis",
+          "title": "Human vs AI Decision-Making",
+          "description": "Analyze the comparative advantages of human intuition versus algorithmic analysis",
+          "timeEstimate": 10,
+          "resources": [
+            {
+              "type": "decision-tree-exercise",
+              "title": "Decision Quality Comparison",
+              "description": "Interactive tool comparing human and AI performance across different scenarios"
+            }
+          ]
+        },
+        {
+          "type": "case-study",
+          "title": "Collaboration Success Stories",
+          "description": "Examine real-world examples of effective human-AI partnerships",
+          "timeEstimate": 8,
+          "deliverable": "Analysis of successful collaboration models and their key factors"
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "title": "Authority and Override Scenarios",
+      "description": "Navigate complex situations where human and AI judgments conflict",
+      "activities": [
+        {
+          "type": "simulation-analysis",
+          "title": "Override Decision Points",
+          "description": "Work through scenarios where human oversight conflicts with AI recommendations",
+          "timeEstimate": 15,
+          "resources": [
+            {
+              "type": "scenario-set",
+              "scenarios": ["robot-surgeon-override", "air-traffic-control", "nuclear-plant-shutdown"]
+            }
+          ],
+          "deliverable": "Decision framework for override situations with ethical justification"
+        },
+        {
+          "type": "role-play",
+          "title": "Multi-Perspective Override Debate",
+          "description": "Role-play different stakeholders in high-stakes override scenarios",
+          "timeEstimate": 12,
+          "deliverable": "Stakeholder position analysis and compromise solutions"
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "title": "Designing Collaborative Systems",
+      "description": "Create frameworks for effective human-AI collaboration",
+      "activities": [
+        {
+          "type": "design-workshop",
+          "title": "Collaborative Interface Design",
+          "description": "Design interfaces that support effective human-AI collaboration",
+          "timeEstimate": 10,
+          "deliverable": "Interface prototype with collaboration principles"
+        },
+        {
+          "type": "policy-development",
+          "title": "Governance Frameworks",
+          "description": "Develop policies for human oversight in automated systems",
+          "timeEstimate": 8,
+          "deliverable": "Governance framework for human-AI collaboration"
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "title": "Future of Human-AI Partnership",
+      "description": "Consider long-term implications and evolution of human-AI collaboration",
+      "activities": [
+        {
+          "type": "scenario-planning",
+          "title": "Future Collaboration Models",
+          "description": "Envision how human-AI partnerships might evolve across different domains",
+          "timeEstimate": 10,
+          "deliverable": "Future scenario analysis with recommendations"
+        },
+        {
+          "type": "reflection",
+          "title": "Personal Leadership in AI Collaboration",
+          "description": "Develop personal strategies for leading effective human-AI partnerships",
+          "timeEstimate": 5,
+          "deliverable": "Personal leadership development plan for AI collaboration"
+        }
+      ]
+    }
+  ],
+
+  "assessmentRubric": {
+    "Systems Thinking": {
+      "exemplary": "Demonstrates sophisticated understanding of complex human-AI system dynamics with nuanced analysis",
+      "proficient": "Shows solid grasp of collaboration principles and system interactions",
+      "developing": "Basic understanding of human-AI relationships with limited systems perspective",
+      "novice": "Minimal comprehension of collaborative system complexities"
+    },
+    "Decision Framework Development": {
+      "exemplary": "Creates comprehensive and practical frameworks that effectively balance multiple considerations",
+      "proficient": "Develops good decision frameworks with clear criteria and justification",
+      "developing": "Basic framework development with limited consideration of edge cases",
+      "novice": "Struggles to create coherent decision-making frameworks"
+    },
+    "Stakeholder Analysis": {
+      "exemplary": "Expertly considers diverse perspectives and their implications for system design",
+      "proficient": "Good understanding of stakeholder needs and concerns",
+      "developing": "Basic awareness of different perspectives with surface-level analysis",
+      "novice": "Limited ability to consider multiple stakeholder viewpoints"
+    },
+    "Practical Implementation": {
+      "exemplary": "Proposes innovative and feasible solutions that address real-world constraints",
+      "proficient": "Develops practical approaches with good consideration of implementation challenges",
+      "developing": "Basic solutions with limited practical consideration",
+      "novice": "Struggles to translate concepts into actionable implementations"
+    }
+  },
+
+  "educatorResources": {
+    "preparationGuide": {
+      "overview": "This lab explores one of the most critical challenges in AI deployment: creating effective partnerships between human expertise and artificial intelligence that leverage the strengths of both while mitigating their respective weaknesses.",
+      "keyFocusAreas": [
+        "Comparative advantages and limitations of human vs AI decision-making",
+        "Design principles for effective human-AI collaboration",
+        "Authority and accountability in hybrid human-AI systems",
+        "Psychological and social impacts of automation on human roles"
+      ],
+      "commonMisconceptions": [
+        "AI should always override human decisions when it has better statistical performance",
+        "Human oversight means humans should always have the final say",
+        "Automation necessarily reduces human skill and agency",
+        "There's a one-size-fits-all approach to human-AI collaboration"
+      ]
+    },
+    "discussionPrompts": [
+      "When should statistical evidence override human expertise and intuition?",
+      "How do we maintain human skills and agency in increasingly automated environments?",
+      "What are the ethical implications of removing human decision-makers from critical systems?",
+      "How should liability be distributed in human-AI collaborative systems?"
+    ],
+    "extensionActivities": [
+      "Interview professionals who work with AI-assisted decision-making systems",
+      "Design human-AI collaboration protocols for a specific industry or domain",
+      "Research emerging trends in human-AI partnership across different fields",
+      "Analyze case studies of human-AI collaboration failures and successes"
+    ],
+    "vocabulary": [
+      {
+        "term": "Human-in-the-Loop",
+        "definition": "AI systems designed to include human oversight and intervention capabilities"
+      },
+      {
+        "term": "Automation Bias",
+        "definition": "The tendency to over-rely on automated systems and under-utilize human judgment"
+      },
+      {
+        "term": "Algorithm Aversion",
+        "definition": "The tendency to avoid or distrust algorithmic decision-making in favor of human judgment"
+      },
+      {
+        "term": "Skill Atrophy",
+        "definition": "The degradation of human capabilities due to over-reliance on automated systems"
+      },
+      {
+        "term": "Collaborative Intelligence",
+        "definition": "The combination of human and artificial intelligence to achieve better outcomes than either could alone"
+      }
+    ],
+    "crossCurricular": {
+      "psychology": "Understanding human decision-making, bias, and trust in automated systems",
+      "management": "Exploring organizational change and human resource implications of automation",
+      "engineering": "Designing systems that effectively integrate human and machine capabilities",
+      "sociology": "Examining social impacts of automation on work and society",
+      "publicPolicy": "Analyzing regulatory approaches to human oversight requirements"
+    }
+  },
+
+  "reflectionQuestions": [
+    "How has this lab influenced your thinking about the role of humans in automated systems?",
+    "What personal experiences do you have with human-AI collaboration, and how do they relate to the concepts explored?",
+    "How do you think the balance between human and AI authority should evolve in your field of interest?",
+    "What strategies would you use to maintain human expertise in an increasingly automated world?",
+    "How can we design systems that amplify rather than replace human capabilities?"
+  ]
+}

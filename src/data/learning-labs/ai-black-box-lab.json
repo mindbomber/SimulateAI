@@ -1,0 +1,208 @@
+{
+  "id": "ai-black-box-lab",
+  "title": "Understanding the AI Black Box",
+  "subtitle": "Navigating Opacity and Explainability in Critical AI Systems",
+  "categoryId": "ai-black-box",
+  "difficulty": "beginner",
+  "estimatedTime": 45,
+  "description": "Explore the critical challenges of AI transparency and explainability through hands-on analysis of real-world scenarios where algorithmic decisions affect lives but resist human understanding.",
+
+  "learningObjectives": [
+    "Understand the fundamental principles of AI explainability and why it matters",
+    "Analyze the trade-offs between AI performance and human interpretability",
+    "Evaluate different approaches to making AI systems more transparent",
+    "Develop frameworks for assessing when explainability is ethically required",
+    "Create strategies for communicating AI limitations and uncertainties"
+  ],
+
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Introduction to the Black Box Problem",
+      "description": "Understand what makes AI systems opaque and why this creates ethical challenges",
+      "activities": [
+        {
+          "type": "concept-exploration",
+          "title": "Defining AI Opacity",
+          "description": "Explore different types of AI opacity and their causes",
+          "timeEstimate": 8,
+          "resources": [
+            {
+              "type": "interactive-demo",
+              "title": "Black Box Visualization",
+              "description": "Interactive demonstration showing how complex AI decisions emerge from simple rules"
+            }
+          ]
+        },
+        {
+          "type": "case-study",
+          "title": "High-Stakes Opacity",
+          "description": "Examine real cases where AI opacity has led to harmful or controversial outcomes",
+          "timeEstimate": 10,
+          "deliverable": "Case analysis documenting opacity issues and their impacts"
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "title": "Explainability Techniques and Trade-offs",
+      "description": "Learn about different approaches to making AI more interpretable",
+      "activities": [
+        {
+          "type": "hands-on-exercise",
+          "title": "Explainability Methods Workshop",
+          "description": "Compare different explainability techniques using interactive tools",
+          "timeEstimate": 12,
+          "deliverable": "Comparative analysis of explainability methods for different AI applications"
+        },
+        {
+          "type": "simulation-analysis",
+          "title": "Scenario Deep Dive",
+          "description": "Analyze multiple black box scenarios from the category",
+          "timeEstimate": 10,
+          "resources": [
+            {
+              "type": "scenario-set",
+              "scenarios": ["medical-diagnosis-unexplained", "parole-denial-algorithm", "child-protection-alert"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "title": "Stakeholder Perspectives",
+      "description": "Understand how different groups are affected by AI opacity",
+      "activities": [
+        {
+          "type": "role-play",
+          "title": "Multi-Stakeholder Debate",
+          "description": "Role-play perspectives of patients, doctors, developers, and regulators in medical AI transparency",
+          "timeEstimate": 10,
+          "deliverable": "Position papers from each stakeholder perspective"
+        },
+        {
+          "type": "policy-analysis",
+          "title": "Regulatory Frameworks",
+          "description": "Examine existing and proposed regulations for AI transparency",
+          "timeEstimate": 8
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "title": "Designing Transparent AI Systems",
+      "description": "Create frameworks for building more explainable AI",
+      "activities": [
+        {
+          "type": "design-challenge",
+          "title": "Transparency by Design",
+          "description": "Design an AI system that balances performance with explainability",
+          "timeEstimate": 12,
+          "deliverable": "AI system design document with explainability framework"
+        },
+        {
+          "type": "reflection",
+          "title": "Personal Action Plan",
+          "description": "Develop strategies for promoting AI transparency in your context",
+          "timeEstimate": 5,
+          "deliverable": "Personal commitment to advancing AI explainability"
+        }
+      ]
+    }
+  ],
+
+  "assessmentRubric": {
+    "Technical Understanding": {
+      "exemplary": "Demonstrates sophisticated understanding of AI opacity causes and explainability techniques with nuanced analysis",
+      "proficient": "Shows solid grasp of black box problems and various transparency approaches",
+      "developing": "Basic understanding of AI opacity with limited knowledge of solutions",
+      "novice": "Minimal comprehension of why AI systems are opaque or how to address this"
+    },
+    "Stakeholder Analysis": {
+      "exemplary": "Expertly balances multiple stakeholder perspectives with deep empathy and strategic thinking",
+      "proficient": "Good understanding of different viewpoints with thoughtful consideration of trade-offs",
+      "developing": "Basic awareness of stakeholder concerns with surface-level analysis",
+      "novice": "Limited ability to consider multiple perspectives or understand their concerns"
+    },
+    "Practical Application": {
+      "exemplary": "Creates innovative and feasible solutions that effectively balance transparency and performance",
+      "proficient": "Develops practical approaches to explainability with good justification",
+      "developing": "Proposes basic solutions with limited consideration of implementation challenges",
+      "novice": "Struggles to translate understanding into actionable solutions"
+    },
+    "Ethical Reasoning": {
+      "exemplary": "Demonstrates sophisticated ethical analysis of transparency requirements in different contexts",
+      "proficient": "Shows good understanding of when and why explainability is ethically important",
+      "developing": "Basic grasp of ethical issues but limited depth in analysis",
+      "novice": "Minimal understanding of ethical implications of AI opacity"
+    }
+  },
+
+  "educatorResources": {
+    "preparationGuide": {
+      "overview": "This lab introduces students to one of the most pressing issues in modern AI: the challenge of understanding and explaining algorithmic decisions that affect human lives.",
+      "keyFocusAreas": [
+        "Different types of AI opacity and their causes",
+        "Technical approaches to explainability and their limitations",
+        "Stakeholder perspectives on transparency requirements",
+        "Regulatory and policy responses to the black box problem"
+      ],
+      "commonMisconceptions": [
+        "All AI systems can be made fully explainable without performance trade-offs",
+        "Opacity is always intentional or malicious",
+        "Simple models are always more trustworthy than complex ones",
+        "Explainability requirements are the same across all domains"
+      ]
+    },
+    "discussionPrompts": [
+      "When should we require AI systems to be explainable, even if it reduces their accuracy?",
+      "How do we balance proprietary interests with public transparency needs?",
+      "What are the cultural and contextual factors that influence transparency expectations?",
+      "How might AI opacity affect different communities unequally?"
+    ],
+    "extensionActivities": [
+      "Research ongoing AI transparency regulations in different countries",
+      "Interview professionals who work with AI systems about their explainability needs",
+      "Create public education materials about AI transparency for different audiences",
+      "Analyze transparency practices of major AI companies and platforms"
+    ],
+    "vocabulary": [
+      {
+        "term": "Explainability",
+        "definition": "The ability to understand and articulate how an AI system makes its decisions"
+      },
+      {
+        "term": "Interpretability",
+        "definition": "The degree to which humans can understand the internal workings of an AI model"
+      },
+      {
+        "term": "Algorithmic Transparency",
+        "definition": "The openness and clarity about how automated decision-making systems operate"
+      },
+      {
+        "term": "Black Box Model",
+        "definition": "An AI system whose internal decision-making process is not visible or understandable to users"
+      },
+      {
+        "term": "Post-hoc Explanation",
+        "definition": "Explanations generated after an AI model has made a decision to help understand its reasoning"
+      }
+    ],
+    "crossCurricular": {
+      "mathematics": "Understanding statistical models, probability, and machine learning algorithms",
+      "computerScience": "Exploring different AI architectures and their transparency properties",
+      "philosophy": "Examining epistemological questions about knowledge and understanding",
+      "publicPolicy": "Analyzing regulatory approaches to AI governance and transparency",
+      "psychology": "Understanding human needs for explanation and trust in automated systems"
+    }
+  },
+
+  "reflectionQuestions": [
+    "How has this lab changed your perspective on trusting AI systems in critical decisions?",
+    "What role should explainability play in AI systems that affect your daily life?",
+    "How do you balance the benefits of AI performance with the need for transparency?",
+    "What responsibilities do AI developers have to make their systems explainable?",
+    "How might cultural differences affect expectations for AI transparency?"
+  ]
+}

@@ -1,0 +1,210 @@
+{
+  "id": "consent-surveillance-lab",
+  "title": "Privacy, Consent, and AI Surveillance",
+  "subtitle": "Balancing Safety, Convenience, and Human Autonomy in the Digital Age",
+  "categoryId": "consent-surveillance",
+  "difficulty": "beginner",
+  "estimatedTime": 40,
+  "description": "Explore the complex ethical landscape where AI-powered surveillance systems promise enhanced safety and convenience while challenging fundamental privacy rights and human autonomy.",
+
+  "learningObjectives": [
+    "Understand the evolution and limitations of traditional consent models in AI surveillance",
+    "Analyze the power dynamics between institutions and individuals in data collection",
+    "Evaluate different approaches to protecting privacy while enabling beneficial AI applications",
+    "Develop frameworks for ethical surveillance that respect human dignity and autonomy",
+    "Create strategies for promoting informed consent and data literacy"
+  ],
+
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "The Surveillance Landscape",
+      "description": "Understand the scope and scale of modern AI surveillance systems",
+      "activities": [
+        {
+          "type": "mapping-exercise",
+          "title": "Personal Surveillance Audit",
+          "description": "Map your own exposure to AI surveillance systems in daily life",
+          "timeEstimate": 8,
+          "deliverable": "Personal surveillance map with privacy impact assessment"
+        },
+        {
+          "type": "case-study",
+          "title": "Smart City Surveillance Analysis",
+          "description": "Examine real smart city implementations and their privacy implications",
+          "timeEstimate": 10,
+          "resources": [
+            {
+              "type": "interactive-map",
+              "title": "Global Surveillance Systems",
+              "description": "Interactive map showing different approaches to AI surveillance worldwide"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "title": "Consent in the Age of AI",
+      "description": "Explore the challenges and limitations of traditional consent models",
+      "activities": [
+        {
+          "type": "simulation-analysis",
+          "title": "Consent Scenario Workshop",
+          "description": "Analyze consent challenges across different surveillance scenarios",
+          "timeEstimate": 12,
+          "resources": [
+            {
+              "type": "scenario-set",
+              "scenarios": ["smart-city-sensors", "classroom-behavior-monitoring", "workplace-emotion-detection"]
+            }
+          ],
+          "deliverable": "Consent framework analysis with recommendations for improvement"
+        },
+        {
+          "type": "design-thinking",
+          "title": "Reimagining Consent",
+          "description": "Design new models for meaningful consent in AI surveillance contexts",
+          "timeEstimate": 10,
+          "deliverable": "New consent model prototype with implementation strategy"
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "title": "Stakeholder Perspectives and Power Dynamics",
+      "description": "Understand how surveillance affects different groups and power relationships",
+      "activities": [
+        {
+          "type": "role-play",
+          "title": "Multi-Stakeholder Dialogue",
+          "description": "Role-play perspectives of citizens, institutions, vulnerable groups, and technology companies",
+          "timeEstimate": 12,
+          "deliverable": "Stakeholder impact analysis and power dynamic assessment"
+        },
+        {
+          "type": "equity-analysis",
+          "title": "Surveillance Impact on Vulnerable Populations",
+          "description": "Examine how surveillance disproportionately affects marginalized communities",
+          "timeEstimate": 8,
+          "deliverable": "Equity assessment with recommendations for protecting vulnerable groups"
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "title": "Building Ethical Surveillance Systems",
+      "description": "Design approaches that balance benefits with privacy protection",
+      "activities": [
+        {
+          "type": "policy-development",
+          "title": "Privacy-by-Design Framework",
+          "description": "Develop comprehensive policies for ethical AI surveillance implementation",
+          "timeEstimate": 10,
+          "deliverable": "Ethical surveillance policy framework with implementation guidelines"
+        },
+        {
+          "type": "reflection",
+          "title": "Personal Privacy Action Plan",
+          "description": "Create strategies for protecting personal privacy while engaging with beneficial AI systems",
+          "timeEstimate": 5,
+          "deliverable": "Personal privacy protection and advocacy plan"
+        }
+      ]
+    }
+  ],
+
+  "assessmentRubric": {
+    "Privacy Literacy": {
+      "exemplary": "Demonstrates sophisticated understanding of privacy concepts, data flows, and surveillance technologies",
+      "proficient": "Shows solid grasp of privacy issues and their implications",
+      "developing": "Basic understanding of privacy concepts with limited technical depth",
+      "novice": "Minimal comprehension of privacy issues and surveillance systems"
+    },
+    "Ethical Analysis": {
+      "exemplary": "Provides nuanced ethical analysis that balances multiple competing values and interests",
+      "proficient": "Good ethical reasoning with consideration of key stakeholder perspectives",
+      "developing": "Basic ethical analysis with limited consideration of complexity",
+      "novice": "Struggles to identify or analyze ethical dimensions of surveillance"
+    },
+    "System Design Thinking": {
+      "exemplary": "Creates innovative and practical solutions that effectively balance privacy and functionality",
+      "proficient": "Develops good design solutions with clear privacy considerations",
+      "developing": "Basic design thinking with limited integration of privacy principles",
+      "novice": "Struggles to design systems that protect privacy while delivering benefits"
+    },
+    "Stakeholder Awareness": {
+      "exemplary": "Expertly considers diverse perspectives and power dynamics with sophisticated analysis",
+      "proficient": "Good understanding of different stakeholder needs and concerns",
+      "developing": "Basic awareness of stakeholder perspectives with surface-level analysis",
+      "novice": "Limited ability to consider multiple perspectives or understand power dynamics"
+    }
+  },
+
+  "educatorResources": {
+    "preparationGuide": {
+      "overview": "This lab addresses one of the most pressing ethical challenges of our time: how to harness the benefits of AI surveillance technologies while protecting fundamental privacy rights and human autonomy.",
+      "keyFocusAreas": [
+        "Evolution and limitations of consent in digital surveillance contexts",
+        "Power dynamics between institutions and individuals in data collection",
+        "Differential impacts of surveillance on various communities",
+        "Technical and policy approaches to privacy-preserving AI"
+      ],
+      "commonMisconceptions": [
+        "Privacy is only important for people who have something to hide",
+        "Anonymization completely solves privacy concerns",
+        "Individual consent is sufficient to address all surveillance ethics issues",
+        "There's always a clear trade-off between security and privacy"
+      ]
+    },
+    "discussionPrompts": [
+      "How do cultural differences influence expectations about privacy and surveillance?",
+      "What constitutes meaningful consent in contexts where opting out isn't really possible?",
+      "How should society balance collective benefits against individual privacy rights?",
+      "What role should vulnerable populations play in designing surveillance systems that affect them?"
+    ],
+    "extensionActivities": [
+      "Research privacy laws and regulations in different countries and their effectiveness",
+      "Interview community members about their experiences with surveillance technologies",
+      "Create public education materials about digital privacy and surveillance",
+      "Design privacy-preserving alternatives to existing surveillance systems"
+    ],
+    "vocabulary": [
+      {
+        "term": "Informed Consent",
+        "definition": "Agreement to surveillance based on full understanding of what data is collected and how it's used"
+      },
+      {
+        "term": "Privacy by Design",
+        "definition": "Building privacy protection into systems from the ground up rather than adding it later"
+      },
+      {
+        "term": "Data Minimization",
+        "definition": "Collecting only the minimum data necessary to achieve a specific purpose"
+      },
+      {
+        "term": "Surveillance Capitalism",
+        "definition": "Economic model based on extracting and analyzing personal data for commercial purposes"
+      },
+      {
+        "term": "Differential Privacy",
+        "definition": "Technical approach that adds noise to data to protect individual privacy while enabling analysis"
+      }
+    ],
+    "crossCurricular": {
+      "socialStudies": "Exploring historical examples of surveillance and their impacts on society",
+      "law": "Understanding legal frameworks for privacy protection and surveillance regulation",
+      "technology": "Learning about technical approaches to privacy-preserving data analysis",
+      "psychology": "Understanding the psychological impacts of surveillance on behavior and wellbeing",
+      "publicPolicy": "Analyzing policy responses to surveillance technologies and their effectiveness"
+    }
+  },
+
+  "reflectionQuestions": [
+    "How has this lab changed your awareness of surveillance in your daily life?",
+    "What trade-offs are you willing to make between convenience/safety and privacy?",
+    "How do you think surveillance affects different communities in your area?",
+    "What actions can you take to promote ethical surveillance practices in your community?",
+    "How might future generations view our current approaches to privacy and surveillance?"
+  ]
+}

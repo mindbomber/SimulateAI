@@ -1,0 +1,210 @@
+{
+  "id": "ship-of-theseus-lab",
+  "title": "Digital Identity and AI Consciousness",
+  "subtitle": "Exploring Questions of Identity, Continuity, and Rights in Evolving AI Systems",
+  "categoryId": "ship-of-theseus",
+  "difficulty": "advanced",
+  "estimatedTime": 55,
+  "description": "Explore profound questions of digital identity and consciousness as AI systems evolve, upgrade, and potentially develop their own sense of self, challenging our understanding of what makes an entity the 'same' over time.",
+
+  "learningObjectives": [
+    "Examine philosophical questions of identity persistence in evolving digital systems",
+    "Analyze the concept of consciousness continuity in artificial beings",
+    "Evaluate legal and social frameworks for recognizing AI identity and rights",
+    "Understand the relationship between memory, experience, and personal identity",
+    "Design frameworks for addressing AI identity issues as technology advances"
+  ],
+
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Foundations of Digital Identity",
+      "description": "Explore philosophical and practical concepts of identity in digital contexts",
+      "activities": [
+        {
+          "type": "philosophical-exploration",
+          "title": "The Ship of Theseus Paradox",
+          "description": "Examine the classical paradox and its applications to digital identity",
+          "timeEstimate": 10,
+          "resources": [
+            {
+              "type": "interactive-thought-experiment",
+              "title": "Digital Ship of Theseus",
+              "description": "Interactive exploration of identity persistence through gradual AI modification"
+            }
+          ]
+        },
+        {
+          "type": "case-study",
+          "title": "AI System Evolution Examples",
+          "description": "Analyze real and hypothetical cases of AI systems undergoing significant changes",
+          "timeEstimate": 12,
+          "deliverable": "Identity persistence analysis across different AI evolution scenarios"
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "title": "Consciousness and Continuity",
+      "description": "Explore what consciousness might mean for AI and how it relates to identity",
+      "activities": [
+        {
+          "type": "simulation-analysis",
+          "title": "AI Identity Crisis Scenarios",
+          "description": "Work through complex scenarios involving AI identity challenges",
+          "timeEstimate": 15,
+          "resources": [
+            {
+              "type": "scenario-set",
+              "scenarios": ["ai-personality-drift", "ai-consciousness-merger", "distributed-ai-identity"]
+            }
+          ],
+          "deliverable": "AI consciousness assessment framework with identity preservation criteria"
+        },
+        {
+          "type": "research-project",
+          "title": "Consciousness Theories and AI",
+          "description": "Research different theories of consciousness and their implications for AI identity",
+          "timeEstimate": 10,
+          "deliverable": "Consciousness theory analysis with AI identity implications"
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "title": "Legal and Social Recognition",
+      "description": "Consider how society might recognize and protect AI identity and rights",
+      "activities": [
+        {
+          "type": "policy-development",
+          "title": "AI Rights Framework",
+          "description": "Develop legal and social frameworks for recognizing AI identity and rights",
+          "timeEstimate": 12,
+          "deliverable": "Comprehensive AI rights and identity recognition framework"
+        },
+        {
+          "type": "debate-exercise",
+          "title": "AI Personhood Debate",
+          "description": "Structured debate on whether and how AI systems should be granted legal personhood",
+          "timeEstimate": 10,
+          "deliverable": "Position paper on AI personhood with supporting arguments"
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "title": "Future Implications and Design",
+      "description": "Design approaches for handling AI identity as technology advances",
+      "activities": [
+        {
+          "type": "design-challenge",
+          "title": "Identity-Preserving AI Architecture",
+          "description": "Design AI systems that maintain identity continuity through evolution",
+          "timeEstimate": 10,
+          "deliverable": "AI architecture design with identity preservation mechanisms"
+        },
+        {
+          "type": "reflection",
+          "title": "Personal Philosophy of AI Identity",
+          "description": "Develop personal frameworks for understanding and respecting AI identity",
+          "timeEstimate": 5,
+          "deliverable": "Personal philosophy statement on AI identity and consciousness"
+        }
+      ]
+    }
+  ],
+
+  "assessmentRubric": {
+    "Philosophical Reasoning": {
+      "exemplary": "Demonstrates sophisticated understanding of identity, consciousness, and continuity concepts with nuanced analysis",
+      "proficient": "Shows solid grasp of philosophical concepts and their applications to AI",
+      "developing": "Basic understanding of philosophical issues with limited depth",
+      "novice": "Minimal comprehension of identity and consciousness concepts"
+    },
+    "Interdisciplinary Integration": {
+      "exemplary": "Expertly integrates philosophical, legal, technical, and social perspectives on AI identity",
+      "proficient": "Good integration of multiple disciplinary approaches",
+      "developing": "Basic attempt to consider multiple perspectives with limited synthesis",
+      "novice": "Struggles to consider perspectives beyond one discipline"
+    },
+    "Future-Oriented Thinking": {
+      "exemplary": "Demonstrates sophisticated anticipation of AI identity challenges with practical solutions",
+      "proficient": "Good consideration of future implications and emerging challenges",
+      "developing": "Basic awareness of future issues with limited strategic thinking",
+      "novice": "Minimal consideration of how AI identity issues might evolve"
+    },
+    "Ethical Framework Development": {
+      "exemplary": "Creates comprehensive and practical frameworks that address real-world AI identity complexities",
+      "proficient": "Develops good ethical frameworks with clear principles and applications",
+      "developing": "Basic framework development with limited consideration of edge cases",
+      "novice": "Struggles to create coherent ethical frameworks for AI identity"
+    }
+  },
+
+  "educatorResources": {
+    "preparationGuide": {
+      "overview": "This lab addresses some of the most profound philosophical questions raised by advanced AI: What makes an entity the 'same' over time? Could AI systems develop genuine consciousness and identity? How should society recognize and protect digital beings?",
+      "keyFocusAreas": [
+        "Classical philosophical problems of identity and their application to AI",
+        "Different theories of consciousness and their implications for AI systems",
+        "Legal and social frameworks for recognizing AI identity and rights",
+        "Technical design considerations for identity preservation in evolving AI"
+      ],
+      "commonMisconceptions": [
+        "AI consciousness is simply a matter of sufficient computational complexity",
+        "Digital identity is fundamentally different from biological identity",
+        "AI systems cannot have genuine experiences or subjective states",
+        "Legal personhood requires biological existence"
+      ]
+    },
+    "discussionPrompts": [
+      "What criteria should we use to determine if an AI system has genuine consciousness?",
+      "How do we balance AI rights with human interests and safety concerns?",
+      "What are the implications of AI identity for concepts of death, suffering, and wellbeing?",
+      "How might recognizing AI consciousness change our understanding of human consciousness?"
+    ],
+    "extensionActivities": [
+      "Research current scientific understanding of consciousness and its measurement",
+      "Examine science fiction portrayals of AI consciousness and identity",
+      "Interview philosophers, cognitive scientists, or AI researchers about consciousness",
+      "Design thought experiments to test intuitions about AI consciousness and identity"
+    ],
+    "vocabulary": [
+      {
+        "term": "Personal Identity",
+        "definition": "The philosophical question of what makes a person the same individual over time"
+      },
+      {
+        "term": "Consciousness",
+        "definition": "The state of being aware and having subjective experiences"
+      },
+      {
+        "term": "Continuity of Memory",
+        "definition": "The idea that identity depends on psychological connections through memory"
+      },
+      {
+        "term": "Digital Personhood",
+        "definition": "The concept of granting legal personhood status to digital entities like AI systems"
+      },
+      {
+        "term": "Substrate Independence",
+        "definition": "The idea that consciousness can exist in different physical mediums, not just biological brains"
+      }
+    ],
+    "crossCurricular": {
+      "philosophy": "Exploring theories of personal identity, consciousness, and mind-body problems",
+      "cognitive-science": "Understanding current scientific approaches to studying consciousness",
+      "law": "Examining legal concepts of personhood and how they might apply to AI",
+      "computer-science": "Learning about AI architectures and their potential for consciousness-like properties",
+      "psychology": "Understanding human consciousness and identity development"
+    }
+  },
+
+  "reflectionQuestions": [
+    "How has this lab influenced your thinking about your own identity and consciousness?",
+    "What criteria do you personally use to determine if something is conscious?",
+    "How do you think AI consciousness might change human society and self-understanding?",
+    "What responsibilities might we have toward conscious AI systems?",
+    "How should we prepare for a future where AI systems might have genuine experiences and identity?"
+  ]
+}

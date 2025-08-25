@@ -1,0 +1,217 @@
+{
+  "id": "moral-luck-lab",
+  "title": "Moral Luck and AI Decision-Making",
+  "subtitle": "Evaluating Ethics When Chance and Unforeseen Circumstances Influence Outcomes",
+  "categoryId": "moral-luck",
+  "difficulty": "intermediate",
+  "estimatedTime": 45,
+  "description": "Explore how unpredictable outcomes and chance events complicate the moral evaluation of AI decisions, learning to fairly assess algorithmic choices when luck and unforeseen circumstances influence results.",
+
+  "learningObjectives": [
+    "Understand how chance and unforeseen circumstances affect moral evaluation of AI decisions",
+    "Analyze the difference between evaluating decision-making processes versus outcomes",
+    "Examine the challenge of assigning responsibility in probabilistic and uncertain environments",
+    "Evaluate how to fairly assess AI system performance when luck influences results",
+    "Design frameworks for ethical evaluation that account for uncertainty and chance"
+  ],
+
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Understanding Moral Luck",
+      "description": "Explore the philosophical concept of moral luck and its applications to AI",
+      "activities": [
+        {
+          "type": "philosophical-exploration",
+          "title": "Types of Moral Luck",
+          "description": "Examine different categories of moral luck and their implications for AI systems",
+          "timeEstimate": 10,
+          "resources": [
+            {
+              "type": "interactive-scenario",
+              "title": "Luck in Decision-Making",
+              "description": "Interactive exploration of how chance affects moral evaluation"
+            }
+          ]
+        },
+        {
+          "type": "case-study",
+          "title": "Historical Examples of Moral Luck",
+          "description": "Analyze historical cases where chance affected moral evaluation of actions",
+          "timeEstimate": 8,
+          "deliverable": "Analysis of moral luck in historical decision-making with applications to AI"
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "title": "AI Systems and Chance Outcomes",
+      "description": "Examine how luck and chance affect AI system performance and evaluation",
+      "activities": [
+        {
+          "type": "simulation-analysis",
+          "title": "Luck-Influenced AI Scenarios",
+          "description": "Analyze scenarios where identical AI systems have different outcomes due to chance",
+          "timeEstimate": 15,
+          "resources": [
+            {
+              "type": "scenario-set",
+              "scenarios": ["crash-avoided-chance", "ai-investment-windfall", "medical-ai-emergency-response"]
+            }
+          ],
+          "deliverable": "Comprehensive analysis of how luck affects AI performance evaluation"
+        },
+        {
+          "type": "statistical-analysis",
+          "title": "Process vs Outcome Evaluation",
+          "description": "Develop methods for evaluating AI systems based on processes rather than outcomes alone",
+          "timeEstimate": 10,
+          "deliverable": "Framework for process-based evaluation of AI decision-making"
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "title": "Responsibility in Uncertain Environments",
+      "description": "Explore how to assign responsibility when outcomes are influenced by chance",
+      "activities": [
+        {
+          "type": "responsibility-framework",
+          "title": "Probabilistic Responsibility",
+          "description": "Develop frameworks for assigning responsibility in probabilistic systems",
+          "timeEstimate": 12,
+          "deliverable": "Responsibility attribution framework for uncertain environments"
+        },
+        {
+          "type": "policy-analysis",
+          "title": "Legal and Regulatory Approaches",
+          "description": "Examine how legal systems handle moral luck in technological contexts",
+          "timeEstimate": 8,
+          "deliverable": "Analysis of legal approaches to moral luck with recommendations for AI"
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "title": "Designing Fair Evaluation Systems",
+      "description": "Create evaluation frameworks that account for uncertainty and chance",
+      "activities": [
+        {
+          "type": "design-challenge",
+          "title": "Luck-Aware AI Evaluation",
+          "description": "Design evaluation systems that fairly assess AI performance despite chance influences",
+          "timeEstimate": 10,
+          "deliverable": "AI evaluation system design with uncertainty and luck considerations"
+        },
+        {
+          "type": "ethics-framework",
+          "title": "Ethical Guidelines for Uncertain Outcomes",
+          "description": "Develop ethical guidelines for making decisions under uncertainty",
+          "timeEstimate": 7,
+          "deliverable": "Ethical decision-making framework for uncertain environments"
+        },
+        {
+          "type": "reflection",
+          "title": "Personal Approach to Moral Luck",
+          "description": "Develop personal frameworks for handling moral luck in AI-related decisions",
+          "timeEstimate": 5,
+          "deliverable": "Personal philosophy for evaluating actions and outcomes under uncertainty"
+        }
+      ]
+    }
+  ],
+
+  "assessmentRubric": {
+    "Conceptual Understanding": {
+      "exemplary": "Demonstrates sophisticated understanding of moral luck concepts and their applications to AI",
+      "proficient": "Shows solid grasp of how chance affects moral evaluation",
+      "developing": "Basic understanding of moral luck with limited application to AI contexts",
+      "novice": "Minimal comprehension of how chance complicates moral evaluation"
+    },
+    "Analytical Thinking": {
+      "exemplary": "Expertly distinguishes between process and outcome evaluation with nuanced analysis",
+      "proficient": "Good analysis of different evaluation approaches and their implications",
+      "developing": "Basic analytical thinking with limited consideration of complexity",
+      "novice": "Struggles to analyze different approaches to evaluation and responsibility"
+    },
+    "Framework Development": {
+      "exemplary": "Creates comprehensive and practical frameworks that effectively address uncertainty and chance",
+      "proficient": "Develops good frameworks with clear consideration of probabilistic factors",
+      "developing": "Basic framework development with limited integration of uncertainty",
+      "novice": "Struggles to create coherent frameworks for uncertain environments"
+    },
+    "Ethical Reasoning": {
+      "exemplary": "Demonstrates sophisticated ethical analysis that balances multiple considerations in uncertain contexts",
+      "proficient": "Good ethical reasoning with consideration of chance and responsibility",
+      "developing": "Basic ethical analysis with limited consideration of uncertainty",
+      "novice": "Struggles to apply ethical reasoning to uncertain situations"
+    }
+  },
+
+  "educatorResources": {
+    "preparationGuide": {
+      "overview": "This lab explores a sophisticated challenge in AI ethics: how to fairly evaluate decisions and assign responsibility when chance, luck, and unforeseen circumstances significantly influence outcomes.",
+      "keyFocusAreas": [
+        "Different types of moral luck and their philosophical implications",
+        "How to evaluate AI systems when outcomes are influenced by factors beyond control",
+        "Responsibility attribution in probabilistic and uncertain environments",
+        "Design of fair evaluation systems that account for chance and uncertainty"
+      ],
+      "commonMisconceptions": [
+        "Good outcomes always indicate good decision-making processes",
+        "Bad luck absolves decision-makers of all responsibility",
+        "AI systems should be evaluated solely on their outcomes",
+        "Uncertainty makes moral evaluation impossible or irrelevant"
+      ]
+    },
+    "discussionPrompts": [
+      "How should we evaluate AI systems when their success depends partly on factors beyond their control?",
+      "What is the difference between a good decision and a good outcome?",
+      "How do cultural and contextual factors influence how we handle moral luck?",
+      "What are the implications of moral luck for AI system design and deployment?"
+    ],
+    "extensionActivities": [
+      "Research how different professions handle uncertainty and moral luck in their evaluation systems",
+      "Interview professionals who make decisions under uncertainty about their evaluation frameworks",
+      "Analyze recent AI failures or successes to identify the role of chance and unforeseen factors",
+      "Design evaluation systems for AI applications in specific high-uncertainty domains"
+    ],
+    "vocabulary": [
+      {
+        "term": "Moral Luck",
+        "definition": "Circumstances where factors beyond an agent's control influence the moral evaluation of their actions"
+      },
+      {
+        "term": "Constitutive Luck",
+        "definition": "Moral luck related to the character traits and dispositions a person happens to have"
+      },
+      {
+        "term": "Circumstantial Luck",
+        "definition": "Moral luck related to the situations and circumstances a person encounters"
+      },
+      {
+        "term": "Resultant Luck",
+        "definition": "Moral luck related to how actions turn out, which may be influenced by chance"
+      },
+      {
+        "term": "Process Evaluation",
+        "definition": "Assessing the quality of decision-making procedures rather than focusing solely on outcomes"
+      }
+    ],
+    "crossCurricular": {
+      "philosophy": "Exploring concepts of responsibility, causation, and moral evaluation",
+      "statistics": "Understanding probability, uncertainty, and statistical evaluation methods",
+      "psychology": "Learning about human decision-making under uncertainty and attribution biases",
+      "law": "Examining legal approaches to causation, negligence, and responsibility",
+      "risk-management": "Understanding how various fields handle uncertainty and unpredictable outcomes"
+    }
+  },
+
+  "reflectionQuestions": [
+    "How has this lab influenced your thinking about evaluating decisions when outcomes are uncertain?",
+    "Can you think of situations in your own life where moral luck played a role in how you or others were evaluated?",
+    "How do you balance outcome-based and process-based evaluation in your own decision-making?",
+    "What implications does moral luck have for how we should design and deploy AI systems?",
+    "How might understanding moral luck change how society approaches AI governance and regulation?"
+  ]
+}

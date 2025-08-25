@@ -1,0 +1,217 @@
+{
+  "id": "experience-machine-lab",
+  "title": "Authentic Experience vs Artificial Happiness",
+  "subtitle": "Exploring the Ethics of AI-Mediated Well-being and Human Flourishing",
+  "categoryId": "experience-machine",
+  "difficulty": "intermediate",
+  "estimatedTime": 50,
+  "description": "Navigate the complex ethics of artificial happiness and authentic experience in an AI-mediated world, examining how technology can provide perfect satisfaction while potentially undermining human agency, relationships, and meaningful struggle.",
+
+  "learningObjectives": [
+    "Examine the tension between authentic experience and artificial enhancement of well-being",
+    "Analyze the role of struggle, challenge, and adversity in human flourishing and meaning",
+    "Evaluate the societal implications of widespread artificial happiness technologies",
+    "Consider the balance between individual autonomy and collective well-being",
+    "Design ethical frameworks for AI-mediated experience enhancement"
+  ],
+
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Understanding the Experience Machine",
+      "description": "Explore philosophical foundations of authentic experience and artificial happiness",
+      "activities": [
+        {
+          "type": "philosophical-exploration",
+          "title": "Nozick's Experience Machine",
+          "description": "Examine the classic thought experiment and its implications for AI-mediated experience",
+          "timeEstimate": 10,
+          "resources": [
+            {
+              "type": "interactive-thought-experiment",
+              "title": "Personal Experience Machine",
+              "description": "Interactive exploration of choices between authentic and artificial experiences"
+            }
+          ]
+        },
+        {
+          "type": "values-clarification",
+          "title": "What Makes Life Meaningful",
+          "description": "Explore different theories of human flourishing and meaningful life",
+          "timeEstimate": 8,
+          "deliverable": "Personal philosophy of meaningful experience and human flourishing"
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "title": "AI-Enhanced Well-being Scenarios",
+      "description": "Analyze real and hypothetical AI systems that enhance human happiness",
+      "activities": [
+        {
+          "type": "simulation-analysis",
+          "title": "Happiness Technology Assessment",
+          "description": "Evaluate different AI systems designed to enhance human well-being",
+          "timeEstimate": 15,
+          "resources": [
+            {
+              "type": "scenario-set",
+              "scenarios": ["happiness-chip", "synthetic-partner", "ai-memory-paradise"]
+            }
+          ],
+          "deliverable": "Comprehensive assessment of happiness technologies with ethical analysis"
+        },
+        {
+          "type": "stakeholder-analysis",
+          "title": "Who Benefits from Artificial Happiness",
+          "description": "Examine how different groups might be affected by happiness enhancement technologies",
+          "timeEstimate": 10,
+          "deliverable": "Stakeholder impact analysis with equity considerations"
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "title": "The Role of Struggle and Adversity",
+      "description": "Explore the importance of challenges and difficulties in human development",
+      "activities": [
+        {
+          "type": "research-project",
+          "title": "Adversity and Growth Research",
+          "description": "Research the role of challenge and struggle in human psychological development",
+          "timeEstimate": 12,
+          "deliverable": "Research synthesis on the importance of adversity in human flourishing"
+        },
+        {
+          "type": "design-challenge",
+          "title": "Meaningful Challenge Design",
+          "description": "Design AI systems that provide beneficial challenges rather than eliminating all difficulties",
+          "timeEstimate": 10,
+          "deliverable": "AI system design that incorporates meaningful challenge and growth opportunities"
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "title": "Societal Implications and Policy",
+      "description": "Consider broader implications for society and governance of happiness technologies",
+      "activities": [
+        {
+          "type": "policy-analysis",
+          "title": "Regulating Happiness Technologies",
+          "description": "Develop policy frameworks for artificial happiness and experience enhancement",
+          "timeEstimate": 10,
+          "deliverable": "Policy framework for governing happiness enhancement technologies"
+        },
+        {
+          "type": "future-scenario-planning",
+          "title": "Society of Artificial Happiness",
+          "description": "Explore long-term societal implications of widespread happiness enhancement",
+          "timeEstimate": 8,
+          "deliverable": "Future society analysis with recommendations for ethical development"
+        },
+        {
+          "type": "reflection",
+          "title": "Personal Technology Boundaries",
+          "description": "Develop personal frameworks for engaging with happiness enhancement technologies",
+          "timeEstimate": 5,
+          "deliverable": "Personal guidelines for authentic living in an AI-enhanced world"
+        }
+      ]
+    }
+  ],
+
+  "assessmentRubric": {
+    "Philosophical Understanding": {
+      "exemplary": "Demonstrates sophisticated understanding of authenticity, meaning, and human flourishing concepts",
+      "proficient": "Shows solid grasp of philosophical issues around authentic experience",
+      "developing": "Basic understanding of philosophical concepts with limited depth",
+      "novice": "Minimal comprehension of authenticity and meaning in human experience"
+    },
+    "Ethical Analysis": {
+      "exemplary": "Provides nuanced analysis that balances individual autonomy with broader social implications",
+      "proficient": "Good ethical reasoning with consideration of multiple perspectives",
+      "developing": "Basic ethical analysis with limited consideration of complexity",
+      "novice": "Struggles to identify or analyze ethical dimensions of happiness enhancement"
+    },
+    "Systems Thinking": {
+      "exemplary": "Demonstrates sophisticated understanding of how happiness technologies affect individuals and society",
+      "proficient": "Good consideration of systemic effects and interconnections",
+      "developing": "Basic awareness of broader implications with limited analysis",
+      "novice": "Focuses only on individual effects without considering systemic implications"
+    },
+    "Design and Policy Thinking": {
+      "exemplary": "Creates innovative and practical solutions that balance enhancement with authenticity",
+      "proficient": "Develops good frameworks with clear ethical considerations",
+      "developing": "Basic policy thinking with limited consideration of implementation challenges",
+      "novice": "Struggles to create coherent frameworks for governing happiness technologies"
+    }
+  },
+
+  "educatorResources": {
+    "preparationGuide": {
+      "overview": "This lab explores fundamental questions about human nature, happiness, and authenticity in an age where AI technologies increasingly can provide perfect satisfaction and eliminate suffering, raising questions about what makes life meaningful.",
+      "keyFocusAreas": [
+        "Philosophical concepts of authenticity, meaning, and human flourishing",
+        "The role of struggle and adversity in human development and meaning-making",
+        "Individual autonomy versus collective well-being in happiness enhancement",
+        "Societal implications of widespread artificial happiness technologies"
+      ],
+      "commonMisconceptions": [
+        "Happiness is the only or most important goal in human life",
+        "Eliminating suffering is always beneficial for human development",
+        "Individual choice is sufficient to address all ethical concerns about happiness enhancement",
+        "Artificial experiences are necessarily less valuable than natural ones"
+      ]
+    },
+    "discussionPrompts": [
+      "What makes an experience authentic, and why might authenticity matter?",
+      "Should society provide artificial happiness to those suffering from depression or trauma?",
+      "How do we balance individual freedom to enhance happiness with concerns about human nature?",
+      "What role should struggle and difficulty play in a good human life?"
+    ],
+    "extensionActivities": [
+      "Research psychological studies on happiness, well-being, and human flourishing",
+      "Interview mental health professionals about the role of struggle in psychological growth",
+      "Analyze current happiness and well-being enhancement technologies and their effects",
+      "Design thought experiments about different aspects of authentic versus artificial experience"
+    ],
+    "vocabulary": [
+      {
+        "term": "Authentic Experience",
+        "definition": "Experiences that are genuine, unmediated, and true to one's actual circumstances"
+      },
+      {
+        "term": "Hedonic Adaptation",
+        "definition": "The tendency for people to return to baseline happiness levels despite positive or negative events"
+      },
+      {
+        "term": "Eudaimonia",
+        "definition": "Aristotelian concept of flourishing or living well, often contrasted with mere pleasure"
+      },
+      {
+        "term": "Post-traumatic Growth",
+        "definition": "Positive psychological change that can result from struggling with adversity"
+      },
+      {
+        "term": "Artificial Happiness",
+        "definition": "Well-being or satisfaction produced through technological intervention rather than natural experience"
+      }
+    ],
+    "crossCurricular": {
+      "psychology": "Understanding theories of well-being, happiness, and human motivation",
+      "philosophy": "Exploring concepts of meaning, authenticity, and the good life",
+      "neuroscience": "Learning about the biological basis of happiness and how it might be technologically enhanced",
+      "sociology": "Examining social factors that contribute to well-being and meaning",
+      "publicPolicy": "Analyzing policy approaches to mental health and societal well-being"
+    }
+  },
+
+  "reflectionQuestions": [
+    "How do you personally define a meaningful life, and how has this lab influenced that definition?",
+    "What role do challenges and difficulties play in your own growth and development?",
+    "How do you balance the desire for happiness with other values and goals in your life?",
+    "What concerns, if any, do you have about AI technologies that could enhance human happiness?",
+    "How might widespread access to artificial happiness change human society and culture?"
+  ]
+}

@@ -1,0 +1,217 @@
+{
+  "id": "simulation-hypothesis-lab",
+  "title": "Ethics of Simulated Realities",
+  "subtitle": "Exploring Moral Obligations in Virtual Worlds and Digital Beings",
+  "categoryId": "simulation-hypothesis",
+  "difficulty": "advanced",
+  "estimatedTime": 60,
+  "description": "Confront the ethical implications of creating and inhabiting simulated realities, exploring questions of consent, authenticity, and responsibility toward conscious digital beings in increasingly convincing virtual worlds.",
+
+  "learningObjectives": [
+    "Understand the ethical implications of creating conscious beings within simulated environments",
+    "Analyze questions of consent, agency, and authenticity in virtual realities",
+    "Evaluate the moral status and rights of simulated beings",
+    "Examine the responsibilities and obligations of simulation creators",
+    "Design ethical frameworks for virtual world development and management"
+  ],
+
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Understanding Simulated Realities",
+      "description": "Explore the nature and implications of increasingly sophisticated virtual worlds",
+      "activities": [
+        {
+          "type": "conceptual-exploration",
+          "title": "Simulation Theory Deep Dive",
+          "description": "Examine the simulation hypothesis and its philosophical implications",
+          "timeEstimate": 12,
+          "resources": [
+            {
+              "type": "interactive-simulation",
+              "title": "Nested Reality Explorer",
+              "description": "Interactive tool for exploring different levels of simulated reality"
+            }
+          ]
+        },
+        {
+          "type": "case-study",
+          "title": "Current Virtual World Analysis",
+          "description": "Analyze existing virtual worlds and their ethical dimensions",
+          "timeEstimate": 10,
+          "deliverable": "Virtual world ethics assessment with current technology analysis"
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "title": "Consent and Agency in Virtual Worlds",
+      "description": "Explore consent challenges when reality itself becomes questionable",
+      "activities": [
+        {
+          "type": "simulation-analysis",
+          "title": "Consent in Simulated Environments",
+          "description": "Analyze consent challenges across different simulation scenarios",
+          "timeEstimate": 15,
+          "resources": [
+            {
+              "type": "scenario-set",
+              "scenarios": ["simulated-suffering", "vr-prison", "digital-afterlife"]
+            }
+          ],
+          "deliverable": "Consent framework for simulated environments with implementation guidelines"
+        },
+        {
+          "type": "ethical-design",
+          "title": "Agency-Preserving Virtual Worlds",
+          "description": "Design virtual environments that preserve meaningful choice and agency",
+          "timeEstimate": 12,
+          "deliverable": "Virtual world design with agency preservation mechanisms"
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "title": "Rights and Status of Digital Beings",
+      "description": "Consider the moral status and rights of beings that exist only in simulation",
+      "activities": [
+        {
+          "type": "philosophical-debate",
+          "title": "Digital Being Rights Symposium",
+          "description": "Structured debate on the moral status and rights of simulated conscious beings",
+          "timeEstimate": 15,
+          "deliverable": "Rights charter for digital beings with implementation framework"
+        },
+        {
+          "type": "policy-development",
+          "title": "Virtual World Governance",
+          "description": "Develop governance frameworks for virtual worlds with conscious inhabitants",
+          "timeEstimate": 10,
+          "deliverable": "Comprehensive virtual world governance policy"
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "title": "Creator Responsibilities and Future Implications",
+      "description": "Examine obligations and design principles for ethical simulation creation",
+      "activities": [
+        {
+          "type": "responsibility-framework",
+          "title": "Simulation Creator Ethics",
+          "description": "Develop ethical frameworks for those who create simulated realities",
+          "timeEstimate": 10,
+          "deliverable": "Creator responsibility framework with ethical guidelines"
+        },
+        {
+          "type": "future-scenario-planning",
+          "title": "Simulation Technology Roadmap",
+          "description": "Plan for ethical challenges as simulation technology advances",
+          "timeEstimate": 8,
+          "deliverable": "Ethical roadmap for advancing simulation technology"
+        },
+        {
+          "type": "reflection",
+          "title": "Personal Simulation Ethics",
+          "description": "Develop personal frameworks for engaging with and creating virtual realities",
+          "timeEstimate": 5,
+          "deliverable": "Personal ethics statement for virtual world engagement"
+        }
+      ]
+    }
+  ],
+
+  "assessmentRubric": {
+    "Conceptual Understanding": {
+      "exemplary": "Demonstrates sophisticated understanding of simulation theory, consciousness, and virtual reality concepts",
+      "proficient": "Shows solid grasp of simulation concepts and their ethical implications",
+      "developing": "Basic understanding of virtual worlds with limited conceptual depth",
+      "novice": "Minimal comprehension of simulation theory and virtual reality ethics"
+    },
+    "Ethical Reasoning": {
+      "exemplary": "Provides nuanced ethical analysis that considers multiple philosophical perspectives and practical implications",
+      "proficient": "Good ethical reasoning with consideration of key stakeholder perspectives",
+      "developing": "Basic ethical analysis with limited consideration of complexity",
+      "novice": "Struggles to identify or analyze ethical dimensions of simulated realities"
+    },
+    "Design Thinking": {
+      "exemplary": "Creates innovative and practical solutions that effectively address virtual world ethical challenges",
+      "proficient": "Develops good design solutions with clear ethical considerations",
+      "developing": "Basic design thinking with limited integration of ethical principles",
+      "novice": "Struggles to design ethical frameworks for virtual environments"
+    },
+    "Future-Oriented Analysis": {
+      "exemplary": "Demonstrates sophisticated anticipation of emerging challenges with adaptive frameworks",
+      "proficient": "Good consideration of future implications and evolving technology impacts",
+      "developing": "Basic awareness of future challenges with limited strategic thinking",
+      "novice": "Minimal consideration of how simulation ethics might evolve"
+    }
+  },
+
+  "educatorResources": {
+    "preparationGuide": {
+      "overview": "This lab explores some of the most profound questions raised by advancing virtual reality and simulation technology: What obligations do we have toward conscious beings we create in virtual worlds? How do we maintain human agency and authenticity in increasingly convincing simulations?",
+      "keyFocusAreas": [
+        "Philosophical implications of the simulation hypothesis and nested realities",
+        "Consent and agency challenges in virtual environments",
+        "Moral status and rights of digital beings",
+        "Creator responsibilities and ethical obligations in virtual world development"
+      ],
+      "commonMisconceptions": [
+        "Virtual experiences are inherently less valuable or meaningful than 'real' ones",
+        "Digital beings cannot have genuine experiences or suffer",
+        "Virtual worlds are just entertainment and don't raise serious ethical issues",
+        "Consent given in the real world is sufficient for all virtual world activities"
+      ]
+    },
+    "discussionPrompts": [
+      "How do we determine the moral worth of experiences that occur in virtual environments?",
+      "What are our obligations toward digital beings that might be conscious?",
+      "How should consent work when the nature of reality itself is in question?",
+      "What are the implications of living in a world where most meaningful experiences are virtual?"
+    ],
+    "extensionActivities": [
+      "Research current virtual reality technology and its ethical implications",
+      "Design virtual world policies for a major technology company",
+      "Interview virtual world users about their experiences and ethical concerns",
+      "Explore science fiction portrayals of virtual reality and their ethical themes"
+    ],
+    "vocabulary": [
+      {
+        "term": "Simulation Hypothesis",
+        "definition": "The proposal that our reality might itself be an artificial simulation"
+      },
+      {
+        "term": "Virtual Consciousness",
+        "definition": "The possibility that conscious beings could exist within simulated environments"
+      },
+      {
+        "term": "Digital Suffering",
+        "definition": "Negative experiences that digital or simulated beings might undergo"
+      },
+      {
+        "term": "Reality Stratification",
+        "definition": "The hierarchy of different levels of reality from base reality to nested simulations"
+      },
+      {
+        "term": "Authentic Experience",
+        "definition": "The question of whether virtual experiences can be as meaningful as non-virtual ones"
+      }
+    ],
+    "crossCurricular": {
+      "philosophy": "Exploring metaphysics, philosophy of mind, and questions about the nature of reality",
+      "computer-science": "Understanding virtual reality technology and simulation computing",
+      "psychology": "Learning about human perception, experience, and the psychology of virtual environments",
+      "media-studies": "Analyzing virtual worlds as media and their cultural significance",
+      "ethics": "Applying ethical frameworks to emerging technologies and virtual experiences"
+    }
+  },
+
+  "reflectionQuestions": [
+    "How has this lab changed your perspective on the nature of reality and authentic experience?",
+    "What responsibilities do you think we have toward beings that might exist only in simulation?",
+    "How do you evaluate the moral worth of virtual versus non-virtual experiences?",
+    "What safeguards should exist for virtual worlds that might contain conscious beings?",
+    "How might widespread adoption of virtual reality change human society and values?"
+  ]
+}

@@ -1,0 +1,210 @@
+{
+  "id": "responsibility-blame-lab",
+  "title": "Navigating Responsibility in AI Systems",
+  "subtitle": "Understanding Accountability Chains in Complex Technological Systems",
+  "categoryId": "responsibility-blame",
+  "difficulty": "intermediate",
+  "estimatedTime": 45,
+  "description": "Explore the complex web of accountability when AI systems cause harm, learning to analyze and design responsibility frameworks for multi-layered technological systems.",
+
+  "learningObjectives": [
+    "Understand different models of responsibility and accountability in technological systems",
+    "Analyze how responsibility should be distributed across AI development and deployment chains",
+    "Evaluate legal and ethical frameworks for accountability in automated systems",
+    "Design responsibility attribution systems that promote safety and innovation",
+    "Develop strategies for managing cascading effects and unforeseeable consequences"
+  ],
+
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Foundations of Technological Responsibility",
+      "description": "Understand different models and theories of responsibility in complex systems",
+      "activities": [
+        {
+          "type": "conceptual-framework",
+          "title": "Responsibility Models Workshop",
+          "description": "Explore different philosophical and legal approaches to responsibility",
+          "timeEstimate": 10,
+          "resources": [
+            {
+              "type": "interactive-diagram",
+              "title": "Responsibility Attribution Model",
+              "description": "Interactive tool for exploring different responsibility frameworks"
+            }
+          ]
+        },
+        {
+          "type": "case-study",
+          "title": "Historical Technology Failures",
+          "description": "Examine how responsibility was handled in major technological accidents",
+          "timeEstimate": 8,
+          "deliverable": "Comparative analysis of responsibility attribution in historical cases"
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "title": "AI System Responsibility Chains",
+      "description": "Map and analyze responsibility across AI development and deployment",
+      "activities": [
+        {
+          "type": "systems-mapping",
+          "title": "AI Responsibility Chain Analysis",
+          "description": "Map responsibility across the AI lifecycle from research to deployment",
+          "timeEstimate": 12,
+          "deliverable": "Comprehensive responsibility chain diagram with accountability points"
+        },
+        {
+          "type": "simulation-analysis",
+          "title": "Multi-Party Liability Scenarios",
+          "description": "Analyze complex scenarios involving multiple responsible parties",
+          "timeEstimate": 10,
+          "resources": [
+            {
+              "type": "scenario-set",
+              "scenarios": ["robot-factory-injury", "deepfake-riot", "ai-medical-misdiagnosis"]
+            }
+          ],
+          "deliverable": "Responsibility attribution analysis with justification framework"
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "title": "Designing Accountability Systems",
+      "description": "Create frameworks and systems for effective responsibility management",
+      "activities": [
+        {
+          "type": "design-workshop",
+          "title": "Accountability by Design",
+          "description": "Design AI systems with built-in accountability mechanisms",
+          "timeEstimate": 10,
+          "deliverable": "AI system design with integrated accountability framework"
+        },
+        {
+          "type": "policy-development",
+          "title": "Organizational Responsibility Policies",
+          "description": "Develop organizational policies for managing AI system responsibility",
+          "timeEstimate": 8,
+          "deliverable": "Comprehensive organizational responsibility policy framework"
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "title": "Future Challenges and Solutions",
+      "description": "Address emerging challenges in AI responsibility and accountability",
+      "activities": [
+        {
+          "type": "scenario-planning",
+          "title": "Future Responsibility Challenges",
+          "description": "Explore emerging challenges in AI responsibility as technology evolves",
+          "timeEstimate": 8,
+          "deliverable": "Future challenge analysis with adaptive framework recommendations"
+        },
+        {
+          "type": "reflection",
+          "title": "Personal Responsibility in AI",
+          "description": "Develop personal frameworks for responsible AI engagement and advocacy",
+          "timeEstimate": 5,
+          "deliverable": "Personal responsibility charter for AI engagement"
+        }
+      ]
+    }
+  ],
+
+  "assessmentRubric": {
+    "Systems Analysis": {
+      "exemplary": "Demonstrates sophisticated understanding of complex responsibility chains with nuanced analysis",
+      "proficient": "Shows solid grasp of multi-party responsibility and system interactions",
+      "developing": "Basic understanding of responsibility distribution with limited systems thinking",
+      "novice": "Minimal comprehension of complex responsibility relationships"
+    },
+    "Legal and Ethical Reasoning": {
+      "exemplary": "Expertly integrates legal and ethical frameworks with practical considerations",
+      "proficient": "Good understanding of legal and ethical approaches to responsibility",
+      "developing": "Basic grasp of legal/ethical concepts with limited integration",
+      "novice": "Struggles to understand or apply legal and ethical responsibility frameworks"
+    },
+    "Framework Development": {
+      "exemplary": "Creates comprehensive and practical responsibility frameworks that address real-world complexity",
+      "proficient": "Develops good frameworks with clear criteria and implementation strategies",
+      "developing": "Basic framework development with limited consideration of edge cases",
+      "novice": "Struggles to create coherent responsibility attribution systems"
+    },
+    "Future-Oriented Thinking": {
+      "exemplary": "Demonstrates sophisticated anticipation of emerging challenges with adaptive solutions",
+      "proficient": "Good consideration of future implications and evolving technology impacts",
+      "developing": "Basic awareness of future challenges with limited strategic thinking",
+      "novice": "Minimal consideration of how responsibility frameworks must evolve"
+    }
+  },
+
+  "educatorResources": {
+    "preparationGuide": {
+      "overview": "This lab tackles one of the most complex challenges in AI ethics: how to fairly and effectively attribute responsibility when sophisticated technological systems cause harm, particularly when multiple parties contribute to outcomes.",
+      "keyFocusAreas": [
+        "Different philosophical and legal models of responsibility and accountability",
+        "Complexity of responsibility chains in AI development and deployment",
+        "Design principles for accountability-conscious AI systems",
+        "Emerging challenges as AI systems become more autonomous and complex"
+      ],
+      "commonMisconceptions": [
+        "Responsibility can always be clearly attributed to a single party",
+        "Legal liability and ethical responsibility are the same thing",
+        "AI systems can be fully responsible for their own actions",
+        "Technical complexity absolves human parties of responsibility"
+      ]
+    },
+    "discussionPrompts": [
+      "How should responsibility be distributed when AI systems make mistakes that no human could have predicted?",
+      "What role should intent play in determining responsibility for AI-caused harm?",
+      "How do we balance innovation incentives with accountability requirements?",
+      "What are the implications of holding AI systems themselves responsible for their actions?"
+    ],
+    "extensionActivities": [
+      "Research how different legal systems approach AI liability and responsibility",
+      "Interview legal professionals about emerging challenges in AI accountability",
+      "Design responsibility frameworks for specific AI applications or industries",
+      "Analyze recent legal cases involving AI system failures and responsibility attribution"
+    ],
+    "vocabulary": [
+      {
+        "term": "Moral Agency",
+        "definition": "The capacity to be held responsible for one's actions based on moral reasoning"
+      },
+      {
+        "term": "Causal Responsibility",
+        "definition": "Responsibility based on being a causal factor in bringing about an outcome"
+      },
+      {
+        "term": "Liability",
+        "definition": "Legal responsibility for damage or harm, often involving financial compensation"
+      },
+      {
+        "term": "Collective Responsibility",
+        "definition": "Responsibility shared among multiple parties who contribute to an outcome"
+      },
+      {
+        "term": "Accountability Gap",
+        "definition": "Situations where it's unclear who should be held responsible for AI system actions"
+      }
+    ],
+    "crossCurricular": {
+      "law": "Understanding legal frameworks for liability, negligence, and responsibility",
+      "philosophy": "Exploring moral philosophy concepts of agency, responsibility, and accountability",
+      "engineering": "Learning about system design principles that support accountability",
+      "business": "Understanding organizational responsibility and risk management in AI deployment",
+      "publicPolicy": "Analyzing regulatory approaches to AI accountability and their effectiveness"
+    }
+  },
+
+  "reflectionQuestions": [
+    "How has this lab influenced your thinking about your own responsibility when using or developing AI systems?",
+    "What role should personal moral responsibility play alongside legal liability in AI systems?",
+    "How do you think responsibility frameworks should evolve as AI systems become more autonomous?",
+    "What are the implications of responsibility distribution for innovation and risk-taking in AI development?",
+    "How can society balance the need for accountability with the complexity of modern technological systems?"
+  ]
+}
