@@ -1,5 +1,13 @@
 /**
- * Firebase Messaging Service Worker
+ * Firebase Messaging Seconst firebaseConfig = {
+  apiKey: process.env.VITE_FIREBASE_API_KEY,
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.VITE_FIREBASE_APP_ID,
+  measurementId: process.env.VITE_FIREBASE_MEASUREMENT_ID
+};ker
  * Handles background push notifications for SimulateAI
  *
  * IMPORTANT: This file MUST be served from the root of your domain
@@ -27,14 +35,16 @@ importScripts(
 // Initialize the Firebase app in the service worker by passing in
 // your app's Firebase configuration.
 // Your web app's Firebase configuration (same as in your main app)
+// Note: Service workers can't access import.meta.env directly
+// This config will be injected during build process
 const firebaseConfig = {
-  apiKey: 'AIzaSyAwoc3L-43aXyNjNB9ncGbFm7eE-yn5bFA',
-  authDomain: 'simulateai-research.firebaseapp.com',
-  projectId: 'simulateai-research',
-  storageBucket: 'simulateai-research.firebasestorage.app',
-  messagingSenderId: '52924445915', // IMPORTANT
-  appId: '1:52924445915:web:dadca1a93bc382403a08fe',
-  measurementId: 'G-XW8H062BMV',
+  apiKey: 'FIREBASE_API_KEY_PLACEHOLDER',
+  authDomain: 'FIREBASE_AUTH_DOMAIN_PLACEHOLDER',
+  projectId: 'FIREBASE_PROJECT_ID_PLACEHOLDER',
+  storageBucket: 'FIREBASE_STORAGE_BUCKET_PLACEHOLDER',
+  messagingSenderId: 'FIREBASE_MESSAGING_SENDER_ID_PLACEHOLDER', // IMPORTANT
+  appId: 'FIREBASE_APP_ID_PLACEHOLDER',
+  measurementId: 'FIREBASE_MEASUREMENT_ID_PLACEHOLDER',
 };
 
 firebase.initializeApp(firebaseConfig);

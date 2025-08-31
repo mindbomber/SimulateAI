@@ -148,7 +148,7 @@ class ModalUtility {
     }, 100);
 
     // Add body class to prevent scrolling
-    scrollLockManager.lock('modal-utility');
+    scrollLockManager.lock("modal-utility");
   }
 
   close() {
@@ -180,7 +180,7 @@ class ModalUtility {
     }, animationDuration);
 
     // Restore body scrolling
-    scrollLockManager.unlock('modal-utility');
+    scrollLockManager.unlock("modal-utility");
 
     // Call onClose callback if provided
     if (this.onClose && typeof this.onClose === "function") {

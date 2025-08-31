@@ -659,9 +659,9 @@ export class EnhancedModal {
 
   setBodyScrolling(enabled) {
     if (enabled) {
-      scrollLockManager.unlock('enhanced-modal');
+      scrollLockManager.unlock("enhanced-modal");
     } else {
-      scrollLockManager.lock('enhanced-modal');
+      scrollLockManager.lock("enhanced-modal");
     }
   }
 

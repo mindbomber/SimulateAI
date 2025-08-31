@@ -2,30 +2,30 @@
 // Clean configuration file - no corruption
 
 export const firebaseConfig = {
-  apiKey: 'AIzaSyB123example456789abcdef',
-  authDomain: 'simulateai-research.firebaseapp.com',
-  projectId: 'simulateai-research',
-  storageBucket: 'simulateai-research.appspot.com',
-  messagingSenderId: '123456789012',
-  appId: '1:123456789012:web:abcdef123456789',
-  measurementId: 'G-ABCDEF1234',
+  apiKey: "AIzaSyB123example456789abcdef",
+  authDomain: "simulateai-research.firebaseapp.com",
+  projectId: "simulateai-research",
+  storageBucket: "simulateai-research.appspot.com",
+  messagingSenderId: "123456789012",
+  appId: "1:123456789012:web:abcdef123456789",
+  measurementId: "G-ABCDEF1234",
 };
 
 // VAPID Key for Firebase Cloud Messaging Web Push
 export const VAPID_KEY =
-  'BAbcdef123456789abcdef123456789abcdef123456789abcdef123456789abcdef123456789abcdef123';
+  "BAbcdef123456789abcdef123456789abcdef123456789abcdef123456789abcdef123456789abcdef123";
 
 // reCAPTCHA v3 Configuration
 export const recaptchaConfig = {
-  siteKey: '6LfizIQrAAAAAETdjKY14uI3ckhF-JeUujcloH53',
-  action: 'submit',
+  siteKey: "6LfizIQrAAAAAETdjKY14uI3ckhF-JeUujcloH53",
+  action: "submit",
 };
 
 // Data Connect Configuration
 export const dataConnectConfig = {
-  connector: 'simulateai-connector',
-  location: 'us-central1',
-  service: 'simulateai-dataconnect',
+  connector: "simulateai-connector",
+  location: "us-central1",
+  service: "simulateai-dataconnect",
 };
 
 // Storage Configuration
@@ -35,20 +35,20 @@ const BYTES_PER_MB = BYTES_PER_KB * KB_PER_MB;
 const MAX_FILE_SIZE_MB = 100;
 
 export const storageConfig = {
-  bucket: 'simulateai-research.appspot.com',
+  bucket: "simulateai-research.appspot.com",
   maxFileSize: MAX_FILE_SIZE_MB * BYTES_PER_MB, // 100MB
   allowedTypes: [
-    'image/jpeg',
-    'image/png',
-    'image/gif',
-    'image/webp',
-    'application/pdf',
-    'text/plain',
-    'application/json',
-    'video/mp4',
-    'video/webm',
-    'audio/mpeg',
-    'audio/wav',
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+    "application/pdf",
+    "text/plain",
+    "application/json",
+    "video/mp4",
+    "video/webm",
+    "audio/mpeg",
+    "audio/wav",
   ],
 };
 
@@ -58,28 +58,27 @@ export const analyticsConfig = {
   enableDebugMode: false,
   enableAnalytics: true,
   customDimensions: {
-    userType: 'custom_dimension_1',
-    contentCategory: 'custom_dimension_2',
-    aiProcessingType: 'custom_dimension_3',
+    userType: "custom_dimension_1",
+    contentCategory: "custom_dimension_2",
+    aiProcessingType: "custom_dimension_3",
   },
 };
 
 // App Check Configuration
 export const appCheckConfig = {
-  provider: 'reCAPTCHA',
+  provider: "reCAPTCHA",
   isTokenAutoRefreshEnabled: true,
+  debugToken:
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+      ? "debug-token-here"
+      : null,
 };
-
-// Note:
-// For local development only, you can enable App Check debug mode without
-// committing secrets by setting in the browser console before app init:
-//   window.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
-// Or set a specific token via environment, but never commit it to source control.
 
 // Cloud Messaging Configuration (for notifications)
 export const messagingConfig = {
   vapidKey:
-    'BKx1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890',
+    "BKx1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
 };
 
 // Performance Monitoring Configuration
@@ -101,8 +100,8 @@ export const securityConfig = {
 // Development Configuration
 export const devConfig = {
   enableDebugLogging:
-    window.location.hostname === 'localhost' ||
-    window.location.hostname === '127.0.0.1',
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1",
   useEmulators: false, // Set to true for local development with emulators
   emulatorPorts: {
     auth: 9099,

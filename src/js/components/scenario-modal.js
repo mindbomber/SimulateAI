@@ -822,7 +822,7 @@ class ScenarioModal {
       this.radarChart = null;
 
       // Restore body scrolling
-      scrollLockManager.unlock('scenario-modal');
+      scrollLockManager.unlock("scenario-modal");
 
       // Remove event listeners
       if (this.escapeHandler) {
@@ -1818,7 +1818,9 @@ class ScenarioModal {
         // CRITICAL: Emergency scroll restoration for test scenarios too
         setTimeout(() => {
           scrollLockManager.forceUnlock();
-          logger.info("🔓 Emergency scroll restoration completed after test scenario modal close");
+          logger.info(
+            "🔓 Emergency scroll restoration completed after test scenario modal close",
+          );
         }, 100);
 
         // Dispatch test scenario modal closed event
@@ -1891,7 +1893,9 @@ class ScenarioModal {
       // This ensures scroll functionality is always restored even if modal cleanup fails
       setTimeout(() => {
         scrollLockManager.forceUnlock();
-        logger.info("🔓 Emergency scroll restoration completed after scenario modal close");
+        logger.info(
+          "🔓 Emergency scroll restoration completed after scenario modal close",
+        );
       }, 100);
 
       // Dispatch event after modal is fully closed (for badge display)
@@ -1925,7 +1929,7 @@ class ScenarioModal {
     this.previousFocusedElement = document.activeElement;
 
     // Prevent body scrolling
-    scrollLockManager.lock('scenario-modal');
+    scrollLockManager.lock("scenario-modal");
 
     // Add show class for animation and wait for it to complete
     await new Promise((resolve) => {
@@ -2015,7 +2019,7 @@ class ScenarioModal {
     }
 
     // Restore body scrolling
-    scrollLockManager.unlock('scenario-modal');
+    scrollLockManager.unlock("scenario-modal");
 
     // Remove event listeners
     if (this.escapeHandler) {

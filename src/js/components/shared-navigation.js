@@ -1668,7 +1668,7 @@ class SharedNavigation {
     }
 
     // Prevent body scroll
-    scrollLockManager.lock('mobile-nav');
+    scrollLockManager.lock("mobile-nav");
   }
 
   /**
@@ -1695,7 +1695,7 @@ class SharedNavigation {
     }
 
     // Restore body scroll
-    scrollLockManager.unlock('mobile-nav');
+    scrollLockManager.unlock("mobile-nav");
   }
 
   /**
