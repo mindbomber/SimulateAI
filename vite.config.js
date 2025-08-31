@@ -16,6 +16,7 @@
 
 import { defineConfig } from "vite";
 import fs from "fs";
+import { injectFirebaseConfigPlugin } from "./vite-plugins/firebase-config-injection.js";
 
 export default defineConfig(({ mode }) => {
   // For custom domain (simulateai.io), always use root path
@@ -25,6 +26,10 @@ export default defineConfig(({ mode }) => {
   return {
     root: ".",
     base, // Use "/" for dev, "/SimulateAI/" for production
+    plugins: [
+      // Inject Firebase config into service worker
+      injectFirebaseConfigPlugin(),
+    ],
     build: {
       outDir: "dist",
       assetsDir: "assets",

@@ -26,10 +26,10 @@
 // Make sure to use the latest version of the Firebase SDK
 // by checking the Firebase documentation.
 importScripts(
-  'https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js'
+  "https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js",
 );
 importScripts(
-  'https://www.gstatic.com/firebasejs/10.11.0/firebase-messaging-compat.js'
+  "https://www.gstatic.com/firebasejs/10.11.0/firebase-messaging-compat.js",
 );
 
 // Initialize the Firebase app in the service worker by passing in
@@ -38,13 +38,13 @@ importScripts(
 // Note: Service workers can't access import.meta.env directly
 // This config will be injected during build process
 const firebaseConfig = {
-  apiKey: 'FIREBASE_API_KEY_PLACEHOLDER',
-  authDomain: 'FIREBASE_AUTH_DOMAIN_PLACEHOLDER',
-  projectId: 'FIREBASE_PROJECT_ID_PLACEHOLDER',
-  storageBucket: 'FIREBASE_STORAGE_BUCKET_PLACEHOLDER',
-  messagingSenderId: 'FIREBASE_MESSAGING_SENDER_ID_PLACEHOLDER', // IMPORTANT
-  appId: 'FIREBASE_APP_ID_PLACEHOLDER',
-  measurementId: 'FIREBASE_MEASUREMENT_ID_PLACEHOLDER',
+  apiKey: "FIREBASE_API_KEY_PLACEHOLDER",
+  authDomain: "FIREBASE_AUTH_DOMAIN_PLACEHOLDER",
+  projectId: "FIREBASE_PROJECT_ID_PLACEHOLDER",
+  storageBucket: "FIREBASE_STORAGE_BUCKET_PLACEHOLDER",
+  messagingSenderId: "FIREBASE_MESSAGING_SENDER_ID_PLACEHOLDER", // IMPORTANT
+  appId: "FIREBASE_APP_ID_PLACEHOLDER",
+  measurementId: "FIREBASE_MEASUREMENT_ID_PLACEHOLDER",
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -53,44 +53,44 @@ firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
 // Handle background messages
-messaging.onBackgroundMessage(payload => {
+messaging.onBackgroundMessage((payload) => {
   console.log(
-    '[firebase-messaging-sw.js] Received background message ',
-    payload
+    "[firebase-messaging-sw.js] Received background message ",
+    payload,
   );
   // Customize notification here
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,
-    icon: '/src/assets/icons/logo.svg', // SimulateAI logo
+    icon: "/src/assets/icons/logo.svg", // SimulateAI logo
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
 // Handle notification click events
-self.addEventListener('notificationclick', event => {
-  console.log('Notification clicked:', event);
+self.addEventListener("notificationclick", (event) => {
+  console.log("Notification clicked:", event);
 
   const { action, notification } = event;
   const { data } = notification;
 
   event.notification.close();
 
-  if (action === 'dismiss') {
+  if (action === "dismiss") {
     // Just close the notification
     return;
   }
 
   // Default action or 'view' action
-  const urlToOpen = data.url || '/';
+  const urlToOpen = data.url || "/";
 
   // Open the URL in existing tab or new tab
   event.waitUntil(
-    clients.matchAll({ type: 'window' }).then(clientList => {
+    clients.matchAll({ type: "window" }).then((clientList) => {
       // Check if there's already a tab open with this URL
       for (const client of clientList) {
-        if (client.url === urlToOpen && 'focus' in client) {
+        if (client.url === urlToOpen && "focus" in client) {
           return client.focus();
         }
       }
@@ -101,13 +101,13 @@ self.addEventListener('notificationclick', event => {
       }
 
       return null;
-    })
+    }),
   );
 
   // Send analytics event
   if (data.type) {
     self.postMessage({
-      type: 'notification-clicked',
+      type: "notification-clicked",
       notificationType: data.type,
       threadId: data.threadId,
       messageId: data.messageId,
@@ -116,8 +116,8 @@ self.addEventListener('notificationclick', event => {
 });
 
 // Handle notification close events
-self.addEventListener('notificationclose', event => {
-  console.log('Notification closed:', event);
+self.addEventListener("notificationclose", (event) => {
+  console.log("Notification closed:", event);
 
   const { notification } = event;
   const { data } = notification;
@@ -125,7 +125,7 @@ self.addEventListener('notificationclose', event => {
   // Send analytics event
   if (data.type) {
     self.postMessage({
-      type: 'notification-dismissed',
+      type: "notification-dismissed",
       notificationType: data.type,
       threadId: data.threadId,
       messageId: data.messageId,
@@ -134,20 +134,20 @@ self.addEventListener('notificationclose', event => {
 });
 
 // Handle messages from main thread
-self.addEventListener('message', event => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
     self.skipWaiting();
   }
 });
 
 // Install event
-self.addEventListener('install', _event => {
-  console.log('Service worker installing...');
+self.addEventListener("install", (_event) => {
+  console.log("Service worker installing...");
   self.skipWaiting();
 });
 
 // Activate event
-self.addEventListener('activate', event => {
-  console.log('Service worker activating...');
+self.addEventListener("activate", (event) => {
+  console.log("Service worker activating...");
   event.waitUntil(clients.claim());
 });
